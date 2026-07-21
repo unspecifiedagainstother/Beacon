@@ -156,15 +156,36 @@ export default {
       }
     });
 
-    // When conversation is selected, mark all deleted messages in that conversation
+    // When conversation is selected, restore isDeleted flags for deleted messages
     ctx.hooks.on('onConversationSelected', conversationId => {
       if (conversationId) {
-        ctx.log('conversation selected, re-checking deleted messages:', conversationId);
+        ctx.log('conversation selected, restoring deleted flags:', conversationId);
+        const state = ctx.redux.getState();
+        const conversation = state.conversations.messagesByConversation[conversationId];
+
+        if (conversation) {
+          // Restore isDeleted flag for all messages in this conversation that were deleted
+          for (const msgId of conversation.messageIds) {
+            if (deletedIds.has(msgId)) {
+              const msg = state.conversations.messagesLookup[msgId];
+              if (msg && !(msg as any).isDeleted) {
+                ctx.log('restoring deleted flag:', msgId);
+                const markedDeleted = { ...msg, isDeleted: true };
+                ctx.redux.dispatch({
+                  type: 'MESSAGE_CHANGED',
+                  payload: { id: msgId, conversationId, data: markedDeleted },
+                } as any);
+              }
+            }
+          }
+        }
+
+        // Mark DOM elements after a delay
         setTimeout(() => {
           for (const msgId of deletedIds) {
             markDeletedElement(msgId);
           }
-        }, 100);
+        }, 50);
       }
     });
 
@@ -199,27 +220,19 @@ export default {
 
     ctx.css.inject(`
       .beacon-deleted-message {
-        opacity: 0.5 !important;
+        opacity: 0.45 !important;
         position: relative;
       }
-      /* Trash icon on message container */
+      /* Big trash icon on message container */
       .beacon-deleted-message::before {
         content: '🗑';
         position: absolute;
-        left: 4px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 16px;
-        z-index: 10;
-        opacity: 0.8;
-      }
-      /* Alternative: on module-message */
-      .beacon-deleted-message .module-message::after {
-        content: '🗑';
-        display: inline;
-        margin-left: 4px;
-        font-size: 14px;
-        opacity: 0.8;
+        left: 2px;
+        top: 8px;
+        font-size: 20px;
+        z-index: 100;
+        opacity: 1 !important;
+        filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));
       }
       .beacon-deleted-placeholder {
         margin: 4px 0;
