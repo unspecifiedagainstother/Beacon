@@ -16,6 +16,9 @@ import { attachHookBus } from './middleware.preload.ts';
 import { addonLoader, type AddonLoader } from './loader.preload.ts';
 import { commandRegistry, type CommandRegistry } from './commands.dom.ts';
 import { createPatcher } from './patcher.std.ts';
+import { createLogger } from '../../logging/log.std.ts';
+
+const log = createLogger('beacon/runtime');
 
 export type BeaconGlobal = {
   hooks: HookBus;
@@ -37,27 +40,43 @@ export const hookBus = new HookBus();
 let initialized = false;
 
 export function initializeBeaconRuntime(store: Store<StateType>): void {
-  if (initialized) {
-    return;
+  try {
+    log.info('initializeBeaconRuntime starting');
+    if (initialized) {
+      log.warn('already initialized, returning');
+      return;
+    }
+    initialized = true;
+
+    log.info('attaching hook bus');
+    attachHookBus(hookBus);
+    log.info('registering builtin commands');
+    registerBuiltinCommands();
+
+    log.info('setting window.Beacon');
+    window.Beacon = {
+      hooks: hookBus,
+      loader: addonLoader,
+      commands: commandRegistry,
+      /** Fresh patcher for console experiments; addons get their own. */
+      createPatcher,
+      store,
+    };
+    log.info('window.Beacon set successfully');
+
+    void (async () => {
+      try {
+        log.info('initializing addon loader');
+        await addonLoader.initialize(store, hookBus);
+        log.info('addon loader initialized, emitting onAppStart');
+        hookBus.emit('onAppStart');
+      } catch (error) {
+        log.error('addon loader initialization error:', error);
+      }
+    })();
+  } catch (error) {
+    log.error('initializeBeaconRuntime error:', error);
   }
-  initialized = true;
-
-  attachHookBus(hookBus);
-  registerBuiltinCommands();
-
-  window.Beacon = {
-    hooks: hookBus,
-    loader: addonLoader,
-    commands: commandRegistry,
-    /** Fresh patcher for console experiments; addons get their own. */
-    createPatcher,
-    store,
-  };
-
-  void (async () => {
-    await addonLoader.initialize(store, hookBus);
-    hookBus.emit('onAppStart');
-  })();
 }
 
 function registerBuiltinCommands(): void {
