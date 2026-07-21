@@ -59,6 +59,13 @@ export default {
       document.querySelectorAll(`[data-testid*="${info.id}"]`).forEach(el => {
         el.setAttribute('data-beacon-deleted', 'true');
       });
+      append({
+        direction: 'received',
+        id: info.id,
+        conversationId: info.conversationId,
+        timestamp: Date.now(),
+        body: '[deleted]',
+      });
     });
 
     const observer = new MutationObserver(() => {
