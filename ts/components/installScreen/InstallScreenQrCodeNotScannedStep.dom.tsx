@@ -22,7 +22,6 @@ import { I18n } from '../I18n.dom.tsx';
 import { Spinner } from '../Spinner.dom.tsx';
 import { BrandedQRCode } from '../BrandedQRCode.dom.tsx';
 import { TitlebarDragArea } from '../TitlebarDragArea.dom.tsx';
-import { InstallScreenSignalLogo } from './InstallScreenSignalLogo.dom.tsx';
 import { InstallScreenUpdateDialog } from './InstallScreenUpdateDialog.dom.tsx';
 import { getClassNamesFor } from '../../util/getClassNamesFor.std.ts';
 import type { UpdatesStateType } from '../../state/ducks/updates.preload.ts';
@@ -75,7 +74,7 @@ export function InstallScreenQrCodeNotScannedStep({
     <div className="module-InstallScreenQrCodeNotScannedStep">
       <TitlebarDragArea />
 
-      <InstallScreenSignalLogo />
+      {/* <InstallScreenSignalLogo /> */}
 
       {(hasExpired || updates.dialogType === DialogType.Downloading) && (
         <InstallScreenUpdateDialog

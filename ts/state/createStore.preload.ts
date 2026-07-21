@@ -12,6 +12,7 @@ import { createLogger } from '../logging/log.std.ts';
 import type { StateType } from './reducer.preload.ts';
 import { reducer } from './reducer.preload.ts';
 import { dispatchItemsMiddleware } from '../shims/dispatchItemsMiddleware.preload.ts';
+import { beaconMiddleware } from '../beacon/core/middleware.preload.ts';
 import { isOlderThan } from '../util/timestamp.std.ts';
 import { SECOND } from '../util/durations/index.std.ts';
 import { getEnvironment } from '../environment.std.ts';
@@ -81,6 +82,7 @@ const actionRateLogger: Middleware = () => next => _action => {
 const middlewareList = [
   promise,
   thunk,
+  beaconMiddleware,
   dispatchItemsMiddleware,
   actionRateLogger,
   ...(env === 'production' || !REDUX_LOGGER_ENABLED ? [] : [logger]),

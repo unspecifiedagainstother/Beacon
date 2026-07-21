@@ -13,7 +13,6 @@ import {
 import { formatFileSize } from '../../util/formatFileSize.std.ts';
 import { TitlebarDragArea } from '../TitlebarDragArea.dom.tsx';
 import { ProgressBar } from '../ProgressBar.dom.tsx';
-import { InstallScreenSignalLogo } from './InstallScreenSignalLogo.dom.tsx';
 import { roundFractionForProgressBar } from '../../util/numbers.std.ts';
 import { missingCaseError } from '../../util/missingCaseError.std.ts';
 import { SYNCING_MESSAGES_SECURITY_URL } from '../../types/support.std.ts';
@@ -164,7 +163,7 @@ export function InstallScreenBackupImportStep(props: PropsType): JSX.Element {
   return (
     <div className="InstallScreenBackupImportStep">
       <TitlebarDragArea />
-      <InstallScreenSignalLogo />
+      {/* <InstallScreenSignalLogo /> */}
       <div className="InstallScreenBackupImportStep__content">
         <h3 className="InstallScreenBackupImportStep__title">
           {i18n('icu:BackupImportScreen__title')}

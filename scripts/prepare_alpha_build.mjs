@@ -22,31 +22,31 @@ console.log('prepare_alpha_build: updating package.json');
 // -------
 
 const NAME_PATH = 'name';
-const PRODUCTION_NAME = 'signal-desktop';
-const ALPHA_NAME = 'signal-desktop-alpha';
+const PRODUCTION_NAME = 'beacon-desktop';
+const ALPHA_NAME = 'beacon-desktop-alpha';
 
 const PRODUCT_NAME_PATH = 'productName';
-const PRODUCTION_PRODUCT_NAME = 'Signal';
-const ALPHA_PRODUCT_NAME = 'Signal Alpha';
+const PRODUCTION_PRODUCT_NAME = 'Beacon';
+const ALPHA_PRODUCT_NAME = 'Beacon Alpha';
 
 const APP_ID_PATH = 'build.appId';
-const PRODUCTION_APP_ID = 'org.whispersystems.signal-desktop';
-const ALPHA_APP_ID = 'org.whispersystems.signal-desktop-alpha';
+const PRODUCTION_APP_ID = 'im.beacon.desktop';
+const ALPHA_APP_ID = 'im.beacon.desktop-alpha';
 
 const STARTUP_WM_CLASS_PATH = 'build.linux.desktop.entry.StartupWMClass';
-const PRODUCTION_WM_CLASS = 'signal';
-const ALPHA_WM_CLASS = 'signal alpha';
+const PRODUCTION_WM_CLASS = 'beacon';
+const ALPHA_WM_CLASS = 'beacon alpha';
 
 const DESKTOP_NAME_PATH = 'desktopName';
 
 // Note: we're avoiding dashes in our .desktop name due to xdg-settings behavior
 //   https://github.com/signalapp/Signal-Desktop/issues/3602
-const PRODUCTION_DESKTOP_NAME = 'signal.desktop';
-const ALPHA_DESKTOP_NAME = 'signal alpha.desktop';
+const PRODUCTION_DESKTOP_NAME = 'beacon.desktop';
+const ALPHA_DESKTOP_NAME = 'beacon alpha.desktop';
 
 const EXECUTABLE_NAME_PATH = 'build.linux.executableName';
-const PRODUCTION_EXECUTABLE_NAME = 'signal-desktop';
-const ALPHA_EXECUTABLE_NAME = 'signal-desktop-alpha';
+const PRODUCTION_EXECUTABLE_NAME = 'beacon-desktop';
+const ALPHA_EXECUTABLE_NAME = 'beacon-desktop-alpha';
 
 // -------
 

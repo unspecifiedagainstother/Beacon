@@ -651,6 +651,29 @@ const mainTitleBarStyle = OS.isMacOS()
   ? ('hidden' as const)
   : ('default' as const);
 
+// Beacon: when enabled we drop the OS frame entirely and draw our own titlebar
+// in the renderer, so it can match the app theme.
+//
+// Read from ephemeralConfig rather than the DB because `frame` is a
+// BrowserWindow construction option — it cannot be changed on a live window, so
+// the value must be known before any window exists, and toggling it needs a
+// restart.
+//
+// macOS is excluded: `titleBarStyle: 'hidden'` there already gives a themed
+// titlebar while keeping the native traffic-light controls. Using `frame: false`
+// would mean reimplementing those, badly.
+// The value the *current* window was created with. Differs from the stored
+// setting after the user toggles it but before restarting — that difference is
+// what drives the "requires restart" warning in Settings.
+let beaconAppliedCustomTitlebar: boolean | undefined;
+
+function getBeaconCustomTitlebar(): boolean {
+  if (OS.isMacOS()) {
+    return false;
+  }
+  return ephemeralConfig.get('beacon-custom-titlebar') === true;
+}
+
 const nonMainTitleBarStyle = 'default' as const;
 
 async function safeLoadURL(window: BrowserWindow, url: string): Promise<void> {
@@ -719,6 +742,11 @@ async function createWindow() {
     minHeight: MIN_HEIGHT,
     autoHideMenuBar: false,
     titleBarStyle: mainTitleBarStyle,
+    // Beacon: frameless when the custom titlebar is on (non-macOS only).
+    ...((): { frame?: false } => {
+      beaconAppliedCustomTitlebar = getBeaconCustomTitlebar();
+      return beaconAppliedCustomTitlebar ? { frame: false } : {};
+    })(),
     backgroundColor,
     webPreferences: {
       ...defaultWebPrefs,
@@ -853,6 +881,18 @@ async function createWindow() {
   mainWindow.on('move', captureWindowStats);
   mainWindow.on('maximize', captureWindowStats);
   mainWindow.on('unmaximize', captureWindowStats);
+
+  // Beacon: keep the custom titlebar's maximize/restore button in sync.
+  const sendMaximizedState = () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send(
+        'beacon:window:maximized-changed',
+        mainWindow.isMaximized()
+      );
+    }
+  };
+  mainWindow.on('maximize', sendMaximizedState);
+  mainWindow.on('unmaximize', sendMaximizedState);
 
   if (
     !ciMode &&
@@ -1134,6 +1174,46 @@ ipc.on('title-bar-double-click', () => {
     //   we add support for other operating systems.
     toggleMaximizedBrowserWindow(mainWindow);
   }
+});
+
+// Beacon: window controls for the custom titlebar. Only meaningful when the
+// window was created frameless; harmless no-ops otherwise.
+ipc.on('beacon:window:minimize', () => {
+  mainWindow?.minimize();
+});
+
+ipc.on('beacon:window:toggle-maximize', () => {
+  if (mainWindow) {
+    toggleMaximizedBrowserWindow(mainWindow);
+  }
+});
+
+ipc.on('beacon:window:close', () => {
+  // Use close() rather than destroy() so the existing close handling runs —
+  // that is what implements minimize-to-tray and the quit confirmation.
+  mainWindow?.close();
+});
+
+ipc.handle('beacon:window:is-maximized', () => {
+  return mainWindow?.isMaximized() ?? false;
+});
+
+// Beacon: custom titlebar setting. Uses a dedicated channel rather than the
+// generic settings plumbing, because that generates getter types from
+// SettingsValuesType and a hand-written async getter collides with the
+// generated sync one.
+ipc.handle('beacon:titlebar:get', () => {
+  return getBeaconCustomTitlebar();
+});
+
+ipc.handle('beacon:titlebar:set', (_event, value: boolean) => {
+  ephemeralConfig.set('beacon-custom-titlebar', value === true);
+});
+
+// What the live window actually uses — compare against the stored value to know
+// whether a restart is pending.
+ipc.handle('beacon:titlebar:get-applied', () => {
+  return beaconAppliedCustomTitlebar ?? false;
 });
 
 ipc.on('set-is-call-active', (_event, isCallActive) => {

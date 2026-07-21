@@ -1,0 +1,567 @@
+// Copyright 2026 Beacon
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// Beacon theme tokens.
+//
+// Central place to define Beacon's own colors. Used by Beacon-authored styles
+// (search `var(--beacon-` to find them). Values here can be changed at runtime
+// via devtools, which makes iterating on the palette fast.
+//
+// -- IMPORTANT: this does NOT retheme upstream Signal styles. --
+//
+// Upstream colors live in _variables.scss as ~145 compile-time SCSS variables.
+// Rewriting those to `var(--beacon-*)` was tried and reverted, because the
+// variables are consumed by SCSS color math that cannot operate on `var()`:
+//
+//   * direct calls    - rgba($color-ultramarine, 8%)          _modules.scss
+//   * mixin arguments - color.adjust($background, ...)        _mixins.scss:1106
+//                       (caller passes $color-accent-green)
+//   * SCSS maps       - color.scale(map.get($value, 'end'))   Quote.scss:148
+//                       (map holds $color-ultramarine)
+//
+// The last two are the blockers: the variable is not named at the failure site,
+// so there is no grep that finds every case. Converting upstream colors means
+// auditing every mixin and map that touches them — a real project, not a
+// find-and-replace.
+//
+// To change an upstream color today, edit its literal in _variables.scss. That
+// file is still a single central location; it just isn't runtime-swappable.
+
+:root {
+  // -- Brand
+  // Beacon's identity color. Currently unused by upstream chrome (see above) —
+  // applies to Beacon-authored UI.
+  --beacon-brand: #2c6bed;
+
+  // -- Message timeline
+  // Earlier revisions of an edited message (see .module-message__past-edits).
+  --beacon-past-edit-opacity: 0.55;
+  --beacon-past-edit-label-opacity: 0.8;
+
+  // Retained content from a deleted message, once the message logger lands
+  // (todo.md section 11b). Red to read as "this was withdrawn".
+  --beacon-deleted-text: #f44336;
+
+  // -- Flat theme
+  // Elevation is drawn with a hairline border rather than a drop shadow.
+  // Consumed by the popper-shadow mixin (_mixins.scss), which Modal,
+  // GroupDialog, ShortcutGuide, CompositionInput and timeline popovers share.
+  //
+  // To restore upstream elevation, set:
+  //   --beacon-elevation-shadow: 0 8px 20px rgb(0 0 0 / 0.3),
+  //                              0 0 8px rgb(0 0 0 / 0.05);
+  //   --beacon-elevation-border: none;
+  --beacon-elevation-shadow: none;
+  --beacon-elevation-border: 1px solid #2f2f2f;
+}
+
+// Beacon: PII blur in Settings.
+//
+// Applied as a container class on the Preferences root, so every matching
+// descendant is blurred by one rule — no per-element wiring, and new PII fields
+// added upstream are covered as long as they use these class names.
+//
+// Design rules, deliberate:
+//   * NO transition. A `transition: filter` animates clear -> blurred on mount,
+//     which renders the value legible for the duration of the animation. That
+//     is the exact leak this feature exists to prevent.
+//   * NO hover/focus reveal. When enabled, the value never becomes legible.
+//     Use the setting toggle to see it.
+//   * `user-select: none` so the text cannot be dragged out and read, and
+//     cannot be copied by accident during a screen share.
+// Beacon: warning banner at the top of Beacon settings, shown when a changed
+// setting only takes effect after an app restart.
+.Beacon__restart-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-block-end: 16px;
+  padding-block: 10px;
+  padding-inline: 12px;
+  border-radius: 8px;
+  // Amber rather than red — this is "action needed", not "something broke".
+  background: var(--beacon-warning-bg, rgba(255, 214, 36, 0.12));
+  border: 1px solid var(--beacon-warning-border, rgba(255, 214, 36, 0.45));
+  color: var(--beacon-warning-text, #ffd624);
+
+  &::before {
+    content: '';
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    background-color: currentColor;
+    -webkit-mask: url('../images/icons/v3/error/error-circle.svg') no-repeat center;
+    -webkit-mask-size: 100%;
+  }
+}
+
+.Beacon__restart-banner__text {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.Beacon__restart-banner__button {
+  flex-shrink: 0;
+}
+
+// Note: `.Preferences__half-flow` on its own is NOT blurred — it wraps both the
+// label ("Phone number") and the value, so blurring it would obscure the label
+// too. Only the value-side variants are targeted.
+.Beacon--blur-pii {
+  // Profile chip at the top of the settings sidebar
+  .Preferences__profile-chip__number,
+  .Preferences__profile-chip__username,
+  // Value column of flow rows — currently phone number and device name
+  .Preferences__flow-value,
+  .Preferences__half-flow--align-right {
+    filter: blur(var(--beacon-pii-blur-radius, 6px));
+    user-select: none;
+    // Blur is a visual guard only — the text stays in the accessibility tree so
+    // screen reader users can still hear their own number.
+    pointer-events: none;
+  }
+}
+
+// Light theme keeps a visible edge too, but lighter — a #2f2f2f border on a
+// white modal would read as a heavy outline.
+//
+// Note: the theme class goes on <body>, not <html> (background.preload.ts:328),
+// so `:root:not(.dark-theme)` would always match. Target .light-theme directly.
+.light-theme {
+  --beacon-elevation-border: 1px solid #d8d8d8;
+}
+
+.dark-theme {
+  --beacon-brand: #6191f3;
+
+  // Dimmed text needs more contrast on dark backgrounds to stay legible.
+  --beacon-past-edit-opacity: 0.65;
+
+  --beacon-deleted-text: #ff6b6b;
+}
+
+// Beacon: CSS editor modal styling. Large modal for editing the whole app.
+.BeaconCSSEditor__modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  // Let the Modal component handle sizing; just fill what's available
+  min-height: 600px;
+  height: 100%;
+}
+
+.BeaconCSSEditor__description {
+  font-size: 0.9375rem;
+  opacity: 0.8;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.BeaconCSSEditor__textarea {
+  font-family: monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  flex: 1;
+  padding: 12px;
+  background: var(--axo-color-surface-primary, #000);
+  color: var(--axo-color-label-primary, #fff);
+  border: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
+  border-radius: 6px;
+  resize: none;
+  overflow: auto;
+}
+
+.BeaconCSSEditor__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
+  padding-top: 12px;
+}
+
+.BeaconCSSEditor__size-hint {
+  font-size: 0.8125rem;
+  opacity: 0.6;
+}
+
+.BeaconCSSEditor__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.BeaconCSSEditor__button {
+  margin-top: 12px;
+}
+
+.Beacon__settings-divider {
+  height: 1px;
+  background: var(--beacon-elevation-border, 1px solid #2f2f2f);
+  margin: 8px 0;
+}
+
+// Beacon: Modules (addons) list page.
+.BeaconModules {
+  padding: 0;
+}
+
+.BeaconModules__description {
+  font-size: 0.9375rem;
+  opacity: 0.8;
+  margin-bottom: 16px;
+}
+
+.BeaconModules__empty {
+  text-align: center;
+  padding: 40px 20px;
+  opacity: 0.6;
+  font-size: 0.9375rem;
+}
+
+.BeaconModules__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.BeaconModules__item {
+  padding: 12px;
+  border: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
+  border-radius: 6px;
+  background: var(--axo-color-surface-primary, #000);
+}
+
+.BeaconModules__item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.BeaconModules__item-id {
+  font-weight: 600;
+  font-family: monospace;
+  font-size: 0.875rem;
+}
+
+.BeaconModules__badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 3px;
+  &--enabled {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+  }
+  &--disabled {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+  }
+}
+
+.BeaconModules__item-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.BeaconModules__note {
+  font-size: 0.8125rem;
+  opacity: 0.6;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
+}
+
+// Command completion popup (Quill integration)
+.command-completion__popup {
+  position: absolute;
+  background: var(--axo-color-surface-primary, #000);
+  border: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
+  border-radius: 8px;
+  max-width: 400px;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.command-completion__item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: transparent;
+  transition: background-color 0.15s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover,
+  &--selected {
+    background: var(--axo-color-surface-secondary, #111);
+  }
+}
+
+.command-completion__item-name {
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--beacon-brand, #2c6bed);
+  font-size: 0.8125rem;
+  line-height: 1.2;
+}
+
+.command-completion__item-desc {
+  font-size: 0.75rem;
+  color: var(--axo-color-label-tertiary, #999);
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+// Beacon: Command Palette
+.command-palette {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  max-height: 400px;
+  background: red;
+  border: 2px solid yellow;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  z-index: 10000;
+}
+
+.command-palette__content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 350px;
+}
+
+.command-palette__input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--axo-color-surface-primary, #000);
+  color: var(--axo-color-label-primary, #fff);
+  border: none;
+  border-bottom: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
+  font-size: 0.9375rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  outline: none;
+
+  &::placeholder {
+    color: var(--axo-color-label-tertiary, #888);
+  }
+
+  &:focus {
+    background: var(--axo-color-surface-secondary, #111);
+  }
+}
+
+.command-palette__list {
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.command-palette__item {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: background-color 0.15s;
+  background: transparent;
+  text-align: left;
+  border: none;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover,
+  &.command-palette__item--selected {
+    background: var(--axo-color-surface-secondary, #111);
+  }
+}
+
+.command-palette__item-name {
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--beacon-brand, #2c6bed);
+  font-size: 0.8125rem;
+  line-height: 1.2;
+}
+
+.command-palette__item-desc {
+  font-size: 0.75rem;
+  color: var(--axo-color-label-tertiary, #999);
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+// Addon-created modals
+.addon-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.addon-modal__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+}
+
+.addon-modal__content {
+  position: relative;
+  background: var(--axo-color-surface-primary, #000);
+  border: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
+  border-radius: 8px;
+  min-width: 300px;
+  max-width: 600px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.addon-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
+}
+
+.addon-modal__title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--axo-color-label-primary, #fff);
+}
+
+.addon-modal__close {
+  background: none;
+  border: none;
+  color: var(--axo-color-label-primary, #fff);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: var(--axo-color-surface-secondary, #111);
+    border-radius: 4px;
+  }
+}
+
+.addon-modal__body {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  color: var(--axo-color-label-primary, #fff);
+}
+
+.addon-modal__actions {
+  display: flex;
+  gap: 8px;
+  padding: 16px;
+  border-top: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
+  justify-content: flex-end;
+}
+
+.addon-modal__button {
+  padding: 8px 16px;
+  border: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
+  border-radius: 4px;
+  background: var(--axo-color-surface-secondary, #111);
+  color: var(--axo-color-label-primary, #fff);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.15s;
+
+  &:hover {
+    background: var(--axo-color-surface-tertiary, #222);
+  }
+
+  &--primary {
+    background: var(--beacon-brand, #2c6bed);
+    border-color: var(--beacon-brand, #2c6bed);
+  }
+
+  &--destructive {
+    background: #f44336;
+    border-color: #f44336;
+  }
+}
+
+// Addon notifications
+.addon-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  z-index: 10001;
+  animation: slideIn 0.3s ease-out;
+
+  &--info {
+    background: var(--axo-color-surface-secondary, #111);
+    color: var(--axo-color-label-primary, #fff);
+    border: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
+  }
+
+  &--success {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+    border: 1px solid #4caf50;
+  }
+
+  &--warning {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid #ffc107;
+  }
+
+  &--error {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    border: 1px solid #f44336;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

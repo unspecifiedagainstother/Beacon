@@ -234,6 +234,13 @@
       @include preferences-icon('../images/icons/v3/heart/heart.svg');
     }
 
+    // Beacon: reuses Signal's own v3 `tune` (sliders) icon rather than shipping
+    // custom artwork, so the nav stays visually consistent — same 20x20 grid,
+    // stroke weight and masking behaviour as every other entry.
+    &--beacon {
+      @include preferences-icon('../images/icons/v3/tune/tune.svg');
+    }
+
     &--internal {
       @include preferences-icon('../images/icons/v3/internal/internal.svg');
     }

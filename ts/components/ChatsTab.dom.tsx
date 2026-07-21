@@ -5,10 +5,8 @@ import type { JSX } from 'react';
 
 import type { LocalizerType } from '../types/I18N.std.ts';
 import type { NavTabPanelProps } from './NavTabs.dom.tsx';
-import { WhatsNewLink } from './WhatsNewLink.dom.tsx';
 import type { UnreadStats } from '../util/countUnreadStats.std.ts';
 import type { SmartConversationViewProps } from '../state/smart/ConversationView.preload.tsx';
-import { tw } from '../axo/tw.dom.tsx';
 
 export type ChatsTabProps = Readonly<{
   otherTabsUnreadStats: UnreadStats;
@@ -37,7 +35,6 @@ export function ChatsTab({
   renderLeftPane,
   renderMiniPlayer,
   selectedConversationId,
-  showWhatsNewModal,
 }: ChatsTabProps): JSX.Element {
   return (
     <>
@@ -64,19 +61,19 @@ export function ChatsTab({
         ) : (
           <div className="Inbox__no-conversation-open">
             {renderMiniPlayer({ shouldFlow: false })}
-            <div className="module-splash-screen__logo module-splash-screen__logo--96" />
+            {/* <div className="module-splash-screen__logo module-splash-screen__logo--96" /> */}
             <h3 className="Inbox__welcome">
               {isStaging
                 ? 'THIS IS A STAGING DESKTOP'
                 : i18n('icu:welcomeToSignal')}
             </h3>
             <p className="Inbox__whatsnew">
-              <WhatsNewLink i18n={i18n} showWhatsNewModal={showWhatsNewModal} />
+              A Signal fork for privacy freaks
             </p>
             <div className="Inbox__padding" />
-            <div className={tw('absolute bottom-0 p-5 text-secondary')}>
+            {/* <div className={tw('absolute bottom-0 p-5 text-secondary')}>
               {i18n('icu:signalNonProfit')}
-            </div>
+            </div> */}
           </div>
         )}
       </div>

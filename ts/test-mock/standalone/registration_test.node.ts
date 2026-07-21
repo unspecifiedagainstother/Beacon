@@ -116,6 +116,6 @@ describe('registration', function (this: Mocha.Suite) {
     const storedData = await app.getSvr2StoreParameters();
     assert.strictEqual(storedData?.pin, pin);
 
-    await expect(window.getByText('Welcome to Signal')).toBeVisible();
+    await expect(window.getByText('Welcome to Beacon')).toBeVisible();
   });
 });

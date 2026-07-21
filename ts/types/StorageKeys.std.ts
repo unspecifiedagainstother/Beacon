@@ -12,6 +12,8 @@ import type { ConfigMapType as RemoteConfigType } from '../RemoteConfig.dom.ts';
 import type { ExtendedStorageID, UnknownRecord } from './StorageService.d.ts';
 
 import type { GroupCredentialType } from '../textsecure/WebAPI.preload.ts';
+import { BEACON_FEATURE_KEYS } from '../beacon/features.std.ts';
+import type { BeaconStorageKeys } from '../beacon/features.std.ts';
 import type {
   SessionResetsType,
   StorageServiceCredentials,
@@ -57,7 +59,9 @@ export type IdentityKeyMap = Record<
   }
 >;
 
-export type StorageAccessType = {
+// Beacon: keys are generated from the feature registry, so adding a feature
+// does not require editing this file. See ts/beacon/features.std.ts.
+export type StorageAccessType = BeaconStorageKeys & {
   'always-relay-calls': boolean;
   'audio-notification': boolean;
   'auto-download-update': boolean;
@@ -340,6 +344,10 @@ export const STORAGE_KEYS_TO_PRESERVE_AFTER_UNLINK = [
   'auto-download-update',
   'autoConvertEmoji',
   'badge-count-muted-conversations',
+  // Beacon: all Beacon settings are display/behaviour preferences for this
+  // install, not account data, so they survive unlinking like the UI settings
+  // around them. Generated from the registry — no edit needed per feature.
+  ...BEACON_FEATURE_KEYS,
   'call-ringtone-notification',
   'call-system-notification',
   'customColors',
