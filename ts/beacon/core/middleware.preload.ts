@@ -40,6 +40,8 @@ const actionInterceptors = new Set<InterceptorEntry>();
 const messageInterceptors = new Set<MessageInterceptor>();
 const notificationInterceptors = new Set<NotificationInterceptor>();
 
+let actionCount = 0;
+
 export function registerActionInterceptor(
   type: string,
   interceptor: ActionInterceptor
@@ -123,6 +125,7 @@ let bus: HookBus | undefined;
 /** Called by the runtime once the bus exists. */
 export function attachHookBus(hookBus: HookBus): void {
   bus = hookBus;
+  log.info('hook bus attached');
 }
 
 function emitDerivedHooks(
@@ -174,6 +177,7 @@ function emitDerivedHooks(
     case MESSAGE_DELETED: {
       const payload = action.payload as { id: string; conversationId: string };
       if (payload) {
+        log.info('emitting onMessageDeleted:', payload.id);
         bus.emit('onMessageDeleted', payload);
       }
       break;
@@ -197,6 +201,11 @@ function emitDerivedHooks(
 export const beaconMiddleware: Middleware =
   storeApi => next => rawAction => {
     let action = rawAction as UnknownAction;
+
+    actionCount += 1;
+    if (actionCount % 100 === 0) {
+      log.info(`middleware active: ${actionCount} actions processed`);
+    }
 
     // Interceptors only see plain actions; thunks/promises pass through
     // untouched — addons wanting those can patch dispatch itself.
@@ -223,12 +232,16 @@ export const beaconMiddleware: Middleware =
       }
 
       try {
-        bus?.emit('onActionDispatched', {
-          type: action.type,
-          payload: (action as { payload?: unknown }).payload,
-        });
-      } catch {
-        // never break dispatch
+        if (!bus) {
+          log.warn('bus not attached, onActionDispatched not emitted');
+        } else {
+          bus.emit('onActionDispatched', {
+            type: action.type,
+            payload: (action as { payload?: unknown }).payload,
+          });
+        }
+      } catch (error) {
+        log.error('onActionDispatched emit error:', error);
       }
     }
 
