@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux';
 import { actionCreators } from './actions.preload.ts';
 import { createStore } from './createStore.preload.ts';
 import { getInitialState } from './getInitialState.preload.ts';
+import { initializeBeaconRuntime } from '../beacon/core/runtime.preload.ts';
 
 import type { BadgesStateType } from './ducks/badges.preload.ts';
 import type { CallHistoryDetails } from '../types/CallDisposition.std.ts';
@@ -46,6 +47,9 @@ export function initializeRedux(data: ReduxInitData): void {
 
   const store = createStore(initialState);
   window.reduxStore = store;
+
+  // Beacon: bring up the addon platform now that the real store exists.
+  initializeBeaconRuntime(store);
 
   // Binding these actions to our redux store and exposing them allows us to update
   //   redux when things change in the rest of the app.

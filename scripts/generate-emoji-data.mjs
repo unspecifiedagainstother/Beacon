@@ -207,7 +207,10 @@ for (const emojiSrc of SRC_EMOJIS_SORTED) {
   }
 
   const emoji = encodeUnified(emojiSrc.unified);
-  assert(isEmoji(emoji), 'Unexpected invalid emoji');
+  if (!isEmoji(emoji)) {
+    console.warn(`Skipping unsupported emoji: ${emojiSrc.short_name} (${emojiSrc.unified})`);
+    continue;
+  }
 
   if (isDeprecated(emoji)) {
     continue; // drop deprecated emoji

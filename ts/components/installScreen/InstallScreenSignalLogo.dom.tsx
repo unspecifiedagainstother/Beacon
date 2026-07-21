@@ -4,5 +4,5 @@
 import type { ReactElement } from 'react';
 
 export function InstallScreenSignalLogo(): ReactElement {
-  return <div className="InstallScreenSignalLogo" />;
+  return <div className="e" />;
 }

@@ -8,7 +8,6 @@ import { missingCaseError } from '../../util/missingCaseError.std.ts';
 import { openLinkInWebBrowser } from '../../util/openLinkInWebBrowser.dom.ts';
 import { Button, ButtonVariant } from '../Button.dom.tsx';
 import { TitlebarDragArea } from '../TitlebarDragArea.dom.tsx';
-import { InstallScreenSignalLogo } from './InstallScreenSignalLogo.dom.tsx';
 import { LINK_SIGNAL_DESKTOP } from '../../types/support.std.ts';
 import { InstallScreenError } from '../../types/InstallScreen.std.ts';
 
@@ -61,7 +60,7 @@ export function InstallScreenErrorStep({
     <div className="module-InstallScreenErrorStep">
       <TitlebarDragArea />
 
-      <InstallScreenSignalLogo />
+      {/* <InstallScreenSignalLogo /> */}
 
       <h1>{i18n('icu:installErrorHeader')}</h1>
       <h2>{errorMessage}</h2>

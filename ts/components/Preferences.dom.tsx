@@ -22,6 +22,13 @@ import { WidthBreakpoint } from './_util.std.ts';
 import { DisappearingTimeDialog } from './DisappearingTimeDialog.dom.tsx';
 import { PhoneNumberDiscoverability } from '../util/phoneNumberDiscoverability.std.ts';
 import { PhoneNumberSharingMode } from '../types/PhoneNumberSharingMode.std.ts';
+import { BeaconModules } from './BeaconModules.dom.tsx';
+import { BeaconCSSEditor } from './BeaconCSSEditor.dom.tsx';
+import { BEACON_FEATURES } from '../beacon/features.std.ts';
+import type {
+  BeaconFeatureKey,
+  BeaconSettingsType,
+} from '../beacon/features.std.ts';
 import { KEY_TRANSPARENCY_URL } from '../types/support.std.ts';
 import { Select } from './Select.dom.tsx';
 import { getCustomColorStyle } from '../util/getCustomColorStyle.dom.ts';
@@ -167,6 +174,15 @@ export type PropsDataType = {
   notificationContent: NotificationSettingType;
   osName: 'linux' | 'macos' | 'windows' | undefined;
   phoneNumber: string | undefined;
+  // Beacon: all Beacon feature values, keyed by registry key.
+  // Beacon: main-process setting — needs an app restart, so it is wired
+  // separately from the registry-driven toggles.
+  hasCustomTitlebar: boolean;
+  onCustomTitlebarChange: (value: boolean) => void;
+  // True when a setting has changed that only takes effect after a restart.
+  beaconNeedsRestart: boolean;
+  beaconSettings: BeaconSettingsType;
+  onBeaconSettingChange: (key: BeaconFeatureKey, value: boolean) => void;
   selectedCamera?: string;
   selectedMicrophone?: AudioDevice;
   selectedSpeaker?: AudioDevice;
@@ -540,6 +556,11 @@ export function Preferences({
   otherTabsUnreadStats,
   settingsLocation,
   phoneNumber = '',
+  hasCustomTitlebar,
+  onCustomTitlebarChange,
+  beaconNeedsRestart,
+  beaconSettings,
+  onBeaconSettingChange,
   pickLocalBackupFolder,
   preferredSystemLocales,
   preferredWidthFromStorage,
@@ -2183,6 +2204,63 @@ export function Preferences({
         title={i18n('icu:Preferences__button--data-usage')}
       />
     );
+  } else if (settingsLocation.page === SettingsPage.Beacon) {
+    // Beacon: fork-specific settings live here so upstream pages stay untouched,
+    // which keeps rebase conflicts to the nav button and this one block.
+    // Rendered from the feature registry — adding a Beacon setting needs no
+    // change here. See ts/beacon/features.std.ts.
+    const pageContents = (
+      <>
+        {beaconNeedsRestart && (
+          <div className="Beacon__restart-banner" role="status">
+            {i18n('icu:Beacon__requires-restart')}
+          </div>
+        )}
+        <SettingsRow title={i18n('icu:Preferences__beacon-title')}>
+        {BEACON_FEATURES.map(feature => (
+          <Checkbox
+            key={feature.key}
+            checked={beaconSettings[feature.key]}
+            description={i18n(
+              feature.descriptionKey as 'icu:Preferences__blur-pii--description'
+            )}
+            label={i18n(feature.labelKey as 'icu:Preferences__blur-pii')}
+            moduleClassName="Preferences__checkbox"
+            name={feature.key}
+            onChange={value => onBeaconSettingChange(feature.key, value)}
+          />
+        ))}
+        <Checkbox
+          checked={hasCustomTitlebar}
+          description={i18n('icu:Preferences__custom-titlebar--description')}
+          label={i18n('icu:Preferences__custom-titlebar')}
+          moduleClassName="Preferences__checkbox"
+          name="beaconCustomTitlebar"
+          onChange={onCustomTitlebarChange}
+        />
+        </SettingsRow>
+        <div className="Beacon__settings-divider" />
+        <BeaconCSSEditor i18n={i18n} />
+      </>
+    );
+    content = (
+      <PreferencesContent
+        contents={pageContents}
+        contentsRef={settingsPaneRef}
+        title={i18n('icu:Preferences__beacon-title')}
+      />
+    );
+  } else if (settingsLocation.page === SettingsPage.BeaconModules) {
+    const pageContents = (
+      <BeaconModules i18n={i18n} />
+    );
+    content = (
+      <PreferencesContent
+        contents={pageContents}
+        contentsRef={settingsPaneRef}
+        title={i18n('icu:Beacon__modules-title')}
+      />
+    );
   } else if (settingsLocation.page === SettingsPage.ChatColor) {
     const backButton = (
       <button
@@ -2560,7 +2638,12 @@ export function Preferences({
   }
   return (
     <>
-      <div className="Preferences">
+      <div
+        className={classNames(
+          'Preferences',
+          beaconSettings.beaconBlurPII && 'Beacon--blur-pii'
+        )}
+      >
         <NavSidebar
           title={i18n('icu:Preferences--header')}
           i18n={i18n}
@@ -2779,6 +2862,34 @@ export function Preferences({
                 }
               >
                 {i18n('icu:Preferences__button--donate')}
+              </button>
+              <button
+                type="button"
+                className={classNames({
+                  Preferences__button: true,
+                  'Preferences__button--beacon': true,
+                  'Preferences__button--selected':
+                    settingsLocation.page === SettingsPage.Beacon,
+                })}
+                onClick={() =>
+                  setSettingsLocation({ page: SettingsPage.Beacon })
+                }
+              >
+                {i18n('icu:Preferences__button--beacon')}
+              </button>
+              <button
+                type="button"
+                className={classNames({
+                  Preferences__button: true,
+                  'Preferences__button--beacon-modules': true,
+                  'Preferences__button--selected':
+                    settingsLocation.page === SettingsPage.BeaconModules,
+                })}
+                onClick={() =>
+                  setSettingsLocation({ page: SettingsPage.BeaconModules })
+                }
+              >
+                {i18n('icu:Preferences__button--beacon-modules')}
               </button>
               {isInternalUser ? (
                 <button

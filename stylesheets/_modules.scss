@@ -1110,6 +1110,57 @@ $message-padding-horizontal: 12px;
   }
 }
 
+// Beacon: earlier revisions of an edited message, shown above the current body.
+.module-message__past-edits {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 4px;
+
+  &__item {
+    // Dimmed to read as superseded. Paired with a text label below, since
+    // opacity alone is not an accessible signal.
+    opacity: var(--beacon-past-edit-opacity, 0.55);
+    // Keep long edit chains from dominating the timeline.
+    overflow-wrap: break-word;
+  }
+
+  &__label {
+    @include mixins.font-caption;
+
+    display: block;
+    margin-bottom: 1px;
+    opacity: var(--beacon-past-edit-label-opacity, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__more {
+    @include mixins.button-reset;
+    @include mixins.font-caption;
+
+    align-self: start;
+    cursor: pointer;
+    opacity: 0.7;
+    text-decoration: underline;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    @include mixins.keyboard-mode {
+      &:focus {
+        outline: 1px solid variables.$color-gray-90;
+      }
+    }
+    @include mixins.dark-keyboard-mode {
+      &:focus {
+        outline: 1px solid variables.$color-white-alpha-90;
+      }
+    }
+  }
+}
+
 .module-message__text--incoming {
   @include mixins.light-theme {
     color: variables.$color-gray-90;

@@ -180,6 +180,39 @@ const IPC: IPCType = {
   titleBarDoubleClick: () => {
     ipc.send('title-bar-double-click');
   },
+
+  // Beacon: custom titlebar window controls.
+  beaconWindowMinimize: () => {
+    ipc.send('beacon:window:minimize');
+  },
+  beaconWindowToggleMaximize: () => {
+    ipc.send('beacon:window:toggle-maximize');
+  },
+  beaconWindowClose: () => {
+    ipc.send('beacon:window:close');
+  },
+  beaconWindowIsMaximized: (): Promise<boolean> => {
+    return ipc.invoke('beacon:window:is-maximized');
+  },
+  beaconGetCustomTitlebar: (): Promise<boolean> => {
+    return ipc.invoke('beacon:titlebar:get');
+  },
+  beaconSetCustomTitlebar: (value: boolean): Promise<void> => {
+    return ipc.invoke('beacon:titlebar:set', value);
+  },
+  beaconGetAppliedCustomTitlebar: (): Promise<boolean> => {
+    return ipc.invoke('beacon:titlebar:get-applied');
+  },
+  beaconOnWindowMaximizedChanged: (
+    handler: (isMaximized: boolean) => void
+  ): (() => void) => {
+    const listener = (_event: unknown, isMaximized: boolean) =>
+      handler(isMaximized);
+    ipc.on('beacon:window:maximized-changed', listener);
+    return () => {
+      ipc.removeListener('beacon:window:maximized-changed', listener);
+    };
+  },
   updateTrayIcon: unreadCount => ipc.send('update-tray-icon', unreadCount),
   whenWindowVisible,
 };

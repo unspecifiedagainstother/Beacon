@@ -369,6 +369,33 @@ export const processBodyRanges = (
   );
 };
 
+/**
+ * Beacon: past revisions of an edited message, for inline display in the bubble.
+ *
+ * `editHistory` is newest-first (see handleEditMessage, which prepends), and
+ * index 0 is the *current* revision — already rendered as the message body. So
+ * we drop it and reverse, giving oldest -> newest to match top-to-bottom order.
+ */
+export const getPastEdits = (
+  message: MessageWithUIFieldsType,
+  isGroup: boolean,
+  options: { conversationSelector: GetConversationByIdType }
+): PropsData['pastEdits'] => {
+  const { editHistory } = message;
+  if (!editHistory || editHistory.length < 2) {
+    return undefined;
+  }
+
+  return editHistory
+    .slice(1)
+    .map(edit => ({
+      timestamp: edit.timestamp,
+      text: edit.body,
+      bodyRanges: processBodyRanges(edit, isGroup, options),
+    }))
+    .reverse();
+};
+
 const getAuthorForMessage = (
   message: MessageWithUIFieldsType,
   options: GetContactOptions
@@ -1021,6 +1048,7 @@ const getPropsForMessage = (
     id: message.id,
     isBlocked: conversation.isBlocked || false,
     isEditedMessage: Boolean(message.editHistory),
+    pastEdits: getPastEdits(message, isGroup, options),
     isMessageRequestAccepted: conversation?.acceptedMessageRequest ?? true,
     isPinned,
     isSelected,

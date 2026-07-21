@@ -1,12 +1,14 @@
 // Copyright 2021 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { useEffect, type JSX } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 
 import { AppViewType } from '../types/app.std.ts';
 import { missingCaseError } from '../util/missingCaseError.std.ts';
 import { usePageVisibility } from '../hooks/usePageVisibility.dom.ts';
 import { TitlebarDragArea } from './TitlebarDragArea.dom.tsx';
+import { loadAndInjectCustomCSS } from './BeaconCSSEditor.dom.tsx';
+import { BeaconTitlebar } from './BeaconTitlebar.dom.tsx';
 import { ThemeType } from '../types/Util.std.ts';
 
 import type { ViewStoryActionCreatorType } from '../state/ducks/stories.preload.ts';
@@ -97,6 +99,29 @@ export function App({
     document.body.classList.toggle('maximized', isMaximized);
   }, [isFullScreen, isMaximized]);
 
+  // Beacon: load saved custom CSS on app startup. The addon platform itself
+  // is initialized in initializeRedux(), not here — it needs the real store.
+  useEffect(() => {
+    loadAndInjectCustomCSS();
+  }, []);
+
+  // Beacon: the window is frameless when the custom titlebar is enabled, so we
+  // draw our own. Read once — the value only changes across restarts, since
+  // BrowserWindow's `frame` is fixed at creation.
+  const [hasCustomTitlebar, setHasCustomTitlebar] = useState(false);
+  useEffect(() => {
+    let canceled = false;
+    void (async () => {
+      const value = await window.IPC.beaconGetCustomTitlebar();
+      if (!canceled) {
+        setHasCustomTitlebar(value);
+      }
+    })();
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
   const isPageVisible = usePageVisibility();
   useEffect(() => {
     document.body.classList.toggle('page-is-visible', isPageVisible);
@@ -104,6 +129,7 @@ export function App({
 
   return (
     <div className="App">
+      {hasCustomTitlebar && <BeaconTitlebar title="Beacon" />}
       {contents}
       {renderGlobalModalContainer()}
       {renderCallManager()}

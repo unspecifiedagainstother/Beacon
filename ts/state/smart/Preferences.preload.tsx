@@ -8,6 +8,11 @@ import type { AudioDevice } from '@signalapp/ringrtc';
 import type { MutableRefObject, JSX } from 'react';
 
 import { useItemsActions } from '../ducks/items.preload.ts';
+import { BEACON_FEATURES } from '../../beacon/features.std.ts';
+import type {
+  BeaconFeatureKey,
+  BeaconSettingsType,
+} from '../../beacon/features.std.ts';
 import { useConversationsActions } from '../ducks/conversations.preload.ts';
 import type { ConversationType } from '../ducks/conversations.preload.ts';
 import {
@@ -404,6 +409,9 @@ export function SmartPreferences(): JSX.Element | null {
     useState<SystemTraySetting>();
   const [hasContentProtection, setContentProtection] = useState<boolean>();
   const [hasSpellCheck, setSpellCheck] = useState<boolean>();
+  // Beacon: main-process setting (window frame), not a registry feature.
+  const [hasCustomTitlebar, setCustomTitlebarState] = useState<boolean>();
+  const [appliedCustomTitlebar, setAppliedCustomTitlebar] = useState<boolean>();
   const [themeSetting, setThemeSetting] = useState<ThemeType>();
 
   useEffect(() => {
@@ -417,6 +425,24 @@ export function SmartPreferences(): JSX.Element | null {
       setLocaleOverride(value);
     };
     drop(loadOverride());
+
+    const loadBeaconCustomTitlebar = async () => {
+      const value = await window.IPC.beaconGetCustomTitlebar();
+      if (canceled) {
+        return;
+      }
+      setCustomTitlebarState(value);
+    };
+    drop(loadBeaconCustomTitlebar());
+
+    const loadBeaconAppliedTitlebar = async () => {
+      const value = await window.IPC.beaconGetAppliedCustomTitlebar();
+      if (canceled) {
+        return;
+      }
+      setAppliedCustomTitlebar(value);
+    };
+    drop(loadBeaconAppliedTitlebar());
 
     const loadSystemTraySettings = async () => {
       const value = await window.Events.getSystemTraySetting();
@@ -658,6 +684,24 @@ export function SmartPreferences(): JSX.Element | null {
       const account = window.ConversationController.getOurConversationOrThrow();
       account.captureChange('linkPreviews');
     }
+  );
+  // Beacon: every registered feature, read/written generically. Local to this
+  // install — not synced to other devices, since these describe the client
+  // rather than the account. Adding a feature needs no change here.
+  const beaconSettings = useMemo(() => {
+    const result = {} as BeaconSettingsType;
+    for (const feature of BEACON_FEATURES) {
+      result[feature.key] =
+        (items[feature.key] as boolean | undefined) ?? feature.defaultValue;
+    }
+    return result;
+  }, [items]);
+
+  const onBeaconSettingChange = useCallback(
+    (key: BeaconFeatureKey, value: boolean) => {
+      putItem(key, value);
+    },
+    [putItem]
   );
   const [hasPreferContactAvatars, onPreferContactAvatarsChange] =
     createItemsAccess('preferContactAvatars', false, () => {
@@ -921,6 +965,18 @@ export function SmartPreferences(): JSX.Element | null {
         disableLocalBackups={backupsService.disableLocalBackups}
         emojiSkinToneDefault={emojiSkinToneDefault}
         phoneNumber={phoneNumber}
+        hasCustomTitlebar={hasCustomTitlebar ?? false}
+        beaconNeedsRestart={
+          hasCustomTitlebar !== undefined &&
+          appliedCustomTitlebar !== undefined &&
+          hasCustomTitlebar !== appliedCustomTitlebar
+        }
+        onCustomTitlebarChange={value => {
+          setCustomTitlebarState(value);
+          drop(window.IPC.beaconSetCustomTitlebar(value));
+        }}
+        beaconSettings={beaconSettings}
+        onBeaconSettingChange={onBeaconSettingChange}
         doDeleteAllData={doDeleteAllData}
         editCustomColor={editCustomColor}
         getConversationsWithCustomColor={getConversationsWithCustomColor}

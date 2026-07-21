@@ -1,0 +1,88 @@
+// Copyright 2026 Beacon
+// SPDX-License-Identifier: AGPL-3.0-only
+
+@use '../mixins';
+@use '../variables';
+
+// Beacon: custom titlebar, shown when the window is frameless.
+.BeaconTitlebar {
+  // Matches --title-bar-drag-area-height conventions in _titlebar.scss.
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  user-select: none;
+  // Whole bar drags the window; buttons opt out below.
+  -webkit-app-region: drag;
+  background: var(--beacon-titlebar-bg, #{variables.$color-gray-75});
+  // border-bottom: var(--beacon-elevation-border, 1px solid #2f2f2f);
+
+  &__title {
+    @include mixins.font-caption;
+    padding-inline-start: 12px;
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__controls {
+    display: flex;
+    height: 100%;
+    // Buttons must not drag the window.
+    -webkit-app-region: no-drag;
+  }
+
+  &__button {
+    @include mixins.button-reset;
+    & {
+      width: 44px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0.75;
+    }
+
+    &:hover {
+      opacity: 1;
+      background: var(--beacon-titlebar-hover, rgba(255, 255, 255, 0.08));
+    }
+
+    // Close gets the conventional red hover so it is not mistaken for the
+    // others at a glance.
+    &--close:hover {
+      background: #c42b1c;
+      opacity: 1;
+    }
+
+    &::before {
+      content: '';
+      display: block;
+      width: 10px;
+      height: 10px;
+      background-color: var(--axo-color-label-primary, #ffffff);
+      -webkit-mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-size: 10px;
+    }
+
+    &--minimize::before {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Crect y='4.5' width='10' height='1'/%3E%3C/svg%3E");
+    }
+
+    &--maximize::before {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Crect x='0.5' y='0.5' width='9' height='9' fill='none' stroke='black'/%3E%3C/svg%3E");
+    }
+
+    &--restore::before {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Crect x='0.5' y='2.5' width='7' height='7' fill='none' stroke='black'/%3E%3Cpath d='M2.5 2.5V0.5H9.5V7.5H7.5' fill='none' stroke='black'/%3E%3C/svg%3E");
+    }
+
+    &--close::before {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M0.5 0.5L9.5 9.5M9.5 0.5L0.5 9.5' stroke='black'/%3E%3C/svg%3E");
+    }
+  }
+}

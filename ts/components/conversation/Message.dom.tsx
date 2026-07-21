@@ -33,6 +33,7 @@ import { ReadStatus } from '../../messages/MessageReadStatus.std.ts';
 import { Avatar, AvatarSize } from '../Avatar.dom.tsx';
 import { AvatarSpacer } from '../AvatarSpacer.dom.tsx';
 import { MessageBodyReadMore } from './MessageBodyReadMore.dom.tsx';
+import { MessageBody } from './MessageBody.dom.tsx';
 import { MessageMetadata } from './MessageMetadata.dom.tsx';
 import { MessageTextMetadataSpacer } from './MessageTextMetadataSpacer.dom.tsx';
 import { ImageGrid } from './ImageGrid.dom.tsx';
@@ -137,6 +138,9 @@ const STICKER_SIZE = 200;
 const GIF_SIZE = 300;
 // Note: this needs to match the animation time
 const TARGETED_TIMEOUT = 1200;
+// Beacon: how many earlier revisions of an edited message to show inline before
+// deferring the rest to the edit history modal.
+const MAX_INLINE_PAST_EDITS = 2;
 const SENT_STATUSES = new Set<MessageStatusType>([
   'delivered',
   'read',
@@ -225,6 +229,13 @@ export type PropsData = {
   textDirection: TextDirection;
   textAttachment?: AttachmentForUIType;
   isEditedMessage?: boolean;
+  // Beacon: older revisions of an edited message, oldest -> newest. Rendered
+  // dimmed above the current body. Excludes the current revision.
+  pastEdits?: ReadonlyArray<{
+    timestamp: number;
+    text?: string;
+    bodyRanges?: HydratedBodyRangesType;
+  }>;
   isSticker?: boolean;
   isTargeted?: boolean;
   isTargetedCounter?: number;
@@ -2439,6 +2450,67 @@ export class Message extends PureComponent<Props, State> {
     return null;
   }
 
+  /**
+   * Beacon: earlier revisions of an edited message, rendered dimmed above the
+   * current body so the edit is visible without opening the modal.
+   *
+   * Only the most recent few are shown inline — a heavily edited message would
+   * otherwise dominate the timeline. Anything older stays behind the existing
+   * edit history modal.
+   */
+  public renderPastEdits(): JSX.Element | null {
+    const { direction, i18n, id, pastEdits, showEditHistoryModal } = this.props;
+
+    if (!pastEdits?.length) {
+      return null;
+    }
+
+    // pastEdits is oldest -> newest, so the most recent revisions are last.
+    const inline = pastEdits.slice(-MAX_INLINE_PAST_EDITS);
+    const hiddenCount = pastEdits.length - inline.length;
+
+    return (
+      <div className="module-message__past-edits">
+        {inline.map(edit => {
+          if (edit.text == null) {
+            return null;
+          }
+
+          return (
+            <div
+              className="module-message__past-edits__item"
+              key={edit.timestamp}
+            >
+              {/* Opacity alone does not convey "superseded" to assistive tech. */}
+              {/* <span className="module-message__past-edits__label">
+                {i18n('icu:Beacon__PastEdit__label')}
+              </span> */}
+              <MessageBody
+                bodyRanges={edit.bodyRanges}
+                direction={direction}
+                disableLinks
+                i18n={i18n}
+                isSpoilerExpanded={{}}
+                originalText={edit.text}
+                renderLocation={RenderLocation.Timeline}
+                text={edit.text}
+              />
+            </div>
+          );
+        })}
+        {hiddenCount > 0 && showEditHistoryModal && (
+          <button
+            className="module-message__past-edits__more"
+            onClick={() => showEditHistoryModal(id)}
+            type="button"
+          >
+            {i18n('icu:Beacon__PastEdit__showEarlier', { count: hiddenCount })}
+          </button>
+        )}
+      </div>
+    );
+  }
+
   public renderText(): JSX.Element | null {
     const {
       text,
@@ -2502,6 +2574,7 @@ export class Message extends PureComponent<Props, State> {
         }}
       >
         {messageStatusContents != null && messageStatusContents}
+        {messageStatusContents == null && this.renderPastEdits()}
         {messageStatusContents == null && text != null && (
           <MessageBodyReadMore
             bodyRanges={bodyRanges}
