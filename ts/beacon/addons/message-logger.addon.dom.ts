@@ -23,6 +23,14 @@ export default {
   version: '2.0.0',
   description: 'Log messages to JSON, /exportlog /clearlog /logstats',
   start(ctx) {
+    ctx.log('message logger addon started');
+
+    ctx.hooks.on('onActionDispatched', action => {
+      if (action.type === 'MESSAGE_DELETED') {
+        ctx.log('MESSAGE_DELETED action dispatched:', action.payload);
+      }
+    });
+
     const append = (entry: LogEntry) => {
       const log = ctx.storage.get<Array<LogEntry>>('log') ?? [];
       log.push(entry);
