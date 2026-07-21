@@ -25,6 +25,22 @@ export default {
   start(ctx) {
     ctx.log('message logger addon started');
 
+    // Intercept MESSAGE_CHANGED to handle deletedForEveryone flag
+    ctx.actions.intercept('MESSAGE_CHANGED', action => {
+      const { data } = action.payload as { data?: any };
+      if (data?.deletedForEveryone && data.id) {
+        ctx.log('intercepting MESSAGE_CHANGED with deletedForEveryone:', data.id);
+        // Ensure isDeleted flag is set for deleted-for-everyone messages
+        if (!data.isDeleted) {
+          data.isDeleted = true;
+          deletedIds.add(data.id);
+          saveDeletedIds();
+          ctx.log('marked deletedForEveryone message as deleted:', data.id);
+        }
+      }
+      return action;
+    });
+
     ctx.actions.intercept('MESSAGE_DELETED', action => {
       ctx.log('intercepting MESSAGE_DELETED:', action.payload);
       const { id, conversationId } = action.payload as {
@@ -89,7 +105,8 @@ export default {
       });
 
       // Track deleted messages loaded from database on app start
-      if ((message as unknown as { isDeleted?: boolean }).isDeleted && message.id) {
+      const msgEx = message as unknown as { isDeleted?: boolean; deletedForEveryone?: boolean };
+      if ((msgEx.isDeleted || msgEx.deletedForEveryone) && message.id) {
         deletedIds.add(message.id);
         ctx.log('tracked deleted message from database:', message.id);
       }
@@ -107,7 +124,8 @@ export default {
 
 
     ctx.messages.intercept(msg => {
-      const isDeleted = (msg as unknown as { isDeleted?: boolean }).isDeleted;
+      const msgEx = msg as unknown as { isDeleted?: boolean; deletedForEveryone?: boolean };
+      const isDeleted = msgEx.isDeleted || msgEx.deletedForEveryone;
       if (isDeleted && msg.id) {
         deletedIds.add(msg.id);
         if (!deletedContent.has(msg.id)) {
@@ -151,7 +169,9 @@ export default {
     };
 
     ctx.hooks.on('onMessageChanged', msg => {
-      if ((msg as unknown as { isDeleted?: boolean }).isDeleted) {
+      const msgEx = msg as unknown as { isDeleted?: boolean; deletedForEveryone?: boolean };
+      if (msgEx.isDeleted || msgEx.deletedForEveryone) {
+        deletedIds.add(msg.id);
         markDeletedElement(msg.id);
       }
     });
@@ -168,13 +188,17 @@ export default {
           for (const msgId of conversation.messageIds) {
             if (deletedIds.has(msgId)) {
               const msg = state.conversations.messagesLookup[msgId];
-              if (msg && !(msg as any).isDeleted) {
-                ctx.log('restoring deleted flag:', msgId);
-                const markedDeleted = { ...msg, isDeleted: true };
-                ctx.redux.dispatch({
-                  type: 'MESSAGE_CHANGED',
-                  payload: { id: msgId, conversationId, data: markedDeleted },
-                } as any);
+              if (msg) {
+                const msgEx = msg as any;
+                // Check if already marked deleted (isDeleted or deletedForEveryone)
+                if (!msgEx.isDeleted && !msgEx.deletedForEveryone) {
+                  ctx.log('restoring deleted flag:', msgId);
+                  const markedDeleted = { ...msg, isDeleted: true };
+                  ctx.redux.dispatch({
+                    type: 'MESSAGE_CHANGED',
+                    payload: { id: msgId, conversationId, data: markedDeleted },
+                  } as any);
+                }
               }
             }
           }
