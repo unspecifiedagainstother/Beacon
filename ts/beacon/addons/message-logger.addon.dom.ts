@@ -43,6 +43,8 @@ export default {
       ctx.storage.get<Array<string>>('deleted-ids') ?? []
     );
 
+    const deletedContent = new Map<string, string>();
+
     const saveDeletedIds = () => {
       ctx.storage.set('deleted-ids', Array.from(deletedIds));
     };
@@ -84,7 +86,10 @@ export default {
       const isDeleted = (msg as unknown as { isDeleted?: boolean }).isDeleted;
       if (isDeleted && msg.id) {
         deletedIds.add(msg.id);
-        ctx.log('message marked deleted at render:', msg.id);
+        if (!deletedContent.has(msg.id)) {
+          deletedContent.set(msg.id, msg.body ?? '[no content]');
+          ctx.log('captured deleted message content:', msg.id, msg.body);
+        }
       }
       return msg;
     });
@@ -99,10 +104,10 @@ export default {
           el.classList.add('beacon-deleted-message');
         } else {
           ctx.log('element already gone, creating placeholder:', msgId);
-          // Element removed before we could mark it, create a placeholder
+          const content = deletedContent.get(msgId) || '[deleted message]';
           const placeholder = document.createElement('div');
           placeholder.className = 'beacon-deleted-message beacon-deleted-placeholder';
-          placeholder.innerHTML = '<div style="padding: 8px; opacity: 0.55; display: flex; align-items: center; gap: 8px;"><span>✕</span><span style="font-size: 12px; color: #999;">[Deleted message]</span></div>';
+          placeholder.innerHTML = `<div style="padding: 8px; opacity: 0.55; display: flex; align-items: flex-start; gap: 8px;"><span style="flex-shrink: 0;">✕</span><span style="font-size: 12px; color: #999; flex: 1; word-break: break-word;">${escapeHtml(content)}</span></div>`;
 
           // Find message container and insert placeholder
           const messageContainer = document.querySelector('[role="listbox"], [role="list"], .module-conversation__messages');
@@ -208,3 +213,14 @@ export default {
     ctx.log('message logger running');
   },
 } satisfies AddonManifest;
+
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  };
+  return text.replace(/[&<>"']/g, char => map[char]);
+}
