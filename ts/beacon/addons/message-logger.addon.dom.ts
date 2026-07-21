@@ -27,7 +27,37 @@ export default {
 
     ctx.actions.intercept('MESSAGE_DELETED', action => {
       ctx.log('intercepting MESSAGE_DELETED:', action.payload);
-      return action;
+      const { id, conversationId } = action.payload as {
+        id: string;
+        conversationId: string;
+      };
+
+      // Cancel removal. Instead, mark message as deleted in Redux + database.
+      const state = ctx.redux.getState();
+      const msg = state.conversations.messagesLookup[id];
+      if (msg) {
+        const markedDeleted = { ...msg, isDeleted: true };
+
+        // Persist to database
+        try {
+          ctx.signal.messageCache.saveMessage(markedDeleted);
+          ctx.log('saved deleted message to database:', id);
+        } catch (err) {
+          ctx.error('failed to save message:', err);
+        }
+
+        // Update Redux store
+        ctx.redux.dispatch({
+          type: 'MESSAGE_CHANGED',
+          payload: { id, conversationId, data: markedDeleted },
+        } as any);
+        deletedIds.add(id);
+        saveDeletedIds();
+        ctx.log('marked message deleted:', id);
+      }
+
+      // Return null to cancel MESSAGE_DELETED action
+      return null;
     });
 
     const append = (entry: LogEntry) => {
@@ -57,6 +87,12 @@ export default {
         timestamp: message.timestamp,
         body: message.body,
       });
+
+      // Track deleted messages loaded from database on app start
+      if ((message as unknown as { isDeleted?: boolean }).isDeleted && message.id) {
+        deletedIds.add(message.id);
+        ctx.log('tracked deleted message from database:', message.id);
+      }
     });
 
     ctx.hooks.on('onMessageSent', (message, info) => {
@@ -69,18 +105,6 @@ export default {
       });
     });
 
-    ctx.hooks.on('onMessageDeleted', info => {
-      deletedIds.add(info.id);
-      saveDeletedIds();
-      ctx.log('message deleted:', info.id, 'total deleted:', deletedIds.size);
-      append({
-        direction: 'received',
-        id: info.id,
-        conversationId: info.conversationId,
-        timestamp: Date.now(),
-        body: '[deleted]',
-      });
-    });
 
     ctx.messages.intercept(msg => {
       const isDeleted = (msg as unknown as { isDeleted?: boolean }).isDeleted;
@@ -107,7 +131,7 @@ export default {
           const content = deletedContent.get(msgId) || '[deleted message]';
           const placeholder = document.createElement('div');
           placeholder.className = 'beacon-deleted-message beacon-deleted-placeholder';
-          placeholder.innerHTML = `<div style="padding: 8px; opacity: 0.55; display: flex; align-items: flex-start; gap: 8px;"><span style="flex-shrink: 0;">✕</span><span style="font-size: 12px; color: #999; flex: 1; word-break: break-word;">${escapeHtml(content)}</span></div>`;
+          placeholder.innerHTML = `<div style="padding: 8px; opacity: 0.55; display: flex; align-items: flex-start; gap: 8px;"><span style="flex-shrink: 0;">🗑</span><span style="font-size: 12px; color: #999; flex: 1; word-break: break-word;">${escapeHtml(content)}</span></div>`;
 
           // Find message container and insert placeholder
           const messageContainer = document.querySelector('[role="listbox"], [role="list"], .module-conversation__messages');
@@ -154,11 +178,11 @@ export default {
         align-items: center;
       }
       .beacon-deleted-message .module-message::before {
-        content: '✕ ';
+        content: '🗑 ';
         position: absolute;
-        left: -26px;
-        font-size: 14px;
-        opacity: 0.7;
+        left: -30px;
+        font-size: 16px;
+        opacity: 0.6;
       }
       .beacon-deleted-placeholder {
         margin: 4px 0;
