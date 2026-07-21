@@ -90,15 +90,16 @@ export default {
     });
 
     const observer = new MutationObserver(() => {
-      const msgEls = document.querySelectorAll('[data-message-id]');
-      ctx.log('mutation observer: found', msgEls.length, 'message elements');
-      msgEls.forEach(el => {
-        const msgId = el.getAttribute('data-message-id');
-        if (msgId && deletedIds.has(msgId)) {
-          ctx.log('marking as deleted:', msgId);
-          el.classList.add('beacon-deleted-message');
+      for (const msgId of deletedIds) {
+        const selector = `[aria-labelledby*="${msgId}"]`;
+        const msgEls = document.querySelectorAll(selector);
+        if (msgEls.length > 0) {
+          ctx.log('found deleted message element:', msgId);
+          msgEls.forEach(el => {
+            el.classList.add('beacon-deleted-message');
+          });
         }
-      });
+      }
     });
 
     observer.observe(document.body, {
