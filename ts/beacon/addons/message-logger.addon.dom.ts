@@ -89,7 +89,7 @@ export default {
       return msg;
     });
 
-    // When message renders with deleted flag, mark its DOM element
+    // When message renders with deleted flag, mark its DOM element or create placeholder
     const markDeletedElement = (msgId: string) => {
       setTimeout(() => {
         const selector = `[aria-labelledby*="${msgId}"]`;
@@ -97,6 +97,18 @@ export default {
         if (el) {
           ctx.log('marking deleted DOM element:', msgId);
           el.classList.add('beacon-deleted-message');
+        } else {
+          ctx.log('element already gone, creating placeholder:', msgId);
+          // Element removed before we could mark it, create a placeholder
+          const placeholder = document.createElement('div');
+          placeholder.className = 'beacon-deleted-message beacon-deleted-placeholder';
+          placeholder.innerHTML = '<div style="padding: 8px; opacity: 0.55; display: flex; align-items: center; gap: 8px;"><span>✕</span><span style="font-size: 12px; color: #999;">[Deleted message]</span></div>';
+
+          // Find message container and insert placeholder
+          const messageContainer = document.querySelector('[role="listbox"], [role="list"], .module-conversation__messages');
+          if (messageContainer) {
+            messageContainer.appendChild(placeholder);
+          }
         }
       }, 0);
     };
@@ -142,6 +154,11 @@ export default {
         left: -26px;
         font-size: 14px;
         opacity: 0.7;
+      }
+      .beacon-deleted-placeholder {
+        margin: 4px 0;
+        border-left: 2px solid #999;
+        background: rgba(0,0,0,0.1);
       }
     `);
 
