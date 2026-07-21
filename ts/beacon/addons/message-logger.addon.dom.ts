@@ -120,26 +120,34 @@ export default {
 
     // When message renders with deleted flag, mark its DOM element or create placeholder
     const markDeletedElement = (msgId: string) => {
-      setTimeout(() => {
-        const selector = `[aria-labelledby*="${msgId}"]`;
-        const el = document.querySelector(selector);
-        if (el) {
-          ctx.log('marking deleted DOM element:', msgId);
-          el.classList.add('beacon-deleted-message');
-        } else {
-          ctx.log('element already gone, creating placeholder:', msgId);
-          const content = deletedContent.get(msgId) || '[deleted message]';
-          const placeholder = document.createElement('div');
-          placeholder.className = 'beacon-deleted-message beacon-deleted-placeholder';
-          placeholder.innerHTML = `<div style="padding: 8px; opacity: 0.55; display: flex; align-items: flex-start; gap: 8px;"><span style="flex-shrink: 0;">🗑</span><span style="font-size: 12px; color: #999; flex: 1; word-break: break-word;">${escapeHtml(content)}</span></div>`;
+      // Try multiple selectors to find the message element
+      const selectors = [
+        `[data-message-id="${msgId}"]`,
+        `.module-message__container-outer[id*="${msgId}"]`,
+        `[id*="${msgId}"].module-message__container-outer`,
+        `.module-message[data-id="${msgId}"]`,
+      ];
 
-          // Find message container and insert placeholder
-          const messageContainer = document.querySelector('[role="listbox"], [role="list"], .module-conversation__messages');
-          if (messageContainer) {
-            messageContainer.appendChild(placeholder);
+      let el: Element | null = null;
+      for (const selector of selectors) {
+        el = document.querySelector(selector);
+        if (el) break;
+      }
+
+      if (el) {
+        ctx.log('marking deleted DOM element:', msgId);
+        el.classList.add('beacon-deleted-message');
+      } else {
+        // Fallback: search by text content or other attributes
+        const allMessages = document.querySelectorAll('.module-message__container-outer, [role="article"]');
+        for (const msg of allMessages) {
+          if (msg.textContent?.includes(msgId) || msg.id?.includes(msgId)) {
+            ctx.log('found deleted message by fallback:', msgId);
+            msg.classList.add('beacon-deleted-message');
+            break;
           }
         }
-      }, 0);
+      }
     };
 
     ctx.hooks.on('onMessageChanged', msg => {
@@ -148,14 +156,35 @@ export default {
       }
     });
 
+    // When conversation is selected, mark all deleted messages in that conversation
+    ctx.hooks.on('onConversationSelected', conversationId => {
+      if (conversationId) {
+        ctx.log('conversation selected, re-checking deleted messages:', conversationId);
+        setTimeout(() => {
+          for (const msgId of deletedIds) {
+            markDeletedElement(msgId);
+          }
+        }, 100);
+      }
+    });
+
     const observer = new MutationObserver(() => {
+      // Reapply deleted marker to all tracked deleted messages
       for (const msgId of deletedIds) {
-        const selector = `[aria-labelledby*="${msgId}"]`;
-        const msgEls = document.querySelectorAll(selector);
-        if (msgEls.length > 0) {
-          ctx.log('found deleted message element:', msgId);
+        const selectors = [
+          `[data-message-id="${msgId}"]`,
+          `.module-message__container-outer[id*="${msgId}"]`,
+          `[id*="${msgId}"].module-message__container-outer`,
+          `.module-message[data-id="${msgId}"]`,
+        ];
+
+        for (const selector of selectors) {
+          const msgEls = document.querySelectorAll(selector);
           msgEls.forEach(el => {
-            el.classList.add('beacon-deleted-message');
+            if (!el.classList.contains('beacon-deleted-message')) {
+              el.classList.add('beacon-deleted-message');
+              ctx.log('marked deleted via observer:', msgId);
+            }
           });
         }
       }
@@ -170,19 +199,27 @@ export default {
 
     ctx.css.inject(`
       .beacon-deleted-message {
-        opacity: 0.55 !important;
-      }
-      .beacon-deleted-message .module-message {
+        opacity: 0.5 !important;
         position: relative;
-        display: flex;
-        align-items: center;
       }
-      .beacon-deleted-message .module-message::before {
-        content: '🗑 ';
+      /* Trash icon on message container */
+      .beacon-deleted-message::before {
+        content: '🗑';
         position: absolute;
-        left: -30px;
+        left: 4px;
+        top: 50%;
+        transform: translateY(-50%);
         font-size: 16px;
-        opacity: 0.6;
+        z-index: 10;
+        opacity: 0.8;
+      }
+      /* Alternative: on module-message */
+      .beacon-deleted-message .module-message::after {
+        content: '🗑';
+        display: inline;
+        margin-left: 4px;
+        font-size: 14px;
+        opacity: 0.8;
       }
       .beacon-deleted-placeholder {
         margin: 4px 0;
