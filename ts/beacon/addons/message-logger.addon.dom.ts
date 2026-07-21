@@ -32,7 +32,13 @@ export default {
       ctx.storage.set('log', log);
     };
 
-    const deletedIds = new Set<string>();
+    const deletedIds = new Set<string>(
+      ctx.storage.get<Array<string>>('deleted-ids') ?? []
+    );
+
+    const saveDeletedIds = () => {
+      ctx.storage.set('deleted-ids', Array.from(deletedIds));
+    };
 
     ctx.hooks.on('onMessageReceived', (message, info) => {
       append({
@@ -56,6 +62,7 @@ export default {
 
     ctx.hooks.on('onMessageDeleted', info => {
       deletedIds.add(info.id);
+      saveDeletedIds();
       append({
         direction: 'received',
         id: info.id,
