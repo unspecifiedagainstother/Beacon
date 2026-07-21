@@ -63,6 +63,7 @@ export default {
     ctx.hooks.on('onMessageDeleted', info => {
       deletedIds.add(info.id);
       saveDeletedIds();
+      ctx.log('message deleted:', info.id, 'total deleted:', deletedIds.size);
       append({
         direction: 'received',
         id: info.id,
@@ -81,9 +82,12 @@ export default {
     });
 
     const observer = new MutationObserver(() => {
-      document.querySelectorAll('[data-message-id]').forEach(el => {
+      const msgEls = document.querySelectorAll('[data-message-id]');
+      ctx.log('mutation observer: found', msgEls.length, 'message elements');
+      msgEls.forEach(el => {
         const msgId = el.getAttribute('data-message-id');
         if (msgId && deletedIds.has(msgId)) {
+          ctx.log('marking as deleted:', msgId);
           el.classList.add('beacon-deleted-message');
         }
       });
