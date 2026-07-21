@@ -25,10 +25,9 @@ export default {
   start(ctx) {
     ctx.log('message logger addon started');
 
-    ctx.hooks.on('onActionDispatched', action => {
-      if (action.type === 'MESSAGE_DELETED') {
-        ctx.log('MESSAGE_DELETED action dispatched:', action.payload);
-      }
+    ctx.actions.intercept('MESSAGE_DELETED', action => {
+      ctx.log('intercepting MESSAGE_DELETED:', action.payload);
+      return action;
     });
 
     const append = (entry: LogEntry) => {
@@ -85,8 +84,27 @@ export default {
       const isDeleted = (msg as unknown as { isDeleted?: boolean }).isDeleted;
       if (isDeleted && msg.id) {
         deletedIds.add(msg.id);
+        ctx.log('message marked deleted at render:', msg.id);
       }
       return msg;
+    });
+
+    // When message renders with deleted flag, mark its DOM element
+    const markDeletedElement = (msgId: string) => {
+      setTimeout(() => {
+        const selector = `[aria-labelledby*="${msgId}"]`;
+        const el = document.querySelector(selector);
+        if (el) {
+          ctx.log('marking deleted DOM element:', msgId);
+          el.classList.add('beacon-deleted-message');
+        }
+      }, 0);
+    };
+
+    ctx.hooks.on('onMessageChanged', msg => {
+      if ((msg as unknown as { isDeleted?: boolean }).isDeleted) {
+        markDeletedElement(msg.id);
+      }
     });
 
     const observer = new MutationObserver(() => {
