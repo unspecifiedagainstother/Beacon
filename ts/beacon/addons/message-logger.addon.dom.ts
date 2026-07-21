@@ -56,9 +56,6 @@ export default {
 
     ctx.hooks.on('onMessageDeleted', info => {
       deletedIds.add(info.id);
-      document.querySelectorAll(`[data-testid*="${info.id}"]`).forEach(el => {
-        el.setAttribute('data-beacon-deleted', 'true');
-      });
       append({
         direction: 'received',
         id: info.id,
@@ -68,14 +65,19 @@ export default {
       });
     });
 
+    ctx.messages.intercept(msg => {
+      const isDeleted = (msg as unknown as { isDeleted?: boolean }).isDeleted;
+      if (isDeleted && msg.id) {
+        deletedIds.add(msg.id);
+      }
+      return msg;
+    });
+
     const observer = new MutationObserver(() => {
-      document.querySelectorAll('[data-testid*="message-"]').forEach(el => {
-        const testId = el.getAttribute('data-testid') ?? '';
-        for (const id of deletedIds) {
-          if (testId.includes(id)) {
-            el.setAttribute('data-beacon-deleted', 'true');
-            break;
-          }
+      document.querySelectorAll('[data-message-id]').forEach(el => {
+        const msgId = el.getAttribute('data-message-id');
+        if (msgId && deletedIds.has(msgId)) {
+          el.classList.add('beacon-deleted-message');
         }
       });
     });
@@ -88,20 +90,20 @@ export default {
     ctx.onDispose(() => observer.disconnect());
 
     ctx.css.inject(`
-      [data-beacon-deleted="true"] {
+      .beacon-deleted-message {
         opacity: 0.55 !important;
       }
-      [data-beacon-deleted="true"] .module-message {
+      .beacon-deleted-message .module-message {
         position: relative;
         display: flex;
         align-items: center;
       }
-      [data-beacon-deleted="true"] .module-message::before {
-        content: '✕';
+      .beacon-deleted-message .module-message::before {
+        content: '✕ ';
         position: absolute;
-        left: -22px;
+        left: -26px;
         font-size: 14px;
-        opacity: 0.6;
+        opacity: 0.7;
       }
     `);
 
