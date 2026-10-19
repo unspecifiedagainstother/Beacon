@@ -18,7 +18,9 @@ export default {
   id: 'focus-mode',
   name: 'Focus Mode',
   version: '2.0.0',
-  description: 'mod+shift+f hides sidebar and tabs, /focus to toggle',
+  description: 'Ctrl/⌘+Shift+F or /focus hides the sidebar and tabs.',
+  authors: ['Beacon'],
+  tags: ['ui'],
   start(ctx) {
     let active: Disposer | undefined;
 

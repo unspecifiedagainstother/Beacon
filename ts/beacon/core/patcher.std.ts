@@ -15,6 +15,7 @@
 
 /* oxlint-disable no-param-reassign -- patching mutates the target by design */
 
+import { createLogger } from '../../logging/log.std.ts';
 import type {
   Disposer,
   PatchCallbackAfter,
@@ -22,6 +23,8 @@ import type {
   PatchCallbackInstead,
   Patcher,
 } from './types.dom.ts';
+
+const log = createLogger('beacon/patcher');
 
 type AnyFn = (...args: Array<unknown>) => unknown;
 
@@ -65,10 +68,16 @@ function getOrCreateEntry(obj: object, method: string): PatchEntry {
   entry.proxy = function patchedProxy(this: unknown, ...args: Array<unknown>) {
     let callArgs = args;
 
-    for (const before of entry.befores) {
-      const replaced = before(callArgs);
-      if (Array.isArray(replaced)) {
-        callArgs = replaced;
+    // before/after callbacks are guarded: a broken addon must not break the
+    // patched upstream method. `instead` is not — it owns the call.
+    for (const before of Array.from(entry.befores)) {
+      try {
+        const replaced = before(callArgs);
+        if (Array.isArray(replaced)) {
+          callArgs = replaced;
+        }
+      } catch (error) {
+        log.error(`before-patch on ${method} threw:`, error);
       }
     }
 
@@ -77,7 +86,9 @@ function getOrCreateEntry(obj: object, method: string): PatchEntry {
     if (entry.insteads.length > 0) {
       // Chain insteads: each receives "call the rest" as its original.
       const chain = entry.insteads.reduceRight<AnyFn>(
-        (nextFn, instead) => (...a: Array<unknown>) => instead(a, nextFn),
+        (nextFn, instead) =>
+          (...a: Array<unknown>) =>
+            instead(a, nextFn),
         boundOriginal
       );
       result = chain(...callArgs);
@@ -85,10 +96,14 @@ function getOrCreateEntry(obj: object, method: string): PatchEntry {
       result = boundOriginal(...callArgs);
     }
 
-    for (const after of entry.afters) {
-      const replaced = after(result, callArgs);
-      if (replaced !== undefined) {
-        result = replaced;
+    for (const after of Array.from(entry.afters)) {
+      try {
+        const replaced = after(result, callArgs);
+        if (replaced !== undefined) {
+          result = replaced;
+        }
+      } catch (error) {
+        log.error(`after-patch on ${method} threw:`, error);
       }
     }
 

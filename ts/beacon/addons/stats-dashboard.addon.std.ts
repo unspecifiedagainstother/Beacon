@@ -4,45 +4,95 @@
 import type { AddonManifest } from '../core/types.dom.ts';
 
 /**
- * Stats Dashboard — /stats shows session counters.
+ * Stats Dashboard — session counters, shown with /stats.
  */
 export default {
   id: 'stats-dashboard',
   name: 'Stats Dashboard',
-  version: '2.0.0',
-  description: 'Session stats: /stats shows message counts and uptime',
+  version: '3.0.0',
+  description: 'Session counters: messages, edits, deletes, busiest chats.',
+  authors: ['Beacon'],
+  tags: ['utility'],
   start(ctx) {
     const startedAt = Date.now();
-    let received = 0;
-    let sent = 0;
+    const counts = { received: 0, sent: 0, edited: 0, deleted: 0 };
+    const perConversation = new Map<string, number>();
 
-    ctx.hooks.on('onMessageReceived', () => {
-      received += 1;
+    ctx.hooks.on('onMessageReceived', (_message, { conversationId }) => {
+      counts.received += 1;
+      perConversation.set(
+        conversationId,
+        (perConversation.get(conversationId) ?? 0) + 1
+      );
     });
     ctx.hooks.on('onMessageSent', () => {
-      sent += 1;
+      counts.sent += 1;
     });
+    ctx.hooks.on('onMessageEdited', () => {
+      counts.edited += 1;
+    });
+    ctx.hooks.on('onMessageDeletedForEveryone', () => {
+      counts.deleted += 1;
+    });
+
+    const el = (tag: string, className: string, text?: string) =>
+      ctx.ui.createElement({ tag, className, text });
 
     ctx.commands.register({
       id: 'stats',
       name: 'Session stats',
-      description: 'Show message counts and uptime',
-      execute: cmd => {
-        const minutes = Math.floor((Date.now() - startedAt) / 60000);
-        const total = received + sent;
-        const rate = minutes > 0 ? (total / minutes).toFixed(1) : String(total);
-        cmd.insertText(
-          [
-            'Session stats:',
-            `received: ${received}`,
-            `sent: ${sent}`,
-            `uptime: ${minutes} min`,
-            `rate: ${rate} msg/min`,
-          ].join('\n')
+      description: 'Show message counts for this session',
+      execute: () => {
+        const minutes = Math.max(
+          1,
+          Math.floor((Date.now() - startedAt) / 60000)
         );
+        const total = counts.received + counts.sent;
+
+        const grid = el('div', 'BeaconStats');
+        for (const [label, value] of [
+          ['Received', counts.received],
+          ['Sent', counts.sent],
+          ['Edited', counts.edited],
+          ['Deleted', counts.deleted],
+          ['Per minute', (total / minutes).toFixed(1)],
+          ['Uptime', `${minutes} min`],
+        ] as const) {
+          const tile = el('div', 'BeaconStats__tile');
+          tile.append(
+            el('div', 'BeaconStats__value', String(value)),
+            el('div', 'BeaconStats__label', label)
+          );
+          grid.append(tile);
+        }
+
+        const top = Array.from(perConversation.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5);
+        const root = el('div', 'BeaconStatsRoot');
+        root.append(grid);
+        if (top.length) {
+          const list = el('div', 'BeaconList');
+          list.append(el('div', 'BeaconList__heading', 'Busiest chats'));
+          for (const [conversationId, n] of top) {
+            const row = el('div', 'BeaconList__row');
+            row.append(
+              el(
+                'span',
+                'BeaconList__title',
+                ctx.signal.conversationController
+                  .get(conversationId)
+                  ?.getTitle() ?? 'Unknown'
+              ),
+              el('span', 'BeaconList__meta', `${n} received`)
+            );
+            list.append(row);
+          }
+          root.append(list);
+        }
+
+        ctx.ui.createModal({ title: 'Session stats', content: root });
       },
     });
-
-    ctx.log('stats running');
   },
 } satisfies AddonManifest;

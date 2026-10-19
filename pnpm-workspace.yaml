@@ -4,6 +4,14 @@ lockfileIncludeTarballUrl: true
 verifyDepsBeforeRun: prompt
 verifyStoreIntegrity: true
 
+# Beacon: always install glibc native bindings (rolldown, oxc, oxlint...).
+# A pnpm running outside the build container misdetected libc and skipped
+# every *-linux-x64-gnu binding, leaving rolldown without its binary.
+supportedArchitectures:
+  os: [current]
+  cpu: [current]
+  libc: [glibc]
+
 packages:
   - 'packages/*'
   - 'sticker-creator'

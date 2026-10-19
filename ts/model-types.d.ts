@@ -23,6 +23,7 @@ import type {
 import type { EmbeddedContactType } from './types/EmbeddedContact.std.ts';
 import { SignalService as Proto } from './protobuf/index.std.ts';
 import type { AvatarDataType, ContactAvatarType } from './types/Avatar.std.ts';
+import type { BeaconDeletedSnapshot } from './beacon/core/message-snapshot.std.ts';
 import type {
   AciString,
   PniString,
@@ -188,6 +189,8 @@ type MessageType =
 //   consider adding a database column as well and updating `MESSAGE_COLUMNS`
 //   in `ts/sql/Server.ts`
 export type MessageAttributesType = {
+  // Beacon: content retained by the message logger across a delete-for-everyone.
+  beaconDeleted?: BeaconDeletedSnapshot;
   bodyAttachment?: AttachmentType;
   bodyRanges?: ReadonlyArray<RawBodyRange>;
   callId?: string;

@@ -9,29 +9,17 @@
 # Runs inside the `mollydesk` distrobox and pins Node via nvm.
 set -euo pipefail
 
-CONTAINER="${BEACON_CONTAINER:-mollydesk}"
-REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# shellcheck source=scripts/beacon/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-if [ ! -f /run/.containerenv ]; then
-  exec distrobox enter "$CONTAINER" -- "$0" "$@"
-fi
+beacon_enter_container "$@"
+beacon_setup_node
 
-cd "$REPO"
-
-export NVM_DIR="$HOME/.nvm"
-# shellcheck disable=SC1091
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-nvm use >/dev/null
-
-# Editing package.json invalidates pnpm's verifyDepsBeforeRun check, and it
-# cannot prompt non-interactively. Reconcile automatically instead of failing.
-if ! pnpm run --silent get-expire-time >/dev/null 2>&1; then
-  echo "beacon: lockfile out of date, reconciling..."
-  CI=true pnpm install
-fi
+beacon_ensure_deps
 
 echo "beacon: full rebuild (bundle + styles + locales)..."
 pnpm run generate
+touch bundles/preload/main.js
 
 cat <<'EOF'
 

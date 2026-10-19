@@ -236,6 +236,15 @@ export type PropsData = {
     text?: string;
     bodyRanges?: HydratedBodyRangesType;
   }>;
+  // Beacon: content retained by the message logger after a delete-for-everyone.
+  beaconDeleted?: {
+    text?: string;
+    bodyRanges?: HydratedBodyRangesType;
+    attachments: ReadonlyArray<string>;
+    stickerEmoji?: string;
+    previousRevisions?: ReadonlyArray<{ body?: string; timestamp: number }>;
+    deletedAt: number;
+  };
   isSticker?: boolean;
   isTargeted?: boolean;
   isTargetedCounter?: number;
@@ -2511,6 +2520,62 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
+  /**
+   * Beacon: what a deleted message said, kept by the message logger. Shown
+   * under the "deleted" line; `.module-message__beacon-deleted` is hidden by
+   * default and revealed by the addon's body class, so disabling the logger
+   * hides retained content without a re-render.
+   */
+  public renderBeaconDeleted(): JSX.Element | null {
+    const { beaconDeleted, direction, i18n } = this.props;
+    if (!beaconDeleted) {
+      return null;
+    }
+
+    return (
+      <div className="module-message__beacon-deleted">
+        {beaconDeleted.previousRevisions?.map(revision =>
+          revision.body ? (
+            <div
+              className="module-message__beacon-deleted__revision"
+              key={revision.timestamp}
+            >
+              {revision.body}
+            </div>
+          ) : null
+        )}
+        {beaconDeleted.text ? (
+          <div className="module-message__beacon-deleted__body">
+            <MessageBody
+              bodyRanges={beaconDeleted.bodyRanges}
+              direction={direction}
+              disableLinks
+              i18n={i18n}
+              isSpoilerExpanded={{}}
+              originalText={beaconDeleted.text}
+              renderLocation={RenderLocation.Timeline}
+              text={beaconDeleted.text}
+            />
+          </div>
+        ) : null}
+        {beaconDeleted.stickerEmoji ? (
+          <span className="module-message__beacon-deleted__attachment">
+            {beaconDeleted.stickerEmoji}
+          </span>
+        ) : null}
+        {beaconDeleted.attachments.map((name, idx) => (
+          <span
+            className="module-message__beacon-deleted__attachment"
+            // oxlint-disable-next-line react/no-array-index-key
+            key={`${name}-${idx}`}
+          >
+            {name}
+          </span>
+        ))}
+      </div>
+    );
+  }
+
   public renderText(): JSX.Element | null {
     const {
       text,
@@ -2574,6 +2639,7 @@ export class Message extends PureComponent<Props, State> {
         }}
       >
         {messageStatusContents != null && messageStatusContents}
+        {deletedForEveryone && this.renderBeaconDeleted()}
         {messageStatusContents == null && this.renderPastEdits()}
         {messageStatusContents == null && text != null && (
           <MessageBodyReadMore

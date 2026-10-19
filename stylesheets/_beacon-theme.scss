@@ -38,8 +38,8 @@
   --beacon-past-edit-opacity: 0.55;
   --beacon-past-edit-label-opacity: 0.8;
 
-  // Retained content from a deleted message, once the message logger lands
-  // (todo.md section 11b). Red to read as "this was withdrawn".
+  // Retained content from a deleted message (message-logger addon). Red to
+  // read as "this was withdrawn".
   --beacon-deleted-text: #f44336;
 
   // -- Flat theme
@@ -91,7 +91,8 @@
     width: 16px;
     height: 16px;
     background-color: currentColor;
-    -webkit-mask: url('../images/icons/v3/error/error-circle.svg') no-repeat center;
+    -webkit-mask: url('../images/icons/v3/error/error-circle.svg') no-repeat
+      center;
     -webkit-mask-size: 100%;
   }
 }
@@ -201,367 +202,818 @@
 
 .Beacon__settings-divider {
   height: 1px;
-  background: var(--beacon-elevation-border, 1px solid #2f2f2f);
-  margin: 8px 0;
+  background: var(--axo-color-border-primary);
+  margin-block: 8px;
 }
 
-// Beacon: Modules (addons) list page.
-.BeaconModules {
-  padding: 0;
+// ===========================================================================
+// Beacon UI kit
+//
+// Shared primitives for Beacon-authored UI: the Modules page, addon modals,
+// toasts, the message log. Built on the axo color tokens, which already
+// resolve per theme via light-dark(), so nothing here needs a .dark-theme
+// override.
+// ===========================================================================
+
+.BeaconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 30px;
+  padding-block: 5px;
+  padding-inline: 12px;
+  border: none;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--axo-color-label-primary);
+  background: var(--axo-color-fill-secondary);
+
+  &:hover {
+    background: var(--axo-color-fill-secondary-pressed);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--axo-color-border-focused-outer);
+    outline-offset: 1px;
+  }
+
+  &--primary {
+    color: var(--axo-color-label-primary-oncolor);
+    background: var(--axo-color-fill-primary);
+
+    &:hover {
+      background: var(--axo-color-fill-primary-pressed);
+    }
+  }
+
+  &--destructive {
+    color: var(--axo-color-label-destructive);
+  }
+
+  &--ghost {
+    background: transparent;
+    color: var(--axo-color-label-secondary);
+
+    &:hover {
+      background: var(--axo-color-fill-secondary);
+      color: var(--axo-color-label-primary);
+    }
+  }
 }
 
-.BeaconModules__description {
-  font-size: 0.9375rem;
-  opacity: 0.8;
-  margin-bottom: 16px;
+.BeaconInput {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 32px;
+  padding-block: 6px;
+  padding-inline: 10px;
+  border: 1px solid var(--axo-color-border-primary);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--axo-color-label-primary);
+  background: var(--axo-color-fill-secondary);
+
+  &::placeholder {
+    color: var(--axo-color-label-placeholder);
+  }
+
+  &:focus {
+    outline: 2px solid var(--axo-color-border-focused-outer);
+    outline-offset: -1px;
+  }
+
+  &--number {
+    width: 110px;
+  }
+
+  &--select {
+    width: auto;
+    min-width: 160px;
+  }
+
+  &--textarea {
+    min-height: 64px;
+    resize: vertical;
+    font-family: inherit;
+  }
 }
 
-.BeaconModules__empty {
+.BeaconSegmented {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 9px;
+  background: var(--axo-color-fill-secondary);
+}
+
+.BeaconSegmented__item {
+  padding-block: 4px;
+  padding-inline: 12px;
+  border: none;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--axo-color-label-secondary);
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--axo-color-label-primary);
+  }
+
+  &--active {
+    color: var(--axo-color-label-primary);
+    background: var(--axo-color-surface-primary);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+  }
+}
+
+.BeaconChip {
+  display: inline-flex;
+  align-items: center;
+  padding-block: 1px;
+  padding-inline: 7px;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--axo-color-label-secondary);
+  background: var(--axo-color-fill-secondary);
+  white-space: nowrap;
+
+  &--command {
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    color: var(--axo-color-label-accent);
+  }
+
+  &--kbd {
+    font-family: inherit;
+    border: 1px solid var(--axo-color-border-primary);
+    background: transparent;
+  }
+}
+
+.BeaconEmpty {
+  padding-block: 32px;
+  padding-inline: 16px;
   text-align: center;
-  padding: 40px 20px;
-  opacity: 0.6;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
+  color: var(--axo-color-label-secondary);
 }
 
-.BeaconModules__list {
+// -- Modules page ------------------------------------------------------------
+
+.BeaconModules {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.BeaconModules__item {
-  padding: 12px;
-  border: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
-  border-radius: 6px;
-  background: var(--axo-color-surface-primary, #000);
-}
-
-.BeaconModules__item-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.BeaconModules__item-id {
-  font-weight: 600;
-  font-family: monospace;
-  font-size: 0.875rem;
-}
-
-.BeaconModules__badge {
-  font-size: 0.75rem;
-  padding: 2px 8px;
-  border-radius: 3px;
-  &--enabled {
-    background: rgba(76, 175, 80, 0.2);
-    color: #4caf50;
-  }
-  &--disabled {
-    background: rgba(244, 67, 54, 0.2);
-    color: #f44336;
-  }
-}
-
-.BeaconModules__item-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.BeaconModules__note {
-  font-size: 0.8125rem;
-  opacity: 0.6;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
-}
-
-// Command completion popup (Quill integration)
-.command-completion__popup {
-  position: absolute;
-  background: var(--axo-color-surface-primary, #000);
-  border: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
-  border-radius: 8px;
-  max-width: 400px;
-  max-height: 300px;
-  overflow-y: auto;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-}
-
-.command-completion__item {
-  padding: 8px 12px;
-  cursor: pointer;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  background: transparent;
-  transition: background-color 0.15s;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:hover,
-  &--selected {
-    background: var(--axo-color-surface-secondary, #111);
-  }
-}
-
-.command-completion__item-name {
-  font-family: monospace;
-  font-weight: 600;
-  color: var(--beacon-brand, #2c6bed);
-  font-size: 0.8125rem;
-  line-height: 1.2;
-}
-
-.command-completion__item-desc {
-  font-size: 0.75rem;
-  color: var(--axo-color-label-tertiary, #999);
-  margin-top: 2px;
-  line-height: 1.2;
-}
-
-// Beacon: Command Palette
-.command-palette {
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 400px;
-  max-height: 400px;
-  background: red;
-  border: 2px solid yellow;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-  z-index: 10000;
-}
-
-.command-palette__content {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-height: 350px;
-}
-
-.command-palette__input {
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--axo-color-surface-primary, #000);
-  color: var(--axo-color-label-primary, #fff);
-  border: none;
-  border-bottom: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
-  font-size: 0.9375rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  outline: none;
-
-  &::placeholder {
-    color: var(--axo-color-label-tertiary, #888);
-  }
-
-  &:focus {
-    background: var(--axo-color-surface-secondary, #111);
-  }
-}
-
-.command-palette__list {
-  max-height: 300px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-}
-
-.command-palette__item {
-  padding: 8px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  cursor: pointer;
-  transition: background-color 0.15s;
-  background: transparent;
-  text-align: left;
-  border: none;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:hover,
-  &.command-palette__item--selected {
-    background: var(--axo-color-surface-secondary, #111);
-  }
-}
-
-.command-palette__item-name {
-  font-family: monospace;
-  font-weight: 600;
-  color: var(--beacon-brand, #2c6bed);
-  font-size: 0.8125rem;
-  line-height: 1.2;
-}
-
-.command-palette__item-desc {
-  font-size: 0.75rem;
-  color: var(--axo-color-label-tertiary, #999);
-  margin-top: 2px;
-  line-height: 1.2;
-}
-
-// Addon-created modals
-.addon-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.addon-modal__overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  cursor: pointer;
-}
-
-.addon-modal__content {
-  position: relative;
-  background: var(--axo-color-surface-primary, #000);
-  border: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
-  border-radius: 8px;
-  min-width: 300px;
-  max-width: 600px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-.addon-modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px;
-  border-bottom: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
-}
-
-.addon-modal__title {
+.BeaconModules__description {
   margin: 0;
-  font-size: 1.25rem;
-  color: var(--axo-color-label-primary, #fff);
+  font-size: 0.875rem;
+  color: var(--axo-color-label-secondary);
 }
 
-.addon-modal__close {
-  background: none;
-  border: none;
-  color: var(--axo-color-label-primary, #fff);
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
+.BeaconModules__toolbar {
   display: flex;
   align-items: center;
-  justify-content: center;
-
-  &:hover {
-    background: var(--axo-color-surface-secondary, #111);
-    border-radius: 4px;
-  }
-}
-
-.addon-modal__body {
-  flex: 1;
-  padding: 16px;
-  overflow-y: auto;
-  color: var(--axo-color-label-primary, #fff);
-}
-
-.addon-modal__actions {
-  display: flex;
   gap: 8px;
-  padding: 16px;
-  border-top: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
-  justify-content: flex-end;
 }
 
-.addon-modal__button {
-  padding: 8px 16px;
-  border: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
-  border-radius: 4px;
-  background: var(--axo-color-surface-secondary, #111);
-  color: var(--axo-color-label-primary, #fff);
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.15s;
-
-  &:hover {
-    background: var(--axo-color-surface-tertiary, #222);
-  }
-
-  &--primary {
-    background: var(--beacon-brand, #2c6bed);
-    border-color: var(--beacon-brand, #2c6bed);
-  }
-
-  &--destructive {
-    background: #f44336;
-    border-color: #f44336;
-  }
+.BeaconModules__search {
+  flex: 1;
 }
 
-// Addon notifications
-.addon-notification {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 12px 16px;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  z-index: 10001;
-  animation: slideIn 0.3s ease-out;
+.BeaconModules__count {
+  font-size: 0.75rem;
+  color: var(--axo-color-label-secondary);
+}
 
-  &--info {
-    background: var(--axo-color-surface-secondary, #111);
-    color: var(--axo-color-label-primary, #fff);
-    border: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
+.BeaconModules__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.BeaconModules__card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--axo-color-border-primary);
+  border-radius: 12px;
+  background: var(--axo-color-surface-secondary);
+
+  &--enabled {
+    border-color: color-mix(in srgb, var(--beacon-brand) 45%, transparent);
   }
 
-  &--success {
-    background: rgba(76, 175, 80, 0.2);
-    color: #4caf50;
-    border: 1px solid #4caf50;
-  }
-
-  &--warning {
-    background: rgba(255, 193, 7, 0.2);
-    color: #ffc107;
-    border: 1px solid #ffc107;
+  &--expanded {
+    grid-column: 1 / -1;
   }
 
   &--error {
-    background: rgba(244, 67, 54, 0.2);
-    color: #f44336;
-    border: 1px solid #f44336;
+    border-color: var(--axo-color-label-destructive);
   }
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateX(400px);
-    opacity: 0;
+.BeaconModules__card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.BeaconModules__card-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.BeaconModules__card-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--axo-color-label-primary);
+}
+
+.BeaconModules__card-version {
+  font-size: 0.75rem;
+  color: var(--axo-color-label-secondary);
+}
+
+.BeaconModules__card-switch {
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.BeaconModules__card-description {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--axo-color-label-secondary);
+}
+
+.BeaconModules__card-error {
+  padding-block: 6px;
+  padding-inline: 8px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: var(--axo-color-label-destructive);
+  background: color-mix(
+    in srgb,
+    var(--axo-color-label-destructive) 10%,
+    transparent
+  );
+}
+
+.BeaconModules__card-extras,
+.BeaconModules__card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.BeaconModules__card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.BeaconModules__card-settings {
+  flex-shrink: 0;
+
+  &::after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background-color: currentColor;
+    -webkit-mask: url('../images/icons/v3/chevron/chevron-down.svg') no-repeat
+      center;
+    -webkit-mask-size: 100%;
   }
-  to {
-    transform: translateX(0);
-    opacity: 1;
+
+  &--open::after {
+    transform: rotate(180deg);
+  }
+}
+
+.BeaconModules__settings {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--axo-color-border-primary);
+}
+
+.BeaconModules__setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 8px;
+
+  &--stacked {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+}
+
+.BeaconModules__setting-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.BeaconModules__setting-label {
+  font-size: 0.8125rem;
+  color: var(--axo-color-label-primary);
+}
+
+.BeaconModules__setting-description {
+  font-size: 0.75rem;
+  color: var(--axo-color-label-secondary);
+}
+
+.BeaconModules__setting-control {
+  flex-shrink: 0;
+}
+
+.BeaconModules__reset {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+// -- Modals ------------------------------------------------------------------
+
+.BeaconModal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.BeaconModal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.55);
+}
+
+.BeaconModal__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(480px, calc(100vw - 48px));
+  max-height: min(80vh, 720px);
+  border: var(--beacon-elevation-border);
+  border-radius: 14px;
+  color: var(--axo-color-label-primary);
+  background: var(--axo-color-material-dialog);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 16px 48px rgb(0 0 0 / 0.3);
+  animation: beacon-pop-in 140ms ease-out;
+
+  &--wide {
+    width: min(720px, calc(100vw - 48px));
+  }
+}
+
+.BeaconModal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 14px 10px;
+  padding-inline: 18px;
+}
+
+.BeaconModal__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.BeaconModal__close {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--axo-color-label-secondary);
+  cursor: pointer;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    background-color: currentColor;
+    -webkit-mask: url('../images/icons/v3/x/x.svg') no-repeat center;
+    -webkit-mask-size: 100%;
+  }
+
+  &:hover {
+    background: var(--axo-color-fill-secondary);
+    color: var(--axo-color-label-primary);
+  }
+}
+
+.BeaconModal__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-block: 0 16px;
+  padding-inline: 18px;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+}
+
+.BeaconModal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-block: 10px 14px;
+  padding-inline: 18px;
+  border-top: 1px solid var(--axo-color-border-primary);
+}
+
+@keyframes beacon-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+// -- Toasts ------------------------------------------------------------------
+
+.BeaconToastStack {
+  position: fixed;
+  inset-inline-end: 16px;
+  inset-block-end: 16px;
+  z-index: 10001;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.BeaconToast {
+  max-width: 360px;
+  padding-block: 10px;
+  padding-inline: 14px;
+  border: var(--beacon-elevation-border);
+  border-inline-start: 3px solid var(--axo-color-label-secondary);
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  color: var(--axo-color-label-primary);
+  background: var(--axo-color-material-dialog);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+  pointer-events: auto;
+  cursor: pointer;
+  white-space: pre-wrap;
+  animation: beacon-toast-in 180ms ease-out;
+  transition:
+    opacity 180ms ease-in,
+    transform 180ms ease-in;
+
+  &--success {
+    border-inline-start-color: #3fb950;
+  }
+
+  &--warning {
+    border-inline-start-color: #e3a008;
+  }
+
+  &--error {
+    border-inline-start-color: var(--axo-color-label-destructive);
+  }
+
+  &--info {
+    border-inline-start-color: var(--beacon-brand);
+  }
+
+  &--leaving {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes beacon-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+// -- Lists (help, stats) -----------------------------------------------------
+
+.BeaconList {
+  display: flex;
+  flex-direction: column;
+  white-space: normal;
+}
+
+.BeaconList__heading {
+  margin-block: 12px 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--axo-color-label-secondary);
+}
+
+.BeaconList__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-block: 7px;
+  border-bottom: 1px solid var(--axo-color-border-primary);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.BeaconList__code {
+  flex: 0 0 200px;
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.8125rem;
+  color: var(--axo-color-label-accent);
+}
+
+.BeaconList__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.BeaconList__meta {
+  flex: 1;
+  font-size: 0.8125rem;
+  color: var(--axo-color-label-secondary);
+}
+
+.BeaconStatsRoot {
+  white-space: normal;
+}
+
+.BeaconStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.BeaconStats__tile {
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--axo-color-fill-secondary);
+}
+
+.BeaconStats__value {
+  font-size: 1.375rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.BeaconStats__label {
+  font-size: 0.75rem;
+  color: var(--axo-color-label-secondary);
+}
+
+// -- Message log viewer ------------------------------------------------------
+
+.BeaconLog {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  white-space: normal;
+}
+
+.BeaconLog__toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-block: 2px 6px;
+  background: inherit;
+}
+
+.BeaconLog__search {
+  flex: 1;
+}
+
+.BeaconLog__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.BeaconLog__item {
+  padding-block: 8px 10px;
+  padding-inline: 12px;
+  border-radius: 10px;
+  border-inline-start: 3px solid var(--axo-color-border-primary);
+  background: var(--axo-color-fill-secondary);
+
+  &--deleted {
+    border-inline-start-color: var(--beacon-deleted-text);
+  }
+
+  &--edited {
+    border-inline-start-color: var(--beacon-brand);
+  }
+}
+
+.BeaconLog__item-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 0.75rem;
+  color: var(--axo-color-label-secondary);
+}
+
+.BeaconLog__item-author {
+  font-weight: 600;
+  color: var(--axo-color-label-primary);
+}
+
+.BeaconLog__item-chat {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.BeaconLog__item-time {
+  margin-inline-start: auto;
+  white-space: nowrap;
+}
+
+.BeaconLog__jump {
+  min-height: 22px;
+  padding-block: 1px;
+  padding-inline: 8px;
+  font-size: 0.75rem;
+}
+
+.BeaconLog__item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.BeaconLog__line {
+  &--old {
+    color: var(--axo-color-label-secondary);
+    text-decoration: line-through;
+    text-decoration-color: color-mix(in srgb, currentColor 50%, transparent);
+  }
+
+  &--deleted {
+    color: var(--beacon-deleted-text);
+  }
+
+  &--gone {
+    font-style: italic;
+    color: var(--axo-color-label-secondary);
+  }
+}
+
+// -- Composer slash-command suggestions ------------------------------------
+
+.BeaconCommandSuggestions__row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  text-align: start;
+}
+
+.BeaconCommandSuggestions__name {
+  flex-shrink: 0;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-weight: 600;
+  color: var(--axo-color-label-accent);
+}
+
+.BeaconCommandSuggestions__usage {
+  font-weight: 400;
+  color: var(--axo-color-label-secondary);
+}
+
+.BeaconCommandSuggestions__description {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  color: var(--axo-color-label-secondary);
+}
+
+.BeaconCommandSuggestions__source {
+  flex-shrink: 0;
+  font-size: 0.6875rem;
+  color: var(--axo-color-label-placeholder);
+}
+
+// -- Message logger: retained content of deleted messages ------------------
+//
+// Hidden unless the message-logger addon is running (it adds the body
+// class), so disabling the addon hides retained text without a re-render.
+
+.module-message__beacon-deleted {
+  display: none;
+}
+
+.Beacon--logger-show-deleted {
+  .module-message__beacon-deleted {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px dashed
+      color-mix(in srgb, var(--beacon-deleted-text) 45%, transparent);
+    font-style: normal;
+  }
+
+  .module-message__beacon-deleted__revision {
+    opacity: var(--beacon-past-edit-opacity);
+    text-decoration: line-through;
+  }
+
+  .module-message__beacon-deleted__attachment {
+    align-self: flex-start;
+    padding-block: 1px;
+    padding-inline: 6px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    background: color-mix(in srgb, var(--beacon-deleted-text) 14%, transparent);
+  }
+}
+
+.Beacon--logger-style-tint .module-message__beacon-deleted__body {
+  color: var(--beacon-deleted-text);
+}
+
+.Beacon--logger-style-strike .module-message__beacon-deleted__body {
+  text-decoration: line-through;
+  text-decoration-color: var(--beacon-deleted-text);
+}
+
+.Beacon--logger-style-subtle .module-message__beacon-deleted__body {
+  opacity: var(--beacon-past-edit-opacity);
+}
+
+// -- Ghost mode badge --------------------------------------------------------
+
+.Beacon--ghost .CompositionArea {
+  position: relative;
+
+  &::before {
+    content: 'ghost';
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 12px;
+    transform: translateY(-50%);
+    padding-block: 1px;
+    padding-inline: 6px;
+    border-radius: 6px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--axo-color-label-secondary);
+    background: var(--axo-color-fill-secondary);
+    pointer-events: none;
   }
 }

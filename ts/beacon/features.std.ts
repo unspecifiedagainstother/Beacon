@@ -58,10 +58,32 @@ export const BEACON_FEATURE_KEYS = BEACON_FEATURES.map(
   feature => feature.key
 ) as ReadonlyArray<BeaconFeatureKey>;
 
-/** Shape mixed into StorageAccessType so each key is a typed boolean. */
+/**
+ * Message-logger index entry. IDs and timestamps only — the retained content
+ * itself lives on the message (`beaconDeleted`, `editHistory`).
+ */
+export type BeaconMessageLogEntry = Readonly<{
+  kind: 'deleted' | 'edited';
+  messageId: string;
+  conversationId: string;
+  /** When the delete/edit was observed. */
+  at: number;
+  /** Original send time of the message, for jump-to-message. */
+  sentAt: number;
+}>;
+
+/**
+ * Non-toggle Beacon data kept in items storage — i.e. inside the encrypted
+ * database, unlike addon localStorage. Not preserved across unlink.
+ */
+export type BeaconDataStorageKeys = {
+  beaconMessageLog: ReadonlyArray<BeaconMessageLogEntry>;
+};
+
+/** Shape mixed into StorageAccessType so each key is typed. */
 export type BeaconStorageKeys = {
   [K in BeaconFeatureKey]: boolean;
-};
+} & BeaconDataStorageKeys;
 
 /** Current value of every Beacon feature, as passed to the Preferences UI. */
 export type BeaconSettingsType = Record<BeaconFeatureKey, boolean>;
