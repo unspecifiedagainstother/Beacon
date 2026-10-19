@@ -18,7 +18,7 @@ beacon_setup_node
 beacon_ensure_deps
 
 echo "beacon: full rebuild (bundle + styles + locales)..."
-pnpm run generate
+beacon_run generate
 touch bundles/preload/main.js
 
 cat <<'EOF'

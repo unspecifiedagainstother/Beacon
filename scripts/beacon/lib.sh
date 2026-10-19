@@ -70,6 +70,17 @@ beacon_setup_node() {
   # automatically instead, for this script and every nested `pnpm run`.
   export pnpm_config_verify_deps_before_run=install
   export npm_config_verify_deps_before_run=install
+  # ...and never stop to ask before re-creating node_modules.
+  export pnpm_config_confirm_modules_purge=false
+  export npm_config_confirm_modules_purge=false
+}
+
+# Run a package.json script with pnpm. Not Bun: Bun rewrites `pnpm run` inside
+# package scripts to `bun run`, and Signal's pipeline relies on pnpm-only
+# regex scripts (`pnpm run "/^build:styles:(sass|tailwind):prod$/"`).
+# Bun is the host-side launcher instead — see package.json beacon:* scripts.
+beacon_run() {
+  pnpm run "$@"
 }
 
 # Never install with CI=true: pnpm 11 derives settings such as
