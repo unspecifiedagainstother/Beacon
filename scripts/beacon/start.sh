@@ -8,7 +8,7 @@
 #                 (default, matches previous behaviour)
 #   --build       force a full rebuild before starting
 #   --no-build    skip the staleness check and start what's built
-#   --debug       expose DevTools protocol on 127.0.0.1:9229
+#   --debug       expose DevTools protocol on 127.0.0.1:9229 (BEACON_DEBUG_PORT)
 #                 (window.Beacon lives in the "Electron Isolated Context")
 #   -h, --help    show this help
 #
@@ -92,8 +92,9 @@ ELECTRON="$BEACON_REPO/node_modules/.bin/electron"
 
 ELECTRON_ARGS=(.)
 if [ "$DEBUG" = 1 ]; then
-  ELECTRON_ARGS=(--remote-debugging-port=9229 --remote-debugging-address=127.0.0.1 .)
-  beacon_log "DevTools protocol on http://127.0.0.1:9229/json"
+  PORT="${BEACON_DEBUG_PORT:-9229}"
+  ELECTRON_ARGS=(--remote-debugging-port="$PORT" --remote-debugging-address=127.0.0.1 .)
+  beacon_log "DevTools protocol on http://127.0.0.1:$PORT/json"
 fi
 if [ ${#EXTRA[@]} -gt 0 ]; then
   ELECTRON_ARGS+=("${EXTRA[@]}")

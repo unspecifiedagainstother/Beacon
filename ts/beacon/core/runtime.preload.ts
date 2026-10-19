@@ -22,6 +22,7 @@ import { createPatcher } from './patcher.std.ts';
 import { createElement, createModal } from './ui.dom.ts';
 import { createLogger } from '../../logging/log.std.ts';
 import { BEACON_FEATURES } from '../features.std.ts';
+import { getAccentHex, getAccentProperties } from './accent.std.ts';
 
 const log = createLogger('beacon/runtime');
 
@@ -68,6 +69,7 @@ export function initializeBeaconRuntime(store: Store<StateType>): void {
   try {
     purgeLegacyPlaintext();
     syncBlurPII(store);
+    syncAccent(store);
     attachHookBus(hookBus);
     registerBuiltinCommands();
 
@@ -111,6 +113,23 @@ function syncBlurPII(store: Store<StateType>): void {
     if (next !== current) {
       current = next;
       document.body.classList.toggle('Beacon--blur-pii', next);
+    }
+  };
+  apply();
+  store.subscribe(apply);
+}
+
+/** Keep Beacon/axo accent tokens in step with the default chat color. */
+function syncAccent(store: Store<StateType>): void {
+  let current: string | undefined;
+  const apply = () => {
+    const hex = getAccentHex(store.getState().items.defaultConversationColor);
+    if (hex === current) {
+      return;
+    }
+    current = hex;
+    for (const [name, value] of Object.entries(getAccentProperties(hex))) {
+      document.body.style.setProperty(name, value);
     }
   };
   apply();

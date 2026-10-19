@@ -256,6 +256,9 @@ function AddonCard({
       )}
     >
       <div className="BeaconModules__card-head">
+        <span className="BeaconModules__card-icon" aria-hidden>
+          {addon.name.charAt(0)}
+        </span>
         <div className="BeaconModules__card-title">
           <span className="BeaconModules__card-name">{addon.name}</span>
           {addon.version ? (
