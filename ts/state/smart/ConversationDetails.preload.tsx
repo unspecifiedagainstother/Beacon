@@ -52,7 +52,6 @@ import { drop } from '../../util/drop.std.ts';
 import { DataReader } from '../../sql/Client.preload.ts';
 import { isFeaturedEnabledSelector } from '../../util/isFeatureEnabled.dom.ts';
 import { getCanAddLabel } from '../../types/GroupMemberLabels.std.ts';
-import { useToastActions } from '../ducks/toast.preload.ts';
 import { useNavActions } from '../ducks/nav.std.ts';
 import { NavTab, SettingsPage } from '../../types/Nav.std.ts';
 
@@ -137,7 +136,7 @@ export const SmartConversationDetails = memo(function SmartConversationDetails({
     reportSpam,
     saveAvatarToDisk,
     setDisappearingMessages,
-    setMuteDuration,
+    setMuteExpiration,
     showConversation,
     startAvatarDownload,
     terminateGroup,
@@ -157,7 +156,6 @@ export const SmartConversationDetails = memo(function SmartConversationDetails({
     toggleEditNicknameAndNoteModal,
     toggleSafetyNumberModal,
   } = useGlobalModalActions();
-  const { showToast } = useToastActions();
 
   const conversation = conversationSelector(conversationId);
   assertDev(
@@ -312,10 +310,9 @@ export const SmartConversationDetails = memo(function SmartConversationDetails({
       searchInConversation={searchInConversation}
       selectedNavTab={selectedNavTab}
       setDisappearingMessages={setDisappearingMessages}
-      setMuteDuration={setMuteDuration}
+      setMuteExpiration={setMuteExpiration}
       showContactModal={showContactModal}
       showConversation={showConversation}
-      showToast={showToast}
       startAvatarDownload={() => startAvatarDownload(conversationId)}
       terminateGroup={terminateGroup}
       theme={theme}

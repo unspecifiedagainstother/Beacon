@@ -9,8 +9,8 @@ import { CallViewMode } from '../types/Calling.std.ts';
 import { AxoDropdownMenu } from '../axo/AxoDropdownMenu.dom.tsx';
 import { AxoIconButton } from '../axo/AxoIconButton.dom.tsx';
 import { tw } from '../axo/tw.dom.tsx';
-import type { AxoSymbolIconName } from '../axo/_internal/AxoSymbolDefs.generated.std.ts';
 import { missingCaseError } from '../util/missingCaseError.std.ts';
+import type { AxoSymbol } from '../axo/AxoSymbol.dom.tsx';
 
 export type PropsType = {
   callViewMode?: CallViewMode;
@@ -55,10 +55,8 @@ export function CallingHeader({
               <AxoIconButton.Root
                 variant="elevated-secondary"
                 size="lg"
-                iconWeight={300}
                 symbol={getCallViewModeIcon(callViewMode)}
-                label={i18n('icu:calling__change-view')}
-                tooltip={false}
+                label={i18n('icu:calling__change-layout')}
               />
             </AxoDropdownMenu.Trigger>
             <AxoDropdownMenu.Content align="end">
@@ -75,19 +73,19 @@ export function CallingHeader({
                   value={CallViewMode.Paginated}
                   symbol="grid"
                 >
-                  {i18n('icu:calling__view_mode--paginated')}
+                  {i18n('icu:calling__layout--paginated')}
                 </AxoDropdownMenu.RadioItem>
                 <AxoDropdownMenu.RadioItem
                   value={CallViewMode.Sidebar}
                   symbol="grid-sidebar"
                 >
-                  {i18n('icu:calling__view_mode--overflow')}
+                  {i18n('icu:calling__layout--overflow')}
                 </AxoDropdownMenu.RadioItem>
                 <AxoDropdownMenu.RadioItem
                   value={CallViewMode.Speaker}
                   symbol="sidebar"
                 >
-                  {i18n('icu:calling__view_mode--speaker')}
+                  {i18n('icu:calling__layout--speaker')}
                 </AxoDropdownMenu.RadioItem>
               </AxoDropdownMenu.RadioGroup>
             </AxoDropdownMenu.Content>
@@ -96,7 +94,6 @@ export function CallingHeader({
       <AxoIconButton.Root
         variant="elevated-secondary"
         size="lg"
-        iconWeight={300}
         symbol="settings"
         label={i18n('icu:callingDeviceSelection__settings')}
         onClick={toggleSettings}
@@ -105,7 +102,6 @@ export function CallingHeader({
         <AxoIconButton.Root
           variant="elevated-secondary"
           size="lg"
-          iconWeight={300}
           symbol="pip"
           label={i18n('icu:calling__pip--on')}
           onClick={togglePip}
@@ -115,7 +111,6 @@ export function CallingHeader({
         <AxoIconButton.Root
           variant="elevated-secondary"
           size="lg"
-          iconWeight={300}
           symbol="x"
           label={i18n('icu:cancel')}
           onClick={onCancel}
@@ -125,7 +120,7 @@ export function CallingHeader({
   );
 }
 
-export function getCallViewModeIcon(mode: CallViewMode): AxoSymbolIconName {
+export function getCallViewModeIcon(mode: CallViewMode): AxoSymbol.Name {
   switch (mode) {
     case CallViewMode.Paginated:
       return 'grid';

@@ -102,26 +102,18 @@ $audio-attachment-button-margin-small: 4px;
   display: flex;
   align-items: center;
   cursor: pointer;
-
-  outline: 0;
 }
 
 .PlaybackButton,
 .PlaybackRateButton,
 .module-message__audio-attachment__waveform {
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 
   .module-message__audio-attachment--outgoing & {
-    &:focus {
-      outline: none;
-      @include mixins.keyboard-mode {
-        @include mixins.axo-focus-ring;
-      }
+    &:focus-visible {
+      @include mixins.axo-focus-ring;
     }
   }
 }

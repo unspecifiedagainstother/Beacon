@@ -86,11 +86,8 @@
     background: var(--axo-color-fill-primary);
   }
 
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 
   &::before {
@@ -133,11 +130,8 @@
   // Disable browser handling of gestures so element can be dragged with touch events
   touch-action: none;
 
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 }
 
@@ -177,11 +171,8 @@
     background: var(--axo-color-fill-primary-pressed);
   }
 
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 }
 

@@ -53,11 +53,14 @@ export const SmartGV1Members = memo(function SmartGV1Members({
     <ConversationDetailsMembershipList
       canAddLabel={false}
       canAddNewMembers={false}
+      canInviteViaGroupLink={false}
+      groupLink={null}
       conversationId={conversationId}
       i18n={i18n}
       isEditMemberLabelEnabled={false}
       isTerminated={false}
       getPreferredBadge={getPreferredBadge}
+      hasOtherModalOpen={false}
       maxShownMemberCount={32}
       memberColors={memberColors}
       memberships={memberships}

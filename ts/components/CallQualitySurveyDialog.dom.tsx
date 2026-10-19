@@ -220,7 +220,7 @@ export function CallQualitySurveyDialog(
                       'field-sizing-content max-h-50 min-h-20 w-full resize-none',
                       'rounded-lg border-[0.5px] px-3 py-2 shadow-elevation-1',
                       'text-primary placeholder:text-placeholder disabled:text-disabled',
-                      'not-forced-colors:outline-none not-forced-colors:focus:axo-focus-ring',
+                      'focus:axo-focus-ring',
                       showOtherInputError
                         ? 'border-(--axo-color-deprecated-border-error)'
                         : 'border-primary'
@@ -363,7 +363,7 @@ export function CallQualitySurveyDialog(
 }
 
 function BigCircleButton(props: {
-  symbol: AxoSymbol.IconName;
+  symbol: AxoSymbol.Name;
   className: string;
   label: string;
   onClick: () => void;
@@ -373,7 +373,7 @@ function BigCircleButton(props: {
       type="button"
       className={tw(
         'group flex w-24 flex-col items-center gap-3 rounded-lg p-3',
-        'not-forced-colors:outline-none not-forced-colors:keyboard-mode:focus:axo-focus-ring'
+        'focus-visible:axo-focus-ring'
       )}
       onClick={props.onClick}
     >
@@ -390,7 +390,7 @@ function BigCircleButton(props: {
   );
 }
 
-const ISSUE_ICONS: Record<Issue, AxoSymbol.InlineGlyphName> = {
+const ISSUE_ICONS: Record<Issue, AxoSymbol.Name> = {
   [Issue.AUDIO]: 'speaker',
   [Issue.AUDIO_STUTTERING]: 'speaker',
   [Issue.AUDIO_LOCAL_ECHO]: 'speaker',

@@ -35,7 +35,7 @@
     z-index: 1;
   }
 
-  &:focus {
+  &:focus-visible {
     // Handled by .FunTabs__TabButton
     outline: none;
   }
@@ -73,11 +73,8 @@
   pointer-events: none;
   background: var(--axo-color-fill-primary-pressed);
 
-  .FunTabs__Tab[data-focused='true'] & {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  .FunTabs__Tab[data-focus-visible='true'] & {
+    @include mixins.axo-focus-ring;
   }
 }
 

@@ -38,14 +38,12 @@ const MAX_GIF_TIME = 8;
 export type Props = {
   readonly attachment: AttachmentForUIType;
   readonly size?: number;
-  readonly tabIndex: number;
   // test-only, to force reduced motion experience
   readonly _forceTapToPlay?: boolean;
 
   readonly i18n: LocalizerType;
   readonly theme?: ThemeType;
 
-  onError: () => void;
   showMediaNoLongerAvailableToast?: () => void;
   showVisualAttachment: () => void;
   startDownload: () => void;
@@ -58,13 +56,11 @@ export function GIF(props: Props): JSX.Element {
   const {
     attachment,
     size,
-    tabIndex,
     _forceTapToPlay,
 
     i18n,
     theme,
 
-    onError,
     showMediaNoLongerAvailableToast,
     showVisualAttachment,
     startDownload,
@@ -81,6 +77,9 @@ export function GIF(props: Props): JSX.Element {
   const [currentTime, setCurrentTime] = useState(0);
   const [isFocused, setIsFocused] = useState(true);
   const [isPlaying, setIsPlaying] = useState(!tapToPlay);
+  const [erroredUrl, setErroredUrl] = useState<string | undefined>();
+
+  const hasErrored = erroredUrl === attachment.url;
 
   useEffect(() => {
     const onFocus = () => setIsFocused(true);
@@ -116,7 +115,11 @@ export function GIF(props: Props): JSX.Element {
     } else {
       video.pause();
     }
-  }, [isPlaying, repeatCount]);
+  }, [
+    isPlaying,
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
+    repeatCount,
+  ]);
 
   //
   // Change `isPlaying` in response to focus, play time, and repeat count
@@ -200,7 +203,7 @@ export function GIF(props: Props): JSX.Element {
   const isMediaDownloadable = !attachment.isPermanentlyUndownloadable;
 
   let gif: JSX.Element | undefined;
-  if (isNotResolved || isPending || !isMediaDownloadable) {
+  if (isNotResolved || isPending || !isMediaDownloadable || hasErrored) {
     gif = (
       <Blurhash
         hash={attachment.blurHash || defaultBlurHash(theme)}
@@ -211,13 +214,14 @@ export function GIF(props: Props): JSX.Element {
     );
   } else {
     gif = (
-      // FIXME
-      // oxlint-disable-next-line jsx-a11y/control-has-associated-label
       <video
         ref={videoRef}
         onTimeUpdate={onTimeUpdate}
         onEnded={onEnded}
-        onError={onError}
+        onError={() => {
+          log.warn('failed to play GIF; falling back to blurhash');
+          setErroredUrl(attachment.url);
+        }}
         onClick={(event: MouseEvent): void => {
           event.preventDefault();
           event.stopPropagation();
@@ -262,7 +266,6 @@ export function GIF(props: Props): JSX.Element {
     i18n,
     cancelDownloadClick,
     cancelDownloadKeyDown,
-    tabIndex,
   });
 
   let overlay: JSX.Element | undefined;
@@ -283,7 +286,6 @@ export function GIF(props: Props): JSX.Element {
         aria-label={i18n('icu:GIF--download')}
         onClick={onOverlayClick}
         onKeyDown={onOverlayKeyDown}
-        tabIndex={tabIndex}
       >
         <span />
       </button>
@@ -295,7 +297,6 @@ export function GIF(props: Props): JSX.Element {
         className="module-image__overlay-circle module-image__overlay-circle--undownloadable"
         aria-label={i18n('icu:mediaNotAvailable')}
         onClick={undownloadableClick}
-        tabIndex={tabIndex}
       >
         <div className="module-image__undownloadable-icon" />
       </button>

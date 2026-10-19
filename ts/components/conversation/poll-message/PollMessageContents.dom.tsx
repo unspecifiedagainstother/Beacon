@@ -27,13 +27,13 @@ function VotedCheckmark({
       className={tw(
         'size-4 rounded-full',
         'flex items-center justify-center',
-        'text-[10px]',
         isIncoming
           ? 'bg-accent text-primary-oncolor'
           : 'bg-(--axo-color-label-primary-oncolor) text-(--axo-color-surface-message-outgoing)'
       )}
     >
-      <AxoSymbol.InlineGlyph
+      <AxoSymbol.Icon
+        size={12}
         symbol="check"
         label={i18n('icu:PollMessage--YouVoted')}
       />
@@ -112,7 +112,7 @@ const PollCheckbox = memo((props: PollCheckboxProps) => {
         className={tw(
           'flex size-6 items-center justify-center rounded-full',
           isPending ? '' : 'border-[1.5px]',
-          'outline-none keyboard-mode:focus:axo-focus-ring',
+          'focus-visible:axo-focus-ring',
           'overflow-hidden',
           'transition-colors duration-250',
           bgColor,
@@ -183,6 +183,7 @@ export function PollMessageContents({
   useEffect(() => {
     if (!hasPendingVotes) {
       // Vote completed, clear pending state
+      // oxlint-disable-next-line react/set-state-in-effect
       setIsPending(false);
       clearTimeout(pendingCheckTimer.current ?? undefined);
       pendingCheckTimer.current = null;

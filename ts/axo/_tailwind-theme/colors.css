@@ -234,7 +234,7 @@
 
 /* prettier-ignore */
 @layer theme {
-  @media (prefers-contrast: more) {
+  @media (prefers-contrast: more) or (prefers-reduced-transparency: reduce) {
     :root {
       --axo-color-material-primary:            light-dark(#fafafa, #191919);
       --axo-color-material-secondary:          light-dark(#f5f5f5, #1e1e1e);
@@ -465,7 +465,7 @@
 /* prettier-ignore */
 @theme {
   --axo-color-border-primary:               light-dark(--alpha(#000000 / 6%), --alpha(#ffffff / 6%));
-  --axo-color-border-secondary:             light-dark(--alpha(#000000 / 10%), --alpha(#ffffff / 10%));
+  --axo-color-border-secondary:             light-dark(--alpha(#000000 / 12%), --alpha(#ffffff / 12%));
   --axo-color-border-tertiary:              light-dark(--alpha(#000000 / 24%), --alpha(#ffffff / 24%));
   --axo-color-border-selected:              light-dark(#4655ff, #c9ceff);
   --axo-color-border-selected-oncolor:      light-dark(#fafafa, #fafafa);
@@ -528,5 +528,4 @@
   --axo-color-legacy-official-chat-badge-bg:   light-dark(--alpha(#4655FF / 12%), --alpha(#4952F8 / 40%));
   --axo-color-legacy-official-chat-badge-text: light-dark(#030FFC, #C2C5FE);
   --axo-color-legacy-signal-chat-message-bg:   light-dark(#8889B4, #444664);
-  --axo-color-legacy-warning-badge:            light-dark(#C84118, #EB977D);
 }

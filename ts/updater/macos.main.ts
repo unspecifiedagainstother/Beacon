@@ -12,6 +12,8 @@ import { isProduction } from '../util/version.std.ts';
 import * as Errors from '../types/errors.std.ts';
 import { DialogType } from '../types/Dialogs.std.ts';
 
+import type { CheckType } from './common.main.ts';
+
 const APP_ID = '1230208093';
 
 export class MacOSUpdater extends Updater {
@@ -20,7 +22,9 @@ export class MacOSUpdater extends Updater {
   }
 
   protected async installUpdate(
-    updateFilePath: string
+    updateFilePath: string,
+    _isSilent: boolean,
+    checkType: CheckType
   ): Promise<() => Promise<void>> {
     const { logger } = this;
 
@@ -32,6 +36,7 @@ export class MacOSUpdater extends Updater {
       const message: string = error.message || '';
       this.markCannotUpdate(
         error,
+        checkType,
         message.includes(readOnly)
           ? DialogType.MacOS_Read_Only
           : DialogType.Cannot_Update

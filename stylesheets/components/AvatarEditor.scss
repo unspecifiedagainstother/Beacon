@@ -67,11 +67,8 @@
       @include button-icon('../images/icons/v2/text-24.svg');
     }
 
-    &:focus {
-      outline: none;
-      @include mixins.keyboard-mode {
-        @include mixins.axo-focus-ring;
-      }
+    &:focus-visible {
+      @include mixins.axo-focus-ring;
     }
   }
 

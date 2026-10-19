@@ -105,7 +105,6 @@ const defaultMessageProps: TimelineMessagesProps = {
   id: 'messageId',
   // renderingContext: 'storybook',
   interactivity: MessageInteractivity.Normal,
-  interactionMode: 'keyboard',
   isBlocked: false,
   isMessageRequestAccepted: true,
   isPinned: false,
@@ -114,7 +113,11 @@ const defaultMessageProps: TimelineMessagesProps = {
   isSignalConversation: false,
   isSMS: false,
   isSpoilerExpanded: {},
+  isTargeted: false,
+  isTargetedCounter: null,
+  isTargetedSource: null,
   isVoiceMessagePlayed: false,
+  handleClickCtaButton: action('handleClickCtaButton'),
   handleDebugMessage: action('debugMessage'),
   toggleSelectMessage: action('toggleSelectMessage'),
   cancelAttachmentDownload: action('default--cancelAttachmentDownload'),
@@ -282,6 +285,31 @@ ImageOnly.args = {
 
 export const ImageAttachment = Template.bind({});
 ImageAttachment.args = {
+  rawAttachment: {
+    contentType: IMAGE_PNG,
+    fileName: 'sax.png',
+    isVoiceMessage: false,
+    thumbnail: {
+      contentType: IMAGE_PNG,
+      height: 100,
+      width: 100,
+      size: 100,
+      path: pngUrl,
+      url: pngUrl,
+    },
+  },
+};
+
+const LONG_UNBREAKABLE_TEXT = 'thisisthewordthatneverends'.repeat(10);
+
+export const LongUnbreakableWord = Template.bind({});
+LongUnbreakableWord.args = {
+  text: LONG_UNBREAKABLE_TEXT,
+};
+
+export const LongUnbreakableWordWithImageAttachment = Template.bind({});
+LongUnbreakableWordWithImageAttachment.args = {
+  text: LONG_UNBREAKABLE_TEXT,
   rawAttachment: {
     contentType: IMAGE_PNG,
     fileName: 'sax.png',

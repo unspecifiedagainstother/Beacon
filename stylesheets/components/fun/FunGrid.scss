@@ -64,11 +64,8 @@
     background: var(--axo-color-fill-primary);
   }
 
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring-inset;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring-inset;
   }
 }
 
@@ -100,11 +97,8 @@ $popover-margin: 12px;
   align-items: center;
   gap: 12px;
 
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring-inset;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring-inset;
   }
 }
 

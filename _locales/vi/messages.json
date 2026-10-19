@@ -11,6 +11,9 @@
   "icu:AxoDialog.Close": {
     "messageformat": "Đóng"
   },
+  "icu:AxoPasswordField.Reveal": {
+    "messageformat": "Hiển thị mật khẩu"
+  },
   "icu:AxoTextField.Clear": {
     "messageformat": "Xoá"
   },
@@ -61,6 +64,24 @@
   },
   "icu:Preferences__DonateTitle": {
     "messageformat": "Ủng hộ Signal"
+  },
+  "icu:LinkedDevicesOnboardingDialog__description": {
+    "messageformat": "Tính năng <bold>Liên kết thiết bị</bold> cho phép bạn truy cập tài khoản Signal và tin nhắn một cách an toàn trên thiết bị bổ sung bất kỳ của bạn."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--1": {
+    "messageformat": "Bạn có thể liên kết máy tính để bàn, máy tính bảng hoặc điện thoại bổ sung."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--2": {
+    "messageformat": "Thiết bị chính của bạn sẽ quản lý các thiết bị đã liên kết, bạn có thể liên kết tối đa 5 thiết bị."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3": {
+    "messageformat": "Cài đặt tài khoản chỉ được quản lý trên thiết bị chính của bạn, bao gồm cài đặt tài khoản và bản sao lưu."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--1": {
+    "messageformat": "Cài đặt tài khoản và các bản sao lưu chỉ có thể được quản lý trên thiết bị chính của bạn."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--2": {
+    "messageformat": "Cài đặt tài khoản và Sao lưu bảo mật Signal chỉ có thể được quản lý trên thiết bị chính của bạn."
   },
   "icu:sentMediaQualityStandard": {
     "messageformat": "Tiêu chuẩn"
@@ -317,11 +338,8 @@
   "icu:LeftPaneChatFolders__ItemLabel--All": {
     "messageformat": "Tất cả cuộc trò chuyện"
   },
-  "icu:LeftPaneChatFolders__ItemUnreadBadge__MaxCount": {
-    "messageformat": "{maxCount,number}+"
-  },
   "icu:LeftPaneChatFolders__ItemUnreadBadge__AccessibleLabel": {
-    "messageformat": "{count, plural, one {{count,number} Unread Message} other {{count,number} Unread Messages}}"
+    "messageformat": "{count, plural, other {{count,number} tin nhắn chưa đọc}}"
   },
   "icu:LeftPaneChatFolders__Item__ContextMenu__MarkAllRead": {
     "messageformat": "Đánh dấu tất cả đã đọc"
@@ -364,9 +382,6 @@
   },
   "icu:NavTabs__ItemIconLabel--UnreadCount": {
     "messageformat": "{count,number} chưa đọc"
-  },
-  "icu:NavTabs__ItemIconLabel--MarkedUnread": {
-    "messageformat": "Đã đánh dấu chưa đọc"
   },
   "icu:NavTabs__ItemLabel--Chats": {
     "messageformat": "Trò chuyện"
@@ -635,20 +650,23 @@
   "icu:SafetyNumberNotReady__learn-more": {
     "messageformat": "Tìm hiểu thêm"
   },
-  "icu:KeyTransparencyErrorDialog__Title": {
-    "messageformat": "Xác minh mã khóa tự động hiện không khả dụng cho thiết bị của bạn. Gửi nhật ký gỡ lỗi?"
+  "icu:KeyTransparencyErrorDialog__Title-v2": {
+    "messageformat": "Xác minh mã khóa tự động hiện không khả dụng cho thiết bị của bạn. Gửi báo cáo để giúp chúng tôi cải thiện?"
   },
-  "icu:KeyTransparencyErrorDialog__Description": {
-    "messageformat": "Nhật ký gỡ lỗi giúp chúng tôi xác định và khắc phục vấn đề, và không chứa thông tin nhận dạng."
+  "icu:KeyTransparencyErrorDialog__Description-v2": {
+    "messageformat": "Việc gửi kèm nhật ký gỡ lỗi giúp chúng tôi chẩn đoán và khắc phục sự cố, đồng thời không chứa thông tin định danh cá nhân. Bạn có thể chọn chia sẻ hoặc không."
   },
-  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label": {
-    "messageformat": "Chia sẻ nhật ký gỡ lỗi"
+  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label-v2": {
+    "messageformat": "Thêm nhật ký gỡ lỗi"
   },
   "icu:KeyTransparencyErrorDialog__ShareDebugLog__ViewButton": {
     "messageformat": "Xem"
   },
   "icu:KeyTransparencyErrorDialog__Submit": {
     "messageformat": "Gửi"
+  },
+  "icu:KeyTransparencyErrorDialog__Cancel": {
+    "messageformat": "Không, cảm ơn"
   },
   "icu:KeyTransparencyOnboardingDialog__Title": {
     "messageformat": "Signal nay có thể tự động xác minh mã hóa"
@@ -746,11 +764,11 @@
   "icu:maximumAttachments": {
     "messageformat": "Bạn không thể thêm bất kì tập tin đính kèm nào cho tin nhắn này."
   },
-  "icu:fileSizeWarning": {
-    "messageformat": "Rất tiếc, tập tin đã chọn vượt quá giới hạn kích thước của tin nhắn. {limit,number} {units}"
+  "icu:fileTooLargeWarning": {
+    "messageformat": "Không thể gửi tập tin này vì dung lượng quá lớn. Bạn có thể gửi tập tin có dung lượng lên đến {limit,number}{units}."
   },
-  "icu:videoFileSizeWarning": {
-    "messageformat": "Rất tiếc, tập tin video đã chọn vượt quá giới hạn dung lượng của tin nhắn. {limit,number}{units}"
+  "icu:videoFileTooLargeWarning": {
+    "messageformat": "Không thể gửi video này vì dung lượng quá lớn. Bạn có thể gửi video có dung lượng lên đến {limit,number}{units}."
   },
   "icu:unableToLoadAttachment": {
     "messageformat": "Không thể tải tập tin đính kèm đã chọn."
@@ -772,6 +790,9 @@
   },
   "icu:checkNetworkConnection": {
     "messageformat": "Kiểm tra kết nối mạng của bạn."
+  },
+  "icu:clockSkewDetected": {
+    "messageformat": "Thông tin ngày trên thiết bị của bạn không chính xác. Chỉnh lại đồng hồ và thử lại. Ngày và giờ trên thiết bị của bạn là:"
   },
   "icu:submitDebugLog": {
     "messageformat": "Nhật ký gỡ lỗi"
@@ -994,6 +1015,9 @@
   },
   "icu:mute": {
     "messageformat": "Tắt tiếng"
+  },
+  "icu:muted": {
+    "messageformat": "Đã tắt tiếng"
   },
   "icu:cannotUpdateDetail-v2": {
     "messageformat": "Signal không thể cập nhật. <retryUpdateButton>Thử cập nhật lại</retryUpdateButton> hoặc truy cập {url} để cài thủ công. Sau đó, <contactSupportLink>liên hệ bộ phận hỗ trợ</contactSupportLink> về vấn đề này"
@@ -1261,6 +1285,9 @@
   },
   "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync": {
     "messageformat": "Tất cả tin nhắn trong cuộc trò chuyện này sẽ được xóa khỏi tất cả thiết bị của bạn."
+  },
+  "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync--still-member": {
+    "messageformat": "Tất cả tin nhắn trong cuộc trò chuyện này sẽ được xóa khỏi tất cả thiết bị của bạn. Bạn vẫn sẽ là thành viên của nhóm này."
   },
   "icu:ConversationHeader__ContextMenu__LeaveGroupAction__title": {
     "messageformat": "Rời nhóm"
@@ -1610,9 +1637,6 @@
   "icu:Preferences__EmojiSkinToneDefaultSetting__Label": {
     "messageformat": "Màu da của emoji"
   },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__Title": {
-    "messageformat": "Thư mục trò chuyện"
-  },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Title": {
     "messageformat": "Thêm thư mục trò chuyện"
   },
@@ -1624,12 +1648,6 @@
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Description--WithChatFolders": {
     "messageformat": "{chatFoldersCount, plural, other {{chatFoldersCount,number} thư mục}}"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button": {
-    "messageformat": "Thiết Lập"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button--WithChatFolders": {
-    "messageformat": "Quản lý"
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__ChatFolderItem__ContextMenu__EditFolder": {
     "messageformat": "Chỉnh sửa thư mục"
@@ -2384,9 +2402,6 @@
   "icu:SafetyNumberModal__title": {
     "messageformat": "Xác minh Số An toàn"
   },
-  "icu:safetyNumberChanged": {
-    "messageformat": "Số An toàn đã được thay đổi"
-  },
   "icu:safetyNumberChanges": {
     "messageformat": "Các thay đổi về Mã số an toàn"
   },
@@ -2826,16 +2841,16 @@
     "messageformat": "Xóa"
   },
   "icu:stickers--StickerManagerPackDragHandle--Label": {
-    "messageformat": "Drag to reorder sticker pack"
+    "messageformat": "Kéo để sắp xếp lại gói nhãn dán"
   },
   "icu:stickers--StickerManagerBlessedPacksList--Label": {
-    "messageformat": "Signal Artist Series sticker packs"
+    "messageformat": "Gói nhãn dán Nghệ sĩ Signal"
   },
   "icu:stickers--StickerManagerReceivedPacksList--Label": {
-    "messageformat": "Received sticker packs"
+    "messageformat": "Gói nhãn dán"
   },
   "icu:stickers--StickerManagerInstalledPacksList--Label": {
-    "messageformat": "Installed sticker packs"
+    "messageformat": "Gói nhãn dán đã cài"
   },
   "icu:stickers--StickerPreview--Title": {
     "messageformat": "Gói Nhãn dán"
@@ -3081,16 +3096,16 @@
     "messageformat": "Thêm một Sticker"
   },
   "icu:FunPicker__Label--StickerReply": {
-    "messageformat": "Reply"
+    "messageformat": "Trả lời"
   },
   "icu:FunPicker__Label--SendStickerReply": {
-    "messageformat": "Send"
+    "messageformat": "Gửi"
   },
   "icu:FunPicker__Label--CancelStickerReply": {
-    "messageformat": "Cancel"
+    "messageformat": "Hủy"
   },
   "icu:FunPicker__Label--Sticker": {
-    "messageformat": "Sticker"
+    "messageformat": "Nhãn dán"
   },
   "icu:confirmation-dialog--Cancel": {
     "messageformat": "Hủy"
@@ -3872,20 +3887,20 @@
   "icu:calling__preview--minimize": {
     "messageformat": "Thu nhỏ khung xem trước"
   },
-  "icu:calling__change-view": {
-    "messageformat": "Đổi chế độ hiển thị"
-  },
-  "icu:calling__view_mode--paginated": {
-    "messageformat": "Hiển thị theo ô"
-  },
-  "icu:calling__view_mode--overflow": {
-    "messageformat": "Hiển thị thanh bên"
-  },
-  "icu:calling__view_mode--speaker": {
-    "messageformat": "Hiển thị người phát biểu"
-  },
   "icu:calling__view_mode--updated": {
     "messageformat": "Chế độ hiển thị đã cập nhật"
+  },
+  "icu:calling__change-layout": {
+    "messageformat": "Đổi bố cục"
+  },
+  "icu:calling__layout--paginated": {
+    "messageformat": "Lưới"
+  },
+  "icu:calling__layout--overflow": {
+    "messageformat": "Thanh bên"
+  },
+  "icu:calling__layout--speaker": {
+    "messageformat": "Loa"
   },
   "icu:calling__SelectPresentingSourcesModal--title": {
     "messageformat": "Chia sẻ màn hình của bạn"
@@ -3950,23 +3965,47 @@
   "icu:notMuted": {
     "messageformat": "Đã bỏ tắt tiếng"
   },
-  "icu:muteHour": {
-    "messageformat": "Tắt tiếng một giờ"
-  },
-  "icu:muteEightHours": {
-    "messageformat": "Tắt tiếng tám giờ"
-  },
-  "icu:muteDay": {
-    "messageformat": "Tắt tiếng một ngày"
-  },
-  "icu:muteWeek": {
-    "messageformat": "Tắt tiếng một tuần"
-  },
-  "icu:muteAlways": {
-    "messageformat": "Tắt tiếng mãi mãi"
-  },
   "icu:unmute": {
     "messageformat": "Bỏ tắt tiếng"
+  },
+  "icu:MuteMenu__label": {
+    "messageformat": "Tắt tiếng cuộc trò chuyện này trong…"
+  },
+  "icu:MuteMenu__hour": {
+    "messageformat": "1 giờ"
+  },
+  "icu:MuteMenu__eightHours": {
+    "messageformat": "8 tiếng"
+  },
+  "icu:MuteMenu__day": {
+    "messageformat": "1 ngày"
+  },
+  "icu:MuteMenu__week": {
+    "messageformat": "1 tuần"
+  },
+  "icu:MuteMenu__until": {
+    "messageformat": "Cho đến…"
+  },
+  "icu:MuteMenu__always": {
+    "messageformat": "Luôn luôn"
+  },
+  "icu:DatePicker__popupTitle": {
+    "messageformat": "Chọn ngày"
+  },
+  "icu:TimePicker__popupTitle": {
+    "messageformat": "Chọn thời gian"
+  },
+  "icu:MuteUntilDialog__title": {
+    "messageformat": "Tắt tiếng cuộc trò chuyện này cho đến…"
+  },
+  "icu:MuteUntilDialog__dateLabel": {
+    "messageformat": "Ngày"
+  },
+  "icu:MuteUntilDialog__timeLabel": {
+    "messageformat": "Thời gian"
+  },
+  "icu:MuteUntilDialog__timeZoneNote": {
+    "messageformat": "Thời gian hiển thị là {timeZone}"
   },
   "icu:muteExpirationLabelAlways": {
     "messageformat": "Đã tắt tiếng mãi mãi"
@@ -4874,9 +4913,6 @@
   "icu:showConversationDetails--direct": {
     "messageformat": "Cài đặt trò chuyện"
   },
-  "icu:ConversationDetails__unmute--title": {
-    "messageformat": "Bỏ tắt tiếng cuộc trò chuyện này?"
-  },
   "icu:ConversationDetails--group-link": {
     "messageformat": "Đường dẫn nhóm"
   },
@@ -5072,6 +5108,9 @@
   "icu:ConversationDetailsMembershipList--show-all": {
     "messageformat": "Xem tất cả"
   },
+  "icu:ConversationDetailsMembershipList__Search__AccessibilityLabel": {
+    "messageformat": "Tìm kiếm"
+  },
   "icu:ConversationDetailsGroups--title": {
     "messageformat": "{count, plural, other {{count,number} nhóm chung}}"
   },
@@ -5108,17 +5147,110 @@
   "icu:EditNicknameAndNoteModal__Note__Placeholder": {
     "messageformat": "Ghi chú"
   },
-  "icu:ConversationNotificationsSettings__mentions__label": {
+  "icu:WhileMuted__title": {
+    "messageformat": "Khi đang tắt tiếng"
+  },
+  "icu:WhileMuted__description": {
+    "messageformat": "Chọn thông báo sẽ hiển thị khi cuộc trò chuyện này đang bị tắt tiếng."
+  },
+  "icu:WhileMuted__calls__title": {
+    "messageformat": "Cuộc gọi"
+  },
+  "icu:WhileMuted__calls__description": {
+    "messageformat": "Đổ chuông hoặc gửi thông báo khi có cuộc gọi bắt đầu trong lúc cuộc trò chuyện này đang bị tắt tiếng."
+  },
+  "icu:WhileMuted__mentions__title": {
     "messageformat": "Nhắc tên"
   },
-  "icu:ConversationNotificationsSettings__mentions__info": {
-    "messageformat": "Nhận thông báo khi bạn được nhắc tới trong các cuộc trò chuyện đã tắt tiếng"
+  "icu:WhileMuted__mentions__description": {
+    "messageformat": "Thông báo khi bạn được @nhắc đến trong lúc cuộc trò chuyện này đang bị tắt tiếng."
   },
-  "icu:ConversationNotificationsSettings__mentions__select__always-notify": {
-    "messageformat": "Luôn luôn thông báo"
+  "icu:WhileMuted__replies__title": {
+    "messageformat": "Câu trả lời"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__dont-notify-for-mentions-if-muted": {
-    "messageformat": "Không thông báo nếu đã tắt tiếng"
+  "icu:WhileMuted__replies__description": {
+    "messageformat": "Thông báo khi có người trả lời tin nhắn của bạn trong khi cuộc trò chuyện này đang bị tắt tiếng."
+  },
+  "icu:WhileMuted__value--none": {
+    "messageformat": "Không"
+  },
+  "icu:WhileMuted__value--calls": {
+    "messageformat": "Cuộc gọi"
+  },
+  "icu:WhileMuted__value--mentions": {
+    "messageformat": "Nhắc tên"
+  },
+  "icu:WhileMuted__value--replies": {
+    "messageformat": "Câu trả lời"
+  },
+  "icu:WhileMuted__value--calls-mentions": {
+    "messageformat": "Cuộc gọi, lượt nhắc tên"
+  },
+  "icu:WhileMuted__value--calls-replies": {
+    "messageformat": "Cuộc gọi, câu trả lời"
+  },
+  "icu:WhileMuted__value--mentions-replies": {
+    "messageformat": "Lượt nhắc tên, câu trả lời"
+  },
+  "icu:WhileMuted__value--calls-mentions-replies": {
+    "messageformat": "Cuộc gọi, lượt nhắc tên, câu trả lời"
+  },
+  "icu:Preferences__WhileMuted__description": {
+    "messageformat": "Chọn thông báo sẽ hiển thị cho các cuộc trò chuyện đã bị tắt tiếng."
+  },
+  "icu:Preferences__WhileMuted__calls__description": {
+    "messageformat": "Đổ chuông hoặc gửi thông báo khi có cuộc gọi bắt đầu trong các cuộc trò chuyện đã tắt tiếng."
+  },
+  "icu:Preferences__WhileMuted__mentions__description": {
+    "messageformat": "Thông báo khi bạn được nhắc đến trong các cuộc trò chuyện đã tắt tiếng."
+  },
+  "icu:Preferences__WhileMuted__replies__description": {
+    "messageformat": "Thông báo khi có người trả lời tin nhắn của bạn trong các cuộc trò chuyện đã tắt tiếng."
+  },
+  "icu:UnreadReminders__title": {
+    "messageformat": "Lời nhắc chưa đọc"
+  },
+  "icu:UnreadReminders__description": {
+    "messageformat": "Thỉnh thoảng thông báo khi có tin nhắn chưa đọc khi đã tắt tiếng cuộc trò chuyện này."
+  },
+  "icu:Preferences__UnreadReminders__description": {
+    "messageformat": "Thỉnh thoảng thông báo khi có tin nhắn chưa đọc trong các cuộc trò chuyện đã tắt tiếng."
+  },
+  "icu:UnreadReminders__notification--messages--1": {
+    "messageformat": "{messageCount, plural, other {Bạn có {messageCount,number} tin nhắn chưa đọc từ {person1}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--2": {
+    "messageformat": "{messageCount, plural, other {Bạn có {messageCount,number} tin nhắn chưa đọc từ {person1} và {person2}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--many": {
+    "messageformat": "{messageCount, plural, other {Bạn có {messageCount,number} tin nhắn chưa đọc từ {person1}, {person2} và những người khác.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-mentions": {
+    "messageformat": "{messageCount, plural, other {Bạn có {messageCount,number} tin nhắn chưa đọc, bao gồm {mentionSummary}.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-replies": {
+    "messageformat": "{messageCount, plural, other {Bạn có {messageCount,number} tin nhắn chưa đọc, bao gồm {replySummary}.}}"
+  },
+  "icu:UnreadReminders__notification--counts--messages": {
+    "messageformat": "{messageCount, plural, other {Bạn có {messageCount,number} tin nhắn chưa đọc.}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--1": {
+    "messageformat": "{mentionCount, plural, other {{mentionCount,number} lượt nhắc tên bạn bởi {person1}}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--2": {
+    "messageformat": "{mentionCount, plural, other {{person1} và {person2} nhắc đến bạn {mentionCount,number} lần}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--many": {
+    "messageformat": "{mentionCount, plural, other {{person1} và những người khác nhắc đến bạn {mentionCount,number} lần}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--1": {
+    "messageformat": "{replyCount, plural, other {{replyCount,number} câu trả lời từ {person1}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--2": {
+    "messageformat": "{replyCount, plural, other {{replyCount,number} câu trả lời từ {person1} và {person2}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--many": {
+    "messageformat": "{replyCount, plural, other {{replyCount,number} câu trả lời từ {person1} và những người khác}}"
   },
   "icu:GroupLinkManagement--clipboard": {
     "messageformat": "Đường dẫn nhóm đã được sao chép."
@@ -5140,6 +5272,48 @@
   },
   "icu:GroupLinkManagement__CopyGroupLinkButtonLabel": {
     "messageformat": "Sao chép đường dẫn signal.group vào clipboard"
+  },
+  "icu:GroupMembersSearchDialog__DialogTitle": {
+    "messageformat": "Tìm thành viên"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder": {
+    "messageformat": "Tìm kiếm"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringByAdmins": {
+    "messageformat": "Tìm quản trị viên"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringBySystemContacts": {
+    "messageformat": "Tìm liên hệ"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Label": {
+    "messageformat": "Lọc"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__AllMembers": {
+    "messageformat": "Tất cả thành viên"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Admins": {
+    "messageformat": "Người quản trị"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__SystemContacts": {
+    "messageformat": "Danh bạ"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithoutSearchQuery": {
+    "messageformat": "Không có kết quả"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithSearchQuery": {
+    "messageformat": "Không có kết quả cho “{searchQuery}”"
+  },
+  "icu:GroupMembersSearchDialog__MemberItem__Admin": {
+    "messageformat": "Quản trị viên"
+  },
+  "icu:GroupMembersSearchDialog__SearchResults__Title": {
+    "messageformat": "Kết quả tìm kiếm"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__AddMembers": {
+    "messageformat": "Thêm thành viên"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__InviteViaGroupLink": {
+    "messageformat": "Mời qua đường dẫn nhóm"
   },
   "icu:PendingInvites--tab-requests": {
     "messageformat": "Yêu cầu ({count,number})"
@@ -5426,6 +5600,9 @@
   },
   "icu:CaptchaDialog__second-paragraph": {
     "messageformat": "Sau khi xác minh, bạn có thể tiếp tục nhắn tin. Những tin nhắn đang tạm dừng sẽ được tự động gửi."
+  },
+  "icu:CaptchaDialog__continue": {
+    "messageformat": "Tiếp tục"
   },
   "icu:CaptchaDialog--can-close__title": {
     "messageformat": "Tiếp tục mà không cần xác minh?"
@@ -5893,6 +6070,15 @@
   "icu:Preferences__message-audio-description": {
     "messageformat": "Nghe một âm thanh thông báo cho tin nhắn gửi đi hoặc nhận được khi trò chuyện."
   },
+  "icu:Preferences__reaction-notifications-title": {
+    "messageformat": "Thông báo về bày tỏ cảm xúc"
+  },
+  "icu:Preferences__reaction-notifications-description": {
+    "messageformat": "Thông báo khi có người bày tỏ cảm xúc với tin nhắn của bạn"
+  },
+  "icu:Preferences__button--account": {
+    "messageformat": "Tài khoản"
+  },
   "icu:Preferences__button--general": {
     "messageformat": "Chung"
   },
@@ -5962,6 +6148,45 @@
   "icu:Preferences--system": {
     "messageformat": "Hệ thống"
   },
+  "icu:Preferences--signal-login": {
+    "messageformat": "Signal Login"
+  },
+  "icu:Preferences--signal-login-description": {
+    "messageformat": "Thông tin Signal Login được sử dụng để khôi phục và phục hồi tài khoản của bạn. Lưu trữ an toàn các mã khóa này trong một công cụ quản lý mật khẩu mà bạn tin tưởng. <learnMoreLink>Tìm hiểu thêm</learnMoreLink>."
+  },
+  "icu:Preferences--signal-login-description--learn-more": {
+    "messageformat": "Tìm hiểu thêm"
+  },
+  "icu:Preferences__SignalAccount__label": {
+    "messageformat": "Tài khoản & khôi phục"
+  },
+  "icu:Preferences__SignalAccount__description": {
+    "messageformat": "2 mã khóa"
+  },
+  "icu:Preferences__SignalAccountKeys__Title": {
+    "messageformat": "Signal Login của bạn"
+  },
+  "icu:Preferences__SignalAccountKeys__Description": {
+    "messageformat": "Lưu ở nơi an toàn, bạn sẽ cần thông tin đăng nhập để khôi phục tài khoản và dữ liệu của mình. Không bao giờ chia sẻ Signal Login với bất kỳ ai."
+  },
+  "icu:Preferences__SignalAccountKeys__AccountKey": {
+    "messageformat": "Mã khóa tài khoản"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountID": {
+    "messageformat": "ID tài khoản"
+  },
+  "icu:Preferences__SignalAccountKeys__RecoveryKey": {
+    "messageformat": "Mã khóa khôi phục"
+  },
+  "icu:Preferences__SignalAccountKeys__Save": {
+    "messageformat": "Lưu"
+  },
+  "icu:Preferences__Account__LinkedDevice__label": {
+    "messageformat": "Đây là một thiết bị đã liên kết"
+  },
+  "icu:Preferences__Account__LinkedDevice__description": {
+    "messageformat": "Để quản lý phần cài đặt tài khoản, mở Signal trên thiết bị chính của bạn."
+  },
   "icu:Preferences--zoom": {
     "messageformat": "Mức độ phóng to"
   },
@@ -5992,8 +6217,116 @@
   "icu:Preferences--advanced": {
     "messageformat": "Nâng cao"
   },
-  "icu:Preferences--notification-content": {
-    "messageformat": "Nội dung thông báo"
+  "icu:Preferences--change-signal-pin": {
+    "messageformat": "Thay đổi mã PIN của bạn."
+  },
+  "icu:Preferences--change-signal-pin-button": {
+    "messageformat": "Thay đổi"
+  },
+  "icu:Preferences--create-signal-pin": {
+    "messageformat": "Tạo mã PIN"
+  },
+  "icu:Preferences--create-signal-pin-button": {
+    "messageformat": "Tạo"
+  },
+  "icu:Preferences--signal-pin": {
+    "messageformat": "Mã PIN Signal"
+  },
+  "icu:Preferences--signal-pin__footer": {
+    "messageformat": "Mã PIN giúp thông tin trên Signal được mã hóa để bạn là người duy nhất có thể truy cập. Không thể khôi phục mã PIN của bạn. Hồ sơ, các cài đặt và danh bạ sẽ được khôi phục khi bạn cài đặt lại Signal. <learnMoreLink>Tìm hiểu thêm</learnMoreLink>"
+  },
+  "icu:Preferences--signal-pin-advanced-settings": {
+    "messageformat": "Cài đặt PIN nâng cao"
+  },
+  "icu:Preferences--disable-signal-pin": {
+    "messageformat": "Tắt PIN"
+  },
+  "icu:Preferences--disable-signal-pin--button": {
+    "messageformat": "Tắt"
+  },
+  "icu:Preferences--disable-signal-pin--footer": {
+    "messageformat": "Nếu bạn tắt PIN, bạn sẽ mất toàn bộ dữ liệu khi bạn đăng kí lại với Signal trừ khi bạn sao lưu và khôi phục dữ liệu thủ công. Bạn không thể bật Khóa đăng kí khi PIN đang tắt."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--title": {
+    "messageformat": "Không thể tắt mã PIN do khóa đăng ký"
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--body": {
+    "messageformat": "Bạn phải tắt khóa đăng ký trước khi tắt mã PIN."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--ok": {
+    "messageformat": "OK"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--title": {
+    "messageformat": "Không thể tắt mã PIN do có bản sao lưu"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--body": {
+    "messageformat": "Bạn phải tắt khóa Sao lưu trước khi tắt mã PIN."
+  },
+  "icu:Preferences--enable-signal-pin": {
+    "messageformat": "Bật PIN"
+  },
+  "icu:Preferences--enable-signal-pin--button": {
+    "messageformat": "Bật"
+  },
+  "icu:Preferences--pin-reminders--header": {
+    "messageformat": "Nhắc nhở PIN"
+  },
+  "icu:Preferences--pin-reminders--description": {
+    "messageformat": "Bạn sẽ dần được hỏi ít thường xuyên hơn qua thời gian"
+  },
+  "icu:Preferences--registration-lock__label": {
+    "messageformat": "Khóa Đăng ký"
+  },
+  "icu:Preferences--registration-lock__footer": {
+    "messageformat": "Yêu cầu mã PIN Signal của bạn để đăng ký lại số điện thoại của bạn với Signal."
+  },
+  "icu:Preferences__Chats__TextInputSection__Title": {
+    "messageformat": "Nhập văn bản"
+  },
+  "icu:Preferences__Chats__ChatFoldersSection__Title": {
+    "messageformat": "Thư mục trò chuyện"
+  },
+  "icu:Preferences__Notifications__Show__Label": {
+    "messageformat": "Hiển thị"
+  },
+  "icu:Preferences__Notifications__SoundsSection__Title": {
+    "messageformat": "Âm thanh"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title": {
+    "messageformat": "Huy hiệu ứng dụng"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title-v2": {
+    "messageformat": "Huy hiệu chưa đọc"
+  },
+  "icu:Preferences__Notifications__Reset__title": {
+    "messageformat": "Khôi phục cài đặt thông báo về mặc định, bao gồm cả các cài đặt tùy chỉnh cho các cuộc trò chuyện của bạn."
+  },
+  "icu:Preferences__Notifications__Reset__button": {
+    "messageformat": "Đặt lại"
+  },
+  "icu:Preferences__Notifications__Reset__modal--body": {
+    "messageformat": "Đặt lại tất cả cài đặt thông báo về mặc định cho mọi cuộc trò chuyện?"
+  },
+  "icu:Preferences__Notifications__Reset__modal--confirm": {
+    "messageformat": "Đặt lại"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Label": {
+    "messageformat": "Số lượng hiển thị"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Description": {
+    "messageformat": "Chọn xem số lượng hiển thị là số tin nhắn chưa đọc hay số cuộc trò chuyện chưa đọc"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadMessages": {
+    "messageformat": "Tin nhắn chưa đọc"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadChats": {
+    "messageformat": "Cuộc trò chuyện chưa đọc"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats": {
+    "messageformat": "Bao gồm cuộc trò chuyện đã tắt tiếng trong huy hiệu ứng dụng"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats__description": {
+    "messageformat": "Các huy hiệu trên thư mục trò chuyện sẽ luôn bao gồm cả các cuộc trò chuyện đã tắt tiếng"
   },
   "icu:PlaintextExport--PreferencesRow--Header": {
     "messageformat": "Xuất lịch sử trò chuyện"
@@ -6145,9 +6478,6 @@
   "icu:NotificationProfiles--setting": {
     "messageformat": "Cấu hình thông báo"
   },
-  "icu:NotificationProfiles--setup": {
-    "messageformat": "Thiết Lập"
-  },
   "icu:NotificationProfiles--title": {
     "messageformat": "Cấu hình thông báo"
   },
@@ -6159,9 +6489,6 @@
   },
   "icu:NotificationProfiles--manage-description": {
     "messageformat": "Thêm hoặc chỉnh sửa cấu hình thông báo"
-  },
-  "icu:NotificationProfiles--manage-profiles": {
-    "messageformat": "{profileCount, plural, other {{profileCount,number} cấu hình}}"
   },
   "icu:NotificationProfiles--create": {
     "messageformat": "Tạo cấu hình"
@@ -6351,6 +6678,9 @@
   },
   "icu:Preferences--blocked-groups": {
     "messageformat": "Các nhóm Đã Chặn"
+  },
+  "icu:Preferences--blocked--blocked-on": {
+    "messageformat": "Bị chặn vào {blockedAt}"
   },
   "icu:Preferences--signal-backups": {
     "messageformat": "Sao lưu bảo mật Signal"
@@ -6559,9 +6889,6 @@
   "icu:Preferences__pnp__row--body": {
     "messageformat": "Chọn người có thể thấy số điện thoại của bạn và người có thể liên hệ với bạn trên Signal với số đó."
   },
-  "icu:Preferences__pnp__row--button": {
-    "messageformat": "Đổi…"
-  },
   "icu:Preferences__pnp__sharing--title": {
     "messageformat": "Ai Có Thể Thấy Số Điện Thoại Của Tôi"
   },
@@ -6610,14 +6937,11 @@
   "icu:Preferences--read-receipts": {
     "messageformat": "Thông báo đã xem"
   },
-  "icu:Preferences--read-receipts--description": {
-    "messageformat": "Nếu tắt, bạn sẽ không thấy thông báo đã đọc từ người khác."
-  },
   "icu:Preferences--typing-indicators": {
     "messageformat": "Thông báo đang nhập"
   },
-  "icu:Preferences--typing-indicators--description": {
-    "messageformat": "Nếu tắt, bạn sẽ không thấy thông báo đang nhập tin nhắn từ người khác."
+  "icu:Preferences--messaging-help": {
+    "messageformat": "Xem và chia sẻ khi tin nhắn được đọc và đang được nhập. Nếu tắt, bạn sẽ không thấy chỉ báo đã đọc hay đang nhập từ người khác."
   },
   "icu:Preferences--updates": {
     "messageformat": "Cập nhật"
@@ -6721,11 +7045,23 @@
   "icu:InstallScreenUpdateDialog--update-required__title": {
     "messageformat": "Yêu cầu Cập nhật"
   },
+  "icu:InstallScreenUpdateDialog--checking-for-updates": {
+    "messageformat": "Đang kiểm tra bản cập nhật"
+  },
+  "icu:InstallScreenUpdateDialog--updating-signal": {
+    "messageformat": "Đang cập nhật Signal"
+  },
+  "icu:InstallScreenUpdateDialog--download-progress": {
+    "messageformat": "Hiện tải được {currentBytes} của tổng {totalBytes} ({percentage,number,percent})..."
+  },
   "icu:InstallScreenUpdateDialog--update-required__body": {
-    "messageformat": "Để hoàn thành đồng bộ tin nhắn, cập nhật Signal Desktop ngay."
+    "messageformat": "Để tiếp tục, hãy cập nhật Signal Desktop."
   },
   "icu:InstallScreenUpdateDialog--update-required__action-update": {
     "messageformat": "Cập nhật"
+  },
+  "icu:InstallScreenUpdateDialog--update-required__action-update__mas": {
+    "messageformat": "Chuyển đến App Store"
   },
   "icu:InstallScreenUpdateDialog--unsupported-os__title": {
     "messageformat": "Yêu cầu Cập nhật"
@@ -6759,6 +7095,9 @@
   },
   "icu:StandaloneRegistration--PhoneNumber--waiting": {
     "messageformat": "Vui lòng thử lại trong {duration}"
+  },
+  "icu:StandaloneRegistration--PhoneNumber--RegionCodeSelector--Label": {
+    "messageformat": "Chọn mã khu vực"
   },
   "icu:StandaloneRegistration--PhoneNumber--placeholder": {
     "messageformat": "Số điện thoại"
@@ -6982,6 +7321,9 @@
   "icu:StandaloneRegistration--VerifyPIN--incorrect-pin--with-count": {
     "messageformat": "{triesRemaining, plural, other {Sai mã PIN. Còn {triesRemaining,number} lần thử.}}"
   },
+  "icu:StandaloneRegistration--VerifyPIN--just-count": {
+    "messageformat": "{triesRemaining, plural, other {Còn {triesRemaining,number} lần thử.}}"
+  },
   "icu:StandaloneRegistration--VerifyPIN--NeedHelp--header": {
     "messageformat": "Cần hỗ trợ?"
   },
@@ -7024,6 +7366,9 @@
   "icu:StandaloneRegistration--VerifyPIN--NoRemainingTries--learn-more": {
     "messageformat": "Tìm hiểu thêm về mã PIN"
   },
+  "icu:StandaloneRegistration--VerifyPIN--open-menu": {
+    "messageformat": "Mở menu"
+  },
   "icu:StandaloneRegistration--VerifyPIN--menu--skip-pin": {
     "messageformat": "Bỏ qua mã PIN"
   },
@@ -7031,7 +7376,7 @@
     "messageformat": "Bỏ qua điền PIN?"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--description": {
-    "messageformat": "Nếu bạn không nhớ mã PIN của mình, bạn có thể tạo một mã mới. Bạn có thể đăng ký và sử dụng tài khoản của mình nhưng sẽ không còn các cài đặt đã lưu như thông tin hồ sơ. Tìm hiểu thêm."
+    "messageformat": "Nếu bạn không nhớ mã PIN của mình, bạn có thể tạo một mã mới. Bạn có thể đăng ký và sử dụng tài khoản của mình nhưng sẽ không còn các cài đặt đã lưu như thông tin hồ sơ. <learnMore>Tìm hiểu thêm</learnMore>."
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--skip-button": {
     "messageformat": "Bỏ qua và Tạo PIN mới"
@@ -7067,7 +7412,7 @@
     "messageformat": "Cảnh báo"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--description": {
-    "messageformat": "Nếu tắt mã PIN, bạn sẽ mất toàn bộ dữ liệu khi đăng ký lại Signal trừ khi bạn chuyển dữ liệu từ một thiết bị iOS khác. Bạn không thể bật Khóa đăng ký khi mã PIN đang tắt."
+    "messageformat": "Nếu tắt mã PIN, bạn sẽ mất toàn bộ dữ liệu khi bạn đăng ký lại Signal. Bạn không thể bật Khóa đăng ký khi mã PIN đang tắt."
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--disable-button": {
     "messageformat": "Tắt PIN"
@@ -7275,6 +7620,12 @@
   },
   "icu:MediaPermissionsModal__step-2": {
     "messageformat": "Bật \"Signal\""
+  },
+  "icu:MediaPermissionsModal__step-2--windows--microphone": {
+    "messageformat": "Cho phép Signal truy cập microphone"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--camera": {
+    "messageformat": "Cho phép Signal truy cập camera"
   },
   "icu:MediaPermissionsModal__open": {
     "messageformat": "Đến mục cài đặt"
@@ -7816,11 +8167,17 @@
   "icu:ContextMenu--button": {
     "messageformat": "Menu chuột phải"
   },
+  "icu:EditUsernameModalBody__username-label": {
+    "messageformat": "Tên người dùng"
+  },
   "icu:EditUsernameModalBody__username-placeholder": {
     "messageformat": "Tên người dùng"
   },
   "icu:EditUsernameModalBody__username-helper": {
     "messageformat": "Tên người dùng luôn được ghép với một dãy số."
+  },
+  "icu:EditUsernameModalBody__discriminator-label": {
+    "messageformat": "Chữ số trong tên người dùng"
   },
   "icu:EditUsernameModalBody__learn-more": {
     "messageformat": "Tìm hiểu thêm"
@@ -7918,6 +8275,75 @@
   },
   "icu:UsernameMegaphone__dismiss": {
     "messageformat": "Bỏ qua"
+  },
+  "icu:PinReminderMegaphone__title": {
+    "messageformat": "Xác minh mã PIN Signal của bạn"
+  },
+  "icu:PinReminderMegaphone__body": {
+    "messageformat": "Thỉnh thoảng chúng tôi sẽ yêu cầu bạn nhập lại mã PIN để giúp bạn ghi nhớ."
+  },
+  "icu:PinReminderMegaphone__verify": {
+    "messageformat": "Xác minh"
+  },
+  "icu:PinReminderMegaphone__not-now": {
+    "messageformat": "Để sau"
+  },
+  "icu:PinReminderModal__title": {
+    "messageformat": "Nhập mã PIN Signal của bạn"
+  },
+  "icu:PinReminderModal__body": {
+    "messageformat": "Để giúp bạn nhớ mã PIN của mình, chúng tôi sẽ yêu cầu bạn nhập lại mã định kỳ. Chúng tôi sẽ dần hỏi ít hơn."
+  },
+  "icu:PinReminderModal__pin-input-placeholder": {
+    "messageformat": "Nhập mã PIN của bạn"
+  },
+  "icu:PinReminderModal__pin-input-error": {
+    "messageformat": "Mã PIN không chính xác. Thử lại"
+  },
+  "icu:PinReminderModal__forgot": {
+    "messageformat": "Quên mã PIN"
+  },
+  "icu:PinReminderModal__confirm": {
+    "messageformat": "Xác nhận"
+  },
+  "icu:PinReminderCompletedToast": {
+    "messageformat": "Mã PIN đúng. Chúng tôi sẽ nhắc bạn lại sau."
+  },
+  "icu:PinChangeModal__title--create": {
+    "messageformat": "Đổi mã PIN Signal"
+  },
+  "icu:PinChangeModal__title--create--without-pin": {
+    "messageformat": "Tạo mã PIN Signal"
+  },
+  "icu:PinChangeModal__body--create": {
+    "messageformat": "Bạn có thể thay đổi mã PIN của bạn với điều kiện thiết bị được đăng ký. <learnMoreLink>Tìm hiểu thêm</learnMoreLink>"
+  },
+  "icu:PinChangeModal__body--create--without-pin": {
+    "messageformat": "Mã PIN giúp thông tin trên Signal được mã hóa để bạn là người duy nhất có thể truy cập. Hồ sơ, các cài đặt và danh bạ sẽ được khôi phục khi bạn cài đặt lại Signal. Bạn không cần điền PIN để mở ứng dụng. <learnMoreLink>Tìm hiểu thêm</learnMoreLink>"
+  },
+  "icu:PinChangeModal__title--confirm": {
+    "messageformat": "Xác nhận mã PIN Signal"
+  },
+  "icu:PinChangeModal__body--confirm": {
+    "messageformat": "Nhập mã PIN bạn vừa tạo."
+  },
+  "icu:PinChangeModal__pin-input-placeholder--create": {
+    "messageformat": "Nhập mã PIN mới"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--confirm": {
+    "messageformat": "Xác nhận mã PIN"
+  },
+  "icu:PinChangeModal__cancel": {
+    "messageformat": "Hủy"
+  },
+  "icu:PinChangeModal__continue": {
+    "messageformat": "Tiếp tục"
+  },
+  "icu:PinChangeModal__confirm": {
+    "messageformat": "Xác nhận"
+  },
+  "icu:PinChangeCompletedToast": {
+    "messageformat": "Đã tạo mã PIN mới."
   },
   "icu:UnsupportedOSWarningDialog__body": {
     "messageformat": "Signal desktop sẽ sớm không còn hỗ trợ phiên bản hiện tại của hệ điều hành {OS} trên máy tính bạn. Để có thể tiếp tục sử dụng Signal, cập nhật phiên bản hệ điều hành trên máy tính bạn trước {expirationDate}. <learnMoreLink>Tìm hiểu thêm</learnMoreLink>"
@@ -8351,8 +8777,11 @@
   "icu:DonationReceipt__type-value--one-time": {
     "messageformat": "Một lần"
   },
-  "icu:DonationReceipt__footer-text": {
-    "messageformat": "Cảm ơn bạn đã hỗ trợ Signal. Đóng góp của bạn giúp duy trì sứ mệnh bảo vệ việc tự biểu đạt và cung cấp nền tảng giao tiếp bảo mật cho hàng triệu người trên thế giới, thông qua công nghệ mã nguồn mở hướng tới quyền riêng tư. Nếu bạn là một cư dân của Hoa Kỳ, vui lòng giữ biên lai này cho hồ sơ thuế. Signal Technology Foundation là một tổ chức phi lợi nhuận được miễn trừ nghĩa vụ thuế ở Hoa Kỳ theo mục 501c3 của Internal Revenue Code. ID Thuế Liên bang của chúng tôi là 82-4506840."
+  "icu:DonationReceipt__footer-text-v2": {
+    "messageformat": "Cảm ơn bạn đã hỗ trợ Signal. Đóng góp của bạn giúp duy trì sứ mệnh bảo vệ việc tự biểu đạt và cung cấp nền tảng giao tiếp bảo mật cho hàng triệu người trên thế giới, thông qua công nghệ mã nguồn mở hướng tới quyền riêng tư. Nếu bạn là một cư dân của Hoa Kỳ, vui lòng giữ biên lai này cho hồ sơ thuế. Signal Technology Foundation là một tổ chức phi lợi nhuận được miễn trừ nghĩa vụ thuế ở Hoa Kỳ theo mục 501c3 của Internal Revenue Code. ID Thuế Liên bang của chúng tôi là 82-4506840. Signal không cung cấp bất kỳ hàng hóa hoặc dịch vụ nào để đổi lấy khoản đóng góp này."
+  },
+  "icu:MessageCta__Donate": {
+    "messageformat": "Ủng Hộ Ngay"
   },
   "icu:Donations__OfflineTooltip": {
     "messageformat": "Bạn đang ngoại tuyến. Vui lòng kết nối internet để hoàn tất khoản ủng hộ."
@@ -8661,16 +9090,10 @@
     "messageformat": "Các tinh chỉnh, sửa lỗi, và cải thiện hiệu năng. Cảm ơn bạn đã sử dụng Signal!",
     "ignoreUnused": true
   },
-  "icu:WhatsNew__8.18--0": {
-    "messageformat": "Giờ đây, bạn cũng có thể tạo cuộc hỏi ý kiến trong các cuộc trò chuyện riêng."
+  "icu:WhatsNew__8.30--0": {
+    "messageformat": "Cải thiện hiệu suất cho cuộc gọi video."
   },
-  "icu:WhatsNew__8.19--0": {
-    "messageformat": "Quản trị viên nhóm giờ đây có thể kết thúc cuộc trò chuyện bằng tùy chọn \"Kết thúc nhóm\" mới trong cài đặt nhóm. Kết thúc nhóm sẽ ngăn các thành viên nhóm gửi tin nhắn hoặc bắt đầu cuộc gọi, đồng thời vô hiệu hóa lời mời."
-  },
-  "icu:WhatsNew__8.20--0": {
-    "messageformat": "Introducing disappearing call events: Missed, outgoing, and received calls that occur after you install this update will now automatically disappear in any chat where disappearing messages are enabled."
-  },
-  "icu:WhatsNew__8.20--1": {
-    "messageformat": "Now you can reorder installed sticker packs so your new favorites don’t get stuck in the back of the line."
+  "icu:WhatsNew__8.30--1": {
+    "messageformat": "Chúng tôi cũng đã thêm một lối tắt tiện lợi để mở cài đặt hệ thống trên Windows trong trường hợp bạn cố gắng tham gia cuộc gọi video nhưng Signal chưa được cấp quyền truy cập camera."
   }
 }

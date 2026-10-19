@@ -126,12 +126,19 @@ function* createRecords({
         preferredReactionEmoji: [],
         displayBadgesOnProfile: true,
         keepMutedChatsArchived: false,
+        notifyForCallsIfMuted: null,
+        notifyForMentionsIfMuted: null,
+        notifyForRepliesIfMuted: null,
+        notifyWhenContactJoins: null,
+        showUnreadReminders: null,
         hasSetMyStoriesPrivacy: true,
         hasViewedOnboardingStory: true,
         storiesDisabled: false,
         hasSeenGroupStoryEducationSheet: true,
         hasCompletedUsernameOnboarding: true,
         hasSeenAdminDeleteEducationDialog: false,
+        includeMutedChatsInBadge: true,
+        reactionNotifications: true,
         phoneNumberSharingMode:
           Backups.AccountData.PhoneNumberSharingMode.EVERYBODY,
         defaultChatStyle: {
@@ -153,6 +160,7 @@ function* createRecords({
         callsUseLessDataSetting: null,
         allowSealedSenderFromAnyone: null,
         allowAutomaticKeyVerification: null,
+        unreadBadgeType: null,
       },
       username: null,
       usernameLink: null,
@@ -202,6 +210,7 @@ function* createRecords({
           contact: {
             aci: chatAci,
             blocked: false,
+            blockedAtTimestamp: null,
             visibility: Backups.Contact.Visibility.VISIBLE,
             registration: {
               registered: {},
@@ -239,6 +248,10 @@ function* createRecords({
         muteUntilMs: 0n,
         markedUnread: false,
         dontNotifyForMentionsIfMuted: false,
+        notifyForCallsIfMuted: null,
+        notifyForRepliesIfMuted: null,
+        notifyForMentionsIfMuted: null,
+        showUnreadReminders: null,
         style: {
           wallpaper: null,
           bubbleColor: {

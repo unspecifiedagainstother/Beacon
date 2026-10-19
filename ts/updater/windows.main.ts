@@ -3,11 +3,13 @@
 
 import { join } from 'node:path';
 import type { SpawnOptions } from 'node:child_process';
+
 import { spawn as spawnEmitter } from 'node:child_process';
 import { readdir, unlink } from 'node:fs/promises';
 import { app } from 'electron';
 import { getAppRootDir } from '../util/appRootDir.main.ts';
 import { Updater } from './common.main.ts';
+import type { CheckType } from './common.main.ts';
 
 const IS_EXE = /\.exe$/i;
 
@@ -40,7 +42,8 @@ export class WindowsUpdater extends Updater {
   }
   protected async installUpdate(
     updateFilePath: string,
-    isSilent: boolean
+    isSilent: boolean,
+    checkType: CheckType
   ): Promise<() => Promise<void>> {
     const { logger } = this;
 
@@ -50,7 +53,7 @@ export class WindowsUpdater extends Updater {
         await this.#install(updateFilePath, isSilent);
         this.#installing = true;
       } catch (error) {
-        this.markCannotUpdate(error);
+        this.markCannotUpdate(error, checkType);
 
         throw error;
       }

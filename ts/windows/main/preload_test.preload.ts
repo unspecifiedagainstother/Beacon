@@ -81,6 +81,9 @@ let workerCount = 1;
 
 window.testUtilities = {
   setup,
+  timeout: process.env.TEST_ELECTRON_TIMEOUT
+    ? parseInt(process.env.TEST_ELECTRON_TIMEOUT, 10)
+    : undefined,
 
   onTestEvent(event: unknown) {
     return ipc.invoke('ci:test-electron:event', event);
@@ -102,7 +105,7 @@ window.testUtilities = {
       badgesState: { byId: {} },
       callLinks: [],
       callHistory: [],
-      callHistoryUnreadCount: 0,
+      callHistoryUnreadCountsByConversationId: {},
       chatFolders: [],
       emojis: {
         recentEmojis: [],

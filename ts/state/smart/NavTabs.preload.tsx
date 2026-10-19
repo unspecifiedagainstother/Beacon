@@ -6,16 +6,21 @@ import type { ReactNode, JSX } from 'react';
 import { useSelector } from 'react-redux';
 import { NavTabs } from '../../components/NavTabs.dom.tsx';
 import { getIntl } from '../selectors/user.std.ts';
-import { getAllConversationsUnreadStats } from '../selectors/conversations.dom.ts';
+import {
+  getAllConversationsUnreadStats,
+  getCallHistoryUnreadCount,
+} from '../selectors/conversations.dom.ts';
 import {
   getHasAnyFailedStorySends,
   getStoriesNotificationCount,
 } from '../selectors/stories.preload.ts';
-import { getStoriesEnabled } from '../selectors/items.dom.ts';
+import {
+  getStoriesEnabled,
+  getUnreadCountBadgeType,
+} from '../selectors/items.dom.ts';
 import { getSelectedNavTab } from '../selectors/nav.std.ts';
 import { useNavActions } from '../ducks/nav.std.ts';
 import { getHasPendingUpdate } from '../selectors/updates.std.ts';
-import { getCallHistoryUnreadCount } from '../selectors/callHistory.std.ts';
 
 import type { Location } from '../../types/Nav.std.ts';
 
@@ -38,6 +43,7 @@ export const SmartNavTabs = memo(function SmartNavTabs({
 }: SmartNavTabsProps): JSX.Element {
   const i18n = useSelector(getIntl);
   const selectedNavTab = useSelector(getSelectedNavTab);
+  const unreadCountBadgeType = useSelector(getUnreadCountBadgeType);
   const storiesEnabled = useSelector(getStoriesEnabled);
   const unreadConversationsStats = useSelector(getAllConversationsUnreadStats);
   const unreadStoriesCount = useSelector(getStoriesNotificationCount);
@@ -60,6 +66,7 @@ export const SmartNavTabs = memo(function SmartNavTabs({
 
   return (
     <NavTabs
+      unreadCountBadgeType={unreadCountBadgeType}
       hasFailedStorySends={hasFailedStorySends}
       hasPendingUpdate={hasPendingUpdate}
       i18n={i18n}

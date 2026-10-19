@@ -64,6 +64,9 @@ function mockMessageTimelineItem(
       isSignalConversation: false,
       isSMS: false,
       isSpoilerExpanded: {},
+      isTargeted: false,
+      isTargetedCounter: null,
+      isTargetedSource: null,
       isVoiceMessagePlayed: false,
       previews: [],
       readStatus: ReadStatus.Read,
@@ -131,7 +134,6 @@ const items: Record<string, TimelineItemType> = {
         id: '+1202555000',
         title: 'Mr. Fire',
       },
-      isGroup: true,
     },
     timestamp: Date.now(),
   },
@@ -302,6 +304,7 @@ const actions = () => ({
   showLightbox: action('showLightbox'),
   showLightboxForViewOnceMedia: action('showLightboxForViewOnceMedia'),
   doubleCheckMissingQuoteReference: action('doubleCheckMissingQuoteReference'),
+  handleClickCtaButton: action('handleClickCtaButton'),
 
   openGiftBadge: action('openGiftBadge'),
   showPinMessageDialog: action('showPinMessageDialog'),
@@ -367,7 +370,6 @@ const renderItem = ({
     isSignalConversation={false}
     i18n={i18n}
     interactivity={MessageInteractivity.Normal}
-    interactionMode="keyboard"
     isNextItemCallingNotification={false}
     theme={ThemeType.light}
     platform="darwin"
@@ -387,7 +389,7 @@ const renderItem = ({
     shouldCollapseBelow={false}
     shouldHideMetadata={false}
     shouldRenderDateHeader={false}
-    targetedMessage={undefined}
+    targetedMessage={null}
     {...actions()}
   />
 );

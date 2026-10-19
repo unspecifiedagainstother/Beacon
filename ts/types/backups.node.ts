@@ -19,11 +19,6 @@ export type BackupPresentationHeadersType = Readonly<{
   'X-Signal-ZK-Auth-Signature': string;
 }>;
 
-export type BackupSignedPresentationType = Readonly<{
-  headers: BackupPresentationHeadersType;
-  level: BackupLevel;
-}>;
-
 export type BackupCdnReadCredentialType = Readonly<{
   credentials: Readonly<GetBackupCDNCredentialsResponseType>;
   retrievedAtMs: number;

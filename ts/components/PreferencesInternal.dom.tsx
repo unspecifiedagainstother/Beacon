@@ -24,8 +24,18 @@ import { AxoButton } from '../axo/AxoButton.dom.tsx';
 import { AxoSwitch } from '../axo/AxoSwitch.dom.tsx';
 import type { VisibleRemoteMegaphoneType } from '../types/Megaphone.std.ts';
 import { internalGetTestMegaphone } from '../util/getTestMegaphone.std.ts';
+import type { AxoSymbol } from '../axo/AxoSymbol.dom.tsx';
+import {
+  SVC_DEFAULT_MODE,
+  SVC_DEFAULT_MODE_FOR_SCREENSHARE,
+} from '../calling/constants.std.ts';
 
 const log = createLogger('PreferencesInternal');
+
+const stripAndParseString = (input: string): number | undefined => {
+  const stripped = input.replace(/\D/g, '');
+  return stripped.length !== 0 ? parseInt(stripped, 10) : undefined;
+};
 
 export function PreferencesInternal({
   i18n,
@@ -44,14 +54,22 @@ export function PreferencesInternal({
 
   dredDuration,
   setDredDuration,
-  isDirectVp9Enabled,
-  setIsDirectVp9Enabled,
+  callStatsIntervalSecs,
+  setCallStatsIntervalSecs,
+  enableVp9Encode,
+  setEnableVp9Encode,
+  enableVp9Decode,
+  setEnableVp9Decode,
   directMaxBitrate,
   setDirectMaxBitrate,
-  isGroupVp9Enabled,
-  setIsGroupVp9Enabled,
   groupMaxBitrate,
   setGroupMaxBitrate,
+  isGroupSvcEnabled,
+  setIsGroupSvcEnabled,
+  groupSvcMode,
+  setGroupSvcMode,
+  groupSvcModeForScreenshare,
+  setGroupSvcModeForScreenshare,
   sfuUrl,
   setSfuUrl,
   forceKeyTransparencyCheck,
@@ -83,14 +101,22 @@ export function PreferencesInternal({
   setCqsTestMode: (value: boolean) => void;
   dredDuration: number | undefined;
   setDredDuration: (value: number | undefined) => void;
-  isDirectVp9Enabled: boolean | undefined;
-  setIsDirectVp9Enabled: (value: boolean | undefined) => void;
+  callStatsIntervalSecs: number | undefined;
+  setCallStatsIntervalSecs: (value: number | undefined) => void;
+  enableVp9Encode: boolean | undefined;
+  setEnableVp9Encode: (value: boolean | undefined) => void;
+  enableVp9Decode: boolean | undefined;
+  setEnableVp9Decode: (value: boolean | undefined) => void;
   directMaxBitrate: number | undefined;
   setDirectMaxBitrate: (value: number | undefined) => void;
-  isGroupVp9Enabled: boolean | undefined;
-  setIsGroupVp9Enabled: (value: boolean | undefined) => void;
   groupMaxBitrate: number | undefined;
   setGroupMaxBitrate: (value: number | undefined) => void;
+  isGroupSvcEnabled: boolean | undefined;
+  setIsGroupSvcEnabled: (value: boolean | undefined) => void;
+  groupSvcMode: string | undefined;
+  setGroupSvcMode: (value: string | undefined) => void;
+  groupSvcModeForScreenshare: string | undefined;
+  setGroupSvcModeForScreenshare: (value: string | undefined) => void;
   sfuUrl: string | undefined;
   setSfuUrl: (value: string | undefined) => void;
   forceKeyTransparencyCheck: () => Promise<void>;
@@ -119,11 +145,6 @@ export function PreferencesInternal({
     RowType<object>
   > | null>(null);
 
-  const stripAndParseString = (input: string): number | undefined => {
-    const stripped = input.replace(/\D/g, '');
-    return stripped.length !== 0 ? parseInt(stripped, 10) : undefined;
-  };
-
   const handleDredDurationUpdate = useCallback(
     (input: string) => {
       const parsed = stripAndParseString(input);
@@ -134,6 +155,17 @@ export function PreferencesInternal({
       }
     },
     [setDredDuration]
+  );
+  const handleStatsIntervalSecsUpdate = useCallback(
+    (input: string) => {
+      const parsed = stripAndParseString(input);
+      if (parsed) {
+        setCallStatsIntervalSecs(Math.max(1, parsed));
+      } else {
+        setCallStatsIntervalSecs(undefined);
+      }
+    },
+    [setCallStatsIntervalSecs]
   );
   const handleDirectMaxBitrateUpdate = useCallback(
     (input: string) => {
@@ -147,6 +179,20 @@ export function PreferencesInternal({
     },
     [setGroupMaxBitrate]
   );
+  const handleGroupSvcModeUpdate = useCallback(
+    (input: string) => {
+      const mode = input.trim();
+      setGroupSvcMode(mode.length !== 0 ? mode : undefined);
+    },
+    [setGroupSvcMode]
+  );
+  const handleGroupSvcModeForScreenshareUpdate = useCallback(
+    (input: string) => {
+      const mode = input.trim();
+      setGroupSvcModeForScreenshare(mode.length !== 0 ? mode : undefined);
+    },
+    [setGroupSvcModeForScreenshare]
+  );
   const handleSfuUrlUpdate = useCallback(
     (input: string) => {
       const url = input.trim();
@@ -156,17 +202,23 @@ export function PreferencesInternal({
   );
   const handleResetCallingOverrides = useCallback(() => {
     setDredDuration(undefined);
-    setIsDirectVp9Enabled(undefined);
+    setEnableVp9Encode(undefined);
+    setEnableVp9Decode(undefined);
     setDirectMaxBitrate(undefined);
-    setIsGroupVp9Enabled(undefined);
     setGroupMaxBitrate(undefined);
+    setIsGroupSvcEnabled(undefined);
+    setGroupSvcMode(undefined);
+    setGroupSvcModeForScreenshare(undefined);
     setSfuUrl(undefined);
   }, [
     setDredDuration,
-    setIsDirectVp9Enabled,
+    setEnableVp9Encode,
+    setEnableVp9Decode,
     setDirectMaxBitrate,
-    setIsGroupVp9Enabled,
     setGroupMaxBitrate,
+    setIsGroupSvcEnabled,
+    setGroupSvcMode,
+    setGroupSvcModeForScreenshare,
     setSfuUrl,
   ]);
 
@@ -177,6 +229,7 @@ export function PreferencesInternal({
       setValidationResult(await doValidateBackup());
     } catch (error) {
       setValidationResult({ error: toLogFormat(error) });
+      // oxlint-disable-next-line react/todo
     } finally {
       setIsValidationPending(false);
     }
@@ -267,6 +320,7 @@ export function PreferencesInternal({
         }
       } catch (error) {
         log.error('Error generating receipt:', toLogFormat(error));
+        // oxlint-disable-next-line react/todo
       } finally {
         setIsGeneratingReceipt(false);
       }
@@ -288,22 +342,24 @@ export function PreferencesInternal({
 
   const handleKeyTransparencyCheck = useCallback(async () => {
     setIsKeyTransparencyRunning(true);
+    const promise = forceKeyTransparencyCheck();
+    // oxlint-disable-next-line react/todo
     try {
-      await forceKeyTransparencyCheck();
+      await promise;
     } finally {
       setIsKeyTransparencyRunning(false);
     }
   }, [forceKeyTransparencyCheck]);
 
-  let keyTransparencySymbol: undefined | 'check-circle-fill' | 'error-fill';
+  let keyTransparencySymbol: AxoSymbol.Name | undefined;
   if (keyTransparencySelfHealth == null) {
     keyTransparencySymbol = undefined;
   } else if (keyTransparencySelfHealth === 'ok') {
     keyTransparencySymbol = 'check-circle-fill';
   } else if (keyTransparencySelfHealth === 'fail') {
-    keyTransparencySymbol = 'error-fill';
+    keyTransparencySymbol = 'error-circle-fill';
   } else if (keyTransparencySelfHealth === 'intermittent') {
-    keyTransparencySymbol = 'error-fill';
+    keyTransparencySymbol = 'error-circle-fill';
   }
 
   const prevAbortControlerRef = useRef<AbortController | null>(null);
@@ -684,14 +740,37 @@ export function PreferencesInternal({
             />
           </div>
         </FlowingSettingsControl>
+        <FlowingSettingsControl>
+          <div className="Preferences__two-thirds-flow">
+            Stats Interval Seconds
+          </div>
+          <div className="Preferences__one-third-flow Preferences__one-third-flow--justify-end">
+            <AutoSizeTextArea
+              i18n={i18n}
+              value={callStatsIntervalSecs?.toString(10)}
+              onChange={handleStatsIntervalSecsUpdate}
+              placeholder="Default"
+              moduleClassName="Preferences__ReadonlySqlPlayground__Textarea"
+            />
+          </div>
+        </FlowingSettingsControl>
       </SettingsRow>
       <SettingsRow title="Direct Calls">
         <FlowingSettingsControl>
-          <div className="Preferences__two-thirds-flow">Enable VP9</div>
+          <div className="Preferences__two-thirds-flow">Enable VP9 Encode</div>
           <div className="Preferences__one-third-flow Preferences__one-third-flow--justify-end">
             <AxoSwitch.Root
-              checked={isDirectVp9Enabled ?? true}
-              onCheckedChange={setIsDirectVp9Enabled}
+              checked={enableVp9Encode ?? true}
+              onCheckedChange={setEnableVp9Encode}
+            />
+          </div>
+        </FlowingSettingsControl>
+        <FlowingSettingsControl>
+          <div className="Preferences__two-thirds-flow">Enable VP9 Decode</div>
+          <div className="Preferences__one-third-flow Preferences__one-third-flow--justify-end">
+            <AxoSwitch.Root
+              checked={enableVp9Decode ?? true}
+              onCheckedChange={setEnableVp9Decode}
             />
           </div>
         </FlowingSettingsControl>
@@ -710,11 +789,37 @@ export function PreferencesInternal({
       </SettingsRow>
       <SettingsRow title="Group/Adhoc Calls">
         <FlowingSettingsControl>
-          <div className="Preferences__two-thirds-flow">Enable VP9</div>
+          <div className="Preferences__two-thirds-flow">Enable SVC</div>
           <div className="Preferences__one-third-flow Preferences__one-third-flow--justify-end">
             <AxoSwitch.Root
-              checked={isGroupVp9Enabled ?? false}
-              onCheckedChange={setIsGroupVp9Enabled}
+              checked={isGroupSvcEnabled ?? false}
+              onCheckedChange={setIsGroupSvcEnabled}
+            />
+          </div>
+        </FlowingSettingsControl>
+        <FlowingSettingsControl>
+          <div className="Preferences__one-third-flow">SVC Mode</div>
+          <div className="Preferences__two-thirds-flow Preferences__two-thirds-flow--justify-end">
+            <AutoSizeTextArea
+              i18n={i18n}
+              value={groupSvcMode}
+              onChange={handleGroupSvcModeUpdate}
+              placeholder={SVC_DEFAULT_MODE}
+              moduleClassName="Preferences__ReadonlySqlPlayground__Textarea"
+            />
+          </div>
+        </FlowingSettingsControl>
+        <FlowingSettingsControl>
+          <div className="Preferences__one-third-flow">
+            SVC mode for screenshare
+          </div>
+          <div className="Preferences__two-thirds-flow Preferences__two-thirds-flow--justify-end">
+            <AutoSizeTextArea
+              i18n={i18n}
+              value={groupSvcModeForScreenshare}
+              onChange={handleGroupSvcModeForScreenshareUpdate}
+              placeholder={SVC_DEFAULT_MODE_FOR_SCREENSHARE}
+              moduleClassName="Preferences__ReadonlySqlPlayground__Textarea"
             />
           </div>
         </FlowingSettingsControl>

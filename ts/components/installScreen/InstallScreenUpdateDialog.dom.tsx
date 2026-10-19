@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { JSX, ReactNode } from 'react';
+import { isNumber } from 'lodash';
+
 import { DialogType } from '../../types/Dialogs.std.ts';
-import { InstallScreenStep } from '../../types/InstallScreen.std.ts';
 import type { LocalizerType } from '../../types/Util.std.ts';
 import {
   PRODUCTION_DOWNLOAD_URL,
@@ -17,14 +18,15 @@ import { roundFractionForProgressBar } from '../../util/numbers.std.ts';
 import { I18n } from '../I18n.dom.tsx';
 import { formatFileSize } from '../../util/formatFileSize.std.ts';
 import { AxoConfirmDialog } from '../../axo/AxoConfirmDialog.dom.tsx';
-import { AxoDialog } from '../../axo/AxoDialog.dom.tsx';
 import { tw } from '../../axo/tw.dom.tsx';
+import { TitlebarDragArea } from '../TitlebarDragArea.dom.tsx';
+import { InstallScreenSignalLogo } from './InstallScreenSignalLogo.dom.tsx';
+import { ProgressBar } from '../ProgressBar.dom.tsx';
 
 export type PropsType = UpdatesStateType &
   Readonly<{
     i18n: LocalizerType;
-    step: InstallScreenStep;
-    forceUpdate: () => void;
+    forceCheck: () => void;
     startUpdate: () => void;
     currentVersion: string;
     OS: string;
@@ -33,66 +35,72 @@ export type PropsType = UpdatesStateType &
 
 export function InstallScreenUpdateDialog({
   i18n,
-  step,
   dialogType,
   isCheckingForUpdates,
   downloadSize,
   downloadedSize,
-  forceUpdate,
+  forceCheck,
   startUpdate,
   currentVersion,
   OS,
   onClose = () => null,
 }: PropsType): JSX.Element | null {
-  if (dialogType === DialogType.None) {
-    if (step === InstallScreenStep.BackupImport) {
-      if (isCheckingForUpdates) {
-        return <UpdateDownloadingModal i18n={i18n} progress={0} />;
-      }
+  let modal: ReactNode | undefined = undefined;
+  let inlineElement: ReactNode | undefined = undefined;
 
-      return (
+  if (dialogType === DialogType.None) {
+    if (isCheckingForUpdates) {
+      inlineElement = (
+        <CenteredElement>
+          <div className={tw('mb-[17px] w-82')}>
+            <div
+              className={tw('mb-4 text-center type-title-medium font-semibold')}
+            >
+              {i18n('icu:InstallScreenUpdateDialog--checking-for-updates')}
+            </div>
+            <ProgressBar
+              fractionComplete={null}
+              isRTL={i18n.getLocaleDirection() === 'rtl'}
+            />
+          </div>
+        </CenteredElement>
+      );
+    } else {
+      modal = (
         <UpdateRequiredModal
+          isMas={false}
           i18n={i18n}
           onClose={onClose}
-          onAction={forceUpdate}
+          onAction={forceCheck}
         />
       );
     }
-
-    return null;
-  }
-
-  if (dialogType === DialogType.UnsupportedOS) {
-    return <UnsupportedOSModal i18n={i18n} onClose={onClose} OS={OS} />;
-  }
-
-  if (dialogType === DialogType.MASUpdate) {
-    return (
+  } else if (dialogType === DialogType.UnsupportedOS) {
+    modal = <UnsupportedOSModal i18n={i18n} onClose={onClose} OS={OS} />;
+  } else if (dialogType === DialogType.MASUpdate) {
+    modal = (
       <UpdateRequiredModal
+        isMas
         i18n={i18n}
         onClose={onClose}
         onAction={startUpdate}
       />
     );
-  }
-
-  if (dialogType === DialogType.DownloadedUpdate) {
-    return (
+  } else if (dialogType === DialogType.DownloadedUpdate) {
+    modal = (
       <UpdateDownloadedModal
         i18n={i18n}
         onClose={onClose}
         onStartUpdate={startUpdate}
       />
     );
-  }
-
-  if (
+  } else if (
     dialogType === DialogType.AutoUpdate ||
     // Manual update with an action button
     dialogType === DialogType.DownloadReady ||
     dialogType === DialogType.FullDownloadReady
   ) {
-    return (
+    modal = (
       <UpdateAvailableModal
         i18n={i18n}
         onClose={onClose}
@@ -104,22 +112,37 @@ export function InstallScreenUpdateDialog({
         }
       />
     );
-  }
-
-  if (dialogType === DialogType.Downloading) {
-    const fractionComplete = roundFractionForProgressBar(
-      (downloadedSize || 0) / (downloadSize || 1)
+  } else if (dialogType === DialogType.Downloading) {
+    const fractionComplete = downloadSize
+      ? roundFractionForProgressBar((downloadedSize || 0) / downloadSize)
+      : null;
+    inlineElement = (
+      <CenteredElement>
+        <div className={tw('mb-4 text-center type-title-medium font-semibold')}>
+          {i18n('icu:InstallScreenUpdateDialog--updating-signal')}
+        </div>
+        <div className={tw('mb-[17px] w-82')}>
+          <ProgressBar
+            fractionComplete={fractionComplete}
+            isRTL={i18n.getLocaleDirection() === 'rtl'}
+          />
+        </div>
+        {isNumber(fractionComplete) ? (
+          <div className={tw('mb-1.5 text-center type-caption font-medium')}>
+            {i18n('icu:InstallScreenUpdateDialog--download-progress', {
+              currentBytes: formatFileSize(downloadedSize ?? 0),
+              totalBytes: formatFileSize(downloadSize ?? 1),
+              percentage: fractionComplete,
+            })}
+          </div>
+        ) : undefined}
+      </CenteredElement>
     );
-    return (
-      <UpdateDownloadingModal i18n={i18n} progress={fractionComplete * 100} />
-    );
-  }
-
-  if (
+  } else if (
     dialogType === DialogType.Cannot_Update ||
     dialogType === DialogType.Cannot_Update_Require_Manual
   ) {
-    return (
+    modal = (
       <CannotUpdateModal
         i18n={i18n}
         onClose={onClose}
@@ -130,17 +153,36 @@ export function InstallScreenUpdateDialog({
         onStartUpdate={startUpdate}
       />
     );
+  } else if (dialogType === DialogType.MacOS_Read_Only) {
+    modal = <CannotUpdateMacOsReadOnlyModal i18n={i18n} onClose={onClose} />;
+  } else {
+    throw missingCaseError(dialogType);
   }
 
-  if (dialogType === DialogType.MacOS_Read_Only) {
-    return <CannotUpdateMacOsReadOnlyModal i18n={i18n} onClose={onClose} />;
-  }
-
-  throw missingCaseError(dialogType);
+  return (
+    <div className="InstallScreenUpdateDialog">
+      <TitlebarDragArea />
+      <InstallScreenSignalLogo />
+      {modal}
+      {inlineElement}
+    </div>
+  );
 }
 
-/** @testexport */
-export function UpdateRequiredModal(props: {
+function CenteredElement({ children }: { children: ReactNode }): JSX.Element {
+  return (
+    <div
+      className={tw(
+        'absolute inset-s-1/2 top-1/2 max-w-[calc(100%-32px)] -translate-1/2'
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+function UpdateRequiredModal(props: {
+  isMas: boolean;
   i18n: LocalizerType;
   onClose: () => void;
   onAction: () => void;
@@ -157,14 +199,19 @@ export function UpdateRequiredModal(props: {
         variant="strong-primary"
         onClick={props.onAction}
       >
-        {i18n('icu:InstallScreenUpdateDialog--update-required__action-update')}
+        {props.isMas
+          ? i18n(
+              'icu:InstallScreenUpdateDialog--update-required__action-update__mas'
+            )
+          : i18n(
+              'icu:InstallScreenUpdateDialog--update-required__action-update'
+            )}
       </AxoConfirmDialog.Action>
     </AxoConfirmDialog.Root>
   );
 }
 
-/** @testexport */
-export function UpdateAvailableModal(props: {
+function UpdateAvailableModal(props: {
   i18n: LocalizerType;
   onClose: () => void;
   onStartUpdate: () => void;
@@ -206,38 +253,7 @@ export function UpdateAvailableModal(props: {
   );
 }
 
-/** @testexport */
-export function UpdateDownloadingModal(props: {
-  i18n: LocalizerType;
-  progress: number;
-}): ReactNode {
-  const { i18n } = props;
-  return (
-    <AxoDialog.Root open>
-      <AxoDialog.Content size="sm" escape="cancel-is-destructive">
-        <AxoDialog.Header>
-          <AxoDialog.Title>
-            {i18n('icu:DialogUpdate__downloading')}
-          </AxoDialog.Title>
-        </AxoDialog.Header>
-        <AxoDialog.Body>
-          <AxoDialog.Description>
-            <div className="InstallScreenUpdateDialog__progress--container">
-              <div
-                className="InstallScreenUpdateDialog__progress--bar"
-                style={{ transform: `translateX(${props.progress - 100}%)` }}
-              />
-            </div>
-          </AxoDialog.Description>
-        </AxoDialog.Body>
-        <AxoDialog.Footer />
-      </AxoDialog.Content>
-    </AxoDialog.Root>
-  );
-}
-
-/** @testexport */
-export function UpdateDownloadedModal(props: {
+function UpdateDownloadedModal(props: {
   i18n: LocalizerType;
   onClose: () => void;
   onStartUpdate: () => void;
@@ -275,8 +291,7 @@ const learnMoreLink = (parts: Array<string | JSX.Element>) => (
   </a>
 );
 
-/** @testexport */
-export function UnsupportedOSModal(props: {
+function UnsupportedOSModal(props: {
   i18n: LocalizerType;
   OS: string;
   onClose: () => void;
@@ -301,8 +316,7 @@ export function UnsupportedOSModal(props: {
   );
 }
 
-/** @testexport */
-export function CannotUpdateModal(props: {
+function CannotUpdateModal(props: {
   i18n: LocalizerType;
   onClose: () => void;
   currentVersion: string;
@@ -354,8 +368,7 @@ export function CannotUpdateModal(props: {
   );
 }
 
-/** @testexport */
-export function CannotUpdateMacOsReadOnlyModal(props: {
+function CannotUpdateMacOsReadOnlyModal(props: {
   i18n: LocalizerType;
   onClose: () => void;
 }): ReactNode {

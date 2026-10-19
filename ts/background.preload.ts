@@ -56,6 +56,7 @@ import {
   initialize as initializeNotificationProfilesService,
   fastUpdate as updateNotificationProfileService,
 } from './services/notificationProfilesService.preload.ts';
+import { initialize as initializeUnreadReminderService } from './services/unreadReminders.preload.ts';
 import { tapToViewMessagesDeletionService } from './services/tapToViewMessagesDeletionService.preload.ts';
 import { senderCertificateService } from './services/senderCertificate.preload.ts';
 import {
@@ -63,7 +64,6 @@ import {
   initializeGroupCredentialFetcher,
 } from './services/groupCredentialFetcher.preload.ts';
 import { initializeNetworkObserver } from './services/networkObserver.preload.ts';
-import * as KeyboardLayout from './services/keyboardLayout.dom.ts';
 import * as StorageService from './services/storage.preload.ts';
 import { usernameIntegrity } from './services/usernameIntegrity.preload.ts';
 import { updateIdentityKey } from './services/profiles.preload.ts';
@@ -153,6 +153,7 @@ import {
   registerRequestHandler,
   reportMessage,
   unregisterRequestHandler,
+  getHasClockSkew,
 } from './textsecure/WebAPI.preload.ts';
 import { accountManager } from './textsecure/AccountManager.preload.ts';
 import * as KeyChangeListener from './textsecure/KeyChangeListener.dom.ts';
@@ -206,7 +207,6 @@ import { isAciString } from './util/isAciString.std.ts';
 import { normalizeAci } from './util/normalizeAci.std.ts';
 import { createLogger } from './logging/log.std.ts';
 import { deleteAllLogs } from './util/deleteAllLogs.preload.ts';
-import { startInteractionMode } from './services/InteractionMode.dom.ts';
 import { calling } from './services/calling.preload.ts';
 import { ReactionSource } from './reactions/ReactionSource.std.ts';
 import { singleProtoJobQueue } from './jobs/singleProtoJobQueue.preload.ts';
@@ -265,6 +265,7 @@ import {
 } from './services/allLoaders.preload.ts';
 import { checkFirstEnvelope } from './util/checkFirstEnvelope.dom.ts';
 import { BLOCKED_UUIDS_ID } from './textsecure/storage/Blocked.std.ts';
+import { isSignalServiceId } from './types/SignalConversation.std.ts';
 import { ReleaseNoteAndMegaphoneFetcher } from './services/releaseNoteAndMegaphoneFetcher.preload.ts';
 import { initMegaphoneCheckService } from './services/megaphone.preload.ts';
 import { BuildExpirationService } from './services/buildExpiration.preload.ts';
@@ -278,7 +279,7 @@ import { MessageModel } from './models/messages.preload.ts';
 import { waitForEvent } from './shims/events.dom.ts';
 import { sendSyncRequests } from './textsecure/syncRequests.preload.ts';
 import { handleServerAlerts } from './util/handleServerAlerts.preload.ts';
-import { isLocalBackupsEnabled } from './util/isLocalBackupsEnabled.preload.ts';
+import { isLocalBackupsEnabled } from './util/isLocalBackupsEnabled.dom.ts';
 import { NavTab, SettingsPage, ProfileEditorPage } from './types/Nav.std.ts';
 import { initialize as initializeDonationService } from './services/donations.preload.ts';
 import { MessageRequestResponseSource } from './types/MessageRequestResponseEvent.std.ts';
@@ -296,6 +297,11 @@ import { saveAndNotify } from './messages/saveAndNotify.preload.ts';
 import { getBackupKeyHash } from './services/backups/crypto.preload.ts';
 import { Emoji } from './axo/emoji.std.ts';
 import { isTrustedContact } from './util/isConversationAccepted.preload.ts';
+import { registrationJobQueue } from './jobs/registrationJobQueue.preload.ts';
+import { PartialRegistrationType } from './types/StandaloneRegistration.std.ts';
+import { PhoneNumberDiscoverability } from './util/phoneNumberDiscoverability.std.ts';
+import { getProfileData } from './state/ducks/standaloneInstaller.preload.ts';
+import { pinReminderService } from './services/pinReminder.preload.ts';
 
 const { isNumber, throttle } = lodash;
 
@@ -332,8 +338,6 @@ async function startApp(): Promise<void> {
   }
 
   const idleDetector = new IdleDetector();
-
-  await KeyboardLayout.initialize();
 
   StartupQueue.initialize();
   notificationService.initialize({
@@ -413,8 +417,6 @@ async function startApp(): Promise<void> {
     createEventHandler({ deleteSelection: true })
   );
 
-  startInteractionMode();
-
   // We add this to window here because the default Node context is erased at the end
   //   of preload.js processing
   window.setImmediate = window.nodeSetImmediate;
@@ -475,8 +477,6 @@ async function startApp(): Promise<void> {
     drop(logout());
     authSocketConnectCount = 0;
 
-    backupReady.reject(new Error('startRegistration'));
-    backupReady = explodePromise();
     registrationCompleted = explodePromise();
   });
 
@@ -485,7 +485,6 @@ async function startApp(): Promise<void> {
 
     drop(itemStorage.put('postRegistrationSyncsStatus', 'incomplete'));
     registrationCompleted?.resolve();
-    drop(Registration.markDone());
     drop(keyTransparency.onRegistrationDone());
   });
 
@@ -905,6 +904,33 @@ async function startApp(): Promise<void> {
         await itemStorage.remove('remoteBuildExpiration');
       }
 
+      try {
+        if (window.ConversationController.areWePrimaryDevice()) {
+          log.info(
+            `We are primary device; adding MigrateSVR job to registrationJobQueue`
+          );
+          await registrationJobQueue.add({
+            type: 'MigrateSVR',
+            reason: `New version ${newVersion}`,
+            id: generateUuid(),
+          });
+        }
+      } catch (error) {
+        log.error(
+          'Failed to add MigrateSVR job to registrationJobQueue:',
+          Errors.toLogFormat(error)
+        );
+      }
+
+      if (window.isBeforeVersion(lastVersion, '8.28.0-alpha')) {
+        await removeStorageKeyJobQueue.add({
+          key: 'isDirectVp9Enabled',
+        });
+        await removeStorageKeyJobQueue.add({
+          key: 'isGroupVp9Enabled',
+        });
+      }
+
       if (window.isBeforeVersion(lastVersion, '6.45.0-alpha')) {
         await removeStorageKeyJobQueue.add({
           key: 'previousAudioDeviceModule',
@@ -1013,7 +1039,7 @@ async function startApp(): Promise<void> {
         if (!hasAllChatsChatFolder) {
           log.info('Creating "all chats" chat folder');
           await DataWriter.createAllChatsChatFolder();
-          StorageService.storageServiceUploadJobAfterEnabled({
+          StorageService.runStorageServiceUploadJobAfterEnabled({
             reason: 'createAllChatsChatFolder',
           });
         }
@@ -1023,6 +1049,14 @@ async function startApp(): Promise<void> {
         await itemStorage.remove('versionedExpirationTimer');
         await itemStorage.remove('callQualitySurveyCooldownDisabled');
         await itemStorage.remove('localDeleteWarningShown');
+      }
+
+      if (window.isBeforeVersion(lastVersion, 'v8.29.0-beta.1')) {
+        await itemStorage.put('callLinkAuthCredentials', []);
+      }
+
+      if (window.isBeforeVersion(lastVersion, 'v8.30.0-beta.1')) {
+        await itemStorage.remove('call-system-notification');
       }
 
       if (
@@ -1236,6 +1270,7 @@ async function startApp(): Promise<void> {
       window.reduxActions.expiration.hydrateExpirationStatus(
         window.getBuildExpiration()
       );
+      window.reduxActions.network.setClockSkew(getHasClockSkew());
 
       // Process crash reports if any. Note that the modal won't be visible
       // until the app will finish loading.
@@ -1257,7 +1292,7 @@ async function startApp(): Promise<void> {
 
     StorageService.disableStorageService(reason);
     unregisterRequestHandler(messageReceiver);
-    messageReceiver.stopProcessing();
+    messageReceiver.stopProcessing(reason);
   }
 
   function setupAppState() {
@@ -1265,9 +1300,9 @@ async function startApp(): Promise<void> {
 
     window.Whisper.events.on('userChanged', (reconnect = false) => {
       const newDeviceId = itemStorage.user.getDeviceId();
-      const newNumber = itemStorage.user.getNumber();
+      const newNumber = itemStorage.user.getOptionalNumber();
       const newACI = itemStorage.user.getAci();
-      const newPNI = itemStorage.user.getPni();
+      const newPNI = itemStorage.user.getOptionalPni();
       const ourConversation =
         window.ConversationController.getOurConversation();
 
@@ -1378,17 +1413,9 @@ async function startApp(): Promise<void> {
     remotelyExpired = true;
   });
 
-  async function enableStorageService({ andSync }: { andSync?: string } = {}) {
-    log.info('enableStorageService: waiting for backupReady');
-    try {
-      await backupReady.promise;
-    } catch (error) {
-      log.warn('enableStorageService: backup is not ready; returning early');
-      return;
-    }
-
+  function enableStorageService({ andSync }: { andSync?: string } = {}) {
     log.info('enableStorageService: enabling and running');
-    StorageService.enableStorageService();
+    StorageService.enableStorageService('background');
 
     if (andSync != null) {
       StorageService.runStorageServiceSyncJob({
@@ -1411,7 +1438,7 @@ async function startApp(): Promise<void> {
     strictAssert(challengeHandler, 'start: challengeHandler');
     await challengeHandler.load();
 
-    if (!itemStorage.user.getNumber()) {
+    if (!itemStorage.user.getOptionalNumber()) {
       const ourConversation =
         window.ConversationController.getOurConversation();
       const ourE164 = ourConversation?.get('e164');
@@ -1424,6 +1451,31 @@ async function startApp(): Promise<void> {
     if (newVersion && lastVersion) {
       if (window.isBeforeVersion(lastVersion, 'v5.31.0')) {
         window.ConversationController.repairPinnedConversations();
+      }
+
+      // Existing accounts keep notifying for calls in muted chats; new installs
+      // leave this unset, which means calls will not ring in muted chats.
+      if (
+        window.isBeforeVersion(lastVersion, '8.29.0-alpha') &&
+        itemStorage.get('notifyForCallsIfMuted') == null
+      ) {
+        log.info(
+          'Defaulting notifyForCallsIfMuted to true for existing account'
+        );
+        await itemStorage.put('notifyForCallsIfMuted', true);
+        window.ConversationController.getOurConversation()?.captureChange(
+          'notifyForCallsIfMuted'
+        );
+      }
+
+      // Existing accounts should default unreadReminders to off; new installs
+      // leave this unset, which defaults to true
+      if (
+        window.isBeforeVersion(lastVersion, '8.31.0-alpha') &&
+        itemStorage.get('showUnreadReminders') == null
+      ) {
+        log.info('Defaulting unreadReminders to false for existing accounts');
+        await itemStorage.put('showUnreadReminders', false);
       }
 
       if (!itemStorage.get('avatarsHaveBeenMigrated', false)) {
@@ -1439,13 +1491,33 @@ async function startApp(): Promise<void> {
 
     log.info('Blocked uuids cleanup: starting...');
     const blockedUuids = itemStorage.get(BLOCKED_UUIDS_ID, []);
-    const blockedAcis = blockedUuids.filter(isAciString);
+    const blockedAcis = blockedUuids.filter(item =>
+      isAciString(item.serviceId)
+    );
     const diff = blockedUuids.length - blockedAcis.length;
     if (diff > 0) {
       log.warn(
         `Blocked uuids cleanup: Found ${diff} non-ACIs in blocked list. Removing.`
       );
       await itemStorage.put(BLOCKED_UUIDS_ID, blockedAcis);
+    }
+
+    const signalItem = blockedAcis.find(item =>
+      isSignalServiceId(item.serviceId)
+    );
+    if (signalItem) {
+      log.warn(
+        'Release notes chat block migration: found in blocked list. Moving.'
+      );
+      await itemStorage.blocked.setReleaseNotesChatBlocked(
+        true,
+        signalItem.blockedAt
+      );
+      await itemStorage.put(
+        BLOCKED_UUIDS_ID,
+        blockedAcis.filter(item => !isSignalServiceId(item.serviceId))
+      );
+      log.info('Release notes chat block migration: complete');
     }
     log.info('Blocked uuids cleanup: complete');
 
@@ -1547,8 +1619,76 @@ async function startApp(): Promise<void> {
 
     if (isCoreDataValid && Registration.everDone()) {
       idleDetector.start();
+
+      const registrationPartialState = itemStorage.get(
+        'standaloneRegistrationPartialState'
+      );
+
       if (itemStorage.get('backupDownloadPath')) {
         window.reduxActions.installer.showBackupImport();
+      } else if (
+        registrationPartialState &&
+        !window.ConversationController.areWePrimaryDevice()
+      ) {
+        log.error(
+          `start: standaloneRegistrationPartialState '${registrationPartialState}' found, but we are not a primary device. Clearing and opening inbox.`
+        );
+        window.reduxActions.app.openInbox();
+        await itemStorage.put('standaloneRegistrationPartialState', undefined);
+      } else if (
+        registrationPartialState &&
+        window.ConversationController.areWePrimaryDevice()
+      ) {
+        const startFromBeginning = false;
+        const phoneNumberDiscoverability =
+          itemStorage.get('phoneNumberDiscoverability') ??
+          PhoneNumberDiscoverability.Discoverable;
+        const profileData = await getProfileData(phoneNumberDiscoverability);
+        log.error(
+          `start: standaloneRegistrationPartialState '${registrationPartialState}' found, processing`
+        );
+        if (
+          registrationPartialState === PartialRegistrationType.EXISTING__PIN
+        ) {
+          StorageService.disableStorageService(
+            'EXISTING__PIN: Need to get PIN before we turn it on'
+          );
+          window.reduxActions.standaloneInstaller.goToVerifyPINStage();
+          window.reduxActions.app.openStandalone(startFromBeginning);
+        } else if (
+          registrationPartialState === PartialRegistrationType.EXISTING__PROFILE
+        ) {
+          StorageService.disableStorageService(
+            'EXISTING__PROFILE: Need to get PIN before we turn it on'
+          );
+          const hasPin = true;
+          window.reduxActions.standaloneInstaller.goToProfileEntryStage(
+            hasPin,
+            profileData
+          );
+          window.reduxActions.app.openStandalone(startFromBeginning);
+        } else if (
+          registrationPartialState ===
+          PartialRegistrationType.NEW_ACCOUNT__PROFILE
+        ) {
+          const hasPin = false;
+          window.reduxActions.standaloneInstaller.goToProfileEntryStage(
+            hasPin,
+            profileData
+          );
+          window.reduxActions.app.openStandalone(startFromBeginning);
+        } else if (
+          registrationPartialState === PartialRegistrationType.NEW_ACCOUNT__PIN
+        ) {
+          window.reduxActions.standaloneInstaller.goToCreatePINStage();
+          window.reduxActions.app.openStandalone(startFromBeginning);
+        } else {
+          const unexpectedState: never = registrationPartialState;
+          log.error(
+            `start: unexpected standaloneRegistrationPartialState '${unexpectedState}', opening inbox`
+          );
+          window.reduxActions.app.openInbox();
+        }
       } else {
         window.reduxActions.app.openInbox();
       }
@@ -1677,7 +1817,6 @@ async function startApp(): Promise<void> {
     }
   }
 
-  let backupReady = explodePromise<{ wasBackupImported: boolean }>();
   let registrationCompleted: ExplodePromiseResultType<void> | undefined;
   let authSocketConnectCount = 0;
   let afterAuthSocketConnectPromise: ExplodePromiseResultType<void> | undefined;
@@ -1719,11 +1858,6 @@ async function startApp(): Promise<void> {
 
       if (!itemStorage.user.getAci()) {
         log.error(`${logId}: ACI not captured during registration, unlinking`);
-        return await unlinkAndDisconnect();
-      }
-
-      if (!itemStorage.user.getPni()) {
-        log.error(`${logId}: PNI not captured during registration, unlinking`);
         return await unlinkAndDisconnect();
       }
 
@@ -1771,20 +1905,25 @@ async function startApp(): Promise<void> {
       messageReceiver.startProcessingQueue();
       registerRequestHandler(messageReceiver);
 
-      // 6. Kickoff storage service sync
-      if (isFirstAuthSocketConnect || !postRegistrationSyncsComplete) {
+      // 6. Kickoff storage service sync if we're not still installing standalone
+      const step6State = window.reduxStore.getState();
+      const standaloneInstallInProgress = Boolean(
+        step6State.standaloneInstaller.workflow
+      );
+      if (
+        !standaloneInstallInProgress &&
+        (isFirstAuthSocketConnect || !postRegistrationSyncsComplete)
+      ) {
         log.info(`${logId}: triggering storage service sync`);
 
         storageServiceSyncComplete = waitForEvent(
           'storageService:syncComplete'
         );
-        drop(
-          enableStorageService({
-            andSync: 'afterFirstAuthSocketConnect',
-          })
-        );
-      } else {
-        drop(enableStorageService());
+        enableStorageService({
+          andSync: 'afterFirstAuthSocketConnect',
+        });
+      } else if (!standaloneInstallInProgress) {
+        enableStorageService();
       }
 
       // 7. Wait for critical post-registration syncs before showing inbox
@@ -1811,9 +1950,9 @@ async function startApp(): Promise<void> {
         }
       }
 
-      // 8. Show inbox
-      const state = window.reduxStore.getState();
-      if (state.app.appView === AppViewType.Installer) {
+      // 8. Show inbox if we were linking (standalone install might stll be happening)
+      const step8State = window.reduxStore.getState();
+      if (step8State.app.appView === AppViewType.Installer) {
         log.info(`${logId}: switching from installer to inbox`);
         window.reduxActions.app.openInbox();
       }
@@ -1849,41 +1988,38 @@ async function startApp(): Promise<void> {
     const isLocalBackupAvailable =
       backupsService.isLocalBackupStaged() && isLocalBackupsEnabled();
 
-    if (isLocalBackupAvailable || backupDownloadPath) {
-      tapToViewMessagesDeletionService.pause();
-
-      // Download backup before enabling request handler and storage service
-      try {
-        let wasBackupImported = false;
-        if (isLocalBackupAvailable) {
-          await backupsService.importLocalBackup();
-          wasBackupImported = true;
-        } else {
-          ({ wasBackupImported } = await backupsService.downloadAndImport({
-            onProgress: (backupStep, currentBytes, totalBytes) => {
-              window.reduxActions.installer.updateBackupImportProgress({
-                backupStep,
-                currentBytes,
-                totalBytes,
-              });
-            },
-          }));
-        }
-
-        log.info('afterAppStart: backup download attempt completed, resolving');
-        backupReady.resolve({ wasBackupImported });
-      } catch (error) {
-        log.error('afterAppStart: backup download failed, rejecting');
-        backupReady.reject(error);
-        throw error;
-      } finally {
-        tapToViewMessagesDeletionService.resume();
-      }
-    } else {
-      backupReady.resolve({ wasBackupImported: false });
+    if (!isLocalBackupAvailable && !backupDownloadPath) {
+      return { wasBackupImported: false };
     }
 
-    return backupReady.promise;
+    tapToViewMessagesDeletionService.pause();
+
+    // Download backup before enabling request handler and storage service
+    try {
+      let wasBackupImported = false;
+      if (isLocalBackupAvailable) {
+        await backupsService.importLocalBackup();
+        wasBackupImported = true;
+      } else {
+        ({ wasBackupImported } = await backupsService.downloadAndImport({
+          onProgress: (backupStep, currentBytes, totalBytes) => {
+            window.reduxActions.installer.updateBackupImportProgress({
+              backupStep,
+              currentBytes,
+              totalBytes,
+            });
+          },
+        }));
+      }
+
+      log.info('afterAppStart: backup download attempt completed');
+      return { wasBackupImported };
+    } catch (error) {
+      log.error('afterAppStart: backup download failed');
+      throw error;
+    } finally {
+      tapToViewMessagesDeletionService.resume();
+    }
   }
 
   function afterEveryLinkedStartup() {
@@ -1904,10 +2040,6 @@ async function startApp(): Promise<void> {
   }) {
     log.info('afterAuthSocketConnect/afterEveryLinkedStartupOnNewVersion');
 
-    if (window.ConversationController.areWePrimaryDevice()) {
-      return;
-    }
-
     try {
       if (
         !skipSyncRequests &&
@@ -1918,10 +2050,11 @@ async function startApp(): Promise<void> {
 
       drop(StorageService.reprocessUnknownFields());
 
-      await Promise.all([
-        accountManager.maybeUpdateDeviceName(),
-        itemStorage.user.removeSignalingKey(),
-      ]);
+      if (!window.ConversationController.areWePrimaryDevice()) {
+        await accountManager.maybeUpdateDeviceName();
+      }
+
+      await itemStorage.user.removeSignalingKey();
     } catch (e) {
       log.error(
         "Problem with 'afterLinkedStartupOnNewVersion' tasks: ",
@@ -1961,6 +2094,7 @@ async function startApp(): Promise<void> {
         attachmentBackfill: true,
         spqr: true,
         usernameChangeSyncMessage: true,
+        optionalPhoneNumber: itemStorage.user.getOptionalNumber() == null,
       });
     } catch (error) {
       log.error(
@@ -2034,19 +2168,25 @@ async function startApp(): Promise<void> {
   // Note: once this function returns, there still might be messages being processed on
   //   a given conversation's queue. But we have processed all events from the websocket.
   async function waitForEmptyEventQueue() {
+    const logId = 'waitForEmptyEventQueue';
+
     if (!messageReceiver) {
-      log.info(
-        'waitForEmptyEventQueue: No messageReceiver available, returning early'
-      );
+      log.info(`${logId}: No messageReceiver available, returning early`);
       return;
     }
 
     const waitStart = Date.now();
 
+    const throwIfStoppingProcessing = () => {
+      const reason = messageReceiver?.getStoppingProcessing();
+      if (reason) {
+        throw new Error(`${logId}: Stopping processing because '${reason}'`);
+      }
+    };
+    throwIfStoppingProcessing();
+
     if (!messageReceiver.hasEmptied()) {
-      log.info(
-        'waitForEmptyEventQueue: Waiting for MessageReceiver empty event...'
-      );
+      log.info(`${logId}: Waiting for MessageReceiver empty event...`);
       const { resolve, reject, promise } = explodePromise<void>();
 
       const cleanup = () => {
@@ -2062,7 +2202,7 @@ async function startApp(): Promise<void> {
       // Reject after 1 minutes of inactivity.
       const onTimeout = () => {
         cleanup();
-        reject(new Error('Empty queue never fired'));
+        reject(new Error(`${logId}: Empty queue never fired`));
       };
       let timeout: Timers.Timeout | undefined = Timers.setTimeout(
         onTimeout,
@@ -2086,16 +2226,18 @@ async function startApp(): Promise<void> {
       await promise;
     }
 
+    throwIfStoppingProcessing();
+
     if (eventHandlerQueue.pending !== 0 || eventHandlerQueue.size !== 0) {
-      log.info(
-        'waitForEmptyEventQueue: Waiting for event handler queue idle...'
-      );
+      log.info(`${logId}: Waiting for event handler queue idle...`);
       await eventHandlerQueue.onIdle();
     }
 
+    throwIfStoppingProcessing();
+
     const duration = Date.now() - waitStart;
     if (duration > SECOND) {
-      log.info(`waitForEmptyEventQueue: resolving after ${duration}ms`);
+      log.info(`${logId}: resolving after ${duration}ms`);
     }
   }
 
@@ -2165,6 +2307,9 @@ async function startApp(): Promise<void> {
 
     drop(initializeDonationService());
     initMegaphoneCheckService();
+    pinReminderService.init();
+    // delay unread reminders by some arbitrary amount to avoid reminding at startup
+    Timers.setTimeout(() => initializeUnreadReminderService(), FIVE_MINUTES);
 
     if (isFromMessageReceiver) {
       drop(
@@ -2960,7 +3105,7 @@ async function startApp(): Promise<void> {
       sendStateByConversationId,
       sent_at: timestamp,
       serverTimestamp: data.serverTimestamp,
-      source: itemStorage.user.getNumber(),
+      source: itemStorage.user.getOptionalNumber(),
       sourceDevice: data.device,
       sourceServiceId: itemStorage.user.getAci(),
       timestamp,
@@ -3051,8 +3196,6 @@ async function startApp(): Promise<void> {
   async function onSentMessage(event: SentEvent): Promise<void> {
     const { data, confirm } = event;
 
-    const source = itemStorage.user.getNumber();
-    strictAssert(source, 'Missing user number');
     const sourceServiceId = itemStorage.user.getAci();
     strictAssert(sourceServiceId, 'Missing user aci');
 
@@ -3448,9 +3591,6 @@ async function startApp(): Promise<void> {
 
       pauseProcessing('unlinkAndDisconnect');
 
-      backupReady.reject(new Error('Aborted'));
-      backupReady = explodePromise();
-
       await logout();
       await waitForAllBatchers();
     }
@@ -3546,7 +3686,7 @@ async function startApp(): Promise<void> {
       case FETCH_LATEST_ENUM.LOCAL_PROFILE: {
         log.info('onFetchLatestSync: fetching latest local profile');
         const ourAci = itemStorage.user.getAci() ?? null;
-        const ourE164 = itemStorage.user.getNumber() ?? null;
+        const ourE164 = itemStorage.user.getOptionalNumber() ?? null;
         await getProfile({
           serviceId: ourAci,
           e164: ourE164,
@@ -3574,6 +3714,13 @@ async function startApp(): Promise<void> {
 
   async function onKeysSync(ev: KeysEvent) {
     const { accountEntropyPool, masterKey, mediaRootBackupKey } = ev;
+
+    if (window.ConversationController.areWePrimaryDevice()) {
+      log.info(
+        'onKeysSync: Not processing incoming keys; we are primary device'
+      );
+      return;
+    }
 
     const prevMasterKeyBase64 = itemStorage.get('masterKey');
     const prevMasterKey = prevMasterKeyBase64
@@ -3627,7 +3774,7 @@ async function startApp(): Promise<void> {
       await itemStorage.put('backupMediaRootKey', mediaRootBackupKey);
     }
 
-    await StorageService.updateWithNewKey('onKeysSync');
+    await StorageService.syncAfterNewKey('onKeysSync');
 
     ev.confirm();
   }

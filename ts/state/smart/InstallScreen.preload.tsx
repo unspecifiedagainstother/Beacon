@@ -32,7 +32,7 @@ export const SmartInstallScreen = memo(function SmartInstallScreen() {
   const updates = useSelector(getUpdatesState);
   const { continueInstallWithDataDeletion, startInstaller, retryBackupImport } =
     useInstallerActions();
-  const { startUpdate, forceUpdate } = useUpdatesActions();
+  const { startUpdate, forceCheck } = useUpdatesActions();
   const hasExpired = useSelector(hasExpiredSelector);
 
   const onCancelBackupImport = useCallback((): void => {
@@ -56,7 +56,7 @@ export const SmartInstallScreen = memo(function SmartInstallScreen() {
           updates,
           currentVersion: window.getVersion(),
           startUpdate,
-          forceUpdate,
+          forceCheck,
           retryGetQrCode: startInstaller,
           isConfirmingDataDeletion: installerState.isConfirmingDataDeletion,
           restartInstall: startInstaller,
@@ -82,7 +82,7 @@ export const SmartInstallScreen = memo(function SmartInstallScreen() {
           onRetry: retryBackupImport,
           updates,
           currentVersion: window.getVersion(),
-          forceUpdate,
+          forceCheck,
           startUpdate,
           OS: OS.getName(),
         },

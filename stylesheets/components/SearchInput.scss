@@ -9,6 +9,7 @@
     position: relative;
     margin-inline: 16px;
     margin-bottom: 8px;
+    flex-grow: 1;
 
     &--noMargin {
       margin-inline: 0px;
@@ -45,11 +46,12 @@
       color: var(--axo-color-label-placeholder);
     }
 
-    &:focus {
+    &:focus-visible {
       outline: none;
-      @include mixins.keyboard-mode {
-        @include mixins.axo-focus-ring-inset;
-      }
+    }
+
+    &[data-focus-visible='true'] {
+      @include mixins.axo-focus-ring;
     }
 
     &--with-text {

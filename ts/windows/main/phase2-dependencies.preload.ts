@@ -17,7 +17,6 @@ import {
   TEMP_PATH,
 } from '../../util/basePaths.preload.ts';
 import { SignalContext } from '../context.preload.ts';
-import '../clipboard.dom.ts';
 
 initializeLogging();
 

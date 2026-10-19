@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { DataReader } from '../../sql/Client.preload.ts';
 import { useItemsActions } from '../ducks/items.preload.ts';
 import {
+  getGlobalNotifyWhileMuted,
   getNavTabsCollapsed,
   getPreferredLeftPaneWidth,
 } from '../selectors/items.dom.ts';
@@ -13,7 +14,7 @@ import { CallsTab } from '../../components/CallsTab.dom.tsx';
 import {
   getAllConversations,
   getConversationSelector,
-  getOtherTabsUnreadStats,
+  getOtherTabsUnreadCount,
 } from '../selectors/conversations.dom.ts';
 import { filterAndSortConversations } from '../../util/filterAndSortConversations.std.ts';
 import type {
@@ -140,6 +141,7 @@ export const SmartCallsTab = memo(function SmartCallsTab() {
 
   const allCallLinks = useSelector(getAllCallLinks);
   const allConversations = useSelector(getAllConversations);
+  const globalNotifyWhileMuted = useSelector(getGlobalNotifyWhileMuted);
   const regionCode = useSelector(getRegionCode);
   const getConversation = useSelector(getConversationSelector);
   const getAdhocCall = useSelector(getAdhocCallSelector);
@@ -152,7 +154,7 @@ export const SmartCallsTab = memo(function SmartCallsTab() {
 
   const hasPendingUpdate = useSelector(getHasPendingUpdate);
   const hasFailedStorySends = useSelector(getHasAnyFailedStorySends);
-  const otherTabsUnreadStats = useSelector(getOtherTabsUnreadStats);
+  const otherTabsUnreadCount = useSelector(getOtherTabsUnreadCount);
 
   const {
     createCallLink,
@@ -223,7 +225,7 @@ export const SmartCallsTab = memo(function SmartCallsTab() {
     <CallsTab
       activeCall={activeCall}
       allConversations={allConversations}
-      otherTabsUnreadStats={otherTabsUnreadStats}
+      otherTabsUnreadCount={otherTabsUnreadCount}
       getConversation={getConversation}
       getCallIdFromEra={getCallIdFromEra}
       getCallHistoryGroupsCount={getCallHistoryGroupsCount}
@@ -232,6 +234,7 @@ export const SmartCallsTab = memo(function SmartCallsTab() {
       getCall={getCall}
       getCallLink={getCallLink}
       callHistoryEdition={callHistoryEdition}
+      globalNotifyWhileMuted={globalNotifyWhileMuted}
       hangUpActiveCall={hangUpActiveCall}
       hasAnyAdminCallLinks={hasAnyAdminCallLinks}
       hasFailedStorySends={hasFailedStorySends}

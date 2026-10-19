@@ -148,7 +148,7 @@ function startUpdate(): ThunkAction<
   };
 }
 
-function forceUpdate(): ThunkAction<
+function forceCheck(): ThunkAction<
   void,
   RootStateType,
   unknown,
@@ -162,7 +162,7 @@ function forceUpdate(): ThunkAction<
     });
 
     try {
-      await updateIpc.forceUpdate();
+      await updateIpc.forceCheck();
     } catch {
       dispatch({
         type: SHOW_UPDATE_DIALOG,
@@ -184,7 +184,7 @@ export const actions = {
   showUpdateDialog,
   snoozeUpdate,
   startUpdate,
-  forceUpdate,
+  forceCheck,
 };
 
 export const useUpdatesActions = (): BoundActionCreatorsMapObject<

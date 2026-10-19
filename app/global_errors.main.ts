@@ -6,6 +6,7 @@ import os from 'node:os';
 
 import * as Errors from '../ts/types/errors.std.ts';
 import { redactAll } from '../ts/util/privacy.node.ts';
+import { drop } from '../ts/util/drop.std.ts';
 import { createLogger } from '../ts/logging/log.std.ts';
 import { reallyJsonStringify } from '../ts/util/reallyJsonStringify.std.ts';
 import type { LocaleType } from './locale.node.ts';
@@ -34,10 +35,12 @@ function handleError(prefix: string, error: Error): void {
     });
 
     if (buttonIndex === 1) {
-      clipboard.writeText(
-        `${prefix}\n\n${redactAll(formattedError)}\n\n` +
-          `App Version: ${app.getVersion()}\n` +
-          `OS: ${os.platform()}`
+      drop(
+        clipboard.writeText(
+          `${prefix}\n\n${redactAll(formattedError)}\n\n` +
+            `App Version: ${app.getVersion()}\n` +
+            `OS: ${os.platform()}`
+        )
       );
     }
   } else {

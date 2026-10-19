@@ -12,8 +12,12 @@ import type {
   CustomColorType,
 } from '../../types/Colors.std.ts';
 import type { AciString } from '../../types/ServiceId.std.ts';
+import type { UnreadCountBadgeType } from '../../types/StorageKeys.std.ts';
+import { STORAGE_KEY_DEFAULTS } from '../../types/StorageKeys.std.ts';
 import { DEFAULT_CONVERSATION_COLOR } from '../../types/Colors.std.ts';
 import { getPreferredReactionEmoji as getPreferredReactionEmojiFromStoredValue } from '../../reactions/preferredReactionEmoji.std.ts';
+import type { NotifyWhileMuted } from '../../util/notifyWhileMuted.std.ts';
+import { DEFAULT_NOTIFY_IF_MUTED } from '../../util/notifyWhileMuted.std.ts';
 import { DurationInSeconds } from '../../util/durations/index.std.ts';
 import * as Bytes from '../../Bytes.std.ts';
 import { contactByEncryptedUsernameRoute } from '../../util/signalRoutes.std.ts';
@@ -21,6 +25,7 @@ import { isNotUpdatable } from '../../util/version.std.ts';
 import { BackupLevel } from '../../services/backups/types.std.ts';
 import type { StateSelector } from '../types.std.ts';
 import { Emoji } from '../../axo/emoji.std.ts';
+import { DEFAULT_SHOW_UNREAD_REMINDERS } from '../../util/unreadReminders.std.ts';
 
 const DEFAULT_PREFERRED_LEFT_PANE_WIDTH = 320;
 
@@ -217,6 +222,31 @@ export const getBadgeCountMutedConversations = createSelector(
   }
 );
 
+export const getGlobalNotifyWhileMuted = createSelector(
+  getItems,
+  (state: ItemsStateType): NotifyWhileMuted => ({
+    calls: state.notifyForCallsIfMuted ?? DEFAULT_NOTIFY_IF_MUTED.calls,
+    mentions:
+      state.notifyForMentionsIfMuted ?? DEFAULT_NOTIFY_IF_MUTED.mentions,
+    replies: state.notifyForRepliesIfMuted ?? DEFAULT_NOTIFY_IF_MUTED.replies,
+  })
+);
+
+export const getGlobalShowUnreadReminders = createSelector(
+  getItems,
+  (state: ItemsStateType): boolean =>
+    state.showUnreadReminders ?? DEFAULT_SHOW_UNREAD_REMINDERS
+);
+
+export const getUnreadCountBadgeType = createSelector(
+  getItems,
+  (state: ItemsStateType): UnreadCountBadgeType => {
+    return (
+      state.unreadCountBadgeType ?? STORAGE_KEY_DEFAULTS.unreadCountBadgeType
+    );
+  }
+);
+
 export const getTextFormattingEnabled = createSelector(
   getItems,
   (state: ItemsStateType): boolean => state.textFormatting ?? true
@@ -231,6 +261,27 @@ export const getShowStickerPickerHint = createSelector(
   getItems,
   (state: ItemsStateType): boolean => {
     return state.showStickerPickerHint ?? false;
+  }
+);
+
+export const getHasRegistrationLock = createSelector(
+  getItems,
+  (state: ItemsStateType): boolean => {
+    return state.registrationLock ?? false;
+  }
+);
+
+export const getHasSvrPin = createSelector(
+  getItems,
+  (state: ItemsStateType): boolean => {
+    return state.svrPin != null && (state.isSvrPinStored ?? false);
+  }
+);
+
+export const getIsSvrPinPending = createSelector(
+  getItems,
+  (state: ItemsStateType): boolean => {
+    return state.svrPin != null && !state.isSvrPinStored;
   }
 );
 

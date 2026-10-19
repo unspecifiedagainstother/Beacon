@@ -7,24 +7,24 @@ import Fuse from 'fuse.js';
 import { AxoSymbol } from './AxoSymbol.dom.tsx';
 import { tw } from './tw.dom.tsx';
 import {
-  _getAllAxoSymbolInlineGlyphNames,
-  getAxoSymbolInlineGlyph,
+  _getAllAxoSymbolNames,
+  _getAxoSymbolInlineGlyph,
 } from './_internal/AxoSymbolDefs.generated.std.ts';
 
 export default {
   title: 'Axo/AxoSymbol',
 } satisfies Meta;
 
-const allAxoSymbolNames = _getAllAxoSymbolInlineGlyphNames()
+const allAxoSymbolNames = _getAllAxoSymbolNames()
   .slice()
   .sort((a, b) => a.localeCompare(b));
 const fuse = new Fuse(allAxoSymbolNames);
 
 const SymbolInfo = memo(function SymbolInfo(props: {
-  symbolName: AxoSymbol.InlineGlyphName;
+  symbolName: AxoSymbol.Name;
 }): JSX.Element {
-  const ltr = getAxoSymbolInlineGlyph(props.symbolName, 'ltr');
-  const rtl = getAxoSymbolInlineGlyph(props.symbolName, 'rtl');
+  const ltr = _getAxoSymbolInlineGlyph(props.symbolName, 'ltr');
+  const rtl = _getAxoSymbolInlineGlyph(props.symbolName, 'rtl');
 
   type Variant = { title: string; dir: 'ltr' | 'rtl'; text: string };
 
@@ -100,8 +100,6 @@ export function All(): JSX.Element {
           'sticky top-4 mb-3 bg-material-primary p-4 shadow-elevation-2'
         )}
       >
-        {/* FIXME */}
-        {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label */}
         <input
           type="search"
           value={input}

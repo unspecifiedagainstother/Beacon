@@ -157,7 +157,7 @@ export function getNotificationDataForMessage(
     const changes = GroupChange.renderChange<string>(change, {
       i18n,
       ourAci: itemStorage.user.getCheckedAci(),
-      ourPni: itemStorage.user.getCheckedPni(),
+      ourPni: itemStorage.user.getOptionalPni(),
       renderContact: (conversationId: string) => {
         const conversation = window.ConversationController.get(conversationId);
         return conversation
@@ -374,7 +374,7 @@ export function getNotificationDataForMessage(
       };
     }
 
-    if (contentType === MIME.IMAGE_GIF || Attachment.isGIF(attachments)) {
+    if (contentType === MIME.IMAGE_GIF || Attachment.isGIF(attachment)) {
       return {
         bodyRanges,
         emoji: Emoji.FERRIS_WHEEL,
@@ -441,7 +441,7 @@ export function getNotificationDataForMessage(
       callHistorySelector: getCallHistorySelector(state),
       conversationSelector: getConversationSelector(state),
       selectedMessageIds: getSelectedMessageIds(state),
-      targetedMessageId: getTargetedMessage(state)?.id,
+      targetedMessageId: getTargetedMessage(state)?.id ?? null,
     });
     if (callingNotification) {
       const text = getCallingNotificationText(callingNotification, i18n);

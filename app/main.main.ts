@@ -29,7 +29,11 @@ import {
   safeStorage,
   protocol as electronProtocol,
 } from 'electron';
-import type { MenuItemConstructorOptions, Settings } from 'electron';
+import type {
+  MenuItemConstructorOptions,
+  Settings,
+  BrowserWindowConstructorOptions,
+} from 'electron';
 import { z } from 'zod';
 
 import { packageJson } from '../ts/util/packageJson.main.ts';
@@ -53,14 +57,8 @@ import { explodePromise } from '../ts/util/explodePromise.std.ts';
 
 import './startup_config.main.ts';
 
-import type {
-  RendererConfigType,
-  SVR2EnclaveType,
-} from '../ts/types/RendererConfig.std.ts';
-import {
-  rendererConfigSchema,
-  svr2ConfigSchema,
-} from '../ts/types/RendererConfig.std.ts';
+import type { RendererConfigType } from '../ts/types/RendererConfig.std.ts';
+import { rendererConfigSchema } from '../ts/types/RendererConfig.std.ts';
 import config from './config.main.ts';
 import {
   Environment,
@@ -119,6 +117,8 @@ import { ChallengeMainHandler } from '../ts/main/challengeMain.main.ts';
 import { NativeThemeNotifier } from '../ts/main/NativeThemeNotifier.main.ts';
 import { PowerChannel } from '../ts/main/powerChannel.main.ts';
 import { SettingsChannel } from '../ts/main/settingsChannel.main.ts';
+import { PDFWindowPropsSchema } from '../ts/windows/pdf/types.std.ts';
+import '../ts/main/clipboardMain.main.ts';
 import { maybeParseUrl, setUrlSearchParams } from '../ts/util/url.std.ts';
 import { getHeicConverter } from '../ts/workers/heicConverterMain.main.ts';
 
@@ -504,7 +504,7 @@ function prepareFileUrl(
   options: PrepareUrlOptions = {}
 ): string {
   const filePath = join(...pathSegments);
-  const fileUrl = pathToFileURL(filePath) as URL;
+  const fileUrl = pathToFileURL(filePath);
   return prepareUrl(fileUrl, options);
 }
 
@@ -731,8 +731,7 @@ async function createWindow() {
     isTestEnvironment(getEnvironment()) ||
     systemTraySetting === SystemTraySetting.MinimizeToAndStartInSystemTray;
 
-  const shouldShowWindow =
-    !app.getLoginItemSettings().wasOpenedAsHidden && !startInTray;
+  const shouldShowWindow = !startInTray;
 
   const windowOptions: Electron.BrowserWindowConstructorOptions = {
     show: false,
@@ -805,6 +804,14 @@ async function createWindow() {
 
   // Create the browser window.
   mainWindow = new BrowserWindow(windowOptions);
+
+  mainWindow.webContents.on('preload-error', (_event, _preloadPath, error) => {
+    log.error(Errors.toLogFormat(error));
+    if (isTestEnvironment(getEnvironment())) {
+      app.quit();
+    }
+  });
+
   if (settingsChannel) {
     settingsChannel.setMainWindow(mainWindow);
   }
@@ -1216,6 +1223,67 @@ ipc.handle('beacon:titlebar:get-applied', () => {
   return beaconAppliedCustomTitlebar ?? false;
 });
 
+ipc.handle('pdf:generate', async (_event, data) => {
+  const props = PDFWindowPropsSchema.parse(data);
+
+  const options: BrowserWindowConstructorOptions = {
+    backgroundColor: '#ffffff',
+    show: false,
+    width: 612,
+    height: 792,
+    maximizable: false,
+    minimizable: false,
+    resizable: false,
+    webPreferences: {
+      ...defaultWebPrefs,
+      nodeIntegration: false,
+      nodeIntegrationInWorker: false,
+      sandbox: true,
+      contextIsolation: true,
+      preload: join(rootDir, 'bundles', 'preload', 'pdf.js'),
+    },
+  };
+
+  const pdfWindow = new BrowserWindow(options);
+
+  pdfWindow.webContents.ipc.on('pdf:getProps', async event => {
+    // oxlint-disable-next-line no-param-reassign
+    event.returnValue = props;
+  });
+
+  await handleCommonWindowEvents(pdfWindow);
+
+  const { promise, resolve, reject } =
+    Promise.withResolvers<Uint8Array<ArrayBuffer>>();
+
+  try {
+    pdfWindow.webContents.on('did-finish-load', async () => {
+      try {
+        const pdf = await pdfWindow.webContents.printToPDF({
+          margins: {
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+          },
+          preferCSSPageSize: true,
+          printBackground: true,
+        });
+        pdfWindow.close();
+        resolve(pdf as Uint8Array<ArrayBuffer>);
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    await safeLoadURL(pdfWindow, prepareFileUrl([rootDir, 'pdf.html']));
+  } catch (error) {
+    reject(error);
+  }
+
+  return promise;
+});
+
 ipc.on('set-is-call-active', (_event, isCallActive) => {
   preventDisplaySleepService.setEnabled(isCallActive);
 });
@@ -1258,8 +1326,14 @@ async function readyForUpdates() {
       'SettingsChannel must be initialized'
     );
     await updater.start({
-      canRunSilently: () => {
+      canRunSilently: async () => {
+        const canRestartInTray = OS.isLinux()
+          ? (await systemTraySettingCache.get()) ===
+            SystemTraySetting.MinimizeToAndStartInSystemTray
+          : true;
+
         return (
+          canRestartInTray &&
           systemTrayService?.isVisible() === true &&
           mainWindow?.isVisible() !== true &&
           !preventDisplaySleepService.isEnabled()
@@ -1453,9 +1527,9 @@ async function showAbout() {
 
 async function getIsLinked() {
   try {
-    const number = await sql.sqlRead('getItemById', 'number_id');
+    const aci = await sql.sqlRead('getItemById', 'uuid_id');
     const password = await sql.sqlRead('getItemById', 'password');
-    return Boolean(number && password);
+    return Boolean(aci && password);
   } catch (e) {
     return false;
   }
@@ -2043,7 +2117,7 @@ const onDatabaseInitializationError = async (error: Error) => {
   });
 
   if (buttonIndex === copyErrorAndQuitButtonIndex) {
-    clipboard.writeText(
+    await clipboard.writeText(
       `Database startup error:\n\n${redactAll(Errors.toLogFormat(error))}\n\n` +
         `App Version: ${app.getVersion()}\n` +
         `OS: ${os.platform()}`
@@ -2216,9 +2290,7 @@ app.on('ready', async () => {
   }
 
   installWebHandler({
-    enableHttp:
-      Boolean(process.env.SIGNAL_ENABLE_HTTP) ||
-      Boolean(process.env.REACT_DEVTOOLS),
+    enableHttp: Boolean(process.env.SIGNAL_ENABLE_HTTP),
     session: session.defaultSession,
   });
 
@@ -2775,22 +2847,9 @@ if (!app.isDefaultProtocolClient('signalcaptcha')) {
   );
 }
 
-ipc.on(
-  'set-badge',
-  (_event: Electron.Event, badge: number | 'marked-unread') => {
-    if (badge === 'marked-unread') {
-      if (process.platform === 'darwin') {
-        // Will show a ● on macOS when undefined
-        app.setBadgeCount(undefined);
-      } else {
-        // All other OS's need a number
-        app.setBadgeCount(1);
-      }
-    } else {
-      app.setBadgeCount(badge);
-    }
-  }
-);
+ipc.on('set-badge-count', (_event: Electron.Event, badgeCount: number) => {
+  app.setBadgeCount(badgeCount);
+});
 
 ipc.on('remove-setup-menu-items', () => {
   setupMenu();
@@ -2960,19 +3019,6 @@ function removeDarkOverlay() {
 ipc.on('get-config', async event => {
   const theme = await getResolvedThemeSetting();
 
-  const svr2Config = safeParseLoose(svr2ConfigSchema, {
-    svr2Url: config.get<string | null>('svr2Url') || undefined,
-    svr2MRENCLAVE:
-      config.get<Array<SVR2EnclaveType> | null>('svr2MRENCLAVE') || undefined,
-  });
-  if (!svr2Config.success) {
-    throw new Error(
-      `prepareUrl: Failed to parse renderer svr2 config ${JSON.stringify(
-        svr2Config.error.flatten()
-      )}`
-    );
-  }
-
   const parsed = safeParseLoose(rendererConfigSchema, {
     name: packageJson.productName,
     availableLocales: getResolvedMessagesLocale().availableLocales,
@@ -3028,8 +3074,6 @@ ipc.on('get-config', async event => {
     homePath: app.getPath('home'),
     installPath: rootDir,
     userDataPath: app.getPath('userData'),
-
-    svr2Config: svr2Config.data,
 
     // Only used by the main window
     isMainWindowFullScreen: Boolean(mainWindow?.isFullScreen()),
@@ -3266,6 +3310,15 @@ ipc.handle('get-media-access-status', async (_event, value) => {
 ipc.handle(
   'open-system-media-permissions',
   async (_event, mediaType: 'camera' | 'microphone' | 'screenCapture') => {
+    if (OS.isWindows()) {
+      // Windows has no privacy page for screenCapture
+      if (mediaType === 'camera') {
+        await shell.openExternal('ms-settings:privacy-webcam');
+      } else if (mediaType === 'microphone') {
+        await shell.openExternal('ms-settings:privacy-microphone');
+      }
+      return;
+    }
     if (!OS.isMacOS()) {
       return;
     }
@@ -3369,7 +3422,6 @@ ipc.handle(
       ({ canceled, filePaths: selectedDirPaths } = await dialog.showOpenDialog(
         mainWindow,
         {
-          defaultPath: app.getPath('downloads'),
           properties: ['openDirectory', 'createDirectory'],
           buttonLabel,
           title,
@@ -3377,7 +3429,6 @@ ipc.handle(
       ));
     } else {
       ({ canceled, filePaths: selectedDirPaths } = await dialog.showOpenDialog({
-        defaultPath: app.getPath('downloads'),
         properties: ['openDirectory', 'createDirectory'],
         buttonLabel,
         title,

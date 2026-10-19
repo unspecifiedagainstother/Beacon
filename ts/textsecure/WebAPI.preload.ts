@@ -21,10 +21,15 @@ import {
 } from '@signalapp/libsignal-client';
 import { AccountAttributes } from '@signalapp/libsignal-client/dist/net.js';
 import type {
+  BackupAuth,
+  LinkedDevice,
+  CopyBackupMediaItem,
+  CopyBackupMediaOutcome,
   ProvisioningConnection,
   ProvisioningConnectionListener,
   RegisterAccountResponse,
 } from '@signalapp/libsignal-client/dist/net.js';
+import { Svr2MigrationSession } from '@signalapp/libsignal-client/dist/net.js';
 import { GroupSendFullToken } from '@signalapp/libsignal-client/zkgroup.js';
 import type { Request as KTRequest } from '@signalapp/libsignal-client/dist/net/KeyTransparency.js';
 import type {
@@ -38,10 +43,7 @@ import type { ExplodePromiseResultType } from '../util/explodePromise.std.ts';
 import { explodePromise } from '../util/explodePromise.std.ts';
 import { getUserAgent } from '../util/getUserAgent.node.ts';
 import { getTimeoutStream } from '../util/getStreamWithTimeout.node.ts';
-import {
-  toWebSafeBase64,
-  fromWebSafeBase64,
-} from '../util/webSafeBase64.std.ts';
+import { toWebSafeBase64 } from '../util/webSafeBase64.std.ts';
 import { getBasicAuth } from '../util/getBasicAuth.std.ts';
 import { createHTTPSAgent } from '../util/createHTTPSAgent.node.ts';
 import { createProxyAgent } from '../util/createProxyAgent.node.ts';
@@ -72,12 +74,7 @@ import {
 import type { BackupPresentationHeadersType } from '../types/backups.node.ts';
 import { HTTPError } from '../types/HTTPError.std.ts';
 import * as Bytes from '../Bytes.std.ts';
-import {
-  decryptHmacSIV,
-  encryptHmacSIV,
-  getRandomBytes,
-  randomInt,
-} from '../Crypto.node.ts';
+import { getRandomBytes, randomInt } from '../Crypto.node.ts';
 import * as linkPreviewFetch from '../linkPreviews/linkPreviewFetch.preload.ts';
 import { isBadgeImageFileUrlValid } from '../badges/isBadgeImageFileUrlValid.std.ts';
 
@@ -103,11 +100,7 @@ import { HOUR, MINUTE, SECOND } from '../util/durations/index.std.ts';
 import { safeParseNumber } from '../util/numbers.std.ts';
 import { getLibsignalNet } from './preconnect.preload.ts';
 import type { GroupSendToken } from '../types/GroupSendEndorsements.std.ts';
-import {
-  parseUnknown,
-  parseLoose,
-  safeParseUnknown,
-} from '../util/schemas.std.ts';
+import { parseUnknown, safeParseUnknown } from '../util/schemas.std.ts';
 import type {
   ProfileFetchAuthRequestOptions,
   ProfileFetchUnauthRequestOptions,
@@ -148,7 +141,6 @@ import {
   SessionNotVerifiedError,
 } from './Errors.std.ts';
 import { PhoneNumberDiscoverability } from '../util/phoneNumberDiscoverability.std.ts';
-import { PinHash } from '@signalapp/libsignal-client/dist/AccountKeys';
 import { sleep } from '../util/sleep.std.ts';
 import { exponentialBackoffSleepTime } from '../util/exponentialBackoff.std.ts';
 
@@ -431,7 +423,7 @@ async function getFetchOptions<Type extends ResponseType, OutputShape>(
         : { 'User-Agent': getUserAgent(options.version) }),
       'X-Signal-Agent': 'OWD',
       ...options.headers,
-    } as FetchHeaderListType,
+    } satisfies FetchHeaderListType,
     redirect: options.redirect,
     agent,
     ca: options.certificateAuthority,
@@ -615,7 +607,7 @@ async function _promiseAjax<Type extends ResponseType, OutputShape>(
       try {
         result = parseUnknown(options.zodSchema, result);
       } catch (e) {
-        log.error(logId, response.status, 'Validation error');
+        log.error(logId, response.status, 'Validation error', e.stack);
         throw e;
       }
     }
@@ -804,9 +796,6 @@ const CHAT_CALLS = {
   getIceServers: 'v2/calling/relays',
   getStickerPackUpload: 'v1/sticker/pack/form',
   getBackupCredentials: 'v1/archives/auth',
-  getBackupCDNCredentials: 'v1/archives/auth/read',
-  getBackupUploadForm: 'v1/archives/upload/form',
-  getBackupMediaUploadForm: 'v1/archives/media/upload/form',
   keys: 'v2/keys',
   linkDevice: 'v1/devices/link',
   me: 'v1/accounts/me',
@@ -814,28 +803,20 @@ const CHAT_CALLS = {
   multiRecipient: 'v1/messages/multi_recipient',
   phoneNumberDiscoverability: 'v2/accounts/phone_number_discoverability',
   profile: 'v1/profile',
-  backup: 'v1/archives',
-  backupMedia: 'v1/archives/media',
-  backupMediaBatch: 'v1/archives/media/batch',
   backupMediaDelete: 'v1/archives/media/delete',
   callLinkCreateAuth: 'v1/call-link/create-auth',
   callQualitySurvey: 'v1/call_quality_survey',
   redeemReceipt: 'v1/donation/redeem-receipt',
-  registration: 'v1/registration',
+  registrationLock: 'v1/accounts/registration_lock',
   registerCapabilities: 'v1/devices/capabilities',
   reportMessage: 'v1/messages/report',
   setBackupId: 'v1/archives/backupid',
-  setBackupSignatureKey: 'v1/archives/keys',
   signed: 'v2/keys/signed',
   storageToken: 'v1/storage/auth',
   subscriptions: 'v1/subscription',
   subscriptionConfiguration: 'v1/subscription/configuration',
   transferArchive: 'v1/devices/transfer_archive',
-  updateDeviceName: 'v1/accounts/name',
-  username: 'v1/accounts/username_hash',
-  reserveUsername: 'v1/accounts/username_hash/reserve',
   confirmUsername: 'v1/accounts/username_hash/confirm',
-  usernameLink: 'v1/accounts/username_link',
   whoami: 'v1/accounts/whoami',
 };
 
@@ -1016,19 +997,6 @@ export type GetAccountForUsernameOptionsType = Readonly<{
 
 export type GetAccountForUsernameResultType = AciString | null;
 
-const getDevicesResultZod = z.object({
-  devices: z.array(
-    z.object({
-      id: z.number(),
-      name: z.string().nullish(), // primary devices may not have a name
-      lastSeen: z.number().nullish(),
-      createdAtCiphertext: z.string(),
-    })
-  ),
-});
-
-export type GetDevicesResultType = z.infer<typeof getDevicesResultZod>;
-
 export type GetIceServersResultType = Readonly<{
   relays?: ReadonlyArray<IceServerGroupType>;
 }>;
@@ -1046,8 +1014,8 @@ export type GetSenderCertificateResultType = Readonly<{ certificate: string }>;
 
 const whoamiResultZod = z.object({
   uuid: z.string(),
-  pni: untaggedPniSchema,
-  number: z.string(),
+  pni: untaggedPniSchema.nullish(),
+  number: z.string().nullish(),
   usernameHash: z.string().nullish(),
   usernameLinkHandle: z.string().nullish(),
 });
@@ -1087,16 +1055,6 @@ export type VerifyServiceIdResponseType = z.infer<
   typeof verifyServiceIdResponse
 >;
 
-export type ReserveUsernameOptionsType = Readonly<{
-  hashes: ReadonlyArray<Uint8Array<ArrayBuffer>>;
-  abortSignal?: AbortSignal;
-}>;
-
-export type ReplaceUsernameLinkOptionsType = Readonly<{
-  encryptedUsername: Uint8Array<ArrayBuffer>;
-  keepLinkHandle: boolean;
-}>;
-
 export type ConfirmUsernameOptionsType = Readonly<{
   hash: Uint8Array<ArrayBuffer>;
   proof: Uint8Array<ArrayBuffer>;
@@ -1104,27 +1062,11 @@ export type ConfirmUsernameOptionsType = Readonly<{
   abortSignal?: AbortSignal;
 }>;
 
-const reserveUsernameResultZod = z.object({
-  usernameHash: z
-    .string()
-    .transform(x => Bytes.fromBase64(fromWebSafeBase64(x))),
-});
-export type ReserveUsernameResultType = z.infer<
-  typeof reserveUsernameResultZod
->;
-
 const confirmUsernameResultZod = z.object({
   usernameLinkHandle: z.string(),
 });
 export type ConfirmUsernameResultType = z.infer<
   typeof confirmUsernameResultZod
->;
-
-const replaceUsernameLinkResultZod = z.object({
-  usernameLinkHandle: z.string(),
-});
-export type ReplaceUsernameLinkResultType = z.infer<
-  typeof replaceUsernameLinkResultZod
 >;
 
 export type ResolveUsernameByLinkOptionsType = Readonly<{
@@ -1138,24 +1080,25 @@ export type ResolveUsernameLinkResultType = {
 
 export type CreateAccountOptionsType = Readonly<{
   sessionId: string;
-  number: string;
   newPassword: string;
   registrationId: number;
-  pniRegistrationId: number;
   accessKey: Uint8Array<ArrayBuffer>;
   aciPublicKey: PublicKey;
-  pniPublicKey: PublicKey;
   aciSignedPreKey: UploadSignedPreKeyType;
-  pniSignedPreKey: UploadSignedPreKeyType;
   aciPqLastResortPreKey: UploadKyberPreKeyType;
-  pniPqLastResortPreKey: UploadKyberPreKeyType;
   registrationLockToken?: string;
   phoneNumberDiscoverability: PhoneNumberDiscoverability;
+
+  number: string;
+  pniRegistrationId: number;
+  pniPublicKey: PublicKey;
+  pniSignedPreKey: UploadSignedPreKeyType;
+  pniPqLastResortPreKey: UploadKyberPreKeyType;
 }>;
 
 const linkDeviceResultZod = z.object({
   uuid: aciSchema,
-  pni: untaggedPniSchema,
+  pni: untaggedPniSchema.nullish(),
   deviceId: z.number(),
 });
 export type LinkDeviceResultType = z.infer<typeof linkDeviceResultZod>;
@@ -1179,34 +1122,42 @@ export type ReportMessageOptionsType = Readonly<{
   token?: string;
 }>;
 
-const attachmentUploadFormResponse = z.object({
-  cdn: z.literal(2).or(z.literal(3)),
-  key: z.string(),
-  headers: z.record(z.string(), z.string()),
-  signedUploadLocation: z.string(),
-});
-
-export type AttachmentUploadFormResponseType = z.infer<
-  typeof attachmentUploadFormResponse
->;
+export type AttachmentUploadFormType = {
+  cdn: number;
+  key: string;
+  headers: Record<string, string>;
+  signedUploadLocation: string;
+};
 
 const ServerKeyCountSchema = z.object({
   count: z.number(),
   pqCount: z.number(),
 });
 
-export type LinkDeviceOptionsType = Readonly<{
-  number: string;
-  verificationCode: string;
-  encryptedDeviceName?: string;
-  newPassword: string;
-  registrationId: number;
-  pniRegistrationId: number;
-  aciSignedPreKey: UploadSignedPreKeyType;
-  pniSignedPreKey: UploadSignedPreKeyType;
-  aciPqLastResortPreKey: UploadKyberPreKeyType;
-  pniPqLastResortPreKey: UploadKyberPreKeyType;
-}>;
+export type LinkDeviceOptionsType = Readonly<
+  {
+    aci: AciString;
+    verificationCode: string;
+    encryptedDeviceName?: string;
+    newPassword: string;
+    registrationId: number;
+    aciSignedPreKey: UploadSignedPreKeyType;
+    aciPqLastResortPreKey: UploadKyberPreKeyType;
+  } & (
+    | {
+        hasE164: true;
+        pniRegistrationId: number;
+        pniSignedPreKey: UploadSignedPreKeyType;
+        pniPqLastResortPreKey: UploadKyberPreKeyType;
+      }
+    | {
+        hasE164: false;
+        pniRegistrationId?: undefined;
+        pniSignedPreKey?: undefined;
+        pniPqLastResortPreKey?: undefined;
+      }
+  )
+>;
 
 export type CreateBoostOptionsType = Readonly<{
   currency: string;
@@ -1334,73 +1285,32 @@ export type SetBackupIdOptionsType = Readonly<{
   mediaBackupAuthCredentialRequest: Uint8Array<ArrayBuffer>;
 }>;
 
-export type SetBackupSignatureKeyOptionsType = Readonly<{
-  headers: BackupPresentationHeadersType;
-  backupIdPublicKey: Uint8Array<ArrayBuffer>;
-}>;
-
 export type UploadBackupOptionsType = Readonly<{
   headers: BackupPresentationHeadersType;
   stream: Readable;
 }>;
 
-export type BackupMediaItemType = Readonly<{
-  sourceAttachment: Readonly<{
-    cdn: number;
-    key: string;
-  }>;
-  objectLength: number;
-  mediaId: string;
-  hmacKey: Uint8Array<ArrayBuffer>;
-  encryptionKey: Uint8Array<ArrayBuffer>;
+export type CopyBackupMediaOptionsType = Readonly<{
+  auth: BackupAuth;
+  items: ReadonlyArray<CopyBackupMediaItem>;
 }>;
-
-export type BackupMediaBatchOptionsType = Readonly<{
-  headers: BackupPresentationHeadersType;
-  items: ReadonlyArray<BackupMediaItemType>;
-}>;
-
-export const backupMediaBatchResponseSchema = z.object({
-  responses: z
-    .object({
-      status: z.number(),
-      failureReason: z.string().nullish(),
-      cdn: z.number(),
-      mediaId: z.string(),
-    })
-    .transform(response => ({
-      ...response,
-      isSuccess: isSuccess(response.status),
-    }))
-    .array(),
-});
-
-export type BackupMediaBatchResponseType = z.infer<
-  typeof backupMediaBatchResponseSchema
->;
 
 export type BackupListMediaOptionsType = Readonly<{
-  headers: BackupPresentationHeadersType;
+  auth: BackupAuth;
   cursor?: string;
   limit: number;
 }>;
 
-export const backupListMediaResponseSchema = z.object({
-  storedMediaObjects: z
-    .object({
-      cdn: z.number(),
-      mediaId: z.string(),
-      objectLength: z.number(),
-    })
-    .array(),
-  backupDir: z.string(),
-  mediaDir: z.string(),
-  cursor: z.string().nullish(),
-});
-
-export type BackupListMediaResponseType = z.infer<
-  typeof backupListMediaResponseSchema
->;
+export type BackupListMediaResponseType = Readonly<{
+  storedMediaObjects: ReadonlyArray<{
+    cdn: number;
+    mediaId: string;
+    objectLength: number;
+  }>;
+  backupDir: string;
+  mediaDir: string;
+  cursor?: string;
+}>;
 
 export type BackupDeleteMediaItemType = Readonly<{
   cdn: number;
@@ -1437,18 +1347,9 @@ export type GetBackupCredentialsResponseType = z.infer<
   typeof getBackupCredentialsResponseSchema
 >;
 
-export type GetBackupCDNCredentialsOptionsType = Readonly<{
-  headers: BackupPresentationHeadersType;
-  cdnNumber: number;
+export type GetBackupCDNCredentialsResponseType = Readonly<{
+  headers: Record<string, string>;
 }>;
-
-export const getBackupCDNCredentialsResponseSchema = z.object({
-  headers: z.record(z.string(), z.string()),
-});
-
-export type GetBackupCDNCredentialsResponseType = z.infer<
-  typeof getBackupCDNCredentialsResponseSchema
->;
 
 export type GetBackupStreamOptionsType = Readonly<{
   cdn: number;
@@ -1468,17 +1369,17 @@ export type GetEphemeralBackupStreamOptionsType = Readonly<{
   abortSignal?: AbortSignal;
 }>;
 
-export const getBackupInfoResponseSchema = z.object({
-  cdn: z.literal(3),
-  backupDir: z.string(),
-  mediaDir: z.string(),
-  backupName: z.string(),
-  usedSpace: z.number().nullish(),
-});
+export type GetMessageBackupInfoResponseType = Readonly<{
+  cdn: number;
+  backupDir: string;
+  backupName: string;
+}>;
 
-export type GetBackupInfoResponseType = z.infer<
-  typeof getBackupInfoResponseSchema
->;
+export type GetMediaBackupInfoResponseType = Readonly<{
+  backupDir: string;
+  mediaDir: string;
+  usedSpace: number;
+}>;
 
 export const megaphoneSchema = z.object({
   uuid: z.string(),
@@ -1766,7 +1667,6 @@ const {
   serverUrl: chatServiceUrl,
   storageUrl,
   stripePublishableKey,
-  svr2Config,
   updatesUrl,
   version,
 } = window.SignalContext.config;
@@ -2054,6 +1954,10 @@ export async function logout(): Promise<void> {
   password = '';
 
   await socketManager.logout();
+}
+
+export function getHasClockSkew(): boolean {
+  return socketManager.getHasClockSkew();
 }
 
 export function getSocketStatus(): SocketStatuses {
@@ -2408,29 +2312,31 @@ export async function registerCapabilities(
 export async function postBatchIdentityCheck(
   elements: VerifyServiceIdRequestType
 ): Promise<VerifyServiceIdResponseType> {
-  const res = await _ajax({
+  const result = await _ajax({
     host: 'chatService',
     data: JSON.stringify({ elements }),
     call: 'batchIdentityCheck',
     httpType: 'POST',
     unauthenticated: true,
     responseType: 'json',
-    // TODO DESKTOP-8719
-    zodSchema: z.unknown(),
+    zodSchema: verifyServiceIdResponse,
   });
 
-  const result = safeParseUnknown(verifyServiceIdResponse, res);
+  // Guard against server returning keys for uuids that we did not request
+  const submittedUuids = new Set(elements.map(el => el.uuid));
 
-  if (result.success) {
-    return result.data;
-  }
-
-  log.error(
-    'invalid response from postBatchIdentityCheck',
-    toLogFormat(result.error)
+  const filtered = result.elements.filter(uuidAndKeyHash =>
+    submittedUuids.has(uuidAndKeyHash.uuid)
   );
 
-  throw result.error;
+  if (filtered.length !== result.elements.length) {
+    log.error(
+      'postBatchIdentityCheck: server returned ' +
+        `${result.elements.length - filtered.length} unrequested uuids`
+    );
+  }
+
+  return { elements: filtered };
 }
 
 function getProfileUrl(
@@ -2694,29 +2600,36 @@ export async function getAvatar(
 }
 
 export async function deleteUsername(abortSignal?: AbortSignal): Promise<void> {
-  await _ajax({
-    host: 'chatService',
-    call: 'username',
-    httpType: 'DELETE',
-    abortSignal,
-  });
+  await _retry(
+    async () => {
+      const chat = await socketManager.getAuthenticatedApi();
+      return chat.deleteUsernameHash({ abortSignal });
+    },
+    { abortSignal }
+  );
 }
 
 export async function reserveUsername({
   hashes,
   abortSignal,
-}: ReserveUsernameOptionsType): Promise<ReserveUsernameResultType> {
-  return _ajax({
-    host: 'chatService',
-    call: 'reserveUsername',
-    httpType: 'PUT',
-    jsonData: {
-      usernameHashes: hashes.map(hash => toWebSafeBase64(Bytes.toBase64(hash))),
+}: {
+  hashes: Array<Uint8Array<ArrayBuffer>>;
+  abortSignal?: AbortSignal;
+}): Promise<{
+  usernameHash: Uint8Array<ArrayBuffer>;
+}> {
+  const usernameHash = await _retry(
+    async () => {
+      const chat = await socketManager.getAuthenticatedApi();
+      return chat.reserveUsernameHash(
+        { usernameHashes: hashes },
+        { abortSignal }
+      );
     },
-    responseType: 'json',
-    abortSignal,
-    zodSchema: reserveUsernameResultZod,
-  });
+    { abortSignal }
+  );
+
+  return { usernameHash };
 }
 export async function confirmUsername({
   hash,
@@ -2742,20 +2655,21 @@ export async function confirmUsername({
 export async function replaceUsernameLink({
   encryptedUsername,
   keepLinkHandle,
-}: ReplaceUsernameLinkOptionsType): Promise<ReplaceUsernameLinkResultType> {
-  return _ajax({
-    host: 'chatService',
-    call: 'usernameLink',
-    httpType: 'PUT',
-    responseType: 'json',
-    jsonData: {
-      usernameLinkEncryptedValue: toWebSafeBase64(
-        Bytes.toBase64(encryptedUsername)
-      ),
+}: {
+  encryptedUsername: Uint8Array<ArrayBuffer>;
+  keepLinkHandle: boolean;
+}): Promise<{
+  usernameLinkHandle: string;
+}> {
+  const usernameLinkHandle = await _retry(async () => {
+    const chat = await socketManager.getAuthenticatedApi();
+    return chat.setUsernameLink({
+      usernameCiphertext: encryptedUsername,
       keepLinkHandle,
-    },
-    zodSchema: replaceUsernameLinkResultZod,
+    });
   });
+
+  return { usernameLinkHandle };
 }
 
 export async function resolveUsernameLink({
@@ -2870,7 +2784,12 @@ export async function submitCodeForVerificationSession(options: {
     sessionId: options.verificationSessionId,
   });
 
-  await session.verifySession(options.code);
+  const success = await session.verifySession(options.code);
+  if (!success) {
+    throw new SessionNotVerifiedError(
+      'submitCodeForVerificationSession: verifySession returned false!'
+    );
+  }
 
   // Verify that the code worked to make the session ready for account creation
   if (!session.sessionState.verified) {
@@ -2946,19 +2865,20 @@ async function _withNewCredentials<
 
 export async function createAccount({
   sessionId,
-  number,
-  newPassword,
   registrationId,
-  pniRegistrationId,
   accessKey,
   aciPublicKey,
-  pniPublicKey,
   aciSignedPreKey,
-  pniSignedPreKey,
+  newPassword,
   aciPqLastResortPreKey,
-  pniPqLastResortPreKey,
   registrationLockToken,
   phoneNumberDiscoverability,
+
+  number,
+  pniRegistrationId,
+  pniPublicKey,
+  pniSignedPreKey,
+  pniPqLastResortPreKey,
 }: CreateAccountOptionsType): Promise<RegisterAccountResponse> {
   const session = await libsignalNet.resumeRegistrationSession({
     sessionId,
@@ -2975,6 +2895,7 @@ export async function createAccount({
     attachmentBackfill: true,
     spqr: true,
     usernameChangeSyncMessage: true,
+    optionalPhoneNumber: false,
   };
 
   // Desktop doesn't support recovery but we need to provide a recovery password.
@@ -3018,30 +2939,31 @@ export async function createAccount({
     aciPublicKey,
     pniPublicKey,
     aciSignedPreKey: asSignedKey(aciSignedPreKey),
-    pniSignedPreKey: asSignedKey(pniSignedPreKey),
     aciPqLastResortPreKey: asSignedKey(aciPqLastResortPreKey),
+    pniSignedPreKey: asSignedKey(pniSignedPreKey),
     pniPqLastResortPreKey: asSignedKey(pniPqLastResortPreKey),
   });
 
   return response;
 }
 
-export async function linkDevice({
-  number,
-  verificationCode,
-  encryptedDeviceName,
-  newPassword,
-  registrationId,
-  pniRegistrationId,
-  aciSignedPreKey,
-  pniSignedPreKey,
-  aciPqLastResortPreKey,
-  pniPqLastResortPreKey,
-}: LinkDeviceOptionsType): Promise<LinkDeviceResultType> {
+export async function linkDevice(
+  options: LinkDeviceOptionsType
+): Promise<LinkDeviceResultType> {
+  const {
+    verificationCode,
+    encryptedDeviceName,
+    newPassword,
+    registrationId,
+    aciSignedPreKey,
+    aciPqLastResortPreKey,
+  } = options;
+
   const capabilities: CapabilitiesUploadType = {
     attachmentBackfill: true,
     spqr: true,
     usernameChangeSyncMessage: true,
+    optionalPhoneNumber: !options.hasE164,
   };
 
   const jsonData = {
@@ -3050,17 +2972,23 @@ export async function linkDevice({
       fetchesMessages: true,
       name: encryptedDeviceName,
       registrationId,
-      pniRegistrationId,
+      pniRegistrationId: options.hasE164
+        ? options.pniRegistrationId
+        : undefined,
       capabilities,
     },
     aciSignedPreKey: serializeSignedPreKey(aciSignedPreKey),
-    pniSignedPreKey: serializeSignedPreKey(pniSignedPreKey),
     aciPqLastResortPreKey: serializeSignedPreKey(aciPqLastResortPreKey),
-    pniPqLastResortPreKey: serializeSignedPreKey(pniPqLastResortPreKey),
+    pniSignedPreKey: options.hasE164
+      ? serializeSignedPreKey(options.pniSignedPreKey)
+      : undefined,
+    pniPqLastResortPreKey: options.hasE164
+      ? serializeSignedPreKey(options.pniPqLastResortPreKey)
+      : undefined,
   };
   return _withNewCredentials(
     {
-      username: number,
+      username: options.aci,
       password: newPassword,
     },
     async () => {
@@ -3093,24 +3021,43 @@ export async function unlink(): Promise<void> {
   });
 }
 
-export async function getDevices(): Promise<GetDevicesResultType> {
-  return _ajax({
+export async function setupRegistrationLock(
+  registrationLock: string
+): Promise<void> {
+  await _ajax({
     host: 'chatService',
-    call: 'devices',
-    httpType: 'GET',
-    responseType: 'json',
-    zodSchema: getDevicesResultZod,
+    call: 'registrationLock',
+    httpType: 'PUT',
+    jsonData: {
+      registrationLock,
+    },
+  });
+}
+export async function disableRegistrationLock(): Promise<void> {
+  await _ajax({
+    host: 'chatService',
+    call: 'registrationLock',
+    httpType: 'DELETE',
   });
 }
 
-export async function updateDeviceName(deviceName: string): Promise<void> {
-  await _ajax({
-    host: 'chatService',
-    call: 'updateDeviceName',
-    httpType: 'PUT',
-    jsonData: {
-      deviceName,
-    },
+export async function getDevices(): Promise<ReadonlyArray<LinkedDevice>> {
+  return _retry(async () => {
+    const chat = await socketManager.getAuthenticatedApi();
+    return chat.getDevices();
+  });
+}
+
+export async function updateDeviceName({
+  deviceId,
+  encryptedName,
+}: {
+  deviceId: number;
+  encryptedName: Uint8Array<ArrayBuffer>;
+}): Promise<void> {
+  await _retry(async () => {
+    const chat = await socketManager.getAuthenticatedApi();
+    await chat.setDeviceName({ deviceId, encryptedName });
   });
 }
 
@@ -3195,19 +3142,31 @@ export async function registerKeys(
   });
 }
 
-export async function getBackupInfo(
-  headers: BackupPresentationHeadersType
-): Promise<GetBackupInfoResponseType> {
-  return _ajax({
-    host: 'chatService',
-    call: 'backup',
-    httpType: 'GET',
-    unauthenticated: true,
-    accessKey: undefined,
-    groupSendToken: undefined,
-    headers,
-    responseType: 'json',
-    zodSchema: getBackupInfoResponseSchema,
+export async function getMessageBackupInfo({
+  auth,
+}: {
+  auth: BackupAuth;
+}): Promise<GetMessageBackupInfoResponseType> {
+  return _retry(async () => {
+    const unauthChat = await socketManager.getUnauthenticatedApi();
+    const { cdn, backupDir, backupName } =
+      await unauthChat.getMessageBackupInfo({ auth });
+
+    return { cdn, backupDir, backupName };
+  });
+}
+
+export async function getMediaBackupInfo({
+  auth,
+}: {
+  auth: BackupAuth;
+}): Promise<GetMediaBackupInfoResponseType> {
+  return _retry(async () => {
+    const unauthChat = await socketManager.getUnauthenticatedApi();
+    const { backupDir, mediaDir, usedSpace } =
+      await unauthChat.getMediaBackupInfo({ auth });
+
+    return { backupDir, mediaDir, usedSpace: Number(usedSpace) };
   });
 }
 
@@ -3271,19 +3230,27 @@ export async function getEphemeralBackupStream({
   });
 }
 
-export async function getBackupMediaUploadForm(
-  headers: BackupPresentationHeadersType
-): Promise<AttachmentUploadFormResponseType> {
-  return _ajax({
-    host: 'chatService',
-    call: 'getBackupMediaUploadForm',
-    httpType: 'GET',
-    unauthenticated: true,
-    accessKey: undefined,
-    groupSendToken: undefined,
-    headers,
-    responseType: 'json',
-    zodSchema: attachmentUploadFormResponse,
+export async function getBackupMediaUploadForm({
+  auth,
+  uploadSize,
+}: {
+  auth: BackupAuth;
+  uploadSize: number;
+}): Promise<AttachmentUploadFormType> {
+  return _retry(async () => {
+    const unauthChat = await socketManager.getUnauthenticatedApi();
+    const { cdn, key, headers, signedUploadUrl } =
+      await unauthChat.getMediaUploadForm({
+        auth,
+        uploadSize,
+      });
+
+    return {
+      cdn,
+      key,
+      headers: Object.fromEntries(headers.entries()),
+      signedUploadLocation: signedUploadUrl.toString(),
+    };
   });
 }
 
@@ -3291,7 +3258,7 @@ export function createFetchForAttachmentUpload({
   signedUploadLocation,
   headers: uploadHeaders,
   cdn,
-}: AttachmentUploadFormResponseType): FetchFunctionType {
+}: AttachmentUploadFormType): FetchFunctionType {
   strictAssert(cdn === 3, 'Fetch can only be created for CDN 3');
   const { origin: expectedOrigin } = new URL(signedUploadLocation);
 
@@ -3327,33 +3294,38 @@ export function createFetchForAttachmentUpload({
   };
 }
 
-export async function getBackupUploadForm(
-  headers: BackupPresentationHeadersType
-): Promise<AttachmentUploadFormResponseType> {
-  return _ajax({
-    host: 'chatService',
-    call: 'getBackupUploadForm',
-    httpType: 'GET',
-    unauthenticated: true,
-    accessKey: undefined,
-    groupSendToken: undefined,
-    headers,
-    responseType: 'json',
-    zodSchema: attachmentUploadFormResponse,
+export async function getBackupUploadForm({
+  auth,
+  uploadSize,
+}: {
+  auth: BackupAuth;
+  uploadSize: number;
+}): Promise<AttachmentUploadFormType> {
+  return _retry(async () => {
+    const unauthChat = await socketManager.getUnauthenticatedApi();
+    const { cdn, key, headers, signedUploadUrl } =
+      await unauthChat.getUploadForm({
+        auth,
+        uploadSize,
+      });
+
+    return {
+      cdn,
+      key,
+      headers: Object.fromEntries(headers.entries()),
+      signedUploadLocation: signedUploadUrl.toString(),
+    };
   });
 }
 
-export async function refreshBackup(
-  headers: BackupPresentationHeadersType
-): Promise<void> {
-  await _ajax({
-    host: 'chatService',
-    call: 'backup',
-    httpType: 'POST',
-    unauthenticated: true,
-    accessKey: undefined,
-    groupSendToken: undefined,
-    headers,
+export async function refreshBackup({
+  auth,
+}: {
+  auth: BackupAuth;
+}): Promise<void> {
+  return _retry(async () => {
+    const unauthChat = await socketManager.getUnauthenticatedApi();
+    return unauthChat.refreshBackup({ auth });
   });
 }
 
@@ -3376,20 +3348,19 @@ export async function getBackupCredentials({
 }
 
 export async function getBackupCDNCredentials({
-  headers,
+  auth,
   cdnNumber,
-}: GetBackupCDNCredentialsOptionsType): Promise<GetBackupCDNCredentialsResponseType> {
-  return _ajax({
-    host: 'chatService',
-    call: 'getBackupCDNCredentials',
-    httpType: 'GET',
-    unauthenticated: true,
-    accessKey: undefined,
-    groupSendToken: undefined,
-    headers,
-    urlParameters: `?cdn=${cdnNumber}`,
-    responseType: 'json',
-    zodSchema: getBackupCDNCredentialsResponseSchema,
+}: {
+  auth: BackupAuth;
+  cdnNumber: number;
+}): Promise<GetBackupCDNCredentialsResponseType> {
+  return _retry(async () => {
+    const unauthChat = await socketManager.getUnauthenticatedApi();
+    const { headers: headersMap } = await unauthChat.getBackupCdnCredentials({
+      auth,
+      cdn: cdnNumber,
+    });
+    return { headers: Object.fromEntries(headersMap) };
   });
 }
 
@@ -3413,85 +3384,55 @@ export async function setBackupId({
 }
 
 export async function setBackupSignatureKey({
-  headers,
-  backupIdPublicKey,
-}: SetBackupSignatureKeyOptionsType): Promise<void> {
-  await _ajax({
-    host: 'chatService',
-    call: 'setBackupSignatureKey',
-    httpType: 'PUT',
-    unauthenticated: true,
-    accessKey: undefined,
-    groupSendToken: undefined,
-    headers,
-    jsonData: {
-      backupIdPublicKey: Bytes.toBase64(backupIdPublicKey),
-    },
+  auth,
+}: {
+  auth: BackupAuth;
+}): Promise<void> {
+  return _retry(async () => {
+    const unauthChat = await socketManager.getUnauthenticatedApi();
+    return unauthChat.setBackupPublicKey({ auth });
   });
 }
 
-export async function backupMediaBatch({
-  headers,
+export async function copyBackupMedia({
+  auth,
   items,
-}: BackupMediaBatchOptionsType): Promise<BackupMediaBatchResponseType> {
-  return _ajax({
-    host: 'chatService',
-    call: 'backupMediaBatch',
-    httpType: 'PUT',
-    unauthenticated: true,
-    accessKey: undefined,
-    groupSendToken: undefined,
-    headers,
-    responseType: 'json',
-    jsonData: {
-      items: items.map(item => {
-        const {
-          sourceAttachment,
-          objectLength,
-          mediaId,
-          hmacKey,
-          encryptionKey,
-        } = item;
+}: CopyBackupMediaOptionsType): Promise<Array<CopyBackupMediaOutcome>> {
+  return _retry(async () => {
+    const unauthChat = await socketManager.getUnauthenticatedApi();
 
-        return {
-          sourceAttachment: {
-            cdn: sourceAttachment.cdn,
-            key: sourceAttachment.key,
-          },
-          objectLength,
-          mediaId,
-          hmacKey: Bytes.toBase64(hmacKey),
-          encryptionKey: Bytes.toBase64(encryptionKey),
-        };
-      }),
-    },
-    zodSchema: backupMediaBatchResponseSchema,
+    const outcomes = new Array<CopyBackupMediaOutcome>();
+    for await (const outcome of unauthChat.copyBackupMedia({ auth, items })) {
+      outcomes.push(outcome);
+    }
+    return outcomes;
   });
 }
 
 export async function backupListMedia({
-  headers,
+  auth,
   cursor,
   limit,
 }: BackupListMediaOptionsType): Promise<BackupListMediaResponseType> {
-  const params = new Array<string>();
+  return _retry(async () => {
+    const unauthChat = await socketManager.getUnauthenticatedApi();
+    const {
+      items,
+      backupDir,
+      mediaDir,
+      cursor: nextCursor,
+    } = await unauthChat.listBackupMedia({ auth, cursor, limit });
 
-  if (cursor != null) {
-    params.push(`cursor=${encodeURIComponent(cursor)}`);
-  }
-  params.push(`limit=${limit}`);
-
-  return _ajax({
-    host: 'chatService',
-    call: 'backupMedia',
-    httpType: 'GET',
-    unauthenticated: true,
-    accessKey: undefined,
-    groupSendToken: undefined,
-    headers,
-    responseType: 'json',
-    urlParameters: `?${params.join('&')}`,
-    zodSchema: backupListMediaResponseSchema,
+    return {
+      storedMediaObjects: items.map(({ cdn, mediaId, objectLength }) => ({
+        cdn,
+        mediaId: Bytes.toBase64url(mediaId),
+        objectLength: Number(objectLength),
+      })),
+      backupDir,
+      mediaDir,
+      cursor: nextCursor,
+    };
   });
 }
 
@@ -3501,6 +3442,7 @@ export async function callLinkCreateAuth(
   return _ajax({
     host: 'chatService',
     call: 'callLinkCreateAuth',
+    urlParameters: '?v101=true',
     httpType: 'POST',
     responseType: 'json',
     jsonData: { createCallLinkCredentialRequest: requestBase64 },
@@ -4378,26 +4320,26 @@ export type GetAttachmentUploadFormOptionsType = Readonly<{
 
 export async function getAttachmentUploadForm({
   uploadSize,
-}: GetAttachmentUploadFormOptionsType): Promise<AttachmentUploadFormResponseType> {
+}: GetAttachmentUploadFormOptionsType): Promise<AttachmentUploadFormType> {
   return _retry(async () => {
     const chat = await socketManager.getAuthenticatedApi();
     const { cdn, key, headers, signedUploadUrl } = await chat.getUploadForm({
       uploadSize: BigInt(uploadSize),
     });
 
-    return parseLoose(attachmentUploadFormResponse, {
+    return {
       cdn,
       key,
       headers: Object.fromEntries(headers.entries()),
       signedUploadLocation: signedUploadUrl.toString(),
-    });
+    };
   });
 }
 
 export async function putEncryptedAttachment(
   encryptedBin: (start: number, end?: number) => Readable,
   encryptedSize: number,
-  uploadForm: AttachmentUploadFormResponseType
+  uploadForm: AttachmentUploadFormType
 ): Promise<void> {
   const { signedUploadLocation, headers } = uploadForm;
 
@@ -4610,6 +4552,7 @@ export async function getGroupCredentials({
     urlParameters:
       `?redemptionStartSeconds=${startDayInSeconds}&` +
       `redemptionEndSeconds=${endDayInSeconds}&` +
+      'v101=true&' +
       'zkcCredential=true',
     httpType: 'GET',
     responseType: 'json',
@@ -5175,38 +5118,6 @@ async function getBackupAuth(): Promise<AuthType> {
   });
 }
 
-function getPinHash(options: { pin: string; username: string }): PinHash {
-  const pinBytes = Bytes.fromString(options.pin);
-  const mrenclaveBytes = Bytes.fromHex(svr2Config.svr2MRENCLAVE.id);
-
-  return PinHash.fromUsernameMrenclave(
-    pinBytes,
-    options.username,
-    mrenclaveBytes
-  );
-}
-
-function encryptSVRPayload({
-  pinHash,
-  data,
-}: {
-  pinHash: PinHash;
-  data: Uint8Array<ArrayBuffer>;
-}): Uint8Array<ArrayBuffer> {
-  const key = pinHash.encryptionKey;
-  return encryptHmacSIV(key, data);
-}
-function decryptSVRPayload({
-  pinHash,
-  data,
-}: {
-  pinHash: PinHash;
-  data: Uint8Array<ArrayBuffer>;
-}): Uint8Array<ArrayBuffer> {
-  const key = pinHash.encryptionKey;
-  return decryptHmacSIV(key, data);
-}
-
 export type RestoreResponseType = Readonly<
   | {
       success: false;
@@ -5241,14 +5152,15 @@ export async function restoreFromSVR2(
 
   const auth = await getAuth();
   const svr2 = libsignalNet.svr2(auth);
-
-  const pinHash = getPinHash({ pin: options.pin, username: auth.username });
+  const pinData = Bytes.fromString(options.pin);
 
   try {
-    const { data, triesRemaining } = await svr2.restore(pinHash.accessKey);
+    const { masterKey, triesRemaining } = await svr2.restore({
+      normalizedPin: pinData,
+    });
     return {
       success: true,
-      data: decryptSVRPayload({ pinHash, data }),
+      data: masterKey,
       triesRemaining,
     };
   } catch (error) {
@@ -5290,40 +5202,56 @@ const MAX_STORE_ATTEMPTS = 3;
 export type StoreParameters = {
   pin: string;
   data: Uint8Array<ArrayBuffer>;
+  sessionData?: Uint8Array<ArrayBuffer>;
 };
+type StoreResponse =
+  | { success: true }
+  | {
+      success: false;
+      sessionData: Uint8Array<ArrayBuffer> | undefined;
+    };
 
 export async function storeWithSVR2(
   options: StoreParameters,
   getAuth = getBackupAuth
-): Promise<void> {
+): Promise<StoreResponse> {
   const logId = 'storeWithSVR2';
 
   if (window.SignalCI) {
     log.info(`${logId}: Running under CI; saving data`);
-    window.SignalCI.saveSVR2StoredData(options);
-    return;
+    window.SignalCI.handleEvent('svrStore', {
+      pin: options.pin,
+      dataBase64: Bytes.toBase64(options.data),
+    });
+    return { success: true };
   }
 
   const auth = await getAuth();
   const svr2 = libsignalNet.svr2(auth);
 
-  const pinHash = getPinHash({ pin: options.pin, username: auth.username });
-  const data = encryptSVRPayload({ pinHash, data: options.data });
+  const { pin, data } = options;
+  const pinData = Bytes.fromString(pin);
 
   log.info(`${logId}: startBackup...`);
   const session = await svr2.startBackup(
-    pinHash.accessKey,
+    { normalizedPin: pinData },
     data,
     MAX_SVR2_TRIES
   );
 
   let attempts = 1;
-  while (attempts <= MAX_STORE_ATTEMPTS) {
+
+  // oxlint-disable-next-line no-constant-condition
+  while (true) {
     try {
       log.info(`${logId}: finishBackup (attempt=${attempts})...`);
       // oxlint-disable-next-line no-await-in-loop
       await svr2.finishBackup(session);
-      break;
+
+      log.info(`${logId}: complete (attempt=${attempts})`);
+      return {
+        success: true,
+      };
     } catch (error) {
       log.error(
         `${logId}: Failed to finish store, attempt ${attempts} of ${MAX_STORE_ATTEMPTS}`,
@@ -5331,9 +5259,10 @@ export async function storeWithSVR2(
       );
 
       if (attempts >= MAX_STORE_ATTEMPTS) {
-        throw new Error(
+        log.error(
           `${logId}: Failed after ${MAX_STORE_ATTEMPTS} to finish store`
         );
+        return { success: false, sessionData: session.serialize() };
       }
 
       const duration = exponentialBackoffSleepTime(attempts, {
@@ -5347,7 +5276,80 @@ export async function storeWithSVR2(
       attempts += 1;
     }
   }
-  log.info(`${logId}: complete (attempt=${attempts})`);
+}
+
+const MAX_MIGRATE_ATTEMPTS = 3;
+
+export async function migrateSVR2(
+  options: StoreParameters,
+  getAuth = getBackupAuth
+): Promise<StoreResponse> {
+  const logId = 'migrateSVR2';
+
+  if (window.SignalCI) {
+    log.info(`${logId}: Running under CI; saving data`);
+    window.SignalCI.handleEvent('svrStore', options);
+    return { success: true };
+  }
+
+  const auth = await getAuth();
+  const svr2 = libsignalNet.svr2(auth);
+
+  const { pin, data } = options;
+  const pinData = Bytes.fromString(pin);
+
+  let attempts = 0;
+  let session: Svr2MigrationSession | undefined = options.sessionData
+    ? Svr2MigrationSession.deserialize(options.sessionData)
+    : undefined;
+
+  // oxlint-disable-next-line no-constant-condition
+  while (true) {
+    try {
+      attempts += 1;
+
+      if (attempts >= MAX_MIGRATE_ATTEMPTS) {
+        log.error(
+          `${logId}: failed after ${MAX_MIGRATE_ATTEMPTS} to finish migration`
+        );
+        return { success: false, sessionData: session?.serialize() };
+      }
+
+      log.info(`${logId}: migrating, attempts=${attempts}...`);
+
+      // oxlint-disable-next-line no-await-in-loop
+      session = await svr2.migrate(
+        { normalizedPin: pinData },
+        data,
+        MAX_SVR2_TRIES
+      );
+
+      if (session.isComplete()) {
+        log.info(`${logId}: complete (attempt=${attempts})`);
+        return {
+          success: true,
+        };
+      }
+
+      const duration = exponentialBackoffSleepTime(attempts, {
+        firstBackoffs: [SECOND * 2],
+        multiplier: 3,
+        maxBackoffTime: SECOND * 30,
+      });
+
+      log.info(
+        `${logId}: not complete; waiting ${duration}ms then trying again; (attempts=${attempts})...`
+      );
+
+      // oxlint-disable-next-line no-await-in-loop
+      await sleep(duration);
+    } catch (error) {
+      log.error(
+        `${logId}: error during migration; attempt ${attempts} of ${MAX_MIGRATE_ATTEMPTS}: `,
+        toLogFormat(error)
+      );
+    }
+  }
 }
 
 // TODO: DESKTOP-8300

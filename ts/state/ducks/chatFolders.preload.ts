@@ -18,8 +18,9 @@ import {
   getCurrentChatFolders,
   getSelectedChatFolder,
 } from '../selectors/chatFolders.std.ts';
+import { getFilterByUnread } from '../selectors/search.preload.ts';
 import { DataReader, DataWriter } from '../../sql/Client.preload.ts';
-import { storageServiceUploadJob } from '../../services/storage.preload.ts';
+import { runStorageServiceUploadJob } from '../../services/storage.preload.ts';
 import { parseStrict } from '../../util/schemas.std.ts';
 import { chatFolderCleanupService } from '../../services/expiring/chatFolderCleanupService.preload.ts';
 import { drop } from '../../util/drop.std.ts';
@@ -128,7 +129,7 @@ function createChatFolder(
     };
 
     await DataWriter.createChatFolder(chatFolder);
-    storageServiceUploadJob({ reason: 'createChatFolder' });
+    runStorageServiceUploadJob({ reason: 'createChatFolder' });
     dispatch(_refetchChatFolders());
 
     if (showToastOnSuccess) {
@@ -150,7 +151,7 @@ function createAllChatsChatFolder(): ThunkAction<
 > {
   return async dispatch => {
     await DataWriter.createAllChatsChatFolder();
-    storageServiceUploadJob({ reason: 'createAllChatsChatFolder' });
+    runStorageServiceUploadJob({ reason: 'createAllChatsChatFolder' });
     dispatch(_refetchChatFolders());
   };
 }
@@ -175,7 +176,7 @@ function updateChatFolder(
     };
 
     await DataWriter.updateChatFolder(nextChatFolder);
-    storageServiceUploadJob({ reason: 'updateChatFolder' });
+    runStorageServiceUploadJob({ reason: 'updateChatFolder' });
     dispatch(_refetchChatFolders());
   };
 }
@@ -185,7 +186,7 @@ function deleteChatFolder(
 ): ThunkAction<void, RootStateType, unknown, never> {
   return async dispatch => {
     await DataWriter.markChatFolderDeleted(chatFolderId, Date.now(), true);
-    storageServiceUploadJob({ reason: 'deleteChatFolder' });
+    runStorageServiceUploadJob({ reason: 'deleteChatFolder' });
     dispatch(_refetchChatFolders());
     drop(chatFolderCleanupService.trigger('redux: deleted chat folder'));
   };
@@ -205,7 +206,7 @@ function updateChatFoldersPositions(
       return { ...chatFolder, position: index + 1 };
     });
     await DataWriter.updateChatFolderPositions(chatFolders);
-    storageServiceUploadJob({ reason: 'updateChatFoldersPositions' });
+    runStorageServiceUploadJob({ reason: 'updateChatFoldersPositions' });
     dispatch(_refetchChatFolders());
   };
 }
@@ -247,7 +248,7 @@ function updateChatFolderToggleChat(
       conversationId,
       toggle
     );
-    storageServiceUploadJob({ reason: 'toggleChatFolderChat' });
+    runStorageServiceUploadJob({ reason: 'toggleChatFolderChat' });
     dispatch(_refetchChatFolders());
 
     if (showToastOnSuccess) {
@@ -281,7 +282,9 @@ function updateChatFolderStateOnTargetConversationChanged(
 
     const state = getState();
     const selectedChatFolder = getSelectedChatFolder(state);
-    if (selectedChatFolder == null) {
+    const filterByUnread = getFilterByUnread(state);
+
+    if (selectedChatFolder == null && !filterByUnread) {
       return;
     }
 
@@ -289,9 +292,14 @@ function updateChatFolderStateOnTargetConversationChanged(
     const conversation = getOwn(conversationLookup, conversationId);
     strictAssert(conversation != null, 'Target conversation not found');
 
-    if (isConversationInChatFolder(selectedChatFolder, conversation)) {
-      // Make sure the targetted conversation doesn't appear from the chat folder
-      // while its open (in case it gets marked read for example).
+    const inSelectedFolder =
+      selectedChatFolder == null ||
+      isConversationInChatFolder(selectedChatFolder, conversation);
+
+    if (inSelectedFolder) {
+      // Make sure the targetted conversation doesn't disappear from the view
+      // while its open (in case it gets marked read for example, or moved out
+      // of the chat folder).
       dispatch(updateStableSelectedConversationIdInChatFolder(conversationId));
       return;
     }

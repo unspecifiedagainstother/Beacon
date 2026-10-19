@@ -28,6 +28,7 @@ import { Environment, setEnvironment } from '../ts/environment.std.ts';
 import { parseUnknown } from '../ts/util/schemas.std.ts';
 import { LocaleEmojiListSchema } from '../ts/types/emoji.std.ts';
 import { FunProvider } from '../ts/components/fun/FunProvider.dom.tsx';
+import { MuteUntilDialogProvider } from '../ts/components/MuteNotificationsMenu.dom.tsx';
 import { MOCK_GIFS_PAGINATED_ONE_PAGE } from '../ts/test-helpers/funPickerMocks.dom.tsx';
 import { NavTab } from '../ts/types/Nav.std.ts';
 
@@ -41,17 +42,6 @@ setEnvironment(Environment.Development, true);
 const i18n = setupI18n('en', messages);
 
 export const globalTypes = {
-  mode: {
-    name: 'Mode',
-    description: 'Application mode',
-    defaultValue: 'mouse',
-    toolbar: {
-      dynamicTitle: true,
-      icon: 'circlehollow',
-      items: ['mouse', 'keyboard'],
-      showName: true,
-    },
-  },
   theme: {
     name: 'Theme',
     description: 'Global theme for components',
@@ -107,6 +97,7 @@ const mockStore: Store<StateType> = createStore(
     ) => state,
     globalModals: (state = {}) => state,
     user: (state = {}) => state,
+    lightbox: (state = {}) => state,
   })
 );
 
@@ -155,6 +146,7 @@ window.SignalContext = {
   getPreferredSystemLocales: () => ['en'],
   getLocaleOverride: () => null,
   getLocaleDisplayNames: () => ({ en: { en: 'English' } }),
+  getResolvedMessagesLocale: () => 'en',
 
   getLocalizedEmojiList: async locale => {
     const data = await fetch(
@@ -196,7 +188,6 @@ window.Signal = {
 const withGlobalTypesProvider = (Story, context) => {
   const theme =
     context.globals.theme === 'light' ? ThemeType.light : ThemeType.dark;
-  const mode = context.globals.mode;
   const direction = context.globals.direction ?? 'auto';
   const background = context.globals.background;
 
@@ -211,14 +202,6 @@ const withGlobalTypesProvider = (Story, context) => {
   } else {
     document.body.classList.remove('light-theme');
     document.body.classList.add('dark-theme');
-  }
-
-  if (mode === 'mouse') {
-    document.body.classList.remove('keyboard-mode');
-    document.body.classList.add('mouse-mode');
-  } else {
-    document.body.classList.remove('mouse-mode');
-    document.body.classList.add('keyboard-mode');
   }
 
   document.body.classList.toggle(
@@ -308,7 +291,16 @@ function withAppProvider(Story, context) {
   );
 }
 
+function withMutedUntilDialogProvider(Story, context) {
+  return (
+    <MuteUntilDialogProvider i18n={window.SignalContext.i18n}>
+      <Story {...context} />
+    </MuteUntilDialogProvider>
+  );
+}
+
 export const decorators = [
+  withMutedUntilDialogProvider,
   withAppProvider,
   withGlobalTypesProvider,
   withMockStoreProvider,

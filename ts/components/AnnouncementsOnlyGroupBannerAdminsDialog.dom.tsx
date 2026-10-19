@@ -54,7 +54,6 @@ export function AnnouncementsOnlyGroupBannerAdminsDialog(
             );
           })}
         </AxoDialog.Body>
-        <AxoDialog.Footer />
       </AxoDialog.Content>
     </AxoDialog.Root>
   );
@@ -83,7 +82,7 @@ function GroupAdminItem(props: {
         onClick={handleClick}
         className={tw(
           'flex w-full flex-row items-center p-2',
-          'outline-none keyboard-mode:focus:axo-focus-ring'
+          'focus-visible:axo-focus-ring'
         )}
       >
         <div className={tw('pe-3')}>

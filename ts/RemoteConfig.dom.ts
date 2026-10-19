@@ -61,18 +61,21 @@ const SemverKeys = [
 export type SemverKeyType = ArrayValues<typeof SemverKeys>;
 
 const ScalarKeys = [
+  'client.maxAllowedClockSkewSeconds',
   'desktop.callQualitySurveyPPM',
   'desktop.calling.dredDuration.alpha',
   'desktop.calling.dredDuration.beta',
   'desktop.calling.dredDuration.prod',
+  'desktop.calling.enableSvc',
+  'desktop.calling.svcMode',
+  'desktop.calling.svcModeForScreenshare',
+  'desktop.calling.svcMaxBitrateBps',
   'desktop.clientExpiration',
   'desktop.heapSizeWarning',
   'desktop.internalUser',
   'desktop.loggingErrorToasts',
   'desktop.mediaQuality.levels',
   'desktop.messageCleanup',
-  'desktop.recentGifs.allowLegacyTenorCdnUrls',
-  'desktop.requirePqRatio',
   'desktop.retryRespondMaxAge',
   'desktop.senderKey.retry',
   'desktop.senderKeyMaxAge',
@@ -110,6 +113,8 @@ const KnownDesktopLibsignalNetKeys = [
   'desktop.libsignalNet.grpc.AttachmentsGetUploadForm.beta',
   'desktop.libsignalNet.grpc.BackupsAnonymousGetUploadForm',
   'desktop.libsignalNet.grpc.BackupsAnonymousGetUploadForm.beta',
+  'desktop.libsignalNet.grpc.KeyTransparencyQueryServiceSearchV2',
+  'desktop.libsignalNet.grpc.KeyTransparencyQueryServiceSearchV2.beta',
   'desktop.libsignalNet.grpc.MessagesAnonymousSendMultiRecipientMessage.2',
   'desktop.libsignalNet.grpc.MessagesAnonymousSendMultiRecipientMessage.2.beta',
   'desktop.libsignalNet.grpc.MessagesAnonymousSendSingleRecipientMessage',
@@ -396,7 +401,7 @@ export function isCountryPpmCsvBucketEnabled(
   e164: string | undefined,
   aci: AciString | undefined
 ): boolean {
-  if (e164 == null || aci == null) {
+  if (aci == null) {
     return false;
   }
 

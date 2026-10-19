@@ -7,7 +7,8 @@ import { tw } from './tw.dom.tsx';
 import { FlexWrapDetector } from './_internal/FlexWrapDetector.dom.tsx';
 import { variants } from './_internal/variants.dom.tsx';
 import { useAxoIntl } from './_internal/AxoIntl.dom.tsx';
-import { SpinnerV2 } from '../components/SpinnerV2.dom.tsx';
+import { forwardExtraPropsForRadix } from './_internal/props.dom.tsx';
+import { AxoBaseSpinner } from './status/_AxoBaseSpinner.dom.tsx';
 
 /**
  * An icon-button + text displayed as a stack, and can be placed in a row.
@@ -38,7 +39,7 @@ export namespace AxoStackedButton {
     /**
      * Icon to display inside the button.
      */
-    symbol: AxoSymbol.IconName;
+    symbol: AxoSymbol.Name;
     /**
      * Label to display below the button
      */
@@ -98,12 +99,12 @@ export namespace AxoStackedButton {
           className={tw(
             'group relative',
             'inline-flex max-w-full flex-col items-center-safe justify-center-safe gap-1.5',
-            'outline-none'
+            'focus-visible:outline-none'
           )}
           aria-disabled={(pending || disabled) ?? undefined}
           aria-label={pending ? intl.get('AxoButton.Pending') : undefined}
           onClick={handleClick}
-          {...rest}
+          {...forwardExtraPropsForRadix(rest)}
         >
           <span
             className={tw(
@@ -112,7 +113,7 @@ export namespace AxoStackedButton {
               'rounded-full bg-primary',
               !(disabled || pending) && 'group-active:bg-primary-pressed',
               disabled || discouraged ? 'text-disabled' : 'text-primary',
-              'keyboard-mode:group-focus:axo-focus-ring',
+              'group-focus-visible:axo-focus-ring',
               'forced-colors:border forced-colors:border-[ButtonBorder] forced-colors:bg-[ButtonFace]',
               disabled || discouraged
                 ? 'forced-colors:text-[GrayText]'
@@ -196,11 +197,12 @@ export namespace AxoStackedButton {
   const Spinner: FC = memo(() => {
     return (
       <span className={tw('absolute inset-0 flex items-center justify-center')}>
-        <SpinnerV2
-          size={20}
-          strokeWidth={2}
-          variant="axo-button-spinner-secondary"
+        <AxoBaseSpinner.Root
+          size={18}
+          weight="regular"
+          variant="default"
           value="indeterminate"
+          track={false}
         />
       </span>
     );

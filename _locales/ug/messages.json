@@ -11,11 +11,14 @@
   "icu:AxoDialog.Close": {
     "messageformat": "تاقا"
   },
+  "icu:AxoPasswordField.Reveal": {
+    "messageformat": "پارولنى كۆرسىتىش"
+  },
   "icu:AxoTextField.Clear": {
     "messageformat": "تازىلا"
   },
   "icu:AxoBadge.MaxOverflow": {
-    "messageformat": "{max,number}+"
+    "messageformat": "+{max,number}"
   },
   "icu:AddUserToAnotherGroupModal__title": {
     "messageformat": "گۇرۇپپىغا قوش"
@@ -61,6 +64,24 @@
   },
   "icu:Preferences__DonateTitle": {
     "messageformat": "‫Signal غا ئىئانە قىلىڭ"
+  },
+  "icu:LinkedDevicesOnboardingDialog__description": {
+    "messageformat": "<bold>ئۇلانغان ئۈسكۈنىلەر</bold> ھەرقانداق قوشۇمچە ئۈسكۈنىلىرىڭىزدە بىخەتەر ھالدا Signal ھېساباتىڭىزغا كىرىپ، ئۇچۇرلارنى زىيارەت قىلىشىڭىزغا يول قويىدۇ."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--1": {
+    "messageformat": "سىز ئۈستەل كومپيۇتېرى، تاختا كومپيۇتېر(مەسىلەن: iPad) ياكى قوشۇمچە تېلېفوننى باغلىيالايسىز."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--2": {
+    "messageformat": "ئاسالىق ئۈسكۈنىڭىزدە نېمىلەرگە باغلىيالايدىغانلىقىڭىزنى باشقۇرىسىز، ئەڭ كۆپ بولغاندا 5 تال ئۈسكۈنىنى باغلىيالايسىز."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3": {
+    "messageformat": "ھېسابات تەڭشەكلىرى ۋە زاپاسلارنى ئۆز ئىچىگە ئالغان بەزى ھېسابات تەڭشەكلىرى پەقەت سىزنىڭ ئاساسلىق ئۈسكۈنىڭىز تەرىپىدىنلا باشقۇرۇلىدۇ."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--1": {
+    "messageformat": "ھېسابات تەڭشەكلىرى ۋە زاپاسلارنى پەقەت ئاساسلىق ئۈسكۈنىدىلا باشقۇرغىلى بولىدۇ."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--2": {
+    "messageformat": "ھېسابات تەڭشەكلىرى ۋە Signal بىخەتەر زاپاسلانمىلىرىنى پەقەت ئاساسلىق ئۈسكۈنىڭىزدىلا باشقۇرغىلى بولىدۇ."
   },
   "icu:sentMediaQualityStandard": {
     "messageformat": "ئۆلچەملىك"
@@ -317,11 +338,8 @@
   "icu:LeftPaneChatFolders__ItemLabel--All": {
     "messageformat": "بارلىق پاراڭلار"
   },
-  "icu:LeftPaneChatFolders__ItemUnreadBadge__MaxCount": {
-    "messageformat": "+{maxCount,number}"
-  },
   "icu:LeftPaneChatFolders__ItemUnreadBadge__AccessibleLabel": {
-    "messageformat": "{count, plural, one {{count,number} Unread Message} other {{count,number} Unread Messages}}"
+    "messageformat": "{count, plural, other {{count,number} ئوقۇلمىغان ئۇچۇر}}"
   },
   "icu:LeftPaneChatFolders__Item__ContextMenu__MarkAllRead": {
     "messageformat": "ھەممىسى ئوقۇلدى"
@@ -364,9 +382,6 @@
   },
   "icu:NavTabs__ItemIconLabel--UnreadCount": {
     "messageformat": "{count,number} ئوقۇلمىغان ئۇچۇر"
-  },
-  "icu:NavTabs__ItemIconLabel--MarkedUnread": {
-    "messageformat": "ئوقۇلمىغان دەپ بەلگە قويۇلغان"
   },
   "icu:NavTabs__ItemLabel--Chats": {
     "messageformat": "پاراڭ"
@@ -635,20 +650,23 @@
   "icu:SafetyNumberNotReady__learn-more": {
     "messageformat": "كۆپرەك ئۆگىنىش"
   },
-  "icu:KeyTransparencyErrorDialog__Title": {
-    "messageformat": "ئاپتوماتىك ئاچقۇچ دەلىللەشنى ھازىرچە ئۈسكۈنىڭىزدە ئىشلەتكىلى بولمايدۇ. كاشىلا ھەل قىلىش خاتىرىسىنى يوللامسىز؟"
+  "icu:KeyTransparencyErrorDialog__Title-v2": {
+    "messageformat": "ئاپتوماتىك ئاچقۇچ دەلىللەشنى ھازىرچە ئۈسكۈنىڭىزدە ئىشلەتكىلى بولمايدۇ. بىزنىڭ ياخشىلىشىمىزغا ياردەم بېرىش ئۈچۈن دوكلات يوللامسىز؟"
   },
-  "icu:KeyTransparencyErrorDialog__Description": {
-    "messageformat": "كاشىلا ھەل قىلىش خاتىرىلىرى بىزنىڭ مەسىلىگە دىئاگنوز قويۇشىمىز ۋە ھەل قىلىشىمىزغا ياردەم بېرىدۇ، ھەمدە تونىتىش ئۇچۇرلىرىنى ئۆز ئىچىگە ئالمايدۇ."
+  "icu:KeyTransparencyErrorDialog__Description-v2": {
+    "messageformat": "كاشىلا ھەل قىلىش خاتىرىسىنى قوشسىڭىز، مەسىلىنى تەكشۈرۈپ ئۇنى ھەل قىلىشىمىزغا ياردەم بېرىدۇ، ھەمدە بۇ خاتىرىلەردە شەخسىيىتىڭىزگە مۇناسىۋەتلىك ئۇچۇرلار بولمايدۇ. ھەمبەھىرلىنىش بولسا ئىختىيارىي."
   },
-  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label": {
-    "messageformat": "كاشىلا ھەل قىلىش خاتىرىسىنى ئورتاقلىشىش"
+  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label-v2": {
+    "messageformat": "سازلاش خاتىرىسىنى ئۆز ئىچىگە ئالىدۇ"
   },
   "icu:KeyTransparencyErrorDialog__ShareDebugLog__ViewButton": {
     "messageformat": "كۆرسەت"
   },
   "icu:KeyTransparencyErrorDialog__Submit": {
     "messageformat": "تاپشۇر"
+  },
+  "icu:KeyTransparencyErrorDialog__Cancel": {
+    "messageformat": "ياق، رەھمەت"
   },
   "icu:KeyTransparencyOnboardingDialog__Title": {
     "messageformat": "Signal ھازىر شىفىرلاشتۇرۇشنى ئاپتوماتىك دەلىللىيەلەيدۇ"
@@ -746,11 +764,11 @@
   "icu:maximumAttachments": {
     "messageformat": "بۇ ئۇچۇرغا ئەمدى يۈكلەنمە قوشقىلى بولمايدۇ."
   },
-  "icu:fileSizeWarning": {
-    "messageformat": "كەچۈرۈڭ، تاللانغان ھۆججەتلەر ئۇچۇر چوڭلۇقى چەكلىمىسىدىن ئېشىپ كەتتى. {limit,number}{units}"
+  "icu:fileTooLargeWarning": {
+    "messageformat": "بۇ ھۆججەتنىڭ ھەجىمى بەك چوڭ بولغانلىقتىن ئەۋەتكىلى بولمىدى. ئەڭ كۆپ بولغاندا {limit,number}{units} ھۆججەتلەرنى ئەۋەتەلەيسىز."
   },
-  "icu:videoFileSizeWarning": {
-    "messageformat": "كەچۈرۈڭ، تاللانغان سىن ھۆججىتى ئۇچۇر چوڭلۇقى چەكلىمىسىدىن ئېشىپ كەتتى. {limit,number}{units}"
+  "icu:videoFileTooLargeWarning": {
+    "messageformat": "بۇ سىنلىق ھۆججەتنىڭ ھەجىمى بەك چوڭ بولغانلىقتىن ئەۋەتكىلى بولمىدى. ئەڭ كۆپ بولغاندا {limit,number}{units} سىنلىق ھۆججەتلەرنى ئەۋەتەلەيسىز."
   },
   "icu:unableToLoadAttachment": {
     "messageformat": "تاللانغان يۈكلەنمىلەرنى يۈكلىيەلمىدى."
@@ -772,6 +790,9 @@
   },
   "icu:checkNetworkConnection": {
     "messageformat": "تور ئۇلىنىشىنى تەكشۈرۈڭ."
+  },
+  "icu:clockSkewDetected": {
+    "messageformat": "ئۈسكىنىڭىزنىڭ چېسلاسى خاتا. سائەتنى توغىرلاپ قايتا سىناڭ. ئۈسكۈنىڭىزنىڭ چېسلاسى ۋە ۋاقتى :"
   },
   "icu:submitDebugLog": {
     "messageformat": "سازلاش خاتىرىسى"
@@ -993,6 +1014,9 @@
     "messageformat": "يېڭىلانمىدى"
   },
   "icu:mute": {
+    "messageformat": "ئۈنسىز"
+  },
+  "icu:muted": {
     "messageformat": "ئۈنسىز"
   },
   "icu:cannotUpdateDetail-v2": {
@@ -1261,6 +1285,9 @@
   },
   "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync": {
     "messageformat": "بۇ پاراڭدىكى بارلىق ئۇچۇرلار ئۈسكۈنىڭىزنىڭ ھەممە يەرلىرىدىن ئۆچۈرۈلىدۇ."
+  },
+  "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync--still-member": {
+    "messageformat": "بۇ پاراڭدىكى ھەممە ئۇچۇرلار بارلىق باغلانغان ئۈسكۈنىلىرىڭىزدىن ئۆچۈرۈلىدۇ. سىز يەنىلا بۇ گۇرۇپپىنىڭ ئەزاسى ھالىتىدە تۇرىسىز."
   },
   "icu:ConversationHeader__ContextMenu__LeaveGroupAction__title": {
     "messageformat": "گۇرۇپپىدىن ئايرىلىش"
@@ -1610,9 +1637,6 @@
   "icu:Preferences__EmojiSkinToneDefaultSetting__Label": {
     "messageformat": "Emoji تېرە رەڭگى"
   },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__Title": {
-    "messageformat": "پاراڭ ھۆججەت قىسقۇچلىرى"
-  },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Title": {
     "messageformat": "بىرتال پاراڭ قىسقۇچ قوشۇش"
   },
@@ -1624,12 +1648,6 @@
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Description--WithChatFolders": {
     "messageformat": "{chatFoldersCount, plural, other {{chatFoldersCount,number} ھۆججەت قىسقۇچلار}}"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button": {
-    "messageformat": "بەلگىلەش"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button--WithChatFolders": {
-    "messageformat": "باشقۇرۇش"
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__ChatFolderItem__ContextMenu__EditFolder": {
     "messageformat": "ھۆججەت قىسقۇچنى تەھرىرلەش"
@@ -2384,9 +2402,6 @@
   "icu:SafetyNumberModal__title": {
     "messageformat": "بىخەتەرلىك نومۇرنى دەلىللەڭ"
   },
-  "icu:safetyNumberChanged": {
-    "messageformat": "بىخەتەرلىك نومۇرى ئۆزگەردى"
-  },
   "icu:safetyNumberChanges": {
     "messageformat": "بىخەتەرلىك نومۇرى ئۆزگەردى"
   },
@@ -2826,16 +2841,16 @@
     "messageformat": "ئۆچۈرۈش"
   },
   "icu:stickers--StickerManagerPackDragHandle--Label": {
-    "messageformat": "Drag to reorder sticker pack"
+    "messageformat": "چاپلاق بولىقىنى تارتىپ قايتىدىن ئورۇنلاشتۇرۇڭ"
   },
   "icu:stickers--StickerManagerBlessedPacksList--Label": {
-    "messageformat": "Signal Artist Series sticker packs"
+    "messageformat": "Signal ئارتىس يۈرۈشلۈكى چاپلاق بولاقلىرى"
   },
   "icu:stickers--StickerManagerReceivedPacksList--Label": {
-    "messageformat": "Received sticker packs"
+    "messageformat": "تاپشۇرۇۋېلىنغان چاپلاق بولاقلىرى"
   },
   "icu:stickers--StickerManagerInstalledPacksList--Label": {
-    "messageformat": "Installed sticker packs"
+    "messageformat": "چۈشۈرۈۋېلىنغان چاپلاق بولاقلىرى"
   },
   "icu:stickers--StickerPreview--Title": {
     "messageformat": "چاپلاق بوغچىسى"
@@ -3081,16 +3096,16 @@
     "messageformat": "چاپلاق قوش"
   },
   "icu:FunPicker__Label--StickerReply": {
-    "messageformat": "Reply"
+    "messageformat": "جاۋاب"
   },
   "icu:FunPicker__Label--SendStickerReply": {
-    "messageformat": "Send"
+    "messageformat": "يوللاش"
   },
   "icu:FunPicker__Label--CancelStickerReply": {
-    "messageformat": "Cancel"
+    "messageformat": "بىكار قىلىش"
   },
   "icu:FunPicker__Label--Sticker": {
-    "messageformat": "Sticker"
+    "messageformat": "چىراي ئىپادە"
   },
   "icu:confirmation-dialog--Cancel": {
     "messageformat": "بىكار قىلىش"
@@ -3872,20 +3887,20 @@
   "icu:calling__preview--minimize": {
     "messageformat": "ئالدىن كۆرەكنى كىچىكلىتىش"
   },
-  "icu:calling__change-view": {
-    "messageformat": "كۆرۈنۈشنى ئۆزگەرتىش"
-  },
-  "icu:calling__view_mode--paginated": {
-    "messageformat": "سېتكا كۆرۈنۈش"
-  },
-  "icu:calling__view_mode--overflow": {
-    "messageformat": "يانبالداق كۆرۈنۈش"
-  },
-  "icu:calling__view_mode--speaker": {
-    "messageformat": "سۆزلىگۈچى كۆرۈنۈشى"
-  },
   "icu:calling__view_mode--updated": {
     "messageformat": "كۆرۈنۈش يېڭىلاندى"
+  },
+  "icu:calling__change-layout": {
+    "messageformat": "كۆرۈنىشنى ئۆزگەرتىش"
+  },
+  "icu:calling__layout--paginated": {
+    "messageformat": "كاتەكچە شەكلىدە"
+  },
+  "icu:calling__layout--overflow": {
+    "messageformat": "يانبالداق"
+  },
+  "icu:calling__layout--speaker": {
+    "messageformat": "سۆزلىگۈچى"
   },
   "icu:calling__SelectPresentingSourcesModal--title": {
     "messageformat": "ئېكران ئورتاقلىشىش"
@@ -3950,23 +3965,47 @@
   "icu:notMuted": {
     "messageformat": "ئۈنسىز ئەمەس"
   },
-  "icu:muteHour": {
-    "messageformat": "بىر سائەت ئۈنسىز قىلىش"
-  },
-  "icu:muteEightHours": {
-    "messageformat": "سەككىز سائەت ئۈنسىز قىلىش"
-  },
-  "icu:muteDay": {
-    "messageformat": "بىر كۈن ئۈنسىز قىلىش"
-  },
-  "icu:muteWeek": {
-    "messageformat": "بىر ھەپتە ئۈنسىز قىلىش"
-  },
-  "icu:muteAlways": {
-    "messageformat": "داۋاملىق ئۈنسىز قىلىش"
-  },
   "icu:unmute": {
     "messageformat": "ئۈنلۈك"
+  },
+  "icu:MuteMenu__label": {
+    "messageformat": "بۇ پاراڭنى تۆۋەندىكىلەر ئۈچۈن ئۈنسىز قىلىش…"
+  },
+  "icu:MuteMenu__hour": {
+    "messageformat": "1 سائەت"
+  },
+  "icu:MuteMenu__eightHours": {
+    "messageformat": "8 سائەت"
+  },
+  "icu:MuteMenu__day": {
+    "messageformat": "1 كۈن"
+  },
+  "icu:MuteMenu__week": {
+    "messageformat": "1 ھەپتە"
+  },
+  "icu:MuteMenu__until": {
+    "messageformat": "…غىچە"
+  },
+  "icu:MuteMenu__always": {
+    "messageformat": "ھەمىشە"
+  },
+  "icu:DatePicker__popupTitle": {
+    "messageformat": "بىر چىسلانى تاللاڭ"
+  },
+  "icu:TimePicker__popupTitle": {
+    "messageformat": "بىر ۋاقىتنى تاللاڭ"
+  },
+  "icu:MuteUntilDialog__title": {
+    "messageformat": "… گىچە بۇ پاراڭنى ئۈنسىزلاندۇرۇڭ"
+  },
+  "icu:MuteUntilDialog__dateLabel": {
+    "messageformat": "ۋاقت"
+  },
+  "icu:MuteUntilDialog__timeLabel": {
+    "messageformat": "ۋاقىت"
+  },
+  "icu:MuteUntilDialog__timeZoneNote": {
+    "messageformat": "{timeZone} دىكى بارلىق ۋاقىتلار"
   },
   "icu:muteExpirationLabelAlways": {
     "messageformat": "داۋاملىق ئۈنسىز قىلىندى"
@@ -4874,9 +4913,6 @@
   "icu:showConversationDetails--direct": {
     "messageformat": "پاراڭ تەڭشەكلىرى"
   },
-  "icu:ConversationDetails__unmute--title": {
-    "messageformat": "بۇ پاراڭنى ئۈنلۈك قىلامسىز؟"
-  },
   "icu:ConversationDetails--group-link": {
     "messageformat": "گۇرۇپپا ئۇلانمىسى"
   },
@@ -5072,6 +5108,9 @@
   "icu:ConversationDetailsMembershipList--show-all": {
     "messageformat": "ھەممىنى كۆرسەت"
   },
+  "icu:ConversationDetailsMembershipList__Search__AccessibilityLabel": {
+    "messageformat": "ئىزدە"
+  },
   "icu:ConversationDetailsGroups--title": {
     "messageformat": "{count, plural, other {ئورتاق گۇرۇپپا {count,number}}}"
   },
@@ -5108,17 +5147,110 @@
   "icu:EditNicknameAndNoteModal__Note__Placeholder": {
     "messageformat": "خاتىرە"
   },
-  "icu:ConversationNotificationsSettings__mentions__label": {
+  "icu:WhileMuted__title": {
+    "messageformat": "ئۈنسىزلاندۇرۇلغاندا"
+  },
+  "icu:WhileMuted__description": {
+    "messageformat": "بۇ ئۈنسىزلاندۇرۇلغان پاراڭ ئۈچۈن قايسى ئۇقتۇرۇشلارنىڭ كۆرۈنىدىغانلىقىنى تاللاڭ."
+  },
+  "icu:WhileMuted__calls__title": {
+    "messageformat": "چاقىرىشلار"
+  },
+  "icu:WhileMuted__calls__description": {
+    "messageformat": "بۇ پاراڭ ئۈنسىزلاندۇرۇلغان ۋاقىتتا تېلېفون كەلسە، جىرىڭلىتىش ياكى ئۇقتۇرۇشنى كۆرسىتىش."
+  },
+  "icu:WhileMuted__mentions__title": {
     "messageformat": "تىلغا ئالغانلار"
   },
-  "icu:ConversationNotificationsSettings__mentions__info": {
-    "messageformat": "ئۈنسىز پاراڭلاردا تىلغا ئېلىنغاندا ئۇقتۇرۇش تاپشۇرۇۋېلىش"
+  "icu:WhileMuted__mentions__description": {
+    "messageformat": "بۇ پاراڭ ئۈنسىزلاندۇرۇلغان بولسىمۇ، سىز تىلغا ئېلىنغاندا (@mentioned) ئۇقتۇرۇش قىلىش."
   },
-  "icu:ConversationNotificationsSettings__mentions__select__always-notify": {
-    "messageformat": "ھەمىشە ئۇقتۇر"
+  "icu:WhileMuted__replies__title": {
+    "messageformat": "جاۋاب"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__dont-notify-for-mentions-if-muted": {
-    "messageformat": "ئۈنسىزلەنگەندە ئۇقتۇرۇش قىلىنمىسۇن"
+  "icu:WhileMuted__replies__description": {
+    "messageformat": "بۇ پاراڭ ئۈنسىزلاندۇرۇلغان بولسىمۇ، بىرى سىزنىڭ ئۇچۇرىڭىزغا جاۋاب قايتۇرغاندا ئۇقتۇرۇش قىلىش."
+  },
+  "icu:WhileMuted__value--none": {
+    "messageformat": "ھېچنېمە"
+  },
+  "icu:WhileMuted__value--calls": {
+    "messageformat": "چاقىرىشلار"
+  },
+  "icu:WhileMuted__value--mentions": {
+    "messageformat": "تىلغا ئالغانلار"
+  },
+  "icu:WhileMuted__value--replies": {
+    "messageformat": "جاۋاب"
+  },
+  "icu:WhileMuted__value--calls-mentions": {
+    "messageformat": "چاقىرىقلار، تىلغا ئېلىشلار"
+  },
+  "icu:WhileMuted__value--calls-replies": {
+    "messageformat": "چاقىرىقلار، قايتقان ئىنكاسلار"
+  },
+  "icu:WhileMuted__value--mentions-replies": {
+    "messageformat": "تىلغا ئېلىشلار، قايتقان ئىنكاسلار"
+  },
+  "icu:WhileMuted__value--calls-mentions-replies": {
+    "messageformat": "چاقىرىقلار، تىلغا ئېلىشلار، قايتقان ئىنكاسلار"
+  },
+  "icu:Preferences__WhileMuted__description": {
+    "messageformat": "ئۈنسىزلاندۇرۇلغان پاراڭلار ئۈچۈن قايسى ئۇقتۇرۇشلارنىڭ كۆرۈنىدىغانلىقىنى تاللاڭ."
+  },
+  "icu:Preferences__WhileMuted__calls__description": {
+    "messageformat": "ئۈنسىزلاندۇرۇلغان پاراڭلاردا تېلېفون باشلانغاندا جىرىڭلىتىش ياكى ئۇقتۇرۇش قىلىش."
+  },
+  "icu:Preferences__WhileMuted__mentions__description": {
+    "messageformat": "ئۈنسىزلاندۇرۇلغان پاراڭلاردا سىز تىلغا ئېلىنغاندا ئۇقتۇرۇش قىلىش."
+  },
+  "icu:Preferences__WhileMuted__replies__description": {
+    "messageformat": "ئۈنسىزلاندۇرۇلغان پاراڭلاردا بىرى سىزنىڭ ئۇچۇرىڭىزغا جاۋاب قايتۇرغاندا ئۇقتۇرۇش قىلىش."
+  },
+  "icu:UnreadReminders__title": {
+    "messageformat": "ئوقۇلمىغان ئۇچۇرلار ئەسكەرتىشلىرى"
+  },
+  "icu:UnreadReminders__description": {
+    "messageformat": "بۇ پاراڭ ئۈنسىزلاندۇرۇلغان ۋاقىتتا ئوقۇلمىغان ئۇچۇرلار بار بولسا، پات-پات ئۇقتۇرۇش قىلىش."
+  },
+  "icu:Preferences__UnreadReminders__description": {
+    "messageformat": "ئۈنسىزلاندۇرۇلغان پاراڭلاردا ئوقۇلمىغان ئۇچۇرلار بولغاندا، پات-پات ئۇقتۇرۇش قىلىپ قويۇش."
+  },
+  "icu:UnreadReminders__notification--messages--1": {
+    "messageformat": "{messageCount, plural, other {{person1} دىن كەلگەن {messageCount,number} ئۇقۇلمىغان ئۇچۇرلىرىڭىز بار.}}"
+  },
+  "icu:UnreadReminders__notification--messages--2": {
+    "messageformat": "{messageCount, plural, other {{person1} ۋە {person2} دىن كەلگەن {messageCount,number} ئۇقۇلمىغان ئۇچۇرلىرىڭىز بار.}}"
+  },
+  "icu:UnreadReminders__notification--messages--many": {
+    "messageformat": "{messageCount, plural, other {{person1}، {person2} ۋە باشقىلاردىن كەلگەن {messageCount,number} ئۇقۇلمىغان ئۇچۇرلىرىڭىز بار.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-mentions": {
+    "messageformat": "{messageCount, plural, other {{mentionSummary} نى ئۆز ئىچىگە ئالغان {messageCount,number} ئۇقۇلمىغان ئۇچۇرلىرىڭىز بار.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-replies": {
+    "messageformat": "{messageCount, plural, other {{replySummary} نى ئۆز ئىچىگە ئالغان {messageCount,number} ئۇقۇلمىغان ئۇچۇرلىرىڭىز بار.}}"
+  },
+  "icu:UnreadReminders__notification--counts--messages": {
+    "messageformat": "{messageCount, plural, other {{messageCount,number} ئۇقۇلمىغان ئۇچۇرلىرىڭىز بار.}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--1": {
+    "messageformat": "{mentionCount, plural, other {{person1} تەرىپىدىن {mentionCount,number} قېتىم تىلغا ئېلىندىڭىز}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--2": {
+    "messageformat": "{mentionCount, plural, other {سىز، {person1} ۋە {person2} تەرىپىدىن {mentionCount,number} تىلغا ئېلىندىڭىز}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--many": {
+    "messageformat": "{mentionCount, plural, other {سىز، {person1} ۋە باشقىلار تەرىپىدىن {mentionCount,number} تىلغا ئېلىندىڭىز}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--1": {
+    "messageformat": "{replyCount, plural, other {{person1} قايتۇرغان {replyCount,number} ئىنكاسلار}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--2": {
+    "messageformat": "{replyCount, plural, other {{person1} ۋە {person2} قايتۇرغان {replyCount,number} ئىنكاسلار}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--many": {
+    "messageformat": "{replyCount, plural, other {{person1} ۋە باشقىلار قايتۇرغان {replyCount,number} ئىنكاسلار}}"
   },
   "icu:GroupLinkManagement--clipboard": {
     "messageformat": "گۇرۇپپا ئۇلانمىسى كۆچۈرۈلدى."
@@ -5140,6 +5272,48 @@
   },
   "icu:GroupLinkManagement__CopyGroupLinkButtonLabel": {
     "messageformat": "signal.group ئۇلانمىسىنى كۇنۇپكا تاختىسىغا كۆچۈرۈڭ"
+  },
+  "icu:GroupMembersSearchDialog__DialogTitle": {
+    "messageformat": "ئەزالارنى ئىزدەش"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder": {
+    "messageformat": "ئىزدە"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringByAdmins": {
+    "messageformat": "گۇرۇپپا باشقۇرغۇچىلىرىنى ئىزدەش"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringBySystemContacts": {
+    "messageformat": "ئالاقىلاشقۇچىلارنى ئىزدەش"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Label": {
+    "messageformat": "سۈزگۈچ"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__AllMembers": {
+    "messageformat": "ھەممە ئەزالار"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Admins": {
+    "messageformat": "باشقۇرغۇچىلار"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__SystemContacts": {
+    "messageformat": "ئالاقەداشلار"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithoutSearchQuery": {
+    "messageformat": "نەتىجە يوق"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithSearchQuery": {
+    "messageformat": "{searchQuery} ئۈچۈن نەتىجە يوق"
+  },
+  "icu:GroupMembersSearchDialog__MemberItem__Admin": {
+    "messageformat": "باشقۇرغۇچى"
+  },
+  "icu:GroupMembersSearchDialog__SearchResults__Title": {
+    "messageformat": "ئىزدەش نەتىجىللىرى"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__AddMembers": {
+    "messageformat": "ئەزا قوشۇش"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__InviteViaGroupLink": {
+    "messageformat": "گۇرۇپپا ئۇلانمىسى ئارقىلىق تەكلىپ قىلىش"
   },
   "icu:PendingInvites--tab-requests": {
     "messageformat": "تەلەپ ({count,number})"
@@ -5426,6 +5600,9 @@
   },
   "icu:CaptchaDialog__second-paragraph": {
     "messageformat": "دەلىللىگەندىن كېيىن، ئۇچۇر يوللاشنى داۋاملاشتۇرالايسىز. ۋاقىتلىق توختىتىلغان ھەر قانداق ئۇچۇر ئۆزلۈكىدىن يوللىنىدۇ."
+  },
+  "icu:CaptchaDialog__continue": {
+    "messageformat": "داۋاملاشتۇرۇش"
   },
   "icu:CaptchaDialog--can-close__title": {
     "messageformat": "دەلىللىمەي داۋاملاشتۇرامدۇ؟"
@@ -5893,6 +6070,15 @@
   "icu:Preferences__message-audio-description": {
     "messageformat": "پاراڭدىكى ۋاقىتتا ئۇچۇر يوللانغانلىق ۋە تاپشۇرۇۋالغانلىق ئۇقتۇرۇش ئاۋازىنى ئاڭلاش."
   },
+  "icu:Preferences__reaction-notifications-title": {
+    "messageformat": "ئىنكاس قايتۇرۇش ئۇقتۇرۇشلىرى"
+  },
+  "icu:Preferences__reaction-notifications-description": {
+    "messageformat": "بىرى سىزنىڭ ئۇچۇرىڭىزغا ئىنكاس قايتۇرغاندا ئۇقتۇرۇش قىلىش"
+  },
+  "icu:Preferences__button--account": {
+    "messageformat": "ھېسابات"
+  },
   "icu:Preferences__button--general": {
     "messageformat": "ئادەتتىكى"
   },
@@ -5962,6 +6148,45 @@
   "icu:Preferences--system": {
     "messageformat": "سىستېما"
   },
+  "icu:Preferences--signal-login": {
+    "messageformat": "Signal Login"
+  },
+  "icu:Preferences--signal-login-description": {
+    "messageformat": "«Signal Login» ھوقوقىڭىز بولسا، ھېساباتىڭىزنى قايتۇرۇپ ئېلىش ۋە ئەسلىگە كەلتۈرۈش ئۈچۈن ئىشلىتىلىدۇ. بۇ ئاچقۇچلارنى سىز ئىشىنىدىغان بىر پارول باشقۇرغۇچىدا بىخەتەر ساقلاڭ. <learnMoreLink>تەپسىلاتى</learnMoreLink>."
+  },
+  "icu:Preferences--signal-login-description--learn-more": {
+    "messageformat": "تەپسىلاتى"
+  },
+  "icu:Preferences__SignalAccount__label": {
+    "messageformat": "ھېسابات & ئەسلىگە كەلتۈرۈش"
+  },
+  "icu:Preferences__SignalAccount__description": {
+    "messageformat": "2 تال ئاچقۇچ"
+  },
+  "icu:Preferences__SignalAccountKeys__Title": {
+    "messageformat": "«Signal Login» ھوقوقىڭىز"
+  },
+  "icu:Preferences__SignalAccountKeys__Description": {
+    "messageformat": "كىرىش ئۇچۇرىڭىز، ھېساباتىڭىز ۋە سانلىق مەلۇماتلىرىڭىزنى ئەسلىگە كەلتۈرۈش ئۈچۈن كېرەك بولىدۇ، شۇڭا ئۇنى بىخەتەر جايدا ساقلاڭ. بۇنى ھېچكىم بىلەن ئورتاقلاشماڭ."
+  },
+  "icu:Preferences__SignalAccountKeys__AccountKey": {
+    "messageformat": "ھېسابات ئاچقۇچى"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountID": {
+    "messageformat": "ھېسابات كىملىكى"
+  },
+  "icu:Preferences__SignalAccountKeys__RecoveryKey": {
+    "messageformat": "ئەسلىگە كەلتۈرۈش ئاچقۇچى"
+  },
+  "icu:Preferences__SignalAccountKeys__Save": {
+    "messageformat": "ساقلا"
+  },
+  "icu:Preferences__Account__LinkedDevice__label": {
+    "messageformat": "بۇ بىر ئۇلانغان ئۈسكۈنە"
+  },
+  "icu:Preferences__Account__LinkedDevice__description": {
+    "messageformat": "ھېسابات تەڭشەكلىرىڭىزنى ئاكتىپ ھالەتتە ساقلاش ئۈچۈن ئاساسلىق ئۈسكۈنىڭىزدە Signal نى ئېچىڭ."
+  },
   "icu:Preferences--zoom": {
     "messageformat": "چوڭايتىش دەرىجىسى"
   },
@@ -5992,8 +6217,116 @@
   "icu:Preferences--advanced": {
     "messageformat": "ئالىي"
   },
-  "icu:Preferences--notification-content": {
-    "messageformat": "ئۇقتۇرۇش مەزمۇنى"
+  "icu:Preferences--change-signal-pin": {
+    "messageformat": "PIN نىڭنى ئۆزگەرت"
+  },
+  "icu:Preferences--change-signal-pin-button": {
+    "messageformat": "ئۆزگەرتىش"
+  },
+  "icu:Preferences--create-signal-pin": {
+    "messageformat": "بىر PIN قۇر"
+  },
+  "icu:Preferences--create-signal-pin-button": {
+    "messageformat": "قۇر"
+  },
+  "icu:Preferences--signal-pin": {
+    "messageformat": "Signal PIN"
+  },
+  "icu:Preferences--signal-pin__footer": {
+    "messageformat": "PIN نۇمۇرلار Signal دا ساقلانغان ئۇچۇرلارنى مەخپىيلەشتۈرۈپ، پەقەت سىزلا ئۇلارغا ئېرىشەلەيدىغان قىلىدۇ. PIN نومۇرىڭىزنى ئەسلىگە كەلتۈرگىلى بولمايدۇ. Signal نى قايتا قاچىلىغاندا، ئارخىپىڭىز، تەڭشەكلىرىڭىز ۋە ئالاقىداشلىرىڭىز ئەسلىگە كېلىدۇ. <learnMoreLink>تەپسىلاتى</learnMoreLink>"
+  },
+  "icu:Preferences--signal-pin-advanced-settings": {
+    "messageformat": "ئالىي PIN تەڭشەكلىرى"
+  },
+  "icu:Preferences--disable-signal-pin": {
+    "messageformat": "PIN چەكلە"
+  },
+  "icu:Preferences--disable-signal-pin--button": {
+    "messageformat": "چەكلە"
+  },
+  "icu:Preferences--disable-signal-pin--footer": {
+    "messageformat": "ئەگەر PIN نى چەكلىسىڭىز، Signal غا قايتا تىزىملاتقاندا ئۆزىڭىز زاپاسلاپ ۋە ئەسلىگە كەلتۈرمىگۈچە ھەممە سانلىق مەلۇماتلىرىڭىز يوقىلىدۇ، PIN چەكلەنسە تىزىملىتىش قۇلۇپىنى ئاچالمايسىز."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--title": {
+    "messageformat": "تىزىملىتىش قۇلۇپىنىڭ سەۋەبىدىن PIN نومۇرىنى تاقاش مەغلۇب بولدى"
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--body": {
+    "messageformat": "PIN نى چەكلەشتىن بۇرۇن چوقۇم تىزىملاش قۇلۇپىنى چەكلىشىڭىز كېرەك."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--ok": {
+    "messageformat": "بولىدۇ"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--title": {
+    "messageformat": "زاپاسلارنىڭ سەۋەبىدىن PIN نومۇرىنى تاقاش مەغلۇب بولدى"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--body": {
+    "messageformat": "PIN نى چەكلەشتىن بۇرۇن چوقۇم زاپاسلاشنى چەكلىشىڭىز كېرەك."
+  },
+  "icu:Preferences--enable-signal-pin": {
+    "messageformat": "PIN نى قوزغات"
+  },
+  "icu:Preferences--enable-signal-pin--button": {
+    "messageformat": "قوزغىتىش"
+  },
+  "icu:Preferences--pin-reminders--header": {
+    "messageformat": "PIN ئەسكەرتكۈچىلىرى"
+  },
+  "icu:Preferences--pin-reminders--description": {
+    "messageformat": "ۋاقىتنىڭ ئۆتۈشىگە ئەگىشىپ سوئالىڭىز ئازىيىدۇ"
+  },
+  "icu:Preferences--registration-lock__label": {
+    "messageformat": "تىزىملىتىش قۇلۇپى"
+  },
+  "icu:Preferences--registration-lock__footer": {
+    "messageformat": "تېلېفون نومۇرىڭىزنى Signal دا قايتا تىزىملىتىش ئۈچۈن Signal PIN نىڭىز لازىم."
+  },
+  "icu:Preferences__Chats__TextInputSection__Title": {
+    "messageformat": "تېكىستنى كىزگۈزۈش"
+  },
+  "icu:Preferences__Chats__ChatFoldersSection__Title": {
+    "messageformat": "پاراڭ ھۆججەت قىسقۇچلىرى"
+  },
+  "icu:Preferences__Notifications__Show__Label": {
+    "messageformat": "كۆرسەت"
+  },
+  "icu:Preferences__Notifications__SoundsSection__Title": {
+    "messageformat": "ئاۋازلار"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title": {
+    "messageformat": "ئەپ ئىزنىكى"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title-v2": {
+    "messageformat": "ئۇقۇلمىغان ئۇچۇر بەلگىللىرى"
+  },
+  "icu:Preferences__Notifications__Reset__title": {
+    "messageformat": "پاراڭلىرىڭىزنىڭ كېيىن تەڭشەلگەن ھالىتىنى ئۆز ئىچىگە ئالغان ئۇقتۇرۇش تەڭشەكلىرىنى زاۋۇتتىن چىققان ھالەتكە قايتۇرۇش."
+  },
+  "icu:Preferences__Notifications__Reset__button": {
+    "messageformat": "ئەسلىگە قايتۇر"
+  },
+  "icu:Preferences__Notifications__Reset__modal--body": {
+    "messageformat": "بارلىق پاراڭلارنىڭ ئۇقتۇرۇش تەڭشەكلىرىنى زاۋۇتتىن چىققان ھالەتكە قايتۇرامسىز؟"
+  },
+  "icu:Preferences__Notifications__Reset__modal--confirm": {
+    "messageformat": "ئەسلىگە قايتۇر"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Label": {
+    "messageformat": "بەلگە سانى"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Description": {
+    "messageformat": "سىنبەلگە تاختىسىنىڭ، ئوقۇلمىغان ئۇچۇرلارنىڭ سانى ياكى ئوقۇلمىغان پاراڭلارنىڭ سانىنى كۆرسىتىش كۆرسەتمەسلىكىنى تاللاڭ"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadMessages": {
+    "messageformat": "ئوقۇلمىغان ئۇچۇرلار"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadChats": {
+    "messageformat": "ئوقۇلمىغان پاراڭلار"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats": {
+    "messageformat": "ئەپ بەلگىسىدە ئۈنسىزلاندۇرۇلغان پاراڭلارنى ئۆز ئىچىگە ئېلىش."
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats__description": {
+    "messageformat": "پاراڭ ھۆججەت قىسقۇچ بەلگىللىرى ھەرقاچان ئۈنسىزلاندۇرۇلغان پاراڭلارنى ئۆز ئىچىگە ئالىدۇ"
   },
   "icu:PlaintextExport--PreferencesRow--Header": {
     "messageformat": "سۆھبەت تارىخىنى ئېكسپورت قىلىش"
@@ -6145,9 +6478,6 @@
   "icu:NotificationProfiles--setting": {
     "messageformat": "ئۇقتۇرۇش ئارخىپى"
   },
-  "icu:NotificationProfiles--setup": {
-    "messageformat": "بەلگىلەش"
-  },
   "icu:NotificationProfiles--title": {
     "messageformat": "ئۇقتۇرۇش ئارخىپى"
   },
@@ -6159,9 +6489,6 @@
   },
   "icu:NotificationProfiles--manage-description": {
     "messageformat": "ئۇقتۇرۇش ئارخىپلىرىنى قوشۇش ياكى تەھرىرلەش"
-  },
-  "icu:NotificationProfiles--manage-profiles": {
-    "messageformat": "{profileCount, plural, other {{profileCount,number} ئارخىپلار}}"
   },
   "icu:NotificationProfiles--create": {
     "messageformat": "ئارخىپ قۇرۇش"
@@ -6351,6 +6678,9 @@
   },
   "icu:Preferences--blocked-groups": {
     "messageformat": "چەكلەنگەن گۇرۇپپىلار"
+  },
+  "icu:Preferences--blocked--blocked-on": {
+    "messageformat": "{blockedAt} دە چەكلەنگەن"
   },
   "icu:Preferences--signal-backups": {
     "messageformat": "Signal بىخەتەر زاپاسلانمىللىرى"
@@ -6559,9 +6889,6 @@
   "icu:Preferences__pnp__row--body": {
     "messageformat": "تېلېفون نومۇرىڭىزنى كۆرسە بولىدىغان كىشىلەرنى ۋە تېلېفون نومۇرىڭىز ئارقىلىق سىز بىلەن Signal دا ئالاقىلاشسا بولىدىغان كىشىلەرنى تاللاڭ."
   },
-  "icu:Preferences__pnp__row--button": {
-    "messageformat": "ئۆزگىرىش…"
-  },
   "icu:Preferences__pnp__sharing--title": {
     "messageformat": "تېلېفون نومۇرۇمنى كۆرسە بولىدىغانلار"
   },
@@ -6610,14 +6937,11 @@
   "icu:Preferences--read-receipts": {
     "messageformat": "ئوقۇلدى ئىشارىتى"
   },
-  "icu:Preferences--read-receipts--description": {
-    "messageformat": "ئەگەر ئەمەلدىن قالدۇرۇلسا، مەزمۇننىڭ ئوقۇلغانلىق ئۇقتۇرۇشلىرىنى كۆرەلمەيسىز."
-  },
   "icu:Preferences--typing-indicators": {
     "messageformat": "بېسىۋاتىدۇ كۆرسەتكۈچى"
   },
-  "icu:Preferences--typing-indicators--description": {
-    "messageformat": "ئەگەر ئەمەلدىن قالدۇرۇلسا، خەت كىرگۈزۈش ھالەت كۆرسەتكۈچلىرىنى كۆرەلمەيسىز."
+  "icu:Preferences--messaging-help": {
+    "messageformat": "ئۇچۇرلار ئوقۇلۇپ ۋە يېزىلغاندا ئۇلارنى كۆرۈش ۋە ھەمبەھىرلەش. ئەگەر ئەمەلدىن قالدۇرۇلسا، ئوقۇلغانلىق ئۇقتۇرۇشلىرىنى ۋە خەت كىرگۈزىۋاتقان ھالەت كۆرسەتكۈچلىرىنى كۆرەلمەيسىز."
   },
   "icu:Preferences--updates": {
     "messageformat": "يېڭىلانما"
@@ -6721,11 +7045,23 @@
   "icu:InstallScreenUpdateDialog--update-required__title": {
     "messageformat": "يېڭىلاش كېرەك"
   },
+  "icu:InstallScreenUpdateDialog--checking-for-updates": {
+    "messageformat": "يېڭى نەشىر نۇسخىلىرىنى ئىزدەۋاتىدۇ"
+  },
+  "icu:InstallScreenUpdateDialog--updating-signal": {
+    "messageformat": "Signal نى يېڭىلاش"
+  },
+  "icu:InstallScreenUpdateDialog--download-progress": {
+    "messageformat": "{totalBytes} نىڭ {currentBytes} تى چۈشۈۋاتىدۇ({percentage,number,percent})..."
+  },
   "icu:InstallScreenUpdateDialog--update-required__body": {
-    "messageformat": "ئۇچۇرلىرىڭىزنى ماسقەدەملەش ئۈچۈن ، سىگنال ئۈستەليۈزىنى ھازىرلا يېڭىلاڭ."
+    "messageformat": "داۋاملاشتۇرۇش ئۈچۈن Signal ئۈستەليۈزى نۇسخىسىنى يېڭىلاڭ."
   },
   "icu:InstallScreenUpdateDialog--update-required__action-update": {
     "messageformat": "يېڭىلا"
+  },
+  "icu:InstallScreenUpdateDialog--update-required__action-update__mas": {
+    "messageformat": "App Store غا كىرىڭ"
   },
   "icu:InstallScreenUpdateDialog--unsupported-os__title": {
     "messageformat": "يېڭىلاش كېرەك"
@@ -6759,6 +7095,9 @@
   },
   "icu:StandaloneRegistration--PhoneNumber--waiting": {
     "messageformat": "{duration} تىن كېيىن قايتا سىناڭ"
+  },
+  "icu:StandaloneRegistration--PhoneNumber--RegionCodeSelector--Label": {
+    "messageformat": "رايون كودىنى تاللاڭ"
   },
   "icu:StandaloneRegistration--PhoneNumber--placeholder": {
     "messageformat": "تېلېفون نومۇرىڭىز"
@@ -6982,6 +7321,9 @@
   "icu:StandaloneRegistration--VerifyPIN--incorrect-pin--with-count": {
     "messageformat": "{triesRemaining, plural, other {PIN خاتا . {triesRemaining,number} كىرگۈزۈش پۇرسىتى قالدى.}}"
   },
+  "icu:StandaloneRegistration--VerifyPIN--just-count": {
+    "messageformat": "{triesRemaining, plural, other {{triesRemaining,number} كىرگۈزۈش پۇرسىتى قالدى.}}"
+  },
   "icu:StandaloneRegistration--VerifyPIN--NeedHelp--header": {
     "messageformat": "ياردەم كېرەكمۇ؟"
   },
@@ -7024,6 +7366,9 @@
   "icu:StandaloneRegistration--VerifyPIN--NoRemainingTries--learn-more": {
     "messageformat": "PIN ھەققىدە تېخىمۇ كۆپ بىلىم"
   },
+  "icu:StandaloneRegistration--VerifyPIN--open-menu": {
+    "messageformat": "تىزىملىكنى ئېچىش"
+  },
   "icu:StandaloneRegistration--VerifyPIN--menu--skip-pin": {
     "messageformat": "PIN كىرگۈزۈشتىن ئاتلاش"
   },
@@ -7031,7 +7376,7 @@
     "messageformat": "PIN كىرگۈزۈشتىن ئاتلامسىز؟"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--description": {
-    "messageformat": "PIN نومۇرىنى ئۇنتۇپ قالغان بولسىڭىز، يېڭىدىن بىرنى قۇرسىڭىز بولىدۇ. ھېساباتىڭىزنى تىزىملىتالايسىز ۋە ئىشلىتەلەيسىز، ئەمما ساقلانغان تەڭشەكلەرنى يوقىتىسىز، مەسىلەن ئارخىپ ئۇچۇرىڭىز دىگەندەكلەر. تېخىمۇ كۆپ بىلدۈرگۈ"
+    "messageformat": "PIN نومۇرىنى ئۇنتۇپ قالغان بولسىڭىز، يېڭىدىن بىرنى قۇرسىڭىز بولىدۇ. ھېساباتىڭىزنى تىزىملىتالايسىز ۋە ئىشلىتەلەيسىز، ئەمما ساقلانغان تەڭشەكلەرنى يوقىتىسىز، مەسىلەن ئارخىپ ئۇچۇرىڭىز دېگەندەكلەر. <learnMore>تەپسىلاتى</learnMore>."
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--skip-button": {
     "messageformat": "ئاتلاڭ ۋە يېڭى PIN كىرگۈزۈڭ"
@@ -7067,7 +7412,7 @@
     "messageformat": "ئاگاھلاندۇرۇش"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--description": {
-    "messageformat": "ئەگەر PIN نى چەكلىسىڭىز، Signal غا قايتا تىزىملاتقاندا باشقا iOS ئەسلىگە كەلتۈرمىگۈچە ھەممە سانلىق مەلۇماتلىرىڭىز يوقىلىدۇ، PIN چەكلەنسە تىزىملىتىش قۇلۇپىنى ئاچالمايسىز."
+    "messageformat": "ئەگەر PIN نى چەكلىسىڭىز، Signal غا قايتا تىزىملاتقاندا ھەممە سانلىق مەلۇماتلىرىڭىزنى يوقىتىسىز. تىزىملىتىش قۇلۇپىنى، PIN چەكلەنگەن ئەھۋال ئاستىدا قوزغىتالمايسىز."
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--disable-button": {
     "messageformat": "PIN چەكلە"
@@ -7275,6 +7620,12 @@
   },
   "icu:MediaPermissionsModal__step-2": {
     "messageformat": "«Signal» نى ئېچىڭ"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--microphone": {
+    "messageformat": "Signal ئۈچۈن مىكروفوننى ئېچىۋېتىڭ"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--camera": {
+    "messageformat": "Signal ئۈچۈن كامېرانى ئېچىۋېتىڭ"
   },
   "icu:MediaPermissionsModal__open": {
     "messageformat": "تەڭشەكلەرگە يۆتكەل"
@@ -7816,11 +8167,17 @@
   "icu:ContextMenu--button": {
     "messageformat": "كونتېكىست تىزىملىكى"
   },
+  "icu:EditUsernameModalBody__username-label": {
+    "messageformat": "ئىشلەتكۈچى ئىسمى"
+  },
   "icu:EditUsernameModalBody__username-placeholder": {
     "messageformat": "ئىشلەتكۈچى ئىسمى"
   },
   "icu:EditUsernameModalBody__username-helper": {
     "messageformat": "ئىشلەتكۈچى نامى داۋاملىق بىر يۈرۈش سان بىلەن ماس كېلىدۇ."
+  },
+  "icu:EditUsernameModalBody__discriminator-label": {
+    "messageformat": "ئىشلەتكۈچى نامى رەقەملىرى"
   },
   "icu:EditUsernameModalBody__learn-more": {
     "messageformat": "تەپسىلات"
@@ -7918,6 +8275,75 @@
   },
   "icu:UsernameMegaphone__dismiss": {
     "messageformat": "ئېتىش"
+  },
+  "icu:PinReminderMegaphone__title": {
+    "messageformat": "Signal PIN نى دەلىللەڭ"
+  },
+  "icu:PinReminderMegaphone__body": {
+    "messageformat": "ئەستە تۇتۇشىڭىز ئۈچۈن بەزىدە PIN ڭىزنى دەلىللىشىڭىزنى سورايمىز."
+  },
+  "icu:PinReminderMegaphone__verify": {
+    "messageformat": "دەلىللەش"
+  },
+  "icu:PinReminderMegaphone__not-now": {
+    "messageformat": "ھازىر ئەمەس"
+  },
+  "icu:PinReminderModal__title": {
+    "messageformat": "Signal PIN نى كىرگۈزۈڭ"
+  },
+  "icu:PinReminderModal__body": {
+    "messageformat": "ئەستە تۇتۇشىڭىزغا قۇلايلىق بولۇشى ئۈچۈن PIN نى قەرەللىك ئەسكەرتىپ تۇرىمىز. ئەسكەرتىش قېتىم سانى تەدرىجىي ئازلايدۇ."
+  },
+  "icu:PinReminderModal__pin-input-placeholder": {
+    "messageformat": "PIN ڭىزنى كىرگۈزۈڭ"
+  },
+  "icu:PinReminderModal__pin-input-error": {
+    "messageformat": "PIN نومۇرى خاتا. قايتا سىناڭ"
+  },
+  "icu:PinReminderModal__forgot": {
+    "messageformat": "PIN نومۇرىنى ئۇنتۇپ قېلىش"
+  },
+  "icu:PinReminderModal__confirm": {
+    "messageformat": "جەزملەشتۈرۈش"
+  },
+  "icu:PinReminderCompletedToast": {
+    "messageformat": "توغرا PIN نومۇر. كېيىنرەك سىزنى قايتا ئەسكەرتىمىز."
+  },
+  "icu:PinChangeModal__title--create": {
+    "messageformat": "Signal PIN نومۇرىڭىزنى ئۆزگەرتىڭ"
+  },
+  "icu:PinChangeModal__title--create--without-pin": {
+    "messageformat": "Signal PIN نومۇرىڭىزنى قۇرۇپ چىقىڭ"
+  },
+  "icu:PinChangeModal__body--create": {
+    "messageformat": "بۇ ئۈسكۈنە تىزىملىتىلغانلا بولسا PIN نى ئۆزگەرتەلەيسىز. <learnMoreLink>تەپسىلاتى</learnMoreLink>"
+  },
+  "icu:PinChangeModal__body--create--without-pin": {
+    "messageformat": "PIN نۇمۇرلار Signal دا ساقلانغان ئۇچۇرلارنى مەخپىيلەشتۈرۈپ، پەقەت سىزلا ئۇلارغا ئېرىشەلەيدىغان قىلىدۇ. قايتا قاچىلىغاندا، ئارخىپىڭىز، تەڭشەكلىرىڭىز ۋە ئالاقىداشلىرىڭىز ئەسلىگە كېلىدۇ. ئەپنى ئېچىش ئۈچۈن PIN نومۇرىڭىزنى لازىم قىلمايسىز. <learnMoreLink>تەپسىلاتى</learnMoreLink>"
+  },
+  "icu:PinChangeModal__title--confirm": {
+    "messageformat": "Signal PIN نىڭىزنى جەزىملەڭ"
+  },
+  "icu:PinChangeModal__body--confirm": {
+    "messageformat": "بايا قۇرغان PIN نى كىرگۈزۈڭ."
+  },
+  "icu:PinChangeModal__pin-input-placeholder--create": {
+    "messageformat": "يېڭى PIN نومۇرىڭىزنى كىرگۈزۈڭ"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--confirm": {
+    "messageformat": "PIN نى جەزىملەڭ"
+  },
+  "icu:PinChangeModal__cancel": {
+    "messageformat": "بىكار قىلىش"
+  },
+  "icu:PinChangeModal__continue": {
+    "messageformat": "داۋاملاشتۇرۇش"
+  },
+  "icu:PinChangeModal__confirm": {
+    "messageformat": "جەزملەشتۈرۈش"
+  },
+  "icu:PinChangeCompletedToast": {
+    "messageformat": "يېڭى PIN نومۇر قۇرۇلدى."
   },
   "icu:UnsupportedOSWarningDialog__body": {
     "messageformat": "قىسقا ۋاقىتتىن كېيىن Signal كومپيۇتېرىڭىزنىڭ {OS} نەشرىنى قوللىمايدۇ. Signal نى داۋاملىق ئىشلىتىش ئۈچۈن، كومپيۇتېرىڭىزنىڭ مەشغۇلات سىستېمىسىنى «{expirationDate}» دىن بۇرۇن يېڭىلاڭ <learnMoreLink>تەپسىلاتى</learnMoreLink>"
@@ -8351,8 +8777,11 @@
   "icu:DonationReceipt__type-value--one-time": {
     "messageformat": "بىر قېتىم"
   },
-  "icu:DonationReceipt__footer-text": {
-    "messageformat": "Signalنى قوللىغانلىقىڭىزغا رەھمەت. سىزنىڭ ئىئانىڭىز ، ئوچۇق مەنبە مەخپىيەتلىك تېخنىكىسى ئارقىلىق ئەركىن ئىپادىلەش ھوقۇقىنى قوغدايدۇ ۋە دۇنيادىكى مىليونلىغان كىشىلەرنىڭ ئالاقىلىشىش بىخەتەرلىكىگە كاپالەتلىك قىلىدۇ. ئەگەر سىز ئامېرىكىنىڭ ئاھالىسى بولسىڭىز ، باج خاتىرىلىرى ئۈچۈن بۇ تالوننى ساقلاپ قويۇڭ. Signal Technology Foundation بولسا ئامېرىكا دۆلەت ئىچى باج قانۇنى 501c3 ماددىسىدىكى بەلگىلىمە بويىچە باجدىن كەچۈرۈم قىلىنىدىغان تاپاۋەتسىز ئورگان بولۇپ ھېسابلىنىدۇ. فېدېراتسىيە باج ID نومۇرىمىز 82-4506840."
+  "icu:DonationReceipt__footer-text-v2": {
+    "messageformat": "Signal نى قوللىغانلىقىڭىزغا رەھمەت. سىزنىڭ قوللىشىڭىز بىزگە ياردەملىشىپ ئوچۇق مەنبە مەخپىيەتلىك تېخنىكىسى ئارقىلىق سۆز ئەركىنلىك ھوقۇقىنى قوغدايدۇ ۋە دۇنيادىكى مىليونلىغان كىشىلەرنىڭ ئالاقىلىشىش بىخەتەرلىكىگە كاپالەتلىك قىلىدۇ. ئەگەر سىز ئامېرىكىنىڭ ئاھالىسى بولسىڭىز، باج خاتىرىلىرى ئۈچۈن بۇ تالوننى ساقلاپ قويۇڭ. Signal Technology Foundation بولسا ئامېرىكا دۆلەت ئىچى باج قانۇنى 501c3 ماددىسىدىكى بەلگىلىمە بويۇنچە باجدىن كەچۈرۈم قىلىنىدىغان تاپاۋەتسىز ئورگان بولۇپ ھېسابلىنىدۇ. فېدېراتسىيە باج ID نومۇرىمىز 82-4506840. بۇ سەۋەبلىك، Signal ھېچقانداق ماددىي بۇيۇملارنى ياكى مۇلازىمەتلەرنى ئىقتىسادىي پايدا مەقسىتىدە تەمىنلىمىدى."
+  },
+  "icu:MessageCta__Donate": {
+    "messageformat": "دەرھال ئىئانە قىلىش"
   },
   "icu:Donations__OfflineTooltip": {
     "messageformat": "سىز تورغا ئۇلانمىغان. ئىئانىنى تاماملاش ئۈچۈن تورغا ئۇلاڭ."
@@ -8661,16 +9090,10 @@
     "messageformat": "كىچىك ئۆزگەرتىشلەر كىرگۈزۈلدى، كاشىلا ھەل قىلىندى ۋە ئىقتىدار ئەلالاشتۇرۇلدى. Signal نى ئىشلەتكەنلىكىڭىزگە رەھمەت!",
     "ignoreUnused": true
   },
-  "icu:WhatsNew__8.18--0": {
-    "messageformat": "راي سىناشنى ھازىر يەككە پاراڭلىشىشتىمۇ ئېلىپ بارغىلى بولىدۇ. 8.18 نەشىر نۇسخىسى ئۇچۈن تەييارلاندى. قارار قىلىشقا ئىككىلىنىۋاتقان دوستىڭىزغا بىر يۈرۈش تاللاشلارنى تەقدىم قىلىڭ، ياكى «مېنى ياخشى كۆرەمسىز؟ ھەئە / ياق / بەلكىم» دېگەن راي سىناشنى قۇرۇپ، يوشۇرۇن ياخشى كۆرگەن ئادىمىڭىزگە خەت ئەۋەتىشنىڭ ھاياجانلىق تۇيغۇسىنى قايتا ھېس قىلىڭ."
+  "icu:WhatsNew__8.30--0": {
+    "messageformat": "ۋىدېيولۇق چاقىرىقلارنىڭ ئىقتىدارى ياخشىلاندى. 8.30 نەشرىنىڭ يېڭىلىقلىرى"
   },
-  "icu:WhatsNew__8.19--0": {
-    "messageformat": "گۇرۇپپا باشقۇرغۇچىلىرى ئەمدى گۇرۇپپا تەڭشەكلىرىدىكى يېڭى «گۇرۇپپىنى تارقىتىۋېتىش» تاللىشى ئارقىلىق سۆھبەتلەرنى رەسمىي ئاخىرلاشتۇرالايدۇ. بىر گۇرۇپپىنى تاقىۋەتكەندە، ئۇ شۇ گۇرۇپپا ئەزالىرىنىڭ ئۇچۇر ئەۋەتىشىنى ياكى چاقىرىق قىلىشىنى توسىدۇ، ھەمدە گۇرۇپپىغا كىرىش تەكلىپلىرىنى ئەمەلدىن قالدۇرىدۇ. ئەمدى سىز ھەممەيلەننىڭ توغرا مۇزاكىرە تېمىسىدا تۇرۇشىغا كاپالەتلىك قىلالايسىز: يېڭى تىككۈچىلىك يىغىلىش گۇرۇپپىسىنى قۇرۇشتىن بۇرۇن، ئۆتكەن يىلدىكى تىككۈچىلىك ئۇچرىشىش گۇرۇپپىسىنى ئاخىرلاشتۇرۇڭ."
-  },
-  "icu:WhatsNew__8.20--0": {
-    "messageformat": "Introducing disappearing call events: Missed, outgoing, and received calls that occur after you install this update will now automatically disappear in any chat where disappearing messages are enabled."
-  },
-  "icu:WhatsNew__8.20--1": {
-    "messageformat": "Now you can reorder installed sticker packs so your new favorites don’t get stuck in the back of the line."
+  "icu:WhatsNew__8.30--1": {
+    "messageformat": "Windows دا ۋىدېيولۇق چاقىرىققا قاتنىشىشقا ئۇرۇنغاندا، Signal نىڭ كامېراغا كىرىش رۇخسىتى بولمىسا، سىستېما تەڭشەكلىرىنى ئېچىش ئۈچۈن قولايلىق تېزلەتمە يولنىمۇ قوشتۇق. 8.30 نەشرىنىڭ يېڭىلىقلىرى ھازىر باشقىلارنىڭ سىزنى كۆرەلىشى ئۈچۈن نېمە قىلىشىڭىز كېرەكلىكىنى ئاسانلا بىلەلەيسىز."
   }
 }

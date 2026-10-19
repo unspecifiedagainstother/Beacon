@@ -74,6 +74,7 @@ import {
   defaultBlurHash,
   isDownloadable,
   isDownloaded,
+  getValidMessageAttachments,
 } from '../../util/Attachment.std.ts';
 import type { MessageAttachmentType } from '../../types/AttachmentDownload.std.ts';
 import type {
@@ -117,6 +118,7 @@ import {
   getCachedConversationMemberColorsSelector,
   getContactNameColor,
   getPinnedMessagesMessageIds,
+  getStoriesState,
 } from './conversations.dom.ts';
 import {
   getIntl,
@@ -184,6 +186,7 @@ import type { PinnedMessageNotificationData } from '../../components/conversatio
 import type { PollTerminateNotificationDataType } from '../../components/conversation/PollTerminateNotification.dom.tsx';
 import { Emoji } from '../../axo/emoji.std.ts';
 import { isDownloadableOrBackfillable } from '../../util/downloadAttachment.preload.ts';
+import type { TargetedMessageSource } from '../ducks/conversationsEnums.std.ts';
 
 const { groupBy, isEmpty, isNumber, isObject, map } = lodash;
 
@@ -213,8 +216,9 @@ export type GetPropsForBubbleOptions = Readonly<{
   ourNumber?: string;
   ourAci: AciString | undefined;
   ourPni: PniString | undefined;
-  targetedMessageId?: string;
-  targetedMessageCounter?: number;
+  targetedMessageId: string | null;
+  targetedMessageCounter: number | null;
+  targetedMessageSource: TargetedMessageSource | null;
   pinnedMessagesMessageIds: ReadonlyArray<string> | null;
   selectedMessageIds: ReadonlyArray<string> | undefined;
   regionCode?: string;
@@ -225,6 +229,9 @@ export type GetPropsForBubbleOptions = Readonly<{
   contactNameColors: Map<string, ContactNameColorType>;
   defaultConversationColor: DefaultConversationColorType;
   hasMediaBackups: boolean;
+  getStoryReplyAttachment: (
+    storyMessageId: string
+  ) => AttachmentType | undefined;
 }>;
 
 export function hasErrors(
@@ -335,18 +342,21 @@ export const getAttachmentsForMessage = (
       },
     ];
   }
-  return (
-    attachments
-      // Long message attachments are removed from message.attachments quickly,
-      // but in case they are still around, let's make sure not to show them
-      .filter(attachment => attachment.contentType !== LONG_MESSAGE)
-      .map(attachment =>
-        getPropsForAttachment(attachment, 'attachment', message, {
-          hasMediaBackups,
-        })
-      )
-      .filter(isNotNil)
-  );
+  return [
+    ...getValidMessageAttachments(
+      attachments
+        // Long message attachments are removed from message.attachments
+        // quickly, but in case they are still around, let's make sure not to
+        // show them
+        .filter(attachment => attachment.contentType !== LONG_MESSAGE)
+        .map(attachment =>
+          getPropsForAttachment(attachment, 'attachment', message, {
+            hasMediaBackups,
+          })
+        )
+        .filter(isNotNil)
+    ),
+  ];
 };
 
 export const processBodyRanges = (
@@ -705,22 +715,42 @@ const getPollForMessage = (
   };
 };
 
+export const getStoryReplyAttachmentSelector = createSelector(
+  getStoriesState,
+  ({ stories }) =>
+    (storyMessageId: string): AttachmentType | undefined => {
+      if (!storyMessageId) {
+        return undefined;
+      }
+      const story = stories.find(item => item.messageId === storyMessageId);
+      return story?.attachment;
+    }
+);
+
 const getPropsForStoryReplyContext = (
   message: Pick<
     MessageWithUIFieldsType,
-    'body' | 'conversationId' | 'storyReaction' | 'storyReplyContext'
+    | 'body'
+    | 'conversationId'
+    | 'storyReaction'
+    | 'storyId'
+    | 'storyReplyContext'
   >,
   {
     conversationSelector,
     ourConversationId,
     defaultConversationColor,
+    getStoryReplyAttachment,
   }: {
     conversationSelector: GetConversationByIdType;
     ourConversationId?: string;
     defaultConversationColor: DefaultConversationColorType;
+    getStoryReplyAttachment: (
+      storyMessageId: string
+    ) => AttachmentType | undefined;
   }
 ): PropsData['storyReplyContext'] => {
-  const { storyReaction, storyReplyContext } = message;
+  const { storyReaction, storyId, storyReplyContext } = message;
   if (!storyReplyContext) {
     return undefined;
   }
@@ -736,6 +766,9 @@ const getPropsForStoryReplyContext = (
     conversation,
     defaultConversationColor
   );
+  const storyAttachment = storyId
+    ? getStoryReplyAttachment(storyId)
+    : undefined;
 
   return {
     authorTitle,
@@ -743,14 +776,12 @@ const getPropsForStoryReplyContext = (
     customColor,
     emoji: storyReaction?.emoji,
     isFromMe,
-    rawAttachment: storyReplyContext.attachment
-      ? processQuoteAttachment(storyReplyContext.attachment)
+    rawAttachment: storyAttachment
+      ? processQuoteAttachment(storyAttachment)
       : undefined,
-    storyId: storyReplyContext.messageId,
-    text: getStoryReplyText(
-      window.SignalContext.i18n,
-      storyReplyContext.attachment
-    ),
+    // Only expose the storyId (making the quote clickable) when the story is found.
+    storyId: storyAttachment ? storyId : undefined,
+    text: getStoryReplyText(window.SignalContext.i18n, storyAttachment),
   };
 };
 
@@ -847,6 +878,7 @@ export type GetPropsForMessageOptions = Pick<
   | 'ourNumber'
   | 'targetedMessageId'
   | 'targetedMessageCounter'
+  | 'targetedMessageSource'
   | 'pinnedMessagesMessageIds'
   | 'selectedMessageIds'
   | 'regionCode'
@@ -854,6 +886,7 @@ export type GetPropsForMessageOptions = Pick<
   | 'contactNameColors'
   | 'defaultConversationColor'
   | 'hasMediaBackups'
+  | 'getStoryReplyAttachment'
 >;
 
 function getTextAttachment(
@@ -953,13 +986,21 @@ const getPropsForMessage = (
     regionCode,
     targetedMessageId,
     targetedMessageCounter,
+    targetedMessageSource,
     pinnedMessagesMessageIds,
     selectedMessageIds,
     contactNameColors,
     defaultConversationColor,
   } = options;
 
-  const { expireTimer, expirationStartTimestamp, conversationId } = message;
+  const {
+    callToActionId,
+    callToActionText,
+    expireTimer,
+    expirationStartTimestamp,
+    conversationId,
+  } = message;
+
   const expirationLength = expireTimer
     ? DurationInSeconds.toMillis(expireTimer)
     : undefined;
@@ -1028,6 +1069,8 @@ const getPropsForMessage = (
             hasMediaBackups,
           }),
     payment,
+    callToActionId,
+    callToActionText,
     canCopy: canCopy(message),
     canEditMessage: canEditMessage(message) && !isGroupTerminated,
     canDeleteForEveryone: canDeleteForEveryoneInSelector(message, {
@@ -1086,7 +1129,8 @@ const getPropsForMessage = (
     isSignalConversation: isSignalConversation(author),
     isSticker: Boolean(sticker),
     isTargeted,
-    isTargetedCounter: isTargeted ? targetedMessageCounter : undefined,
+    isTargetedCounter: isTargeted ? targetedMessageCounter : null,
+    isTargetedSource: isTargeted ? targetedMessageSource : null,
     isTapToView: isMessageTapToView,
     isTapToViewError:
       isMessageTapToView && isIncoming(message) && message.isTapToViewInvalid,
@@ -1121,6 +1165,7 @@ export const getMessagePropsSelector = createSelector(
   getSelectedMessageIds,
   getDefaultConversationColor,
   getHasMediaBackups,
+  getStoryReplyAttachmentSelector,
   (
     conversationSelector,
     ourConversationId,
@@ -1134,7 +1179,8 @@ export const getMessagePropsSelector = createSelector(
     pinnedMessagesMessageIds,
     selectedMessageIds,
     defaultConversationColor,
-    hasMediaBackups
+    hasMediaBackups,
+    getStoryReplyAttachment
   ) =>
     (message: MessageWithUIFieldsType) => {
       const contactNameColors = cachedConversationMemberColorsSelector(
@@ -1149,12 +1195,14 @@ export const getMessagePropsSelector = createSelector(
         ourAci,
         ourPni,
         regionCode,
-        targetedMessageCounter: targetedMessage?.counter,
-        targetedMessageId: targetedMessage?.id,
+        targetedMessageCounter: targetedMessage?.counter ?? null,
+        targetedMessageId: targetedMessage?.id ?? null,
+        targetedMessageSource: targetedMessage?.source ?? null,
         pinnedMessagesMessageIds,
         selectedMessageIds,
         defaultConversationColor,
         hasMediaBackups,
+        getStoryReplyAttachment,
       });
     }
 );
@@ -1602,10 +1650,9 @@ function getPropsForSafetyNumberNotification(
     );
   }
 
-  const contact = identifier ? conversationSelector(identifier) : conversation;
+  const contact = isGroup ? conversationSelector(identifier) : conversation;
 
   return {
-    isGroup,
     contact,
   };
 }
@@ -2951,6 +2998,7 @@ export const getMessageDetailsSelector = createSelector(
   getDefaultConversationColor,
   getHasUnidentifiedDeliveryIndicators,
   getHasMediaBackups,
+  getStoryReplyAttachmentSelector,
   (
     accountSelector,
     cachedConversationMemberColorsSelector,
@@ -2966,7 +3014,8 @@ export const getMessageDetailsSelector = createSelector(
     selectedMessageIds,
     defaultConversationColor,
     hasUnidentifiedDeliveryIndicators,
-    hasMediaBackups
+    hasMediaBackups,
+    getStoryReplyAttachment
   ): ((messageId: string) => SmartMessageDetailPropsType | undefined) =>
     (messageId: string) => {
       if (!messageLookup || !ourConversationId) {
@@ -3018,8 +3067,12 @@ export const getMessageDetailsSelector = createSelector(
           regionCode,
           pinnedMessagesMessageIds,
           selectedMessageIds,
+          targetedMessageId: null,
+          targetedMessageCounter: null,
+          targetedMessageSource: null,
           defaultConversationColor,
           hasMediaBackups,
+          getStoryReplyAttachment,
         }),
         receivedAt: message.received_at_ms ?? message.received_at ?? 0,
       };

@@ -19,6 +19,7 @@ export default {
   args: {
     getPreferredBadge: () => undefined,
     isHighQuality: false,
+    isCreatingStory: true,
     i18n,
     // oxlint-disable-next-line typescript/no-base-to-string
     imageToBlurHash: input => Promise.resolve(input.toString()),
@@ -32,7 +33,11 @@ export default {
     platform: 'darwin',
     emojiSkinToneDefault: Emoji.SkinTone.None,
     convertDraftBodyRangesIntoHydrated: () => undefined,
-  },
+    draftText: null,
+    draftBodyRanges: null,
+    ourConversationId: undefined,
+    sortedGroupMembers: null,
+  } satisfies PropsType,
 } satisfies Meta<PropsType>;
 
 const Template: StoryFn<PropsType> = args => <MediaEditor {...args} />;

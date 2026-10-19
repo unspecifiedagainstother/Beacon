@@ -123,6 +123,7 @@ export function Accessories(): JSX.Element {
       <Row>
         <Example trigger="None" />
         <Example trigger="Keyboard Shortcut" keyboardShortcut="⌘⇧Y" />
+        {/* oxlint-disable-next-line react/purity */}
         <Example trigger="Timestamp" experimentalTimestamp={Date.now()} />
       </Row>
       <Row>
@@ -135,6 +136,7 @@ export function Accessories(): JSX.Element {
         <Example
           label={LONG_TEXT}
           trigger="Timestamp"
+          // oxlint-disable-next-line react/purity
           experimentalTimestamp={Date.now()}
         />
       </Row>
@@ -196,4 +198,14 @@ export function InDialog(): JSX.Element {
 
 export function Disabled(): JSX.Element {
   return <SimpleExample disabled />;
+}
+
+export function LongText(): ReactNode {
+  return (
+    <AxoTooltip.Root __FORCE_OPEN label="This person is in your contacts.">
+      <AxoButton.Root variant="strong-primary" size="md">
+        Hover Me
+      </AxoButton.Root>
+    </AxoTooltip.Root>
+  );
 }

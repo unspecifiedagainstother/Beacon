@@ -12,6 +12,7 @@ import type {
   AddonSettingValue,
 } from '../beacon/core/types.dom.ts';
 import { AxoSwitch } from '../axo/AxoSwitch.dom.tsx';
+import { drop } from '../util/drop.std.ts';
 
 export type PropsType = {
   i18n: LocalizerType;
@@ -96,8 +97,14 @@ function SettingControl({
   const inputId = `beacon-setting-${addonId}-${def.key}`;
 
   // Text fields commit on blur so filters don't re-run on every keystroke.
+  // Re-seed the draft when the stored value changes elsewhere (reset, another
+  // window) — adjusted during render, not in an effect.
   const [draft, setDraft] = useState(String(value));
-  useEffect(() => setDraft(String(value)), [value]);
+  const [seededFrom, setSeededFrom] = useState(value);
+  if (seededFrom !== value) {
+    setSeededFrom(value);
+    setDraft(String(value));
+  }
 
   let control: JSX.Element;
   switch (def.type) {
@@ -339,9 +346,10 @@ export function BeaconModules({ i18n }: PropsType): JSX.Element {
     setBusy(id);
     try {
       await getBeacon()?.loader.toggle(id);
-    } finally {
-      setBusy(undefined);
+    } catch {
+      // The loader logs start/stop failures and surfaces them on the card.
     }
+    setBusy(undefined);
   }, []);
 
   const visible = useMemo(() => {
@@ -431,7 +439,7 @@ export function BeaconModules({ i18n }: PropsType): JSX.Element {
               i18n={i18n}
               busy={busy === addon.id}
               expanded={expanded === addon.id}
-              onToggle={() => void toggleAddon(addon.id)}
+              onToggle={() => drop(toggleAddon(addon.id))}
               onExpand={() =>
                 setExpanded(prev => (prev === addon.id ? undefined : addon.id))
               }

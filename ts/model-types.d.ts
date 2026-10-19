@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { ReadonlyDeep } from 'type-fest';
+import type { MuteExpiration } from '@signalapp/types';
 
 import type { GroupV2ChangeType } from './types/groups.std.ts';
 import type { DraftBodyRanges, RawBodyRange } from './types/BodyRange.std.ts';
@@ -71,6 +72,7 @@ export type SenderKeyInfoType = {
 };
 
 export type CustomError = Error & {
+  identifier?: string;
   serviceId?: ServiceIdString;
   number?: string;
   data?: object;
@@ -114,10 +116,8 @@ export type QuotedMessageType = {
   messageId?: string;
 };
 
-type StoryReplyContextType = {
-  attachment?: AttachmentType;
+export type StoryReplyContextType = {
   authorAci?: AciString;
-  messageId: string;
 };
 
 export type GroupV1Update = {
@@ -194,6 +194,8 @@ export type MessageAttributesType = {
   bodyAttachment?: AttachmentType;
   bodyRanges?: ReadonlyArray<RawBodyRange>;
   callId?: string;
+  callToActionId?: string;
+  callToActionText?: string;
   canReplyToStory?: boolean;
   changedId?: string;
   dataMessage?: Uint8Array<ArrayBuffer> | null;
@@ -415,8 +417,13 @@ export type ConversationAttributesType = {
   messageCountBeforeMessageRequests?: number | null;
   messageRequestResponseType?: number;
   messagesDeleted?: boolean;
-  muteExpiresAt?: number;
-  dontNotifyForMentionsIfMuted?: boolean;
+  muteExpiresAt?: MuteExpiration;
+  // Ternary: undefined means unset, so the chat follows the global setting
+  notifyForCallsIfMuted?: boolean;
+  notifyForMentionsIfMuted?: boolean;
+  notifyForRepliesIfMuted?: boolean;
+  showUnreadReminders?: boolean;
+  lastUnreadReminderAt?: number;
   sharingPhoneNumber?: boolean;
   profileAvatar?: ContactAvatarType | null;
   profileKeyCredential?: string | null;

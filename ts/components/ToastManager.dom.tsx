@@ -25,6 +25,7 @@ import type { Location } from '../types/Nav.std.ts';
 import { I18n } from './I18n.dom.tsx';
 import { UserText } from './UserText.dom.tsx';
 import { RemoteMegaphone } from './RemoteMegaphone.dom.tsx';
+import { PinReminderMegaphone } from './PinReminderMegaphone.dom.tsx';
 
 export type PropsType = {
   changeLocation: (newLocation: Location) => unknown;
@@ -167,15 +168,6 @@ function renderToast({
       </Toast>
     );
   }
-
-  if (toastType === ToastType.CannotAddMemberLabel) {
-    return (
-      <Toast onClose={hideToast}>
-        {i18n('icu:ToastManager__CannotAddMemberLabel')}
-      </Toast>
-    );
-  }
-
   if (toastType === ToastType.CannotEditMessage) {
     return (
       <Toast onClose={hideToast}>
@@ -601,7 +593,7 @@ function renderToast({
   if (toastType === ToastType.FileSize) {
     return (
       <Toast onClose={hideToast}>
-        {i18n('icu:fileSizeWarning', {
+        {i18n('icu:fileTooLargeWarning', {
           limit: toast.parameters.limit,
           units: toast.parameters.units,
         })}
@@ -611,7 +603,7 @@ function renderToast({
   if (toastType === ToastType.VideoFileSize) {
     return (
       <Toast onClose={hideToast}>
-        {i18n('icu:videoFileSizeWarning', {
+        {i18n('icu:videoFileTooLargeWarning', {
           limit: toast.parameters.limit,
           units: toast.parameters.units,
         })}
@@ -794,6 +786,18 @@ function renderToast({
           components={{ maxPinnedConversations: toast.maxPinnedConversations }}
         />
       </Toast>
+    );
+  }
+
+  if (toastType === ToastType.PinChangeCompleted) {
+    return (
+      <Toast onClose={hideToast}>{i18n('icu:PinChangeCompletedToast')}</Toast>
+    );
+  }
+
+  if (toastType === ToastType.PinReminderCompleted) {
+    return (
+      <Toast onClose={hideToast}>{i18n('icu:PinReminderCompletedToast')}</Toast>
     );
   }
 
@@ -1058,12 +1062,25 @@ function renderMegaphone({
     return <UsernameMegaphone i18n={i18n} {...megaphone} />;
   }
 
+  const isFullSize = containerWidthBreakpoint !== WidthBreakpoint.Narrow;
+
   if (megaphone.type === MegaphoneType.Remote) {
     return (
       <RemoteMegaphone
         {...megaphone}
         i18n={i18n}
-        isFullSize={containerWidthBreakpoint !== WidthBreakpoint.Narrow}
+        isFullSize={isFullSize}
+        onClickNarrowMegaphone={expandNarrowLeftPane}
+      />
+    );
+  }
+
+  if (megaphone.type === MegaphoneType.PinReminder) {
+    return (
+      <PinReminderMegaphone
+        {...megaphone}
+        i18n={i18n}
+        isFullSize={isFullSize}
         onClickNarrowMegaphone={expandNarrowLeftPane}
       />
     );

@@ -8,11 +8,13 @@ import config from 'config';
 import { app } from 'electron';
 import { coerce, lt } from 'semver';
 
-import type { JSONVendorSchema } from './common.main.ts';
 import { Updater } from './common.main.ts';
 import { appRelaunch } from '../util/relaunch.main.ts';
 import { hexToBinary } from './signature.node.ts';
 import { DialogType } from '../types/Dialogs.std.ts';
+
+import type { JSONVendorSchema } from './common.main.ts';
+import type { CheckType } from './common.main.ts';
 
 export class LinuxAppImageUpdater extends Updater {
   #installing = false;
@@ -22,7 +24,9 @@ export class LinuxAppImageUpdater extends Updater {
   }
 
   protected async installUpdate(
-    updateFilePath: string
+    updateFilePath: string,
+    _isSilent: boolean,
+    checkType: CheckType
   ): Promise<() => Promise<void>> {
     const { logger } = this;
 
@@ -32,7 +36,7 @@ export class LinuxAppImageUpdater extends Updater {
         await this.#install(updateFilePath);
         this.#installing = true;
       } catch (error) {
-        this.markCannotUpdate(error);
+        this.markCannotUpdate(error, checkType);
 
         throw error;
       }
@@ -79,7 +83,10 @@ export class LinuxAppImageUpdater extends Updater {
     await chmod(appImageFile, 0o700);
   }
 
-  override checkSystemRequirements(vendor: JSONVendorSchema): boolean {
+  override checkSystemRequirements(
+    vendor: JSONVendorSchema,
+    checkType: CheckType
+  ): boolean {
     const { minGlibcVersion } = vendor;
     if (minGlibcVersion) {
       const parsedMinGlibcVersion = coerce(minGlibcVersion);
@@ -103,6 +110,7 @@ export class LinuxAppImageUpdater extends Updater {
         );
         this.markCannotUpdate(
           new Error('system glibc version missing or unparseable'),
+          checkType,
           DialogType.UnsupportedOS
         );
         return false;
@@ -115,6 +123,7 @@ export class LinuxAppImageUpdater extends Updater {
         );
         this.markCannotUpdate(
           new Error('yaml file has unsatisfied minGlibcVersion value'),
+          checkType,
           DialogType.UnsupportedOS
         );
         return false;

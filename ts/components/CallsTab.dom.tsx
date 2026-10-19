@@ -17,7 +17,6 @@ import type {
   ActiveCallStateType,
   PeekNotConnectedGroupCallType,
 } from '../state/ducks/calling.preload.ts';
-import type { UnreadStats } from '../util/countUnreadStats.std.ts';
 import type { getCallIdFromEra } from '../util/callDisposition.preload.ts';
 import type { CallLinkType } from '../types/CallLink.std.ts';
 import type { CallStateType } from '../state/selectors/calling.std.ts';
@@ -26,6 +25,7 @@ import { I18n } from './I18n.dom.tsx';
 import { AxoDropdownMenu } from '../axo/AxoDropdownMenu.dom.tsx';
 import type { SmartPropsType as SmartToastManagerPropsType } from '../state/smart/ToastManager.preload.tsx';
 import { AxoConfirmDialog } from '../axo/AxoConfirmDialog.dom.tsx';
+import type { NotifyWhileMuted } from '../util/notifyWhileMuted.std.ts';
 
 enum CallsTabSidebarView {
   CallsListView,
@@ -35,7 +35,7 @@ enum CallsTabSidebarView {
 type CallsTabProps = Readonly<{
   activeCall: ActiveCallStateType | undefined;
   allConversations: ReadonlyArray<ConversationType>;
-  otherTabsUnreadStats: UnreadStats;
+  otherTabsUnreadCount: number;
   getCallHistoryGroupsCount: (
     options: CallHistoryFilterOptions
   ) => Promise<number>;
@@ -49,6 +49,7 @@ type CallsTabProps = Readonly<{
   getCallLink: (id: string) => CallLinkType | undefined;
   getCallIdFromEra: typeof getCallIdFromEra;
   getConversation: (id: string) => ConversationType | void;
+  globalNotifyWhileMuted: NotifyWhileMuted;
   hangUpActiveCall: (reason: string) => void;
   hasAnyAdminCallLinks: boolean;
   hasFailedStorySends: boolean;
@@ -95,7 +96,7 @@ export type CallsTabSelectedView =
 export function CallsTab({
   activeCall,
   allConversations,
-  otherTabsUnreadStats,
+  otherTabsUnreadCount,
   getCallHistoryGroupsCount,
   getCallHistoryGroups,
   getCallIdFromEra,
@@ -104,6 +105,7 @@ export function CallsTab({
   getCall,
   getCallLink,
   getConversation,
+  globalNotifyWhileMuted,
   hangUpActiveCall,
   hasAnyAdminCallLinks,
   hasFailedStorySends,
@@ -205,7 +207,7 @@ export function CallsTab({
               ? i18n('icu:CallsTab__HeaderTitle--CallsList')
               : i18n('icu:CallsTab__HeaderTitle--NewCall')
           }
-          otherTabsUnreadStats={otherTabsUnreadStats}
+          otherTabsUnreadCount={otherTabsUnreadCount}
           hasFailedStorySends={hasFailedStorySends}
           hasPendingUpdate={hasPendingUpdate}
           navTabsCollapsed={navTabsCollapsed}
@@ -265,6 +267,7 @@ export function CallsTab({
               getCallIdFromEra={getCallIdFromEra}
               getCallLink={getCallLink}
               getConversation={getConversation}
+              globalNotifyWhileMuted={globalNotifyWhileMuted}
               hangUpActiveCall={hangUpActiveCall}
               i18n={i18n}
               selectedCallHistoryGroup={selectedView?.callHistoryGroup ?? null}

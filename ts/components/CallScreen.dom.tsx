@@ -15,10 +15,12 @@ import {
   useCallback,
   useLayoutEffect,
   useMemo,
+  useEffectEvent,
 } from 'react';
 import lodash from 'lodash';
 import classNames from 'classnames';
 import type { VideoFrameSource } from '@signalapp/ringrtc';
+import { tinykeys } from 'tinykeys';
 import type {
   BatchUserActionPayloadType,
   PendingUserActionPayloadType,
@@ -70,11 +72,7 @@ import {
   CallingAudioIndicator,
   SPEAKING_LINGER_MS,
 } from './CallingAudioIndicator.dom.tsx';
-import {
-  makeKeyboardShortcutHandler,
-  useActiveCallShortcuts,
-  useKeyboardShortcuts,
-} from '../hooks/useKeyboardShortcuts.dom.tsx';
+import { getControlOrAltKey } from '../hooks/useKeyboardShortcuts.dom.tsx';
 import { useValueAtFixedRate } from '../hooks/useValueAtFixedRate.std.ts';
 import { isReconnecting as callingIsReconnecting } from '../util/callingIsReconnecting.std.ts';
 import { usePreviousDeprecated } from '../hooks/usePrevious.std.ts';
@@ -269,9 +267,6 @@ export function CallScreen({
     switchFromPresentationView,
   });
 
-  const activeCallShortcuts = useActiveCallShortcuts(hangUpActiveCall);
-  useKeyboardShortcuts(activeCallShortcuts);
-
   const toggleAudio = useCallback(() => {
     setLocalAudio({
       enabled: !hasLocalAudio,
@@ -377,6 +372,7 @@ export function CallScreen({
   const [showSelfViewControls, setShowSelfViewControls] = useState(false);
   useEffect(() => {
     if (selfViewHover) {
+      // oxlint-disable-next-line react/set-state-in-effect
       setShowSelfViewControls(true);
       return;
     }
@@ -385,7 +381,12 @@ export function CallScreen({
       setShowSelfViewControls(false);
     }, 2000);
     return clearTimeout.bind(null, timer);
-  }, [showSelfViewControls, setShowSelfViewControls, selfViewHover]);
+  }, [
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
+    showSelfViewControls,
+    setShowSelfViewControls,
+    selfViewHover,
+  ]);
 
   useEffect(() => {
     if (!showReactionPicker) {
@@ -562,6 +563,7 @@ export function CallScreen({
 
     const existingAspectRatio = localPreviewWidth / localPreviewHeight;
     if (selfViewExpanded) {
+      // oxlint-disable-next-line react/set-state-in-effect
       setLocalPreviewHeight(LOCAL_PREVIEW_HEIGHT_LARGE);
       setLocalPreviewWidth(LOCAL_PREVIEW_HEIGHT_LARGE * existingAspectRatio);
     } else {
@@ -872,7 +874,14 @@ export function CallScreen({
         </div>
       );
     },
-    [i18n, localDemuxId, conversationsByDemuxId, toggleRaiseHand]
+    [
+      i18n,
+      // oxlint-disable-next-line react/preserve-manual-memoization
+      localDemuxId,
+      // oxlint-disable-next-line react/preserve-manual-memoization
+      conversationsByDemuxId,
+      toggleRaiseHand,
+    ]
   );
 
   const raisedHandsCount: number = raisedHands?.size ?? 0;
@@ -909,34 +918,68 @@ export function CallScreen({
     return null;
   }, [
     i18n,
+    // oxlint-disable-next-line react/preserve-manual-memoization
     isConnecting,
+    // oxlint-disable-next-line react/preserve-manual-memoization
     isRinging,
+    // oxlint-disable-next-line react/preserve-manual-memoization
     isConnected,
     activeCall.callMode,
     activeCall.joinedAt,
     isReconnecting,
     isGroupCall,
+    // oxlint-disable-next-line react/preserve-manual-memoization
     participantCount,
     hasLocalVideo,
     hasLocalAudio,
     toggleParticipants,
   ]);
 
-  useKeyboardShortcuts(
-    makeKeyboardShortcutHandler('v', { shift: true }, () => {
-      toggleVideo();
-      setShowControls(true);
-    }),
-    makeKeyboardShortcutHandler('m', { shift: true }, () => {
-      toggleAudio();
-      setShowControls(true);
-    }),
-    makeKeyboardShortcutHandler('h', { shift: true }, () => {
-      toggleRaiseHand();
-      setShowControls(true);
-    }),
-    makeKeyboardShortcutHandler('p', { shift: true }, toggleSelfViewExpanded)
+  const onHangUpActiveCallShortcut = useEffectEvent((event: KeyboardEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    hangUpActiveCall('Keyboard shortcut');
+  });
+
+  const onToggleVideoShortcut = useEffectEvent((event: KeyboardEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleVideo();
+    setShowControls(true);
+  });
+
+  const onToggleAudioShortcut = useEffectEvent((event: KeyboardEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleAudio();
+    setShowControls(true);
+  });
+
+  const onToggleRaiseHandShortcut = useEffectEvent((event: KeyboardEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleRaiseHand();
+    setShowControls(true);
+  });
+
+  const onToggleSelfViewExpandedShortcut = useEffectEvent(
+    (event: KeyboardEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleSelfViewExpanded();
+    }
   );
+
+  useEffect(() => {
+    const ControlOrAlt = getControlOrAltKey();
+    return tinykeys(window, {
+      [`${ControlOrAlt}+Shift+E`]: onHangUpActiveCallShortcut,
+      'Shift+V': onToggleVideoShortcut,
+      'Shift+M': onToggleAudioShortcut,
+      'Shift+H': onToggleRaiseHandShortcut,
+      'Shift+P': onToggleSelfViewExpandedShortcut,
+    });
+  }, []);
 
   let remoteParticipantsElement: ReactNode;
   switch (activeCall.callMode) {
@@ -1010,6 +1053,7 @@ export function CallScreen({
   }
 
   return (
+    // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       className={classNames(
         'module-calling__container',
@@ -1361,6 +1405,7 @@ function useViewModeChangedToast({
     showToast,
     hideToast,
     i18n,
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
     activeCall,
     viewMode,
     previousViewMode,
@@ -1405,6 +1450,7 @@ function useReactionsToast(props: UseReactionsToastType): void {
   const { showToast } = useCallingToasts();
 
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect react/no-deriving-state-in-effects
     setPreviousReactions(reactions);
   }, [reactions]);
 

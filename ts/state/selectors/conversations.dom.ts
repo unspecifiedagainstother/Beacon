@@ -58,8 +58,10 @@ import {
 } from './user.std.ts';
 import {
   getBadgeCountMutedConversations,
+  getGlobalNotifyWhileMuted,
   getPinnedConversationIds,
   getStoriesEnabled,
+  getUnreadCountBadgeType,
 } from './items.dom.ts';
 import { createLogger } from '../../logging/log.std.ts';
 import { TimelineMessageLoadingState } from '../../util/timelineUtil.std.ts';
@@ -85,6 +87,8 @@ import {
 import {
   countAllChatFoldersUnreadStats,
   countAllConversationsUnreadStats,
+  getUnreadCallsCount,
+  getUnreadCountForBadge,
 } from '../../util/countUnreadStats.std.ts';
 import type { AllChatFoldersMutedStats } from '../../util/countMutedStats.std.ts';
 import { countAllChatFoldersMutedStats } from '../../util/countMutedStats.std.ts';
@@ -92,7 +96,7 @@ import { getActiveProfile } from './notificationProfiles.dom.ts';
 import type { PinnedMessage } from '../../types/PinnedMessage.std.ts';
 import { getPinnedMessagesLimit } from '../../util/pinnedMessages.dom.ts';
 import { getSelectedConversationId, getSelectedNavTab } from './nav.std.ts';
-import { getCallHistoryUnreadCount } from './callHistory.std.ts';
+import { getCallHistoryUnreadCountsByConversationId } from './callHistory.std.ts';
 import { NavTab } from '../../types/Nav.std.ts';
 import { ReadStatus } from '../../messages/MessageReadStatus.std.ts';
 import type { Emoji } from '../../axo/emoji.std.ts';
@@ -198,23 +202,25 @@ export const getSafeConversationWithSameTitle = createSelector(
 export type TargetedMessageType = {
   id: string;
   counter: number;
+  source: TargetedMessageSource | null;
 };
 export const getTargetedMessage = createSelector(
   getConversations,
-  (state: ConversationsStateType): TargetedMessageType | undefined => {
+  (state: ConversationsStateType): TargetedMessageType | null => {
     if (!state.targetedMessage) {
-      return undefined;
+      return null;
     }
 
     return {
       id: state.targetedMessage,
       counter: state.targetedMessageCounter,
+      source: state.targetedMessageSource,
     };
   }
 );
 export const getTargetedMessageSource = createSelector(
   getConversations,
-  (state: ConversationsStateType): TargetedMessageSource | undefined => {
+  (state: ConversationsStateType): TargetedMessageSource | null => {
     return state.targetedMessageSource;
   }
 );
@@ -451,38 +457,46 @@ export const _getLeftPaneLists = ({
   const pinnedConversationIdsSet = new Set(pinnedConversationIds);
 
   for (let conversation of Object.values(conversationLookup)) {
-    if (
-      !_shouldIncludeInChatFolder(
-        conversation,
-        selectedChatFolder,
-        stableSelectedConversationIdInChatFolder
-      )
-    ) {
-      continue;
-    }
+    const isSelected = selectedConversationId === conversation.id;
 
-    if (selectedConversationId === conversation.id) {
+    if (isSelected) {
       conversation = {
         ...conversation,
         isSelected: true,
       };
     }
 
-    // We always show pinned conversations
-    if (
-      conversation.isPinned &&
-      pinnedConversationIdsSet.has(conversation.id)
-    ) {
+    const isPinned =
+      conversation.isPinned && pinnedConversationIdsSet.has(conversation.id);
+
+    const matchesChatFolder = _shouldIncludeInChatFolder(
+      conversation,
+      selectedChatFolder,
+      stableSelectedConversationIdInChatFolder
+    );
+
+    if (isPinned && matchesChatFolder) {
       pinnedConversations.push(conversation);
       continue;
     }
 
-    if (conversation.activeAt) {
-      if (conversation.isArchived) {
-        archivedConversations.push(conversation);
-      } else {
-        conversations.push(conversation);
-      }
+    const isActive =
+      conversation.activeAt != null && conversation.activeAt !== 0;
+
+    if (!isActive) {
+      continue;
+    }
+
+    const isArchived = conversation.isArchived ?? false;
+
+    // ignore current chat folder
+    if (isArchived) {
+      archivedConversations.push(conversation);
+      continue;
+    }
+
+    if (matchesChatFolder) {
+      conversations.push(conversation);
     }
   }
 
@@ -733,6 +747,11 @@ export const getAllComposableConversations = createSelector(
     )
 );
 
+export const getAllConversationsForNotificationProfiles = createSelector(
+  getAllComposableConversations,
+  conversations => conversations.filter(convo => !convo.isMe)
+);
+
 export const getAllGroupsWithInviteAccess = createSelector(
   getConversationLookup,
   (conversationLookup: ConversationLookupType): Array<ConversationType> =>
@@ -764,22 +783,14 @@ export const getAllChatFoldersUnreadStats: StateSelector<AllChatFoldersUnreadSta
   createSelector(
     getCurrentChatFolders,
     getAllConversations,
-    getBadgeCountMutedConversations,
     getActiveProfile,
-    (
-      currentChatFolders,
-      allConversations,
-      badgeCountMutedConversations,
-      activeProfile
-    ) => {
+    (currentChatFolders, allConversations, activeProfile) => {
       return countAllChatFoldersUnreadStats(
         currentChatFolders,
         allConversations,
         {
           activeProfile,
-          includeMuted: badgeCountMutedConversations
-            ? 'setting-on'
-            : 'setting-off',
+          includeMuted: 'force-include',
         }
       );
     }
@@ -1505,42 +1516,61 @@ const getStoriesNotificationCount = createSelector(
   }
 );
 
-export const getOtherTabsUnreadStats = createSelector(
+export const getCallHistoryUnreadCount: StateSelector<number> = createSelector(
+  getCallHistoryUnreadCountsByConversationId,
+  getConversationLookup,
+  getBadgeCountMutedConversations,
+  getGlobalNotifyWhileMuted,
+  getActiveProfile,
+  (
+    unreadCountsByConversationId,
+    conversationLookup,
+    badgeCountMutedConversations,
+    globalNotifyWhileMuted,
+    activeProfile
+  ) => {
+    return getUnreadCallsCount({
+      unreadCountsByConversationId,
+      conversationLookup,
+      badgeCountMutedConversations,
+      globalNotifyWhileMuted,
+      activeProfile,
+    });
+  }
+);
+
+export const getOtherTabsUnreadCount = createSelector(
   getSelectedNavTab,
   getAllConversationsUnreadStats,
+  getUnreadCountBadgeType,
   getCallHistoryUnreadCount,
   getStoriesNotificationCount,
   (
     selectedNavTab,
     conversationsUnreadStats,
+    unreadCountBadgeType,
     callHistoryUnreadCount,
     storiesNotificationCount
-  ): UnreadStats => {
-    let unreadCount = 0;
-    let unreadMentionsCount = 0;
-    let readChatsMarkedUnreadCount = 0;
+  ): number => {
+    let count = 0;
 
     if (selectedNavTab !== NavTab.Chats) {
-      unreadCount += conversationsUnreadStats.unreadCount;
-      unreadMentionsCount += conversationsUnreadStats.unreadMentionsCount;
-      readChatsMarkedUnreadCount +=
-        conversationsUnreadStats.readChatsMarkedUnreadCount;
+      count += getUnreadCountForBadge(
+        conversationsUnreadStats,
+        unreadCountBadgeType
+      );
     }
 
     // Note: Conversation unread stats includes the call history unread count.
     if (selectedNavTab !== NavTab.Calls) {
-      unreadCount += callHistoryUnreadCount;
+      count += callHistoryUnreadCount;
     }
 
     if (selectedNavTab !== NavTab.Stories) {
-      unreadCount += storiesNotificationCount;
+      count += storiesNotificationCount;
     }
 
-    return {
-      unreadCount,
-      unreadMentionsCount,
-      readChatsMarkedUnreadCount,
-    };
+    return count;
   }
 );
 
