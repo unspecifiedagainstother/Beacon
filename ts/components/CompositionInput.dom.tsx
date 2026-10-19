@@ -518,6 +518,11 @@ export function CompositionInput(props: Props): ReactElement {
       return false;
     }
 
+    // Beacon: a slash command runs instead of being sent as text.
+    if (commandCompletionRef.current?.handleEnter()) {
+      return false;
+    }
+
     if (propsRef.current.large) {
       return true;
     }
@@ -547,6 +552,10 @@ export function CompositionInput(props: Props): ReactElement {
 
     if (mentionCompletion.results.length) {
       mentionCompletion.completeMention();
+      return false;
+    }
+
+    if (commandCompletionRef.current?.handleTab()) {
       return false;
     }
 
@@ -793,7 +802,7 @@ export function CompositionInput(props: Props): ReactElement {
       }
 
       if (commandCompletion !== undefined) {
-        commandCompletion.reset();
+        commandCompletion.destroy();
       }
     },
     []

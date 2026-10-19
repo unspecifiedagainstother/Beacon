@@ -13,6 +13,7 @@ import { isAciString } from './isAciString.std.ts';
 import { eraseMessageContents } from './cleanup.preload.ts';
 import { notificationService } from '../services/notifications.preload.ts';
 import { DataWriter } from '../sql/Client.preload.ts';
+import { applyBeaconFilter } from '../beacon/core/filters.std.ts';
 
 const log = createLogger('deleteForEveryone');
 
@@ -122,7 +123,13 @@ export async function applyDeleteForEveryone(
     if (del.isAdminDelete) {
       additionalProps.deletedForEveryoneByAdminAci = del.deleteSentByAci;
     }
-    await eraseMessageContents(message, 'delete-for-everyone', additionalProps);
+    // Beacon: let addons (message logger) retain data across the erase.
+    const erasedProps = applyBeaconFilter(
+      'message.deleteForEveryone',
+      additionalProps,
+      { message: message.attributes, isAdminDelete: del.isAdminDelete }
+    );
+    await eraseMessageContents(message, 'delete-for-everyone', erasedProps);
 
     if (shouldPersist) {
       // We delete the message first, before re-saving it -- this causes any foreign key

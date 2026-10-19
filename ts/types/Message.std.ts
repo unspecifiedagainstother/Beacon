@@ -36,6 +36,8 @@ const messageAttributesEraseBehavior: Record<
   sent_at: 'preserve',
   received_at: 'preserve',
 
+  // Beacon: message-logger snapshot; written as part of the erase itself.
+  beaconDeleted: 'preserve',
   canReplyToStory: 'preserve',
   deletedForEveryone: 'preserve',
   deletedForEveryoneByAdminAci: 'preserve',

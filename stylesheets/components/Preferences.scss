@@ -241,6 +241,10 @@
       @include preferences-icon('../images/icons/v3/tune/tune.svg');
     }
 
+    &--beacon-modules {
+      @include preferences-icon('../images/icons/v3/grid/grid.svg');
+    }
+
     &--internal {
       @include preferences-icon('../images/icons/v3/internal/internal.svg');
     }

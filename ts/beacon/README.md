@@ -12,6 +12,17 @@ Two systems live side by side:
   with hooks, action interception, patching, commands, and live
   enable/disable.
 
+## Running
+
+```sh
+scripts/beacon/start.sh --staging   # build if sources changed, then launch
+scripts/beacon/start.sh --help      # --prod, --build, --no-build, --debug
+```
+
+Works from the host (re-enters the `mollydesk` distrobox), installs
+dependencies and a pnpm shim on first run, and rebuilds only when something
+under `ts/`, `stylesheets/`, `_locales/` or `protos/` is newer than the bundle.
+
 ## Adding a toggle setting
 
 Two steps.

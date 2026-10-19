@@ -11,10 +11,13 @@
 
 import type { Store } from 'redux';
 import type { StateType } from '../../state/reducer.preload.ts';
-import type { ReadonlyMessageAttributesType } from '../../model-types.d.ts';
+import type {
+  MessageAttributesType,
+  ReadonlyMessageAttributesType,
+} from '../../model-types.d.ts';
 
 // ---------------------------------------------------------------------------
-// Hooks
+// Hooks — fire-and-forget notifications
 // ---------------------------------------------------------------------------
 
 /**
@@ -29,12 +32,12 @@ export type HookPayloads = {
   onActionDispatched: [action: { type: string; payload?: unknown }];
   /** Fired after every Redux action has been reduced. */
   onStateChanged: [info: { action: { type: string }; state: StateType }];
-  /** An incoming message was added to the timeline. */
+  /** A new incoming message was added to the timeline. */
   onMessageReceived: [
     message: ReadonlyMessageAttributesType,
     info: { conversationId: string; isNewMessage: boolean },
   ];
-  /** An outgoing message was added to the timeline. */
+  /** A new outgoing message was added to the timeline. */
   onMessageSent: [
     message: ReadonlyMessageAttributesType,
     info: { conversationId: string; isNewMessage: boolean },
@@ -42,22 +45,34 @@ export type HookPayloads = {
   /** An existing message's attributes changed (edit, status, reactions...). */
   onMessageChanged: [
     message: ReadonlyMessageAttributesType,
-    info: { id: string; conversationId: string },
+    info: {
+      id: string;
+      conversationId: string;
+      /** Attributes before the change, if the message was loaded in Redux. */
+      previous: ReadonlyMessageAttributesType | undefined;
+    },
   ];
-  /** A message was removed from the timeline. */
+  /**
+   * A message gained a new revision. `message.editHistory[0]` is the new
+   * revision; `previous` holds what it said before.
+   */
+  onMessageEdited: [
+    message: ReadonlyMessageAttributesType,
+    info: {
+      conversationId: string;
+      previous: ReadonlyMessageAttributesType | undefined;
+    },
+  ];
+  /** A message flipped to deletedForEveryone (remote or local delete). */
+  onMessageDeletedForEveryone: [
+    message: ReadonlyMessageAttributesType,
+    info: {
+      conversationId: string;
+      previous: ReadonlyMessageAttributesType | undefined;
+    },
+  ];
+  /** A message was removed from the timeline (delete for me, expiry...). */
   onMessageDeleted: [info: { id: string; conversationId: string }];
-  /** A reaction was added to a message. */
-  onReactionAdded: [
-    reaction: { emoji: string; timestamp: number },
-    message: ReadonlyMessageAttributesType,
-    info: { conversationId: string },
-  ];
-  /** A reaction was removed from a message. */
-  onReactionRemoved: [
-    reaction: { emoji: string },
-    message: ReadonlyMessageAttributesType,
-    info: { conversationId: string },
-  ];
   /** The user targeted (opened) a conversation. undefined = closed. */
   onConversationSelected: [conversationId: string | undefined];
   /** Theme flipped between light/dark/system resolution. */
@@ -74,6 +89,55 @@ export type HookFn<Name extends HookName = HookName> = (
 export type Disposer = () => void;
 
 // ---------------------------------------------------------------------------
+// Filters — synchronous, value-transforming hook points inside upstream code
+// ---------------------------------------------------------------------------
+
+/**
+ * Filters are the "patch points" Beacon adds to upstream code. Each is a
+ * single call site in an upstream file that passes a value through every
+ * registered filter, waterfall style, and uses the result. Unlike hooks they
+ * run synchronously and their return value matters.
+ *
+ * Shape: [value, context]. A filter receives both and returns the (possibly
+ * replaced) value. Returning undefined keeps the value unchanged.
+ */
+export type FilterPayloads = {
+  /**
+   * ts/util/deleteForEveryone.preload.ts — attributes merged into a message
+   * when a delete-for-everyone erases it. Add fields to retain data; the
+   * message JSON lives in the encrypted SQLCipher DB.
+   */
+  'message.deleteForEveryone': [
+    value: Partial<MessageAttributesType>,
+    context: {
+      message: ReadonlyMessageAttributesType;
+      isAdminDelete: boolean;
+    },
+  ];
+  /**
+   * ts/services/notifications.preload.ts — whether to show a desktop
+   * notification. Return false to suppress it.
+   */
+  'notification.show': [
+    value: boolean,
+    context: {
+      conversationId: string;
+      messageId: string;
+      message: string;
+      senderTitle: string;
+      type: string;
+    },
+  ];
+};
+
+export type FilterName = keyof FilterPayloads;
+
+export type FilterFn<Name extends FilterName = FilterName> = (
+  value: FilterPayloads[Name][0],
+  context: FilterPayloads[Name][1]
+) => FilterPayloads[Name][0] | undefined;
+
+// ---------------------------------------------------------------------------
 // Action interception
 // ---------------------------------------------------------------------------
 
@@ -87,37 +151,24 @@ export type Disposer = () => void;
 export type ActionInterceptor = (action: {
   type: string;
   payload?: unknown;
-}) => { type: string; payload?: unknown } | null;
+}) => { type: string; payload?: unknown } | null | undefined;
 
-// ---------------------------------------------------------------------------
-// Message/notification interception
-// ---------------------------------------------------------------------------
-
-/**
- * Filter or transform messages before render.
- * Return modified message or null to hide it.
- */
-export type MessageInterceptor = (
-  message: ReadonlyMessageAttributesType
-) => ReadonlyMessageAttributesType | null;
-
-/**
- * Suppress notifications by type.
- * Return true to block the notification.
- */
-export type NotificationInterceptor = (info: {
-  title: string;
-  body?: string;
-  tag?: string;
-  urgency?: 'low' | 'normal' | 'high';
-}) => boolean;
+/** Return true to block the notification. */
+export type NotificationInterceptor = (
+  info: FilterPayloads['notification.show'][1]
+) => boolean;
 
 // ---------------------------------------------------------------------------
 // Patcher
 // ---------------------------------------------------------------------------
 
-export type PatchCallbackBefore = (args: Array<unknown>) => Array<unknown> | void;
-export type PatchCallbackAfter = (result: unknown, args: Array<unknown>) => unknown;
+export type PatchCallbackBefore = (
+  args: Array<unknown>
+) => Array<unknown> | void;
+export type PatchCallbackAfter = (
+  result: unknown,
+  args: Array<unknown>
+) => unknown;
 export type PatchCallbackInstead = (
   args: Array<unknown>,
   original: (...a: Array<unknown>) => unknown
@@ -125,19 +176,11 @@ export type PatchCallbackInstead = (
 
 export type Patcher = {
   /** Run cb before the original; return a new args array to rewrite them. */
-  before: (
-    obj: object,
-    method: string,
-    cb: PatchCallbackBefore
-  ) => Disposer;
-  /** Run cb after the original; return value replaces the result. */
+  before: (obj: object, method: string, cb: PatchCallbackBefore) => Disposer;
+  /** Run cb after the original; a non-undefined return replaces the result. */
   after: (obj: object, method: string, cb: PatchCallbackAfter) => Disposer;
   /** Replace the original entirely; cb receives it to call (or not). */
-  instead: (
-    obj: object,
-    method: string,
-    cb: PatchCallbackInstead
-  ) => Disposer;
+  instead: (obj: object, method: string, cb: PatchCallbackInstead) => Disposer;
   /** Remove every patch this patcher instance created. */
   unpatchAll: () => void;
 };
@@ -156,7 +199,7 @@ export type CommandContext = {
   /** Insert text into the composer at the cursor. */
   insertText: (text: string) => void;
   /** Show the result to the user without touching the composer. */
-  reply: (text: string) => void;
+  reply: (text: string, type?: ToastType) => void;
 };
 
 export type CommandDefinition = {
@@ -164,6 +207,8 @@ export type CommandDefinition = {
   name: string;
   description?: string;
   usage?: string;
+  /** Set by the platform: the addon that registered it (undefined = core). */
+  addonId?: string;
   execute: (ctx: CommandContext) => void | Promise<void>;
 };
 
@@ -171,9 +216,13 @@ export type CommandDefinition = {
 // UI
 // ---------------------------------------------------------------------------
 
+export type ToastType = 'info' | 'warning' | 'error' | 'success';
+
 export type ModalOptions = {
   title: string;
   content: string | HTMLElement;
+  /** 'wide' for list/log viewers. */
+  size?: 'normal' | 'wide';
   actions?: Array<{
     label: string;
     onClick: () => void | Promise<void>;
@@ -189,34 +238,60 @@ export type ModalAPI = {
   addAction: (action: NonNullable<ModalOptions['actions']>[0]) => void;
 };
 
-export type AddonSettingDefinition = {
-  key: string;
-  label: string;
-  description?: string;
-  type: 'toggle' | 'text' | 'number' | 'select';
-  defaultValue: boolean | string | number;
-  options?: Array<{ label: string; value: string | number }>;
-};
-
 export type UIElementOptions = {
   tag: string;
   className?: string;
   id?: string;
   text?: string;
-  html?: string;
-  children?: Array<HTMLElement>;
-  onClick?: () => void;
+  children?: Array<HTMLElement | string>;
+  onClick?: (ev: MouseEvent) => void;
   attrs?: Record<string, string>;
 };
+
+// ---------------------------------------------------------------------------
+// Settings
+// ---------------------------------------------------------------------------
+
+type SettingBase = {
+  key: string;
+  label: string;
+  description?: string;
+};
+
+/**
+ * Declared on the manifest so Settings → Beacon → Modules can render the
+ * controls whether or not the addon is running.
+ */
+export type AddonSettingDefinition =
+  | (SettingBase & { type: 'toggle'; defaultValue: boolean })
+  | (SettingBase & {
+      type: 'text';
+      defaultValue: string;
+      placeholder?: string;
+      multiline?: boolean;
+    })
+  | (SettingBase & {
+      type: 'number';
+      defaultValue: number;
+      min?: number;
+      max?: number;
+    })
+  | (SettingBase & {
+      type: 'select';
+      defaultValue: string;
+      options: Array<{ label: string; value: string }>;
+    });
+
+export type AddonSettingValue = boolean | string | number;
 
 // ---------------------------------------------------------------------------
 // Addon context — what start() receives
 // ---------------------------------------------------------------------------
 
 /**
- * Everything registered through the context (hooks, patches, listeners,
- * styles, commands, keybinds) is tracked and torn down automatically when the
- * addon is disabled. No reload needed.
+ * Everything registered through the context (hooks, filters, patches,
+ * listeners, styles, commands, keybinds) is tracked and torn down
+ * automatically when the addon is disabled. No reload needed.
  */
 export type AddonContext = {
   readonly id: string;
@@ -228,6 +303,11 @@ export type AddonContext = {
   /** Typed event hooks. Auto-disposed. */
   hooks: {
     on: <Name extends HookName>(name: Name, fn: HookFn<Name>) => Disposer;
+  };
+
+  /** Value-transforming patch points in upstream code. Auto-disposed. */
+  filters: {
+    add: <Name extends FilterName>(name: Name, fn: FilterFn<Name>) => Disposer;
   };
 
   /** Monkey-patcher scoped to this addon. Auto-unpatched. */
@@ -251,12 +331,7 @@ export type AddonContext = {
     intercept: (type: string, interceptor: ActionInterceptor) => Disposer;
   };
 
-  /** Filter or transform messages before render. Return null to hide. */
-  messages: {
-    intercept: (interceptor: MessageInterceptor) => Disposer;
-  };
-
-  /** Suppress notifications by type or content. */
+  /** Sugar over the 'notification.show' filter. */
   notifications: {
     intercept: (interceptor: NotificationInterceptor) => Disposer;
   };
@@ -276,9 +351,9 @@ export type AddonContext = {
   dom: {
     query: (selector: string) => Element | null;
     queryAll: (selector: string) => Array<Element>;
-    on: <K extends keyof DocumentEventMap>(
+    on: (
       target: EventTarget,
-      type: K | string,
+      type: string,
       fn: (ev: Event) => void,
       options?: AddEventListenerOptions
     ) => Disposer;
@@ -287,9 +362,11 @@ export type AddonContext = {
   /** Inject a stylesheet; removed on disable (and by the disposer). */
   css: {
     inject: (cssText: string) => Disposer;
+    /** Toggle a class on <body> while the addon runs. */
+    bodyClass: (className: string) => Disposer;
   };
 
-  /** Keyboard shortcuts, e.g. 'ctrl+shift+f'. Auto-disposed. */
+  /** Keyboard shortcuts, e.g. 'mod+shift+f'. Auto-disposed. */
   keybinds: {
     register: (combo: string, fn: (ev: KeyboardEvent) => void) => Disposer;
   };
@@ -297,20 +374,20 @@ export type AddonContext = {
   ui: {
     createModal: (options: ModalOptions) => ModalAPI;
     createElement: (options: UIElementOptions) => HTMLElement;
-    showNotification: (
-      text: string,
-      type?: 'info' | 'warning' | 'error' | 'success'
-    ) => void;
+    showNotification: (text: string, type?: ToastType) => void;
   };
 
   /** Slash commands. Auto-unregistered on disable. */
   commands: {
-    register: (command: CommandDefinition) => Disposer;
+    register: (command: Omit<CommandDefinition, 'addonId'>) => Disposer;
     list: () => Array<CommandDefinition>;
     execute: (commandId: string, argsRaw?: string) => Promise<void>;
   };
 
-  /** Per-addon persistent storage (localStorage-backed). */
+  /**
+   * Per-addon persistent KV (localStorage-backed, NOT encrypted at rest).
+   * Never put message content or other secrets here.
+   */
   storage: {
     get: <T = unknown>(key: string) => T | undefined;
     set: (key: string, value: unknown) => void;
@@ -318,11 +395,12 @@ export type AddonContext = {
     keys: () => Array<string>;
   };
 
-  /** Addon settings appear in Preferences under addon name. */
+  /** Values for the settings declared on the manifest. */
   settings: {
-    register: (defs: Array<AddonSettingDefinition>) => Disposer;
-    get: <T = unknown>(key: string) => T | undefined;
-    set: (key: string, value: unknown) => void;
+    get: <T extends AddonSettingValue = AddonSettingValue>(key: string) => T;
+    set: (key: string, value: AddonSettingValue) => void;
+    /** Fires on any change, including edits from the Settings page. */
+    onChange: (fn: (key: string, value: AddonSettingValue) => void) => Disposer;
   };
 
   /** Plain fetch. Requests leave the machine — respect the user's proxy. */
@@ -338,14 +416,35 @@ export type AddonContext = {
 // Manifest
 // ---------------------------------------------------------------------------
 
+/** What the loader reports about an addon (Settings page, /addons, console). */
+export type AddonInfo = {
+  id: string;
+  name: string;
+  version?: string;
+  description?: string;
+  authors: Array<string>;
+  tags: Array<string>;
+  enabled: boolean;
+  /** Message from the last failed start(), cleared on success. */
+  error?: string;
+  settings: Array<AddonSettingDefinition>;
+  /** Live registrations — only populated while enabled. */
+  commands: Array<{ id: string; usage?: string; description?: string }>;
+  keybinds: Array<string>;
+};
+
 export type AddonManifest = {
   id: string;
   name: string;
   version?: string;
   description?: string;
   authors?: Array<string>;
+  /** Free-form labels shown as chips, e.g. 'privacy', 'chat', 'utility'. */
+  tags?: Array<string>;
   /** Enabled state for a fresh profile. Keep false unless you mean it. */
   defaultEnabled?: boolean;
+  /** User-facing settings, rendered in Settings → Beacon → Modules. */
+  settings?: Array<AddonSettingDefinition>;
   /** Called when the addon is enabled (at startup or live from settings). */
   start: (ctx: AddonContext) => void | Promise<void>;
   /**

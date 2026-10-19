@@ -19,6 +19,7 @@ import type { LocalizerType } from '../types/Util.std.ts';
 import { NotificationType } from '../types/notifications.std.ts';
 import { drop } from '../util/drop.std.ts';
 import type { Emoji } from '../axo/emoji.std.ts';
+import { applyBeaconFilter } from '../beacon/core/filters.std.ts';
 
 const { debounce } = lodash;
 
@@ -144,6 +145,18 @@ class NotificationService extends EventEmitter {
    * which doesn't check permissions, do any filtering, etc.
    */
   public add(notificationData: Omit<NotificationDataType, 'wasShown'>): void {
+    // Beacon: addons may suppress a notification (see notification-filter).
+    if (
+      !applyBeaconFilter('notification.show', true, {
+        conversationId: notificationData.conversationId,
+        messageId: notificationData.messageId,
+        message: notificationData.message,
+        senderTitle: notificationData.senderTitle,
+        type: notificationData.type,
+      })
+    ) {
+      return;
+    }
     log.info(
       'NotificationService: adding a notification and requesting an update'
     );

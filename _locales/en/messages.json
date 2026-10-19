@@ -11614,7 +11614,7 @@
     "description": "Release notes for 8.20"
   },
   "icu:Beacon__modules-description": {
-    "messageformat": "Manage installed Beacon addons. See addons.md for how to create them.",
+    "messageformat": "Addons extend Beacon with extra features. Changes apply immediately, no restart needed.",
     "description": "Description of the Beacon modules page"
   },
   "icu:Beacon__modules-empty": {
@@ -11648,6 +11648,54 @@
   "icu:Preferences__button--beacon-modules": {
     "messageformat": "Modules",
     "description": "Left nav button for Beacon modules (addons)"
+  },
+  "icu:Beacon__modules-search": {
+    "messageformat": "Search addons",
+    "description": "Placeholder for the addon search box on the Beacon modules page"
+  },
+  "icu:Beacon__modules-filter-all": {
+    "messageformat": "All",
+    "description": "Filter on the Beacon modules page: show every addon"
+  },
+  "icu:Beacon__modules-filter-enabled": {
+    "messageformat": "Enabled",
+    "description": "Filter on the Beacon modules page: show enabled addons"
+  },
+  "icu:Beacon__modules-filter-disabled": {
+    "messageformat": "Disabled",
+    "description": "Filter on the Beacon modules page: show disabled addons"
+  },
+  "icu:Beacon__modules-count": {
+    "messageformat": "{enabled, number} of {total, number} enabled",
+    "description": "Summary on the Beacon modules page"
+  },
+  "icu:Beacon__modules-no-matches": {
+    "messageformat": "No addons match your search.",
+    "description": "Shown when the addon search has no results"
+  },
+  "icu:Beacon__modules-settings": {
+    "messageformat": "Settings",
+    "description": "Button that expands an addon's settings"
+  },
+  "icu:Beacon__modules-reset": {
+    "messageformat": "Reset to defaults",
+    "description": "Button that resets an addon's settings"
+  },
+  "icu:Beacon__modules-commands": {
+    "messageformat": "Commands",
+    "description": "Heading for the slash commands an addon provides"
+  },
+  "icu:Beacon__modules-shortcuts": {
+    "messageformat": "Shortcuts",
+    "description": "Heading for the keyboard shortcuts an addon provides"
+  },
+  "icu:Beacon__modules-error": {
+    "messageformat": "Failed to start: {message}",
+    "description": "Shown on an addon card when the addon threw while starting"
+  },
+  "icu:Beacon__modules-toggle": {
+    "messageformat": "Enable {name}",
+    "description": "Accessible label for the switch that enables or disables an addon"
   },
   "icu:Beacon__modules-title": {
     "messageformat": "Modules",

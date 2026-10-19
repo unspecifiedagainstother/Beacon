@@ -7,10 +7,10 @@
  * Installed once in createStore. Gives addons:
  *  - interception: rewrite or cancel any action before reducers run
  *  - onActionDispatched / onStateChanged firehose hooks
- *  - derived high-level hooks (message received/sent/changed/deleted,
- *    conversation selected, theme changed) — real payloads straight from the
- *    actions the app itself dispatches, so there is nothing to poll and no
- *    DOM scraping.
+ *  - derived high-level hooks (message received/sent/changed/edited/
+ *    deleted, conversation selected, theme changed) — real payloads straight
+ *    from the actions the app itself dispatches, so there is nothing to poll
+ *    and no DOM scraping.
  *
  * Everything is guarded: a broken addon can never stall the dispatch chain.
  */
@@ -24,12 +24,7 @@ import {
   TARGETED_CONVERSATION_CHANGED,
 } from '../../state/ducks/conversations.preload.ts';
 import { createLogger } from '../../logging/log.std.ts';
-import type {
-  ActionInterceptor,
-  Disposer,
-  MessageInterceptor,
-  NotificationInterceptor,
-} from './types.dom.ts';
+import type { ActionInterceptor, Disposer } from './types.dom.ts';
 import type { HookBus } from './hook-bus.std.ts';
 
 const log = createLogger('beacon/middleware');
@@ -37,10 +32,8 @@ const log = createLogger('beacon/middleware');
 type InterceptorEntry = { type: string; interceptor: ActionInterceptor };
 
 const actionInterceptors = new Set<InterceptorEntry>();
-const messageInterceptors = new Set<MessageInterceptor>();
-const notificationInterceptors = new Set<NotificationInterceptor>();
 
-let actionCount = 0;
+let bus: HookBus | undefined;
 
 export function registerActionInterceptor(
   type: string,
@@ -53,138 +46,102 @@ export function registerActionInterceptor(
   };
 }
 
-export function registerMessageInterceptor(
-  interceptor: MessageInterceptor
-): Disposer {
-  messageInterceptors.add(interceptor);
-  return () => {
-    messageInterceptors.delete(interceptor);
-  };
-}
-
-export function registerNotificationInterceptor(
-  interceptor: NotificationInterceptor
-): Disposer {
-  notificationInterceptors.add(interceptor);
-  return () => {
-    notificationInterceptors.delete(interceptor);
-  };
-}
-
-export function runMessageInterceptors(
-  msg: unknown
-): ReadonlyMessageAttributesType | null {
-  let current = msg as ReadonlyMessageAttributesType;
-  for (const interceptor of messageInterceptors) {
-    if (current == null) {
-      break;
-    }
-    try {
-      const result = interceptor(current);
-      // oxlint-disable-next-line eqeqeq
-      if (result === null) {
-        return null;
-      }
-      current = result;
-    } catch (error) {
-      log.error('message interceptor error:', error);
-    }
-  }
-  return current;
-}
-
-export function runNotificationInterceptors(info: {
-  title: string;
-  body?: string;
-  tag?: string;
-  urgency?: string;
-}): boolean {
-  for (const interceptor of notificationInterceptors) {
-    try {
-      if (
-        interceptor(
-          info as {
-            title: string;
-            body?: string;
-            tag?: string;
-            urgency?: 'low' | 'normal' | 'high';
-          }
-        )
-      ) {
-        return true;
-      }
-    } catch (error) {
-      log.error('notification interceptor error:', error);
-    }
-  }
-  return false;
-}
-
-let bus: HookBus | undefined;
-
 /** Called by the runtime once the bus exists. */
 export function attachHookBus(hookBus: HookBus): void {
   bus = hookBus;
-  log.info('hook bus attached');
+}
+
+function isPlainAction(action: unknown): action is UnknownAction {
+  return (
+    typeof action === 'object' &&
+    action != null &&
+    'type' in action &&
+    typeof (action as { type: unknown }).type === 'string'
+  );
+}
+
+function lookupMessage(
+  state: StateType,
+  id: string
+): ReadonlyMessageAttributesType | undefined {
+  return state.conversations?.messagesLookup?.[id] as
+    | ReadonlyMessageAttributesType
+    | undefined;
 }
 
 function emitDerivedHooks(
+  hookBus: HookBus,
   action: UnknownAction,
   prevState: StateType,
   nextState: StateType
 ): void {
-  if (!bus) {
-    return;
-  }
-
   switch (action.type) {
     case 'MESSAGES_ADDED': {
-      const payload = action.payload as {
-        conversationId: string;
-        isNewMessage: boolean;
-        messages: ReadonlyArray<ReadonlyMessageAttributesType>;
-      };
+      const payload = action.payload as
+        | {
+            conversationId: string;
+            isNewMessage: boolean;
+            messages: ReadonlyArray<ReadonlyMessageAttributesType>;
+          }
+        | undefined;
       if (!payload?.isNewMessage) {
         break;
       }
+      const info = {
+        conversationId: payload.conversationId,
+        isNewMessage: payload.isNewMessage,
+      };
       for (const message of payload.messages) {
-        const info = {
-          conversationId: payload.conversationId,
-          isNewMessage: payload.isNewMessage,
-        };
         if (message.type === 'incoming') {
-          bus.emit('onMessageReceived', message, info);
+          hookBus.emit('onMessageReceived', message, info);
         } else if (message.type === 'outgoing') {
-          bus.emit('onMessageSent', message, info);
+          hookBus.emit('onMessageSent', message, info);
         }
       }
       break;
     }
     case MESSAGE_CHANGED: {
-      const payload = action.payload as {
-        id: string;
-        conversationId: string;
-        data: ReadonlyMessageAttributesType;
-      };
-      if (payload?.data) {
-        bus.emit('onMessageChanged', payload.data, {
-          id: payload.id,
-          conversationId: payload.conversationId,
+      const payload = action.payload as
+        | {
+            id: string;
+            conversationId: string;
+            data: ReadonlyMessageAttributesType;
+          }
+        | undefined;
+      if (!payload?.data) {
+        break;
+      }
+      const { id, conversationId, data } = payload;
+      const previous = lookupMessage(prevState, id);
+      hookBus.emit('onMessageChanged', data, { id, conversationId, previous });
+
+      const prevEdits = previous?.editHistory?.length ?? 0;
+      const nextEdits = data.editHistory?.length ?? 0;
+      // A first edit takes editHistory from undefined to [new, original].
+      if (nextEdits > prevEdits && nextEdits >= 2) {
+        hookBus.emit('onMessageEdited', data, { conversationId, previous });
+      }
+
+      if (data.deletedForEveryone && !previous?.deletedForEveryone) {
+        hookBus.emit('onMessageDeletedForEveryone', data, {
+          conversationId,
+          previous,
         });
       }
       break;
     }
     case MESSAGE_DELETED: {
-      const payload = action.payload as { id: string; conversationId: string };
+      const payload = action.payload as
+        | { id: string; conversationId: string }
+        | undefined;
       if (payload) {
-        log.info('emitting onMessageDeleted:', payload.id);
-        bus.emit('onMessageDeleted', payload);
+        hookBus.emit('onMessageDeleted', payload);
       }
       break;
     }
     case TARGETED_CONVERSATION_CHANGED: {
-      const payload = action.payload as { conversationId?: string };
-      bus.emit('onConversationSelected', payload?.conversationId);
+      const payload = action.payload as { conversationId?: string } | undefined;
+      hookBus.emit('onConversationSelected', payload?.conversationId);
       break;
     }
     default:
@@ -194,72 +151,63 @@ function emitDerivedHooks(
   const prevTheme = prevState.user?.theme;
   const nextTheme = nextState.user?.theme;
   if (prevTheme !== nextTheme && nextTheme != null) {
-    bus.emit('onThemeChanged', nextTheme);
+    hookBus.emit('onThemeChanged', nextTheme);
   }
 }
 
-export const beaconMiddleware: Middleware =
-  storeApi => next => rawAction => {
-    let action = rawAction as UnknownAction;
+export const beaconMiddleware: Middleware = storeApi => next => rawAction => {
+  // Thunks and promises pass through untouched — they come back here as plain
+  // actions once they dispatch.
+  if (!isPlainAction(rawAction)) {
+    return next(rawAction);
+  }
 
-    actionCount += 1;
-    if (actionCount % 100 === 0) {
-      log.info(`middleware active: ${actionCount} actions processed`);
+  let action = rawAction;
+
+  for (const entry of Array.from(actionInterceptors)) {
+    if (entry.type !== '*' && entry.type !== action.type) {
+      continue;
     }
-
-    // Interceptors only see plain actions; thunks/promises pass through
-    // untouched — addons wanting those can patch dispatch itself.
-    if (typeof action === 'object' && action != null && 'type' in action) {
-      for (const entry of Array.from(actionInterceptors)) {
-        if (entry.type !== '*' && entry.type !== action.type) {
-          continue;
-        }
-        try {
-          const result = entry.interceptor(
-            action as { type: string; payload?: unknown }
-          );
-          // null cancels; undefined (forgotten return) passes unchanged.
-          // oxlint-disable-next-line eqeqeq
-          if (result === null) {
-            return action; // cancelled — reducers never see it
-          }
-          if (result && typeof result.type === 'string') {
-            action = result as UnknownAction;
-          }
-        } catch (error) {
-          log.error('action interceptor error:', error);
-        }
+    try {
+      const result = entry.interceptor(
+        action as { type: string; payload?: unknown }
+      );
+      // null cancels; undefined (forgotten return) passes unchanged.
+      // oxlint-disable-next-line eqeqeq -- must not match undefined
+      if (result === null) {
+        return action; // cancelled — reducers never see it
       }
-
-      try {
-        if (!bus) {
-          log.warn('bus not attached, onActionDispatched not emitted');
-        } else {
-          bus.emit('onActionDispatched', {
-            type: action.type,
-            payload: (action as { payload?: unknown }).payload,
-          });
-        }
-      } catch (error) {
-        log.error('onActionDispatched emit error:', error);
+      if (result && typeof result.type === 'string') {
+        action = result as UnknownAction;
       }
+    } catch (error) {
+      log.error(`action interceptor for ${entry.type} threw:`, error);
     }
+  }
 
-    const prevState = storeApi.getState() as StateType;
-    const result = next(action);
-    const nextState = storeApi.getState() as StateType;
+  if (!bus) {
+    return next(action);
+  }
+  const hookBus = bus;
 
-    if (typeof action === 'object' && action != null && 'type' in action) {
-      try {
-        emitDerivedHooks(action, prevState, nextState);
-        bus?.emit('onStateChanged', {
-          action: { type: action.type },
-          state: nextState,
-        });
-      } catch (error) {
-        log.error('hook emission error:', error);
-      }
-    }
+  hookBus.emit('onActionDispatched', {
+    type: action.type,
+    payload: (action as { payload?: unknown }).payload,
+  });
 
-    return result;
-  };
+  const prevState = storeApi.getState() as StateType;
+  const result = next(action);
+  const nextState = storeApi.getState() as StateType;
+
+  try {
+    emitDerivedHooks(hookBus, action, prevState, nextState);
+    hookBus.emit('onStateChanged', {
+      action: { type: action.type },
+      state: nextState,
+    });
+  } catch (error) {
+    log.error('hook emission error:', error);
+  }
+
+  return result;
+};

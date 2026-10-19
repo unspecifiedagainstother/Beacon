@@ -11,11 +11,15 @@
 
 import type { Store } from 'redux';
 import type { StateType } from '../../state/reducer.preload.ts';
+import { NavTab, SettingsPage } from '../../types/Nav.std.ts';
 import { HookBus } from './hook-bus.std.ts';
 import { attachHookBus } from './middleware.preload.ts';
 import { addonLoader, type AddonLoader } from './loader.preload.ts';
 import { commandRegistry, type CommandRegistry } from './commands.dom.ts';
+import { addonSettings, type AddonSettingsStore } from './settings.std.ts';
+import { addBeaconFilter, applyBeaconFilter } from './filters.std.ts';
 import { createPatcher } from './patcher.std.ts';
+import { createElement, createModal } from './ui.dom.ts';
 import { createLogger } from '../../logging/log.std.ts';
 
 const log = createLogger('beacon/runtime');
@@ -24,8 +28,15 @@ export type BeaconGlobal = {
   hooks: HookBus;
   loader: AddonLoader;
   commands: CommandRegistry;
+  settings: AddonSettingsStore;
+  filters: {
+    add: typeof addBeaconFilter;
+    apply: typeof applyBeaconFilter;
+  };
   createPatcher: typeof createPatcher;
   store: Store<StateType>;
+  /** Jump to Settings → Beacon → Modules. */
+  openModules: () => void;
 };
 
 declare global {
@@ -39,73 +50,136 @@ export const hookBus = new HookBus();
 
 let initialized = false;
 
-export function initializeBeaconRuntime(store: Store<StateType>): void {
-  try {
-    log.info('initializeBeaconRuntime starting');
-    if (initialized) {
-      log.warn('already initialized, returning');
-      return;
-    }
-    initialized = true;
+function openModules(): void {
+  window.reduxActions?.nav.changeLocation({
+    tab: NavTab.Settings,
+    details: { page: SettingsPage.BeaconModules },
+  });
+}
 
-    log.info('attaching hook bus');
+export function initializeBeaconRuntime(store: Store<StateType>): void {
+  if (initialized) {
+    log.warn('initializeBeaconRuntime called twice, ignoring');
+    return;
+  }
+  initialized = true;
+
+  try {
+    purgeLegacyPlaintext();
     attachHookBus(hookBus);
-    log.info('registering builtin commands');
     registerBuiltinCommands();
 
-    log.info('setting window.Beacon');
     window.Beacon = {
       hooks: hookBus,
       loader: addonLoader,
       commands: commandRegistry,
+      settings: addonSettings,
+      filters: { add: addBeaconFilter, apply: applyBeaconFilter },
       /** Fresh patcher for console experiments; addons get their own. */
       createPatcher,
       store,
+      openModules,
     };
-    log.info('window.Beacon set successfully');
-
-    void (async () => {
-      try {
-        log.info('initializing addon loader');
-        await addonLoader.initialize(store, hookBus);
-        log.info('addon loader initialized, emitting onAppStart');
-        hookBus.emit('onAppStart');
-      } catch (error) {
-        log.error('addon loader initialization error:', error);
-      }
-    })();
   } catch (error) {
     log.error('initializeBeaconRuntime error:', error);
+    return;
   }
+
+  void (async () => {
+    try {
+      await addonLoader.initialize(store, hookBus);
+      hookBus.emit('onAppStart');
+    } catch (error) {
+      log.error('addon loader initialization error:', error);
+    }
+  })();
+}
+
+/**
+ * Message logger v2 kept message bodies in localStorage, which is not
+ * encrypted at rest. v3 stores retained content in the SQLCipher DB instead;
+ * delete what v2 left behind whether or not the addon is ever enabled again.
+ */
+function purgeLegacyPlaintext(): void {
+  for (const key of [
+    'beacon-addon-message-logger-log',
+    'beacon-addon-message-logger-deleted-ids',
+  ]) {
+    try {
+      if (localStorage.getItem(key) != null) {
+        localStorage.removeItem(key);
+        log.info(`removed legacy plaintext store ${key}`);
+      }
+    } catch {
+      // Storage unavailable — nothing to purge.
+    }
+  }
+}
+
+function renderCommandList(): HTMLElement {
+  const rows = commandRegistry.list().map(cmd =>
+    createElement({
+      tag: 'div',
+      className: 'BeaconList__row',
+      children: [
+        createElement({
+          tag: 'code',
+          className: 'BeaconList__code',
+          text: `/${cmd.id}${cmd.usage ? ` ${cmd.usage}` : ''}`,
+        }),
+        createElement({
+          tag: 'span',
+          className: 'BeaconList__meta',
+          text: cmd.description ?? cmd.name,
+        }),
+        ...(cmd.addonId
+          ? [
+              createElement({
+                tag: 'span',
+                className: 'BeaconChip',
+                text: cmd.addonId,
+              }),
+            ]
+          : []),
+      ],
+    })
+  );
+  return createElement({ tag: 'div', className: 'BeaconList', children: rows });
 }
 
 function registerBuiltinCommands(): void {
   commandRegistry.register({
     id: 'help',
     name: 'Help',
-    description: 'List available commands',
-    execute: ctx => {
-      const lines = commandRegistry
-        .list()
-        .map(c => `/${c.id}${c.usage ? ` ${c.usage}` : ''} — ${c.description || c.name}`)
-        .sort();
-      ctx.insertText(`Available commands:\n${lines.join('\n')}`);
+    description: 'List every available command',
+    execute: () => {
+      createModal({
+        title: 'Beacon commands',
+        content: renderCommandList(),
+        size: 'wide',
+      });
     },
   });
 
   commandRegistry.register({
     id: 'addons',
-    name: 'List addons',
-    description: 'Show all addons and their state',
-    execute: ctx => {
-      const lines = addonLoader
-        .list()
-        .map(a => `${a.enabled ? '●' : '○'} ${a.id} — ${a.description ?? a.name}`);
-      ctx.insertText(
-        lines.length ? `Addons:\n${lines.join('\n')}` : 'No addons registered.'
-      );
-    },
+    name: 'Addons',
+    description: 'Open Settings → Beacon → Modules',
+    execute: () => openModules(),
   });
+
+  const findAddon = (query: string | undefined) => {
+    if (!query) {
+      return undefined;
+    }
+    const q = query.toLowerCase();
+    const all = addonLoader.list();
+    return (
+      all.find(a => a.id === q) ??
+      all.find(a => a.name.toLowerCase() === q) ??
+      all.find(a => a.id.startsWith(q))
+    );
+  };
 
   commandRegistry.register({
     id: 'enable',
@@ -113,13 +187,22 @@ function registerBuiltinCommands(): void {
     usage: '<addon-id>',
     description: 'Enable an addon (takes effect immediately)',
     execute: async ctx => {
-      const [id] = ctx.args;
-      if (!id) {
-        ctx.reply('Usage: /enable <addon-id>');
+      const addon = findAddon(ctx.args[0]);
+      if (!addon) {
+        ctx.reply(
+          `Unknown addon. Try: ${addonLoader
+            .list()
+            .map(a => a.id)
+            .join(', ')}`,
+          'warning'
+        );
         return;
       }
-      const ok = await addonLoader.enable(id);
-      ctx.reply(ok ? `Enabled ${id}` : `Could not enable ${id}`);
+      const ok = await addonLoader.enable(addon.id);
+      ctx.reply(
+        ok ? `${addon.name} enabled` : `${addon.name} failed to start`,
+        ok ? 'success' : 'error'
+      );
     },
   });
 
@@ -129,13 +212,42 @@ function registerBuiltinCommands(): void {
     usage: '<addon-id>',
     description: 'Disable an addon (takes effect immediately)',
     execute: async ctx => {
-      const [id] = ctx.args;
-      if (!id) {
-        ctx.reply('Usage: /disable <addon-id>');
+      const addon = findAddon(ctx.args[0]);
+      if (!addon) {
+        ctx.reply('Unknown addon', 'warning');
         return;
       }
-      const ok = await addonLoader.disable(id);
-      ctx.reply(ok ? `Disabled ${id}` : `Could not disable ${id}`);
+      await addonLoader.disable(addon.id);
+      ctx.reply(`${addon.name} disabled`, 'success');
+    },
+  });
+
+  commandRegistry.register({
+    id: 'reload',
+    name: 'Restart addon',
+    usage: '<addon-id>',
+    description: 'Stop and start an addon again',
+    execute: async ctx => {
+      const addon = findAddon(ctx.args[0]);
+      if (!addon?.enabled) {
+        ctx.reply('Addon not running', 'warning');
+        return;
+      }
+      const ok = await addonLoader.restart(addon.id);
+      ctx.reply(
+        ok ? `${addon.name} restarted` : 'Restart failed',
+        ok ? 'success' : 'error'
+      );
+    },
+  });
+
+  commandRegistry.register({
+    id: 'shrug',
+    name: 'Shrug',
+    usage: '[text]',
+    description: 'Append ¯\\_(ツ)_/¯ to your message',
+    execute: ctx => {
+      ctx.insertText(`${ctx.argsRaw ? `${ctx.argsRaw} ` : ''}¯\\_(ツ)_/¯`);
     },
   });
 }
