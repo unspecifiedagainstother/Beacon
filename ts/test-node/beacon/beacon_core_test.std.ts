@@ -18,6 +18,11 @@ import {
 import { tokenizeCss } from '../../beacon/util/cssHighlight.std.ts';
 import { getAccentHex } from '../../beacon/core/accent.std.ts';
 import {
+  defineIcon,
+  iconToCssUrl,
+  isSvgMarkup,
+} from '../../beacon/core/icons.std.ts';
+import {
   cleanUrlsInText,
   DEFAULT_TRACKING_PARAMS,
   toParamMatchers,
@@ -260,6 +265,24 @@ describe('Beacon core', () => {
         }),
         /^#[0-9a-f]{6}$/
       );
+    });
+  });
+
+  describe('icons', () => {
+    it('builds SVG from path data and escapes attributes', () => {
+      const svg = defineIcon(['M0 0h24', 'M"<>'], { stroke: false });
+      assert.isTrue(isSvgMarkup(svg));
+      assert.include(svg, 'viewBox="0 0 24 24"');
+      assert.include(svg, 'd="M&#34;&#60;&#62;"');
+    });
+
+    it('turns SVG into a mask URL and rejects anything else', () => {
+      const url = iconToCssUrl('<svg viewBox="0 0 1 1"><path d="M0 0"/></svg>');
+      assert.match(url ?? '', /^url\("data:image\/svg\+xml,/);
+      assert.include(decodeURIComponent(url ?? ''), 'xmlns=');
+      assert.isUndefined(iconToCssUrl('data:text/html,<b>x</b>'));
+      assert.isUndefined(iconToCssUrl('<div>not svg</div>'));
+      assert.isUndefined(iconToCssUrl(undefined));
     });
   });
 });

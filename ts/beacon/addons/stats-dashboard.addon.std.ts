@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { AddonManifest } from '../core/types.dom.ts';
+import { ICON_STATS_DASHBOARD } from './icons.std.ts';
 
 /**
  * Stats Dashboard — session counters, shown with /stats.
  */
 export default {
   id: 'stats-dashboard',
+  icon: ICON_STATS_DASHBOARD,
   name: 'Stats Dashboard',
   version: '3.0.0',
   description: 'Session counters: messages, edits, deletes, busiest chats.',

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { AddonManifest } from '../core/types.dom.ts';
+import { ICON_QUICK_MUTE } from './icons.std.ts';
 import { MuteExpiration } from '@signalapp/types';
 import { getSelectedConversationId } from '../../state/selectors/nav.std.ts';
 import { isConversationMuted } from '../../util/isConversationMuted.std.ts';
@@ -11,6 +12,7 @@ import { isConversationMuted } from '../../util/isConversationMuted.std.ts';
  */
 export default {
   id: 'quick-mute',
+  icon: ICON_QUICK_MUTE,
   name: 'Quick Mute',
   version: '2.0.0',
   description: 'Ctrl/⌘+M toggles mute on the open conversation.',
