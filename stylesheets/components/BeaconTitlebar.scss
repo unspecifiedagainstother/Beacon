@@ -5,6 +5,17 @@
 @use '../variables';
 
 // Beacon: custom titlebar, shown when the window is frameless.
+//
+// .App is a flex column and its content child is `height: 100%`, so with the
+// titlebar on top the content overflowed by the bar's height and the bottom
+// of every page (the settings button, the composer) went off-screen. Let the
+// content take the remaining space instead.
+.BeaconTitlebar + * {
+  flex: 1 1 0;
+  min-height: 0;
+  height: auto;
+}
+
 .BeaconTitlebar {
   // Matches --title-bar-drag-area-height conventions in _titlebar.scss.
   height: 32px;
