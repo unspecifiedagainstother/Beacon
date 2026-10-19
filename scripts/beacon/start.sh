@@ -84,6 +84,12 @@ case "$BUILD" in
   skip) ;;
 esac
 
+# Launch Electron directly, not through `pnpm exec`: with NODE_ENV=production
+# pnpm treats the workspace as a production install and offers to purge
+# devDependencies (a hidden prompt that hangs in a terminal).
+ELECTRON="$BEACON_REPO/node_modules/.bin/electron"
+[ -x "$ELECTRON" ] || beacon_die "electron missing — run scripts/beacon/build.sh"
+
 ELECTRON_ARGS=(.)
 if [ "$DEBUG" = 1 ]; then
   ELECTRON_ARGS=(--remote-debugging-port=9229 --remote-debugging-address=127.0.0.1 .)
@@ -97,9 +103,9 @@ if [ "$MODE" = staging ]; then
   # config/default.json points at *.staging.signal.org. Your phone cannot link
   # to it; register via File -> "Set Up as Standalone Device".
   beacon_log "starting against STAGING (standalone device, not your account)"
-  exec pnpm exec electron "${ELECTRON_ARGS[@]}"
+  exec "$ELECTRON" "${ELECTRON_ARGS[@]}"
 fi
 
 beacon_log "starting against PRODUCTION — real Signal servers, real account."
 beacon_log "  uses a linked-device slot and syncs real message history."
-exec env NODE_ENV=production pnpm exec electron "${ELECTRON_ARGS[@]}"
+exec env NODE_ENV=production "$ELECTRON" "${ELECTRON_ARGS[@]}"
