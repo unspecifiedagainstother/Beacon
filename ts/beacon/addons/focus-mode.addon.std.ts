@@ -13,14 +13,14 @@ const FOCUS_CSS = `
 `;
 
 /**
- * Focus Mode — mod+shift+f hides sidebar, /focus toggles.
+ * Focus Mode — mod+alt+f hides sidebar, /focus toggles.
  */
 export default {
   id: 'focus-mode',
   icon: ICON_FOCUS_MODE,
   name: 'Focus Mode',
   version: '2.0.0',
-  description: 'Ctrl/⌘+Shift+F or /focus hides the sidebar and tabs.',
+  description: 'Ctrl/⌘+Alt+F or /focus hides the sidebar and tabs.',
   authors: ['Beacon'],
   tags: ['ui'],
   start(ctx) {
@@ -37,7 +37,7 @@ export default {
       }
     };
 
-    ctx.keybinds.register('mod+shift+f', toggle);
+    ctx.keybinds.register('mod+alt+f', toggle);
     ctx.commands.register({
       id: 'focus',
       name: 'Toggle focus mode',

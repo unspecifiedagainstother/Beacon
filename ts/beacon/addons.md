@@ -86,7 +86,7 @@ export default {
         ),
     });
 
-    ctx.keybinds.register('mod+shift+x', () => ctx.ui.showNotification('hi'));
+    ctx.keybinds.register('mod+alt+x', () => ctx.ui.showNotification('hi'));
   },
 } satisfies AddonManifest;
 ```
@@ -222,7 +222,9 @@ Builtins: `/help`, `/addons`, `/enable <id>`, `/disable <id>`,
 - `ctx.css.inject(css)`, `ctx.css.bodyClass(name)` — removed on disable.
   Prefer a body class plus rules in `stylesheets/_beacon-theme.scss` over
   injected CSS for anything non-trivial.
-- `ctx.keybinds.register('mod+shift+f', fn)` — `mod` = Ctrl (⌘ on mac);
+- `ctx.keybinds.register('mod+alt+f', fn)` — `mod` = Ctrl (⌘ on mac). Use
+  the `mod+alt+<key>` family: Signal itself owns most `mod+shift+<letter>`
+  combos (search, reply, mute...), and desktops grab `ctrl+alt+l`/`t`;
   matches on `key` or `code`, ignores auto-repeat
 - `ctx.ui` — `createModal({title, content, size, actions})` (Escape and
   overlay close; closed automatically on disable), `createElement`,
