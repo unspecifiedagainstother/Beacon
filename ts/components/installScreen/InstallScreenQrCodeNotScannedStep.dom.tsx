@@ -7,10 +7,7 @@ import classNames from 'classnames';
 import lodash from 'lodash';
 
 import type { LocalizerType } from '../../types/Util.std.ts';
-import {
-  InstallScreenStep,
-  InstallScreenQRCodeError,
-} from '../../types/InstallScreen.std.ts';
+import { InstallScreenQRCodeError } from '../../types/InstallScreen.std.ts';
 import { DialogType } from '../../types/Dialogs.std.ts';
 import { missingCaseError } from '../../util/missingCaseError.std.ts';
 import type { Loadable } from '../../util/loadable.std.ts';
@@ -42,7 +39,7 @@ export type PropsType = Readonly<{
   isStaging: boolean;
   retryGetQrCode: () => void;
   startUpdate: () => void;
-  forceUpdate: () => void;
+  forceCheck: () => void;
   isConfirmingDataDeletion: boolean;
   continueInstallWithDataDeletion: () => void;
   restartInstall: () => void;
@@ -64,29 +61,30 @@ export function InstallScreenQrCodeNotScannedStep({
   provisioningUrl,
   retryGetQrCode,
   startUpdate,
-  forceUpdate,
+  forceCheck,
   isConfirmingDataDeletion,
   restartInstall,
   continueInstallWithDataDeletion,
   updates,
 }: Readonly<PropsType>): ReactElement {
+  if (hasExpired || updates.dialogType === DialogType.Downloading) {
+    return (
+      <InstallScreenUpdateDialog
+        i18n={i18n}
+        {...updates}
+        startUpdate={startUpdate}
+        forceCheck={forceCheck}
+        currentVersion={currentVersion}
+        OS={OS}
+      />
+    );
+  }
+
   return (
     <div className="module-InstallScreenQrCodeNotScannedStep">
       <TitlebarDragArea />
 
       {/* <InstallScreenSignalLogo /> */}
-
-      {(hasExpired || updates.dialogType === DialogType.Downloading) && (
-        <InstallScreenUpdateDialog
-          i18n={i18n}
-          {...updates}
-          step={InstallScreenStep.QrCodeNotScanned}
-          startUpdate={startUpdate}
-          forceUpdate={forceUpdate}
-          currentVersion={currentVersion}
-          OS={OS}
-        />
-      )}
 
       <div className="module-InstallScreenQrCodeNotScannedStep__contents">
         <InstallScreenQrCode
@@ -329,6 +327,7 @@ function QRCodeImage({
   }, [isCopying]);
 
   return (
+    // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <svg
       role="img"
       aria-label={i18n('icu:Install__scan-this-code')}

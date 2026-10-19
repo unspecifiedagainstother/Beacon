@@ -1,5 +1,7 @@
 // Copyright 2025 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
+import { MuteExpiration } from '@signalapp/types';
+
 import {
   useCallback,
   useMemo,
@@ -19,10 +21,12 @@ import type {
   AllChatFoldersUnreadStats,
   UnreadStats,
 } from '../../util/countUnreadStats.std.ts';
+import { getUnreadCountForBadge } from '../../util/countUnreadStats.std.ts';
 import { WidthBreakpoint } from '../_util.std.ts';
 import { AxoSelect } from '../../axo/AxoSelect.dom.tsx';
 import { AxoContextMenu } from '../../axo/AxoContextMenu.dom.tsx';
 import { getMuteValuesOptions } from '../../util/getMuteOptions.std.ts';
+import { MuteNotificationsSubMenu } from '../MuteNotificationsMenu.dom.tsx';
 import type {
   AllChatFoldersMutedStats,
   MutedStats,
@@ -30,31 +34,34 @@ import type {
 import type { AxoSymbol } from '../../axo/AxoSymbol.dom.tsx';
 import { UserText } from '../UserText.dom.tsx';
 import { CurrentChatFolders } from '../../types/CurrentChatFolders.std.ts';
+import type { UnreadCountBadgeType } from '../../types/StorageKeys.std.ts';
 
 export type LeftPaneChatFoldersProps = Readonly<{
   i18n: LocalizerType;
   navSidebarWidthBreakpoint: WidthBreakpoint | null;
   currentChatFolders: CurrentChatFolders;
   allChatFoldersUnreadStats: AllChatFoldersUnreadStats;
+  unreadCountBadgeType: UnreadCountBadgeType;
   allChatFoldersMutedStats: AllChatFoldersMutedStats;
   selectedChatFolder: ChatFolder | null;
   onSelectedChatFolderIdChange: (newValue: ChatFolderId) => void;
   onChatFolderMarkRead: (chatFolderId: ChatFolderId) => void;
-  onChatFolderUpdateMute: (chatFolderId: ChatFolderId, value: number) => void;
+  onChatFolderUpdateMute: (
+    chatFolderId: ChatFolderId,
+    muteExpiresAt: MuteExpiration
+  ) => void;
   onChatFolderOpenSettings: (chatFolderId: ChatFolderId) => void;
 }>;
 
-function getBadgeValue(unreadStats: UnreadStats | null): number | null {
+function getBadgeValue(
+  unreadStats: UnreadStats | null,
+  unreadCountBadgeType: UnreadCountBadgeType
+): number | null {
   if (unreadStats == null) {
     return null;
   }
-  if (unreadStats.unreadCount > 0) {
-    return unreadStats.unreadCount + unreadStats.readChatsMarkedUnreadCount;
-  }
-  if (unreadStats.readChatsMarkedUnreadCount > 0) {
-    return unreadStats.readChatsMarkedUnreadCount;
-  }
-  return null;
+  const total = getUnreadCountForBadge(unreadStats, unreadCountBadgeType);
+  return total > 0 ? total : null;
 }
 
 function getChatFolderLabel(
@@ -74,9 +81,7 @@ function getChatFolderLabel(
   return '';
 }
 
-function getChatFolderIconName(
-  chatFolder: ChatFolder | null
-): AxoSymbol.IconName {
+function getChatFolderIconName(chatFolder: ChatFolder | null): AxoSymbol.Name {
   if (chatFolder == null) {
     return 'message';
   }
@@ -139,6 +144,7 @@ export function LeftPaneChatFolders(
                   i18n={i18n}
                   chatFolder={chatFolder}
                   unreadStats={unreadStats}
+                  unreadCountBadgeType={props.unreadCountBadgeType}
                 />
               );
             })}
@@ -173,6 +179,7 @@ export function LeftPaneChatFolders(
               i18n={i18n}
               chatFolder={chatFolder}
               unreadStats={unreadStats}
+              unreadCountBadgeType={props.unreadCountBadgeType}
               mutedStats={mutedStats}
               onChatFolderMarkRead={props.onChatFolderMarkRead}
               onChatFolderUpdateMute={props.onChatFolderUpdateMute}
@@ -191,12 +198,13 @@ function ChatFolderSelectItem(props: {
   i18n: LocalizerType;
   chatFolder: ChatFolder;
   unreadStats: UnreadStats | null;
+  unreadCountBadgeType: UnreadCountBadgeType;
 }): JSX.Element {
-  const { i18n, unreadStats } = props;
+  const { i18n, unreadStats, unreadCountBadgeType } = props;
 
   const badgeValue = useMemo(() => {
-    return getBadgeValue(unreadStats);
-  }, [unreadStats]);
+    return getBadgeValue(unreadStats, unreadCountBadgeType);
+  }, [unreadStats, unreadCountBadgeType]);
 
   return (
     <AxoSelect.Item
@@ -226,16 +234,20 @@ function ChatFolderSegmentedControlItem(props: {
   i18n: LocalizerType;
   chatFolder: ChatFolder;
   unreadStats: UnreadStats | null;
+  unreadCountBadgeType: UnreadCountBadgeType;
   mutedStats: MutedStats | null;
   onChatFolderMarkRead: (chatFolderId: ChatFolderId) => void;
-  onChatFolderUpdateMute: (chatFolderId: ChatFolderId, value: number) => void;
+  onChatFolderUpdateMute: (
+    chatFolderId: ChatFolderId,
+    muteExpiresAt: MuteExpiration
+  ) => void;
   onChatFolderOpenSettings: (chatFolderId: ChatFolderId) => void;
 }): JSX.Element {
-  const { i18n, unreadStats } = props;
+  const { i18n, unreadStats, unreadCountBadgeType } = props;
 
   const badgeValue = useMemo(() => {
-    return getBadgeValue(unreadStats);
-  }, [unreadStats]);
+    return getBadgeValue(unreadStats, unreadCountBadgeType);
+  }, [unreadStats, unreadCountBadgeType]);
 
   return (
     <ChatFolderSegmentedControlItemContextMenu
@@ -273,7 +285,10 @@ function ChatFolderSegmentedControlItemContextMenu(props: {
   unreadStats: UnreadStats | null;
   mutedStats: MutedStats | null;
   onChatFolderMarkRead: (chatFolderId: ChatFolderId) => void;
-  onChatFolderUpdateMute: (chatFolderId: ChatFolderId, value: number) => void;
+  onChatFolderUpdateMute: (
+    chatFolderId: ChatFolderId,
+    muteExpiresAt: MuteExpiration
+  ) => void;
   onChatFolderOpenSettings: (chatFolderId: ChatFolderId) => void;
   children: ReactNode;
 }) {
@@ -302,11 +317,15 @@ function ChatFolderSegmentedControlItemContextMenu(props: {
   }, [chatFolderId, onChatFolderMarkRead]);
 
   const handleChatFolderUpdateMute = useCallback(
-    (value: number) => {
-      onChatFolderUpdateMute(chatFolderId, value);
+    (muteExpiresAt: MuteExpiration) => {
+      onChatFolderUpdateMute(chatFolderId, muteExpiresAt);
     },
     [chatFolderId, onChatFolderUpdateMute]
   );
+
+  const handleChatFolderUnmuteAll = useCallback(() => {
+    onChatFolderUpdateMute(chatFolderId, MuteExpiration.UNMUTED);
+  }, [chatFolderId, onChatFolderUpdateMute]);
 
   const handleChatFolderOpenSettings = useCallback(() => {
     onChatFolderOpenSettings(chatFolderId);
@@ -325,45 +344,31 @@ function ChatFolderSegmentedControlItemContextMenu(props: {
           </AxoContextMenu.Item>
         )}
         {!showOnlyUnmuteAll && (
-          <AxoContextMenu.Sub>
-            <AxoContextMenu.SubTrigger symbol="bell-slash">
-              {i18n(
-                'icu:LeftPaneChatFolders__Item__ContextMenu__MuteNotifications'
-              )}
-            </AxoContextMenu.SubTrigger>
-            <AxoContextMenu.SubContent>
-              {someChatsMuted && (
-                <ContextMenuMuteNotificationsItem
-                  value={0}
-                  onSelect={handleChatFolderUpdateMute}
-                >
-                  {i18n(
-                    'icu:LeftPaneChatFolders__Item__ContextMenu__MuteNotifications__UnmuteAll'
-                  )}
-                </ContextMenuMuteNotificationsItem>
-              )}
-              {muteValuesOptions.map(option => {
-                return (
-                  <ContextMenuMuteNotificationsItem
-                    key={option.value}
-                    value={option.value}
-                    onSelect={handleChatFolderUpdateMute}
-                  >
-                    {option.name}
-                  </ContextMenuMuteNotificationsItem>
-                );
-              })}
-            </AxoContextMenu.SubContent>
-          </AxoContextMenu.Sub>
+          <MuteNotificationsSubMenu
+            i18n={i18n}
+            renderer="AxoContextMenu"
+            title={i18n(
+              'icu:LeftPaneChatFolders__Item__ContextMenu__MuteNotifications'
+            )}
+            options={muteValuesOptions}
+            onMuteExpiration={handleChatFolderUpdateMute}
+          >
+            {someChatsMuted && (
+              <AxoContextMenu.Item onSelect={handleChatFolderUnmuteAll}>
+                {i18n(
+                  'icu:LeftPaneChatFolders__Item__ContextMenu__MuteNotifications__UnmuteAll'
+                )}
+              </AxoContextMenu.Item>
+            )}
+          </MuteNotificationsSubMenu>
         )}
         {showOnlyUnmuteAll && (
-          <ContextMenuMuteNotificationsItem
+          <AxoContextMenu.Item
             symbol="bell"
-            value={0}
-            onSelect={handleChatFolderUpdateMute}
+            onSelect={handleChatFolderUnmuteAll}
           >
             {i18n('icu:LeftPaneChatFolders__Item__ContextMenu__UnmuteAll')}
-          </ContextMenuMuteNotificationsItem>
+          </AxoContextMenu.Item>
         )}
         {props.chatFolder.folderType === ChatFolderType.CUSTOM && (
           <AxoContextMenu.Item
@@ -375,22 +380,5 @@ function ChatFolderSegmentedControlItemContextMenu(props: {
         )}
       </AxoContextMenu.Content>
     </AxoContextMenu.Root>
-  );
-}
-
-function ContextMenuMuteNotificationsItem(props: {
-  symbol?: AxoSymbol.IconName;
-  value: number;
-  onSelect: (value: number) => void;
-  children: ReactNode;
-}): JSX.Element {
-  const { value, onSelect } = props;
-  const handleSelect = useCallback(() => {
-    onSelect(value);
-  }, [onSelect, value]);
-  return (
-    <AxoContextMenu.Item symbol={props.symbol} onSelect={handleSelect}>
-      {props.children}
-    </AxoContextMenu.Item>
   );
 }

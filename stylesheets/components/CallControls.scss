@@ -52,10 +52,8 @@
   line-height: 18px;
   overflow: hidden;
 
-  &:focus-within {
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  @include mixins.focus-visible-within {
+    @include mixins.axo-focus-ring;
   }
 }
 
@@ -78,8 +76,8 @@
     );
   }
 
-  &:focus {
-    outline: none;
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 }
 
@@ -103,11 +101,8 @@
   padding-inline: 16px;
   border-radius: 40px;
 
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 }
 

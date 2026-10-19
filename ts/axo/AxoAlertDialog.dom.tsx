@@ -133,11 +133,7 @@ export namespace AxoAlertDialog {
             <AlertDialog.Overlay className={AxoBaseDialog.overlayStyles} />
             <AlertDialog.Content
               onEscapeKeyDown={handleContentEscapeEvent}
-              className={AxoBaseDialog.contentStyles}
-              style={{
-                minWidth: 300,
-                width: 300,
-              }}
+              className={tw(AxoBaseDialog.contentStyles, 'w-72 min-w-72')}
             >
               {props.children}
             </AlertDialog.Content>
@@ -352,6 +348,8 @@ export namespace AxoAlertDialog {
     | 'strong-destructive'
     | 'subtle-destructive';
 
+  export type Arrow = 'next' | 'external-link';
+
   export type ActionProps = Readonly<{
     /**
      * Visual style of the button.
@@ -360,11 +358,11 @@ export namespace AxoAlertDialog {
     /**
      * Optional leading icon.
      */
-    symbol?: AxoSymbol.InlineGlyphName;
+    symbol?: AxoSymbol.Name | null;
     /**
      * When `true`, shows a forward arrow on the trailing side.
      */
-    arrow?: boolean;
+    arrow?: Arrow | null;
     /**
      * Called when the button is clicked.
      */
@@ -397,7 +395,7 @@ export namespace AxoAlertDialog {
         <AxoButton.Root
           variant={props.variant}
           symbol={props.symbol}
-          arrow={props.arrow ? 'next' : null}
+          arrow={props.arrow}
           size="md"
           width="grow"
           onClick={props.onClick}

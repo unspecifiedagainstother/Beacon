@@ -29,6 +29,7 @@ import assert from 'node:assert/strict';
  * }} HookContext
  *
  * @typedef {{
+ *   verifyStoreIntegrity?: unknown,
  *   verifyDepsBeforeRun?: unknown,
  * }} Config
  *
@@ -249,6 +250,9 @@ export const hooks = {
   updateConfig(config) {
     return {
       ...config,
+      verifyStoreIntegrity: process.env.CI
+        ? false
+        : config.verifyStoreIntegrity,
       verifyDepsBeforeRun:
         process.env.CI || process.env.SKIP_VERIFY_DEPS_BEFORE_RUN
           ? false

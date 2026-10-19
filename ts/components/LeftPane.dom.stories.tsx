@@ -37,6 +37,7 @@ import { ServerAlert } from '../types/ServerAlert.std.ts';
 import { LeftPaneChatFolders } from './leftPane/LeftPaneChatFolders.dom.tsx';
 import { LeftPaneConversationListItemContextMenu } from './leftPane/LeftPaneConversationListItemContextMenu.dom.tsx';
 import { CurrentChatFolders } from '../types/CurrentChatFolders.std.ts';
+import { DialogClockSkew } from './DialogClockSkew.dom.tsx';
 
 const { i18n } = window.SignalContext;
 
@@ -145,11 +146,7 @@ const useProps = (overrideProps: OverridePropsType = {}): PropsType => {
   const isUpdateDownloaded = false;
 
   return {
-    otherTabsUnreadStats: {
-      unreadCount: 0,
-      unreadMentionsCount: 0,
-      readChatsMarkedUnreadCount: 0,
-    },
+    otherTabsUnreadCount: 0,
     backupMediaDownloadProgress: {
       isBackupMediaEnabled: true,
       downloadBannerDismissed: false,
@@ -191,7 +188,6 @@ const useProps = (overrideProps: OverridePropsType = {}): PropsType => {
     hasFailedStorySends: false,
     hasPendingUpdate: false,
     i18n,
-    isMacOS: false,
     isMAS: false,
     isOnline: true,
     preferredWidthFromStorage: 320,
@@ -199,6 +195,7 @@ const useProps = (overrideProps: OverridePropsType = {}): PropsType => {
     crashReportCount: 0,
 
     hasAnyCurrentCustomChatFolders: false,
+    hasClockSkewDialog: false,
     hasNetworkDialog: false,
     hasExpiredDialog: false,
     hasRelinkDialog: false,
@@ -285,9 +282,15 @@ const useProps = (overrideProps: OverridePropsType = {}): PropsType => {
     renderCaptchaDialog: () => (
       <CaptchaDialog
         i18n={i18n}
-        isPending={overrideProps.challengeStatus === 'pending'}
+        pending={overrideProps.challengeStatus === 'pending'}
         onContinue={action('onCaptchaContinue')}
         onSkip={action('onCaptchaSkip')}
+      />
+    ),
+    renderClockSkewDialog: ({ containerWidthBreakpoint }) => (
+      <DialogClockSkew
+        containerWidthBreakpoint={containerWidthBreakpoint}
+        i18n={i18n}
       />
     ),
     renderCrashReportDialog: () => (
@@ -333,6 +336,7 @@ const useProps = (overrideProps: OverridePropsType = {}): PropsType => {
         currentChatFolders={CurrentChatFolders.createEmpty()}
         allChatFoldersUnreadStats={new Map()}
         allChatFoldersMutedStats={new Map()}
+        unreadCountBadgeType="unread-messages"
         selectedChatFolder={null}
         onSelectedChatFolderIdChange={action('onSelectedChatFolderIdChange')}
         onChatFolderMarkRead={action('onChatFolderMarkRead')}
@@ -468,6 +472,7 @@ export function InboxCriticalIdlePrimaryDeviceAlert(): JSX.Element {
       {...useProps({
         serverAlerts: {
           [ServerAlert.CRITICAL_IDLE_PRIMARY_DEVICE]: {
+            // oxlint-disable-next-line react/purity
             firstReceivedAt: Date.now(),
           },
         },
@@ -481,6 +486,7 @@ export function InboxIdlePrimaryDeviceAlert(): JSX.Element {
       {...useProps({
         serverAlerts: {
           [ServerAlert.IDLE_PRIMARY_DEVICE]: {
+            // oxlint-disable-next-line react/purity
             firstReceivedAt: Date.now(),
           },
         },
@@ -494,7 +500,9 @@ export function InboxIdlePrimaryDeviceAlertNonDismissable(): JSX.Element {
       {...useProps({
         serverAlerts: {
           [ServerAlert.IDLE_PRIMARY_DEVICE]: {
+            // oxlint-disable-next-line react/purity
             firstReceivedAt: Date.now() - 10 * DAY,
+            // oxlint-disable-next-line react/purity
             dismissedAt: Date.now() - 8 * DAY,
           },
         },

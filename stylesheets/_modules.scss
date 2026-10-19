@@ -63,11 +63,14 @@
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  outline: none;
   padding-inline: 16px;
   transition-property: background, translate;
   transition-duration: 0.1s;
   transition-timing-function: ease-out;
+
+  &:focus-visible {
+    outline: none;
+  }
 }
 
 .module-message__quote-story-reaction-header {
@@ -152,7 +155,9 @@
 }
 
 .module-message:hover .module-message__buttons,
-.module-message__buttons:has([data-axo-contextmenu-state='open']) {
+.module-message:is(:focus-visible, :has(:focus-visible))
+  .module-message__buttons,
+.module-message__buttons:has([data-axo-dropdownmenu-state='open']) {
   opacity: 1;
 }
 
@@ -179,41 +184,32 @@
   }
 }
 
-@mixin module-message__buttons__button($light-icon, $dark-icon: $light-icon) {
-  cursor: pointer;
-  height: 20px;
-  width: 20px;
+@mixin module-message__buttons__button($icon) {
+  color: variables.$color-gray-45;
+  border-radius: 9999px;
 
-  @include mixins.light-theme {
-    @include mixins.color-svg($light-icon, variables.$color-gray-45);
-    &:hover {
-      @include mixins.color-svg($light-icon, variables.$color-gray-90);
-    }
+  &::before {
+    content: '';
+    display: block;
+    height: 20px;
+    width: 20px;
+    @include mixins.color-svg($icon, currentColor);
   }
 
-  @include mixins.dark-theme {
-    @include mixins.color-svg($dark-icon, variables.$color-gray-45);
-    &:hover {
-      @include mixins.color-svg($dark-icon, variables.$color-gray-02);
-    }
+  &:hover {
+    color: light-dark(variables.$color-gray-90, variables.$color-gray-02);
+  }
+
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 
   .module-message--targeted & {
-    @include mixins.mouse-mode {
-      background-color: variables.$color-gray-60;
-    }
-    @include mixins.dark-mouse-mode {
-      background-color: variables.$color-white;
-    }
+    color: light-dark(variables.$color-gray-60, variables.$color-white);
   }
 
   .module-message:focus & {
-    @include mixins.keyboard-mode {
-      background-color: variables.$color-gray-60;
-    }
-    @include mixins.dark-keyboard-mode {
-      background-color: variables.$color-white;
-    }
+    color: light-dark(variables.$color-gray-60, variables.$color-white);
   }
 }
 
@@ -322,7 +318,6 @@ $message-padding-horizontal: 12px;
   position: relative;
   display: inline-block;
   border-radius: 18px;
-  outline: none;
   margin-bottom: 6px;
   margin-top: 6px;
   min-width: 0px;
@@ -331,6 +326,10 @@ $message-padding-horizontal: 12px;
   padding-inline: $message-padding-horizontal;
   padding-top: $message-padding-vertical;
   padding-bottom: $message-padding-vertical;
+
+  &:focus-visible {
+    outline: none;
+  }
 
   .module-message--collapsed-above & {
     margin-top: 1px;
@@ -354,12 +353,13 @@ $message-padding-horizontal: 12px;
 }
 
 .module-message__container--targeted {
-  @include mixins.mouse-mode {
+  .module-message--flashing & {
     animation: module-message__highlight 1.2s cubic-bezier(0.17, 0.17, 0, 1);
   }
 }
+
 .module-message__container--targeted-lighter {
-  @include mixins.mouse-mode {
+  .module-message--flashing & {
     animation: module-message__highlight-lighter 1.2s
       cubic-bezier(0.17, 0.17, 0, 1);
   }
@@ -437,11 +437,11 @@ $message-padding-horizontal: 12px;
   }
 }
 
-.module-message:focus-within {
-  @include mixins.keyboard-mode {
+.module-message:focus-visible {
+  @include mixins.light-theme {
     background: variables.$color-selected-message-background-light;
   }
-  @include mixins.dark-keyboard-mode {
+  @include mixins.dark-theme {
     background: variables.$color-selected-message-background-dark;
   }
 }
@@ -661,18 +661,14 @@ $message-padding-horizontal: 12px;
     border-radius: 4px;
   }
 
-  @include mixins.keyboard-mode {
-    &:focus {
-      box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-    }
+  &:focus-visible {
+    box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
   }
 }
 
 .module-message__container--outgoing .module-message__simple-attachment {
-  @include mixins.keyboard-mode {
-    &:focus {
-      box-shadow: 0px 0px 0px 2px variables.$color-white;
-    }
+  &:focus-visible {
+    box-shadow: 0px 0px 0px 2px variables.$color-white;
   }
 }
 
@@ -905,10 +901,9 @@ $message-padding-horizontal: 12px;
 
 .module-message__undownloadable-attachment-learn-more {
   @include mixins.button-reset;
-  @include mixins.keyboard-mode {
-    &:focus {
-      box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-    }
+
+  &:focus-visible {
+    box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
   }
 
   & {
@@ -933,16 +928,13 @@ $message-padding-horizontal: 12px;
 
     margin-inline: -$message-padding-horizontal;
     width: calc(100% + 24px);
-    outline: none;
 
     margin-top: -$message-padding-vertical;
     margin-bottom: 5px;
     overflow: hidden;
 
-    @include mixins.keyboard-mode {
-      &:focus {
-        box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-      }
+    &:focus-visible {
+      @include mixins.axo-focus-ring;
     }
   }
 }
@@ -966,8 +958,12 @@ $message-padding-horizontal: 12px;
   }
 }
 
-.module-message__link-preview__text--with-icon {
-  margin-top: 5px;
+.module-message__link-preview__text {
+  min-width: 0;
+
+  &--with-icon {
+    margin-top: 5px;
+  }
 }
 
 .module-message__link-preview__title {
@@ -1085,25 +1081,22 @@ $message-padding-horizontal: 12px;
 
   a {
     text-decoration: underline;
-    outline: none;
     // Allow links to be broken anywhere so they don't force extra line breaks
     // when surrounded by text.
     word-break: break-all;
 
     @include mixins.light-theme {
       color: variables.$color-white-alpha-90;
-    }
-    @include mixins.keyboard-mode {
-      &:focus {
+
+      &:focus-visible {
         outline: 1px solid variables.$color-gray-90;
       }
     }
 
     @include mixins.dark-theme {
       color: variables.$color-white-alpha-90;
-    }
-    @include mixins.dark-keyboard-mode {
-      &:focus {
+
+      &:focus-visible {
         outline: 1px solid variables.$color-white-alpha-90;
       }
     }
@@ -1148,15 +1141,8 @@ $message-padding-horizontal: 12px;
       opacity: 1;
     }
 
-    @include mixins.keyboard-mode {
-      &:focus {
-        outline: 1px solid variables.$color-gray-90;
-      }
-    }
-    @include mixins.dark-keyboard-mode {
-      &:focus {
-        outline: 1px solid variables.$color-white-alpha-90;
-      }
+    &:focus-visible {
+      outline: 1px solid currentColor;
     }
   }
 }
@@ -1171,22 +1157,19 @@ $message-padding-horizontal: 12px;
 
   a {
     text-decoration: underline;
-    outline: none;
 
     @include mixins.light-theme {
       color: variables.$color-gray-90;
-    }
-    @include mixins.keyboard-mode {
-      &:focus {
+
+      &:focus-visible {
         outline: 1px solid variables.$color-gray-90;
       }
     }
 
     @include mixins.dark-theme {
       color: variables.$color-gray-05;
-    }
-    @include mixins.dark-keyboard-mode {
-      &:focus {
+
+      &:focus-visible {
         outline: 1px solid variables.$color-gray-05;
       }
     }
@@ -1353,10 +1336,8 @@ $message-padding-horizontal: 12px;
     }
   }
 
-  @include mixins.keyboard-mode {
-    &:focus {
-      box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-    }
+  &:focus-visible {
+    box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
   }
 }
 
@@ -1429,15 +1410,7 @@ $message-padding-horizontal: 12px;
   }
 
   .module-Avatar__contents {
-    outline: 3px solid;
-
-    @include mixins.light-theme() {
-      outline-color: variables.$color-white;
-    }
-
-    @include mixins.dark-theme() {
-      outline-color: variables.$color-gray-95;
-    }
+    outline: 3px solid var(--axo-color-surface-primary);
   }
 }
 
@@ -1629,11 +1602,11 @@ $message-padding-horizontal: 12px;
 
       // Disabling hover
       &:hover {
-        @include mixins.mouse-mode {
+        @include mixins.light-theme {
           background-color: variables.$color-white;
         }
 
-        @include mixins.dark-mouse-mode {
+        @include mixins.dark-theme {
           background-color: variables.$color-gray-62;
         }
       }
@@ -1649,38 +1622,19 @@ $message-padding-horizontal: 12px;
         background-color: variables.$color-white-alpha-80;
       }
       &:hover {
-        @include mixins.mouse-mode {
+        @include mixins.light-theme {
           background-color: variables.$color-white-alpha-90;
         }
 
-        @include mixins.dark-mouse-mode {
+        @include mixins.dark-theme {
           background-color: variables.$color-white-alpha-90;
         }
       }
-      &:focus {
-        @include mixins.keyboard-mode {
-          box-shadow: 0px 0px 0px 3px variables.$color-ultramarine-light;
-        }
-        @include mixins.dark-keyboard-mode {
-          box-shadow: 0px 0px 0px 3px variables.$color-ultramarine-light;
-        }
+      &:focus-visible {
+        box-shadow: 0px 0px 0px 3px variables.$color-ultramarine-light;
       }
       &:active {
-        // We need to include all four here for specificity precedence
-
-        @include mixins.mouse-mode {
-          background-color: variables.$color-white;
-        }
-        @include mixins.dark-mouse-mode {
-          background-color: variables.$color-white;
-        }
-
-        @include mixins.keyboard-mode {
-          background-color: variables.$color-white;
-        }
-        @include mixins.dark-keyboard-mode {
-          background-color: variables.$color-white;
-        }
+        background-color: variables.$color-white;
       }
     }
 
@@ -1802,14 +1756,9 @@ $message-padding-horizontal: 12px;
     }
   }
 
-  &:focus {
+  &:focus-visible {
     outline: none;
-  }
-
-  @include mixins.keyboard-mode {
-    &:focus {
-      box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-    }
+    box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
   }
 
   & {
@@ -1937,18 +1886,14 @@ $timer-icons:
   width: 52px;
   border-radius: 26px;
 
-  @include mixins.keyboard-mode {
-    &:focus {
-      box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-    }
+  &:focus-visible {
+    box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
   }
 }
 
 .module-embedded-contact--outgoing .module-embedded-contact__avatar-container {
-  @include mixins.keyboard-mode {
-    &:focus {
-      box-shadow: 0px 0px 0px 2px variables.$color-white;
-    }
+  &:focus-visible {
+    box-shadow: 0px 0px 0px 2px variables.$color-white;
   }
 }
 
@@ -2151,14 +2096,14 @@ $timer-icons:
 // Module: Inline Notification Wrapper
 
 .module-inline-notification-wrapper {
-  outline: none;
   position: relative;
 
-  &:focus {
-    @include mixins.keyboard-mode {
+  &:focus-visible {
+    outline: none;
+    @include mixins.light-theme {
       background: variables.$color-selected-message-background-light;
     }
-    @include mixins.dark-keyboard-mode {
+    @include mixins.dark-theme {
       background: variables.$color-selected-message-background-dark;
     }
   }
@@ -2176,16 +2121,12 @@ $timer-icons:
   text-align: center;
   cursor: pointer;
 
-  &:focus {
-    @include mixins.keyboard-mode {
-      outline: 0;
-    }
+  &:focus-visible {
+    outline: none;
   }
 
-  &:focus &__message {
-    @include mixins.keyboard-mode {
-      opacity: 1;
-    }
+  &:focus-visible &__message {
+    opacity: 1;
   }
 
   &__message {
@@ -2263,13 +2204,11 @@ $timer-icons:
     );
   }
 
-  @include mixins.keyboard-mode {
-    &:focus {
-      @include mixins.color-svg(
-        '../images/icons/v3/person/person-circle-compact.svg',
-        variables.$color-ultramarine
-      );
-    }
+  &:focus-visible {
+    @include mixins.color-svg(
+      '../images/icons/v3/person/person-circle-compact.svg',
+      variables.$color-ultramarine
+    );
   }
 }
 
@@ -2288,35 +2227,6 @@ $timer-icons:
 // Brought this up here to add specificity
 button.ConversationDetails__action-button {
   margin-inline-start: 16px;
-}
-
-// Module: Message Request Actions
-
-.module-message-request-actions {
-  padding-block: 8px 12px;
-  padding-inline: 16px;
-
-  &__message {
-    @include mixins.font-body-2;
-    text-align: center;
-    margin-bottom: 12px;
-
-    @include mixins.light-theme {
-      color: variables.$color-gray-60;
-    }
-
-    @include mixins.dark-theme {
-      color: variables.$color-gray-25;
-    }
-
-    &__name {
-      @include mixins.font-body-2-bold;
-    }
-
-    &__learn-more {
-      text-decoration: none;
-    }
-  }
 }
 
 // Module: Image
@@ -2353,12 +2263,15 @@ button.ConversationDetails__action-button {
     }
   }
 
+  &:focus-visible {
+    outline: none;
+  }
+
   &:focus {
     span {
       background-color: variables.$color-gray-75;
       border: 4px solid variables.$color-ultramarine;
       box-sizing: border-box;
-      outline: none;
     }
   }
 }
@@ -2468,10 +2381,8 @@ button.ConversationDetails__action-button {
   }
 }
 
-button.module-image__border-overlay:focus {
-  @include mixins.keyboard-mode {
-    box-shadow: inset 0px 0px 0px 2px variables.$color-ultramarine;
-  }
+button.module-image__border-overlay:focus-visible {
+  @include mixins.axo-focus-ring-inset;
 }
 
 .module-image__border-overlay--dark {
@@ -2612,11 +2523,8 @@ button.module-image__border-overlay:focus {
     );
   }
 
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 }
 
@@ -2646,10 +2554,8 @@ button.module-image__border-overlay:focus {
     justify-content: center;
   }
 
-  @include mixins.keyboard-mode {
-    &:focus .module-image-grid__download-pill {
-      box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-    }
+  &:focus-visible .module-image-grid__download-pill {
+    box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
   }
 }
 
@@ -2684,10 +2590,6 @@ button.module-image__border-overlay:focus {
 .module-image-grid__download_pill__text-wrapper {
   @include mixins.font-body-1;
   margin-inline-end: 14px;
-}
-
-.module-image-grid--one-image {
-  margin-bottom: -5px;
 }
 
 .module-image-grid--with-sticker {
@@ -2870,10 +2772,8 @@ button.module-image__border-overlay:focus {
     }
   }
 
-  @include mixins.keyboard-mode {
-    &:focus {
-      @include mixins.color-svg($icon, variables.$color-ultramarine);
-    }
+  &:focus-visible {
+    @include mixins.color-svg($icon, variables.$color-ultramarine);
   }
 }
 
@@ -2965,11 +2865,8 @@ button.module-image__border-overlay:focus {
     }
   }
 
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 }
 
@@ -3017,11 +2914,8 @@ button.module-image__border-overlay:focus {
     }
   }
 
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 }
 
@@ -3312,13 +3206,9 @@ button.module-image__border-overlay:focus {
         margin-inline-start: 4px;
       }
 
-      &:focus {
+      &:focus-visible {
         outline: none;
-      }
-      @include mixins.keyboard-mode {
-        &:focus {
-          box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-        }
+        box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
       }
 
       background: none;
@@ -3764,9 +3654,12 @@ button.module-image__border-overlay:focus {
             padding-inline: 4px;
             margin-inline: 0;
             opacity: 0;
-            outline: none;
             transition: opacity 200ms ease-out;
             width: 24px;
+
+            &:focus-visible {
+              @include mixins.axo-focus-ring;
+            }
           }
         }
 
@@ -4522,10 +4415,8 @@ button.module-image__border-overlay:focus {
       z-index: variables.$z-index-above-base;
     }
 
-    @include mixins.keyboard-mode {
-      &:focus {
-        background: variables.$color-ultramarine;
-      }
+    &:focus-visible {
+      background: variables.$color-ultramarine;
     }
   }
 
@@ -4667,11 +4558,8 @@ button.module-calling-participants-list__contact {
         }
       }
 
-      &:focus {
-        outline: none;
-        @include mixins.keyboard-mode {
-          @include mixins.axo-focus-ring;
-        }
+      &:focus-visible {
+        @include mixins.axo-focus-ring;
       }
 
       &__icon {
@@ -4802,7 +4690,7 @@ button.module-calling-participants-list__contact {
           cursor: inherit;
         }
 
-        &:focus {
+        &:focus-visible {
           outline: none;
         }
       }
@@ -4820,10 +4708,8 @@ button.module-calling-participants-list__contact {
         --conversation-item-bg: var(--axo-color-fill-primary);
       }
 
-      @include mixins.keyboard-mode {
-        &:focus:not(:disabled, &--disabled) {
-          @include mixins.axo-focus-ring-inset;
-        }
+      &:focus-visible:not(:disabled, &--disabled) {
+        @include mixins.axo-focus-ring-inset;
       }
 
       &--is-selected {
@@ -5168,12 +5054,12 @@ button.module-calling-participants-list__contact {
           border: 1px solid variables.$color-gray-80;
         }
 
-        &:focus {
+        &:focus-visible {
           outline: none;
         }
 
-        @include mixins.keyboard-mode {
-          &:focus {
+        @include mixins.light-theme {
+          &:focus-visible {
             border-width: 2px;
             border-color: variables.$color-ultramarine;
             &:checked {
@@ -5181,8 +5067,8 @@ button.module-calling-participants-list__contact {
             }
           }
         }
-        @include mixins.dark-keyboard-mode {
-          &:focus {
+        @include mixins.dark-theme {
+          &:focus-visible {
             border-width: 2px;
             border-color: variables.$color-ultramarine-light;
 
@@ -5386,9 +5272,9 @@ button.module-calling-participants-list__contact {
           );
         }
       }
-      @include mixins.keyboard-mode {
+      @include mixins.light-theme {
         &:dir(ltr) {
-          &:focus {
+          &:focus-visible {
             @include mixins.color-svg(
               '../images/icons/v3/chevron/chevron-left.svg',
               variables.$color-ultramarine
@@ -5419,9 +5305,9 @@ button.module-calling-participants-list__contact {
           );
         }
       }
-      @include mixins.dark-keyboard-mode {
+      @include mixins.dark-theme {
         &:dir(ltr) {
-          &:hover {
+          &:focus-visible {
             @include mixins.color-svg(
               '../images/icons/v3/chevron/chevron-left.svg',
               variables.$color-ultramarine-light
@@ -5429,7 +5315,7 @@ button.module-calling-participants-list__contact {
           }
         }
         &:dir(rtl) {
-          &:hover {
+          &:focus-visible {
             @include mixins.color-svg(
               '../images/icons/v3/chevron/chevron-right.svg',
               variables.$color-ultramarine-light
@@ -5563,7 +5449,6 @@ button.module-calling-participants-list__contact {
   padding-inline: 1em;
   width: 100%;
   text-align: center;
-  outline: none;
 }
 
 .module-left-pane__no-search-results,
@@ -5572,7 +5457,6 @@ button.module-calling-participants-list__contact {
   padding-inline: 1em;
   width: 100%;
   text-align: center;
-  outline: none;
 }
 
 .module-left-pane__compose-no-contacts {
@@ -5598,7 +5482,6 @@ button.module-calling-participants-list__contact {
 .module-left-pane__list--measure {
   flex-grow: 1;
   flex-shrink: 1;
-  outline: none;
 }
 
 .module-left-pane__list--wrapper {
@@ -5607,7 +5490,6 @@ button.module-calling-participants-list__contact {
 
 .module-left-pane__list {
   position: absolute;
-  outline: none;
 }
 
 .module-left-pane__footer {
@@ -5715,10 +5597,6 @@ button.module-calling-participants-list__contact {
   gap: 14px;
 }
 
-.ReactVirtualized__List {
-  outline: none;
-}
-
 .CollapseSet__height-container {
   overflow: hidden;
   height: 0px;
@@ -5819,12 +5697,10 @@ button.module-calling-participants-list__contact {
     z-index: variables.$z-index-above-base;
   }
 
-  @include mixins.keyboard-mode {
-    &:focus,
-    &:active,
-    &:hover {
-      background-color: variables.$color-ultramarine;
-    }
+  &:focus-visible,
+  &:active,
+  &:hover {
+    background-color: variables.$color-ultramarine;
   }
 }
 
@@ -5950,11 +5826,8 @@ button.module-calling-participants-list__contact {
       background-color: variables.$color-gray-05;
     }
   }
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 }
 
@@ -6042,11 +5915,11 @@ button.module-calling-participants-list__contact {
     }
   }
 
-  &:focus {
-    @include mixins.keyboard-mode {
+  &:focus-visible {
+    @include mixins.light-theme {
       background-color: variables.$color-ultramarine;
     }
-    @include mixins.dark-keyboard-mode {
+    @include mixins.dark-theme {
       background-color: variables.$color-ultramarine-light;
     }
   }
@@ -6146,10 +6019,8 @@ button.module-calling-participants-list__contact {
     @include mixins.font-body-2;
     @include mixins.button-reset;
 
-    @include mixins.keyboard-mode {
-      &:focus {
-        box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-      }
+    &:focus-visible {
+      @include mixins.axo-focus-ring;
     }
 
     & {
@@ -6168,7 +6039,6 @@ button.module-calling-participants-list__contact {
       border-radius: 4px;
       border-style: solid;
       border-width: 1px;
-      outline: none;
       padding-block: 7px;
       padding-inline: 12px;
     }

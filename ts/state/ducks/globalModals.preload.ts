@@ -4,6 +4,7 @@
 import type { CallSummary } from '@signalapp/ringrtc';
 import type { ThunkAction } from 'redux-thunk';
 import type { ReadonlyDeep } from 'type-fest';
+import { v7 as generateUuid } from 'uuid';
 import OS from '../../util/os/osMain.node.ts';
 import type { ExplodePromiseResultType } from '../../util/explodePromise.std.ts';
 import type {
@@ -21,7 +22,10 @@ import type { StateType as RootStateType } from '../reducer.preload.ts';
 import * as SingleServePromise from '../../services/singleServePromise.std.ts';
 import { isKeyTransparencyAvailable } from '../../services/keyTransparency.preload.ts';
 import * as Stickers from '../../types/Stickers.preload.ts';
-import type { ContactModalStateType } from '../../types/globalModals.std.ts';
+import {
+  type ContactModalStateType,
+  PinReminderState,
+} from '../../types/globalModals.std.ts';
 import { UsernameOnboardingState } from '../../types/globalModals.std.ts';
 import { createLogger } from '../../logging/log.std.ts';
 import {
@@ -68,6 +72,12 @@ import type { ErrorModalDataProps } from '../../components/ErrorModal.dom.tsx';
 import { isDownloadableOrBackfillable } from '../../util/downloadAttachment.preload.ts';
 import { backupsService } from '../../services/backups/index.preload.ts';
 import { getHasMediaBackups } from '../selectors/items.dom.ts';
+import { registrationJobQueue } from '../../jobs/registrationJobQueue.preload.ts';
+import { toLogFormat } from '../../types/errors.std.ts';
+import { pinReminderService } from '../../services/pinReminder.preload.ts';
+import { drop } from '../../util/drop.std.ts';
+import { showToast, type ToastActionType } from './toast.preload.ts';
+import { ToastType } from '../../types/Toast.dom.tsx';
 
 const log = createLogger('globalModals');
 
@@ -125,7 +135,7 @@ export type GroupMemberLabelInfoPropsType = ReadonlyDeep<{
 
 export type GlobalModalsStateType = ReadonlyDeep<{
   addUserToAnotherGroupModalContactId?: string;
-  aboutContactModalState?: ContactModalStateType;
+  aboutContactModalState: ContactModalStateType | null;
   backfillFailureModalKind: BackfillFailureModalKind | null;
   callLinkAddNameModalRoomId: string | null;
   callLinkEditModalRoomId: string | null;
@@ -147,6 +157,7 @@ export type GlobalModalsStateType = ReadonlyDeep<{
   gv2MigrationProps?: MigrateToGV2PropsType;
   groupMemberLabelInfoModalState?: GroupMemberLabelInfoPropsType;
   hasConfirmationModal: boolean;
+  isPinChangeModalVisible: boolean;
   isProfileNameWarningModalVisible: boolean;
   profileNameWarningModalConversationType?: string;
   isShortcutGuideModalVisible: boolean;
@@ -161,10 +172,12 @@ export type GlobalModalsStateType = ReadonlyDeep<{
   messageRequestActionsConfirmationProps: MessageRequestActionsConfirmationPropsType | null;
   notePreviewModalProps: NotePreviewModalPropsType | null;
   pinMessageDialogData: PinMessageDialogData | null;
+  pinReminderState: PinReminderState;
   usernameOnboardingState: UsernameOnboardingState;
   mediaPermissionsModalProps?: {
     mediaType: 'camera' | 'microphone';
     requestor: 'call' | 'voiceNote';
+    osName: 'macos' | 'windows';
     abortController: AbortController;
   };
   safetyNumberChangedBlockingData?: SafetyNumberChangedBlockingDataType;
@@ -223,6 +236,9 @@ const TOGGLE_CALL_LINK_PENDING_PARTICIPANT_MODAL =
 export const SHOW_CALL_QUALITY_SURVEY = 'globalModals/SHOW_CALL_QUALITY_SURVEY';
 export const HIDE_CALL_QUALITY_SURVEY = 'globalModals/HIDE_CALL_QUALITY_SURVEY';
 const TOGGLE_ABOUT_MODAL = 'globalModals/TOGGLE_ABOUT_MODAL';
+const SHOW_PIN_CHANGE_MODAL = 'globalModals/SHOW_PIN_CHANGE_MODAL';
+const HIDE_PIN_CHANGE_MODAL = 'globalModals/HIDE_PIN_CHANGE_MODAL';
+const TOGGLE_PIN_REMINDER = 'globalModals/TOGGLE_PIN_REMINDER';
 const TOGGLE_SIGNAL_CONNECTIONS_MODAL =
   'globalModals/TOGGLE_SIGNAL_CONNECTIONS_MODAL';
 export const SHOW_SEND_ANYWAY_DIALOG = 'globalModals/SHOW_SEND_ANYWAY_DIALOG';
@@ -411,7 +427,7 @@ export type HideCallQualitySurveyActionType = ReadonlyDeep<{
 
 type ToggleAboutContactModalActionType = ReadonlyDeep<{
   type: typeof TOGGLE_ABOUT_MODAL;
-  payload: ContactModalStateType | undefined;
+  payload: ContactModalStateType | null;
 }>;
 
 type ToggleSignalConnectionsModalActionType = ReadonlyDeep<{
@@ -493,6 +509,7 @@ type ShowMediaPermissionsModalActionType = ReadonlyDeep<{
   payload: {
     mediaType: 'camera' | 'microphone';
     requestor: 'call' | 'voiceNote';
+    osName: 'macos' | 'windows';
     abortController: AbortController;
   };
 }>;
@@ -555,6 +572,20 @@ type TogglePinMessageDialogActionType = ReadonlyDeep<{
   payload: PinMessageDialogData | null;
 }>;
 
+type HidePinChangeModalActionType = ReadonlyDeep<{
+  type: typeof HIDE_PIN_CHANGE_MODAL;
+}>;
+
+type ShowPinChangeModalActionType = ReadonlyDeep<{
+  type: typeof SHOW_PIN_CHANGE_MODAL;
+}>;
+
+// Not to be confused with pinned messages
+type TogglePinReminderActionType = ReadonlyDeep<{
+  type: typeof TOGGLE_PIN_REMINDER;
+  payload: PinReminderState;
+}>;
+
 export type ShowTerminateGroupFailedModalActionType = ReadonlyDeep<{
   type: typeof SHOW_TERMINATE_GROUP_FAILED_MODAL;
   payload: {
@@ -581,6 +612,7 @@ export type GlobalModalsActionType = ReadonlyDeep<
   | HideKeyTransparencyErrorDialogActionType
   | HideKeyTransparencyOnboardingDialogActionType
   | HideLowDiskSpaceBackupImportModalActionType
+  | HidePinChangeModalActionType
   | HideSendAnywayDialogActiontype
   | HideStoriesSettingsActionType
   | HideTapToViewNotAvailableModalActionType
@@ -600,6 +632,7 @@ export type GlobalModalsActionType = ReadonlyDeep<
   | ShowKeyTransparencyOnboardingDialogActionType
   | ShowLowDiskSpaceBackupImportModalActionType
   | ShowMediaPermissionsModalActionType
+  | ShowPinChangeModalActionType
   | ShowSendAnywayDialogActionType
   | ShowShortcutGuideModalActionType
   | ShowStickerPackPreviewActionType
@@ -624,6 +657,7 @@ export type GlobalModalsActionType = ReadonlyDeep<
   | ToggleGroupMemberLabelInfoModalActionType
   | ToggleMessageRequestActionsConfirmationActionType
   | ToggleNotePreviewModalActionType
+  | TogglePinReminderActionType
   | ToggleProfileNameWarningModalActionType
   | ToggleSafetyNumberModalActionType
   | ToggleSignalConnectionsModalActionType
@@ -651,11 +685,13 @@ export const actions = {
   hideKeyTransparencyErrorDialog,
   hideKeyTransparencyOnboardingDialog,
   hideLowDiskSpaceBackupImportModal,
+  hidePinChangeModal,
   hideStoriesSettings,
   hideTapToViewNotAvailableModal,
   hideTerminateGroupFailedModal,
   hideUserNotFoundModal,
   hideWhatsNewModal,
+  maybeShowPinReminder,
   showBackfillFailureModal,
   showBlockingSafetyNumberChangeDialog,
   showCallQualitySurvey,
@@ -668,6 +704,7 @@ export const actions = {
   showKeyTransparencyErrorDialog,
   showKeyTransparencyOnboardingDialog,
   showLowDiskSpaceBackupImportModal,
+  showPinChangeModal,
   showShareCallLinkViaSignal,
   showShortcutGuideModal,
   showStickerPackPreview,
@@ -676,6 +713,7 @@ export const actions = {
   showTerminateGroupFailedModal,
   showUserNotFoundModal,
   showWhatsNewModal,
+  submitPinChangeModal,
   toggleAboutContactModal,
   toggleAddUserToAnotherGroupModal,
   toggleCallLinkAddNameModal,
@@ -691,6 +729,7 @@ export const actions = {
   toggleGroupMemberLabelInfoModal,
   toggleMessageRequestActionsConfirmation,
   toggleNotePreviewModal,
+  togglePinReminder,
   toggleProfileNameWarningModal,
   toggleSafetyNumberModal,
   toggleSignalConnectionsModal,
@@ -1161,7 +1200,7 @@ function toggleCallLinkPendingParticipantModal(
 }
 
 function toggleAboutContactModal(
-  payload?: ContactModalStateType
+  payload: ContactModalStateType | null
 ): ToggleAboutContactModalActionType {
   return {
     type: TOGGLE_ABOUT_MODAL,
@@ -1181,6 +1220,76 @@ function toggleConfirmationModal(
   return {
     type: TOGGLE_CONFIRMATION_MODAL,
     payload: isOpen,
+  };
+}
+
+function hidePinChangeModal(): HidePinChangeModalActionType {
+  return {
+    type: HIDE_PIN_CHANGE_MODAL,
+  };
+}
+
+function showPinChangeModal(): ShowPinChangeModalActionType {
+  return {
+    type: SHOW_PIN_CHANGE_MODAL,
+  };
+}
+
+function submitPinChangeModal(
+  pin: string
+): ThunkAction<
+  void,
+  RootStateType,
+  unknown,
+  HidePinChangeModalActionType | ToastActionType
+> {
+  return async dispatch => {
+    try {
+      await itemStorage.put('svrPin', pin);
+      await registrationJobQueue.add({
+        type: 'StoreSVR',
+        id: generateUuid(),
+        reason: 'submitPinChangeModal',
+      });
+      drop(pinReminderService.resetPinReminderTimes());
+
+      dispatch(showToast({ toastType: ToastType.PinChangeCompleted }));
+    } catch (error) {
+      log.error(`submitPinChangeModal: error changing PIN`, toLogFormat(error));
+    }
+
+    dispatch({
+      type: HIDE_PIN_CHANGE_MODAL,
+    });
+  };
+}
+
+function maybeShowPinReminder(): ThunkAction<
+  void,
+  RootStateType,
+  unknown,
+  TogglePinReminderActionType
+> {
+  return async (dispatch, getState) => {
+    // Ignore if pin reminder megaphone or dialog is visible
+    const existingState = getState().globalModals.pinReminderState;
+    if (existingState !== PinReminderState.None) {
+      return;
+    }
+
+    dispatch({
+      type: TOGGLE_PIN_REMINDER,
+      payload: PinReminderState.Megaphone,
+    });
+  };
+}
+
+function togglePinReminder(
+  payload: PinReminderState
+): TogglePinReminderActionType {
+  return {
+    type: TOGGLE_PIN_REMINDER,
+    payload,
   };
 }
 
@@ -1298,8 +1407,8 @@ function ensureSystemMediaPermissions(
   ShowMediaPermissionsModalActionType | CloseMediaPermissionsModalActionType
 > {
   return async dispatch => {
-    // Only macOS supported at the moment
-    if (!OS.isMacOS()) {
+    // getMediaAccessStatus is only implemented on macOS and Windows
+    if (!OS.isMacOS() && !OS.isWindows()) {
       return;
     }
 
@@ -1314,7 +1423,12 @@ function ensureSystemMediaPermissions(
     const abortController = new AbortController();
     dispatch({
       type: SHOW_MEDIA_PERMISSIONS_MODAL,
-      payload: { mediaType, requestor, abortController },
+      payload: {
+        mediaType,
+        requestor,
+        osName: OS.isWindows() ? 'windows' : 'macos',
+        abortController,
+      },
     });
 
     const { signal } = abortController;
@@ -1549,6 +1663,7 @@ function hidePinMessageDialog(): TogglePinMessageDialogActionType {
 
 export function getEmptyState(): GlobalModalsStateType {
   return {
+    aboutContactModalState: null,
     backfillFailureModalKind: null,
     hasConfirmationModal: false,
     callLinkAddNameModalRoomId: null,
@@ -1561,6 +1676,7 @@ export function getEmptyState(): GlobalModalsStateType {
     draftGifMessageSendModalProps: null,
     editNicknameAndNoteModalProps: null,
     errorModalProps: null,
+    isPinChangeModalVisible: false,
     isProfileNameWarningModalVisible: false,
     profileNameWarningModalConversationType: undefined,
     isShortcutGuideModalVisible: false,
@@ -1570,6 +1686,7 @@ export function getEmptyState(): GlobalModalsStateType {
     isKeyTransparencyErrorVisible: false,
     isKeyTransparencyOnboardingVisible: false,
     lowDiskSpaceBackupImportModal: null,
+    pinReminderState: PinReminderState.None,
     usernameOnboardingState: UsernameOnboardingState.NeverShown,
     messageRequestActionsConfirmationProps: null,
     tapToViewNotAvailableModalData: null,
@@ -1811,6 +1928,27 @@ export function reducer(
     return {
       ...state,
       isStoriesSettingsVisible: true,
+    };
+  }
+
+  if (action.type === HIDE_PIN_CHANGE_MODAL) {
+    return {
+      ...state,
+      isPinChangeModalVisible: false,
+    };
+  }
+
+  if (action.type === SHOW_PIN_CHANGE_MODAL) {
+    return {
+      ...state,
+      isPinChangeModalVisible: true,
+    };
+  }
+
+  if (action.type === TOGGLE_PIN_REMINDER) {
+    return {
+      ...state,
+      pinReminderState: action.payload,
     };
   }
 

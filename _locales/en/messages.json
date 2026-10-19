@@ -1,4 +1,96 @@
 {
+  "icu:Beacon__modules-description": {
+    "messageformat": "Addons extend Beacon with extra features. Changes apply immediately, no restart needed.",
+    "description": "Description of the Beacon modules page"
+  },
+  "icu:Beacon__modules-empty": {
+    "messageformat": "No addons installed. Use the CSS Editor or console to add one.",
+    "description": "Message when no addons are installed"
+  },
+  "icu:Beacon__modules-enabled": {
+    "messageformat": "Enabled",
+    "description": "Badge for enabled addon"
+  },
+  "icu:Beacon__modules-disabled": {
+    "messageformat": "Disabled",
+    "description": "Badge for disabled addon"
+  },
+  "icu:Beacon__modules-enable": {
+    "messageformat": "Enable",
+    "description": "Button to enable an addon"
+  },
+  "icu:Beacon__modules-disable": {
+    "messageformat": "Disable",
+    "description": "Button to disable an addon"
+  },
+  "icu:Beacon__modules-delete": {
+    "messageformat": "Delete",
+    "description": "Button to delete an addon"
+  },
+  "icu:Beacon__modules-note": {
+    "messageformat": "Disabling or deleting an addon requires an app restart to take effect.",
+    "description": "Note about addon changes requiring restart"
+  },
+  "icu:Preferences__button--beacon-modules": {
+    "messageformat": "Modules",
+    "description": "Left nav button for Beacon modules (addons)"
+  },
+  "icu:Beacon__modules-search": {
+    "messageformat": "Search addons",
+    "description": "Placeholder for the addon search box on the Beacon modules page"
+  },
+  "icu:Beacon__modules-filter-all": {
+    "messageformat": "All",
+    "description": "Filter on the Beacon modules page: show every addon"
+  },
+  "icu:Beacon__modules-filter-enabled": {
+    "messageformat": "Enabled",
+    "description": "Filter on the Beacon modules page: show enabled addons"
+  },
+  "icu:Beacon__modules-filter-disabled": {
+    "messageformat": "Disabled",
+    "description": "Filter on the Beacon modules page: show disabled addons"
+  },
+  "icu:Beacon__modules-count": {
+    "messageformat": "{enabled, number} of {total, number} enabled",
+    "description": "Summary on the Beacon modules page"
+  },
+  "icu:Beacon__modules-no-matches": {
+    "messageformat": "No addons match your search.",
+    "description": "Shown when the addon search has no results"
+  },
+  "icu:Beacon__modules-settings": {
+    "messageformat": "Settings",
+    "description": "Button that expands an addon's settings"
+  },
+  "icu:Beacon__modules-reset": {
+    "messageformat": "Reset to defaults",
+    "description": "Button that resets an addon's settings"
+  },
+  "icu:Beacon__modules-commands": {
+    "messageformat": "Commands",
+    "description": "Heading for the slash commands an addon provides"
+  },
+  "icu:Beacon__modules-shortcuts": {
+    "messageformat": "Shortcuts",
+    "description": "Heading for the keyboard shortcuts an addon provides"
+  },
+  "icu:Beacon__modules-error": {
+    "messageformat": "Failed to start: {message}",
+    "description": "Shown on an addon card when the addon threw while starting"
+  },
+  "icu:Beacon__modules-toggle": {
+    "messageformat": "Enable {name}",
+    "description": "Accessible label for the switch that enables or disables an addon"
+  },
+  "icu:Beacon__modules-title": {
+    "messageformat": "Modules",
+    "description": "Title of the Beacon modules settings page"
+  },
+  "icu:Beacon__restart-now": {
+    "messageformat": "Reload Now",
+    "description": "Button to reload app after addon change"
+  },
   "smartling": {
     "placeholder_format_custom": "(\\$.+?\\$)",
     "string_format_paths": "icu: [*/messageformat]",
@@ -26,6 +118,10 @@
   "icu:AxoDialog.Close": {
     "messageformat": "Close",
     "description": "Axo Design System > Dialog Component > Close Button > Generic accessibility label"
+  },
+  "icu:AxoPasswordField.Reveal": {
+    "messageformat": "Show Password",
+    "description": "Axo Design System > Password Field Component > Reveal Button > Generic accessibility label"
   },
   "icu:AxoTextField.Clear": {
     "messageformat": "Clear",
@@ -94,6 +190,30 @@
   "icu:Preferences__DonateTitle": {
     "messageformat": "Donate to Signal",
     "description": "The title of the preferences pane for donating to signal"
+  },
+  "icu:LinkedDevicesOnboardingDialog__description": {
+    "messageformat": "<bold>Linked Devices</bold> let you access your Signal account and messages securely on any of your additional devices.",
+    "description": "Description of the Linked Devices Onboarding Dialog"
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--1": {
+    "messageformat": "You can link a desktop, tablet or additional phone.",
+    "description": "First bullet point of the Linked Devices Onboarding Dialog"
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--2": {
+    "messageformat": "Your primary device manages what’s linked, you can link up to 5 devices.",
+    "description": "Second bullet point of the Linked Devices Onboarding Dialog"
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3": {
+    "messageformat": "Account settings are managed on your primary device only, including account settings and backups.",
+    "description": "(Deleted 2026/09/10) Third bullet point of the Linked Devices Onboarding Dialog"
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--1": {
+    "messageformat": "Account settings and backups can only be managed on your primary device.",
+    "description": "(Deleted 2026/09/23) Third bullet point of the Linked Devices Onboarding Dialog"
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--2": {
+    "messageformat": "Account settings and Signal Secure Backups can only be managed on your primary device.",
+    "description": "Third bullet point of the Linked Devices Onboarding Dialog"
   },
   "icu:sentMediaQualityStandard": {
     "messageformat": "Standard",
@@ -435,10 +555,6 @@
     "messageformat": "All chats",
     "description": "Left Pane > Inbox > Chat List > Chat Folders > Item Label > All chats"
   },
-  "icu:LeftPaneChatFolders__ItemUnreadBadge__MaxCount": {
-    "messageformat": "{maxCount, number}+",
-    "description": "(Deleted 2026/07/15) Left Pane > Inbox > Chat List > Chat Folders > Item > Badge Count > When over the max count (Example: 1000 or more would be 999+)"
-  },
   "icu:LeftPaneChatFolders__ItemUnreadBadge__AccessibleLabel": {
     "messageformat": "{count, plural, one {# Unread Message} other {# Unread Messages}}",
     "description": "Left Pane > Inbox > Chat List > Chat Folders > Item > Badge Count > Accessible Label"
@@ -498,10 +614,6 @@
   "icu:NavTabs__ItemIconLabel--UnreadCount": {
     "messageformat": "{count, number} unread",
     "description": "Nav Tabs > Unread badge > Accessibility Text"
-  },
-  "icu:NavTabs__ItemIconLabel--MarkedUnread": {
-    "messageformat": "Marked unread",
-    "description": "Nav Tabs > Unread badge > when conversation is marked unread > Accessibility Text"
   },
   "icu:NavTabs__ItemLabel--Chats": {
     "messageformat": "Chats",
@@ -858,16 +970,16 @@
     "messageformat": "Learn more",
     "description": "Text of 'Learn more' button of SafetyNumberNotReady modal"
   },
-  "icu:KeyTransparencyErrorDialog__Title": {
-    "messageformat": "Automatic Key Verification is currently unavailable for your device. Submit debug log?",
+  "icu:KeyTransparencyErrorDialog__Title-v2": {
+    "messageformat": "Automatic Key Verification is currently unavailable for your device. Submit a report to help us improve?",
     "description": "Key Transparency Error Dialog > Title"
   },
-  "icu:KeyTransparencyErrorDialog__Description": {
-    "messageformat": "Debug logs helps us diagnose and fix the issue, and do not contain identifying information.",
+  "icu:KeyTransparencyErrorDialog__Description-v2": {
+    "messageformat": "Including your debug logs help us diagnose and fix the issue, and do not contain identifying information. Sharing is optional.",
     "description": "Key Transparency Error Dialog > Description"
   },
-  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label": {
-    "messageformat": "Share debug log",
+  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label-v2": {
+    "messageformat": "Include debug log",
     "description": "Key Transparency Error Dialog > Share debug log > Label"
   },
   "icu:KeyTransparencyErrorDialog__ShareDebugLog__ViewButton": {
@@ -877,6 +989,10 @@
   "icu:KeyTransparencyErrorDialog__Submit": {
     "messageformat": "Submit",
     "description": "Primary button text in the dialog shown when an unexpected key transparency error occurs. Clicking it will open a support page"
+  },
+  "icu:KeyTransparencyErrorDialog__Cancel": {
+    "messageformat": "No thanks",
+    "description": "Cancel button text in the dialog shown when an unexpected key transparency error occurs. Clicking it will close the dialog"
   },
   "icu:KeyTransparencyOnboardingDialog__Title": {
     "messageformat": "Signal can now auto-verify encryption",
@@ -1004,13 +1120,13 @@
     "messageformat": "You cannot add any more attachments to this message.",
     "description": "An error popup when the user has attempted to add an attachment"
   },
-  "icu:fileSizeWarning": {
-    "messageformat": "Sorry, the selected file exceeds message size restrictions. {limit, number}{units}",
-    "description": "Shown in a toast if the user tries to attach too-large file"
+  "icu:fileTooLargeWarning": {
+    "messageformat": "Can’t send this file because it’s too large. You can send files up to {limit, number}{units}.",
+    "description": "Shown in a toast if the user tries to attach a file that is too large to send"
   },
-  "icu:videoFileSizeWarning": {
-    "messageformat": "Sorry, the selected video file exceeds message size restrictions. {limit, number}{units}",
-    "description": "Shown in a toast if the user tries to attach too-large video file"
+  "icu:videoFileTooLargeWarning": {
+    "messageformat": "Can’t send this video file because it’s too large. You can send video files up to {limit, number}{units}.",
+    "description": "Shown in a toast if the user tries to attach a video file that is too large to send"
   },
   "icu:unableToLoadAttachment": {
     "messageformat": "Unable to load selected attachment."
@@ -1038,6 +1154,10 @@
   "icu:checkNetworkConnection": {
     "messageformat": "Check your network connection.",
     "description": "Obvious instructions for when a user's computer loses its network connection"
+  },
+  "icu:clockSkewDetected": {
+    "messageformat": "Your device date is inaccurate. Adjust your clock and try again. Your device date and time is:",
+    "description": "Warning notification that the system clock is out of date. The user's device date and time is shown directly below, for example: Jul 31, 2026, 12:42:19 PM PDT"
   },
   "icu:submitDebugLog": {
     "messageformat": "Debug log",
@@ -1333,6 +1453,10 @@
   "icu:mute": {
     "messageformat": "Mute",
     "description": "Shown in a button when a conversation is unmuted and can be muted"
+  },
+  "icu:muted": {
+    "messageformat": "Muted",
+    "description": "Label for icon showing conversation is muted"
   },
   "icu:cannotUpdateDetail-v2": {
     "messageformat": "Signal couldn't update. <retryUpdateButton>Retry update</retryUpdateButton> or visit {url} to install it manually. Then, <contactSupportLink>contact support</contactSupportLink> about this problem",
@@ -1677,6 +1801,10 @@
   "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync": {
     "messageformat": "All messages in this chat will be deleted from all your devices.",
     "description": "Description for confirmation modal to delete a conversation"
+  },
+  "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync--still-member": {
+    "messageformat": "All messages in this chat will be deleted from all your devices. You will still be a member of this group.",
+    "description": "Description for confirmation modal to delete a conversation, if you are still part of the group."
   },
   "icu:ConversationHeader__ContextMenu__LeaveGroupAction__title": {
     "messageformat": "Leave group",
@@ -2142,10 +2270,6 @@
     "messageformat": "Emoji skin tone",
     "description": "Preferences Window > Chats Tab > Emoji skin tone default setting > Label"
   },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__Title": {
-    "messageformat": "Chat folders",
-    "description": "Preferences > Chats Page > Chat Folders Section > Title"
-  },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Title": {
     "messageformat": "Add a chat folder",
     "description": "Preferences > Chats Page > Chat Folders Section > Add Chat Folder Item > Title"
@@ -2161,14 +2285,6 @@
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Description--WithChatFolders": {
     "messageformat": "{chatFoldersCount, plural, one {# folder} other {# folders}}",
     "description": "Preferences > Chats Page > Chat Folders Section > Add Chat Folder Item > Description (with chat folders)"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button": {
-    "messageformat": "Set up",
-    "description": "Preferences > Chats Page > Chat Folders Section > Add Chat Folder Item > Button"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button--WithChatFolders": {
-    "messageformat": "Manage",
-    "description": "Preferences > Chats Page > Chat Folders Section > Add Chat Folder Item > Button (with chat folders)"
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__ChatFolderItem__ContextMenu__EditFolder": {
     "messageformat": "Edit folder",
@@ -3150,7 +3266,7 @@
   },
   "icu:callSystemNotificationDescription": {
     "messageformat": "Show notifications for calls",
-    "description": "Description for call notification setting"
+    "description": "(Deleted 2026/09/23) Description for call notification setting"
   },
   "icu:incomingCallNotificationDescription": {
     "messageformat": "Enable incoming calls",
@@ -3168,17 +3284,13 @@
     "messageformat": "Verify Safety Number",
     "description": "Title for the modal for safety number verification"
   },
-  "icu:safetyNumberChanged": {
-    "messageformat": "Safety Number has changed",
-    "description": "A notification shown in the conversation when a contact reinstalls"
-  },
   "icu:safetyNumberChanges": {
     "messageformat": "Safety Number Changes",
     "description": "Title for safety number changed modal"
   },
   "icu:safetyNumberChangedGroup": {
     "messageformat": "Safety Number with {name} has changed",
-    "description": "A notification shown in a group conversation when a contact reinstalls, showing the contact name"
+    "description": "A notification shown in a group and 1:1 conversations when a contact reinstalls, showing the contact name"
   },
   "icu:ConversationDetails__viewSafetyNumber": {
     "messageformat": "View Safety Number",
@@ -4044,7 +4156,7 @@
   },
   "icu:FunSearch__ClearButtonLabel": {
     "messageformat": "Clear Search",
-    "description": "FunPicker > Search Field > Clear Search Button > Accessibility Label"
+    "description": "(Deleted 2026/10/01) FunPicker > Search Field > Clear Search Button > Accessibility Label"
   },
   "icu:FunSkinTones__List": {
     "messageformat": "Skin tone",
@@ -5138,25 +5250,25 @@
     "messageformat": "Minimize preview",
     "description": "Title for button to make in-call video preview smaller"
   },
-  "icu:calling__change-view": {
-    "messageformat": "Change view",
-    "description": "Tooltip for changing the in-call layout of remote participants in a group call"
-  },
-  "icu:calling__view_mode--paginated": {
-    "messageformat": "Grid view",
-    "description": "Label for option to view participants in a group call in a paginated grid view"
-  },
-  "icu:calling__view_mode--overflow": {
-    "messageformat": "Sidebar view",
-    "description": "Label for option to view participants in a group call where videos that don't fit onto the page are put into a scrollable overflow sidebar"
-  },
-  "icu:calling__view_mode--speaker": {
-    "messageformat": "Speaker view",
-    "description": "Label for option to view participants where only the current speaker's video is fully visible and all others are put into a scrollable overflow sidebar"
-  },
   "icu:calling__view_mode--updated": {
     "messageformat": "View updated",
     "description": "Toast shown whenver the calling view mode is changed (e.g. paginated view -> speaker view)"
+  },
+  "icu:calling__change-layout": {
+    "messageformat": "Change layout",
+    "description": "Tooltip for the button that changes the in-call layout of remote participants in a group call"
+  },
+  "icu:calling__layout--paginated": {
+    "messageformat": "Grid",
+    "description": "Label for option to view participants in a group call in a paginated grid layout"
+  },
+  "icu:calling__layout--overflow": {
+    "messageformat": "Sidebar",
+    "description": "Label for option to view participants in a group call where videos that don't fit onto the page are put into a scrollable overflow sidebar"
+  },
+  "icu:calling__layout--speaker": {
+    "messageformat": "Speaker",
+    "description": "Label for option to view participants where only the current speaker's video is fully visible and all others are put into a scrollable overflow sidebar"
   },
   "icu:calling__SelectPresentingSourcesModal--title": {
     "messageformat": "Share your screen",
@@ -5242,29 +5354,61 @@
     "messageformat": "Not muted",
     "description": "Label when the conversation is not muted"
   },
-  "icu:muteHour": {
-    "messageformat": "Mute for one hour",
-    "description": "Label for muting the conversation"
-  },
-  "icu:muteEightHours": {
-    "messageformat": "Mute for eight hours",
-    "description": "Label for muting the conversation"
-  },
-  "icu:muteDay": {
-    "messageformat": "Mute for one day",
-    "description": "Label for muting the conversation"
-  },
-  "icu:muteWeek": {
-    "messageformat": "Mute for one week",
-    "description": "Label for muting the conversation"
-  },
-  "icu:muteAlways": {
-    "messageformat": "Mute always",
-    "description": "Label for muting the conversation"
-  },
   "icu:unmute": {
     "messageformat": "Unmute",
     "description": "Label for unmuting the conversation"
+  },
+  "icu:MuteMenu__label": {
+    "messageformat": "Mute this chat for…",
+    "description": "Header shown at the top of the mute notifications menu when the chat is not currently muted"
+  },
+  "icu:MuteMenu__hour": {
+    "messageformat": "1 hour",
+    "description": "Label for muting the conversation for one hour"
+  },
+  "icu:MuteMenu__eightHours": {
+    "messageformat": "8 hours",
+    "description": "Label for muting the conversation for eight hours"
+  },
+  "icu:MuteMenu__day": {
+    "messageformat": "1 day",
+    "description": "Label for muting the conversation for one day"
+  },
+  "icu:MuteMenu__week": {
+    "messageformat": "1 week",
+    "description": "Label for muting the conversation for one week"
+  },
+  "icu:MuteMenu__until": {
+    "messageformat": "Until…",
+    "description": "Label for muting the conversation until a date and time the user picks. Opens a dialog."
+  },
+  "icu:MuteMenu__always": {
+    "messageformat": "Always",
+    "description": "Label for muting the conversation forever"
+  },
+  "icu:DatePicker__popupTitle": {
+    "messageformat": "Choose a date",
+    "description": "Title of the popup for choosing a date, only read out by screen readers"
+  },
+  "icu:TimePicker__popupTitle": {
+    "messageformat": "Choose a time",
+    "description": "Title of the popup for choosing a time, only read out by screen readers"
+  },
+  "icu:MuteUntilDialog__title": {
+    "messageformat": "Mute this chat until…",
+    "description": "Title of the dialog where a date and time to mute the conversation until is picked"
+  },
+  "icu:MuteUntilDialog__dateLabel": {
+    "messageformat": "Date",
+    "description": "Accessible label for the date field in the dialog where a date and time to mute the conversation until is picked"
+  },
+  "icu:MuteUntilDialog__timeLabel": {
+    "messageformat": "Time",
+    "description": "Accessible label for the time field in the dialog where a date and time to mute the conversation until is picked"
+  },
+  "icu:MuteUntilDialog__timeZoneNote": {
+    "messageformat": "All times in {timeZone}",
+    "description": "Note below the date and time fields telling the user which time zone the times are in. {timeZone} is a time zone name, like 'Eastern Time'."
   },
   "icu:muteExpirationLabelAlways": {
     "messageformat": "Muted always",
@@ -6392,7 +6536,7 @@
   },
   "icu:countMutedConversationsDescription": {
     "messageformat": "Include muted chats in badge count",
-    "description": "Description for counting muted conversations in badge setting"
+    "description": "(Deleted 2026/09/23) Description for counting muted conversations in badge setting"
   },
   "icu:ContactModal--nickname": {
     "messageformat": "Nickname",
@@ -6473,10 +6617,6 @@
   "icu:showConversationDetails--direct": {
     "messageformat": "Chat settings",
     "description": "This is a button in the conversation context menu to show chat settings"
-  },
-  "icu:ConversationDetails__unmute--title": {
-    "messageformat": "Unmute this chat?",
-    "description": "Title for the modal to unmute a chat"
   },
   "icu:ConversationDetails--group-link": {
     "messageformat": "Group link",
@@ -6738,6 +6878,10 @@
     "messageformat": "See all",
     "description": "This is a button on the conversation details to show all members"
   },
+  "icu:ConversationDetailsMembershipList__Search__AccessibilityLabel": {
+    "messageformat": "Search",
+    "description": "ConversationDetailsMembershipList > Search > Accessibility Label"
+  },
   "icu:ConversationDetailsGroups--title": {
     "messageformat": "{count, plural, one {# group} other {# groups}} in common",
     "description": "Title of the groups-in-common panel, in the contact details"
@@ -6786,21 +6930,145 @@
     "messageformat": "Note",
     "description": "Input placeholder for the note input in the edit nickname and note modal"
   },
-  "icu:ConversationNotificationsSettings__mentions__label": {
+  "icu:WhileMuted__title": {
+    "messageformat": "While muted",
+    "description": "Title of the panel, and label of the row that opens it, for choosing which notifications still come through while a chat is muted"
+  },
+  "icu:WhileMuted__description": {
+    "messageformat": "Choose notifications to show while this chat is muted.",
+    "description": "Sub-label of the row in conversation notification settings that opens the 'While muted' panel"
+  },
+  "icu:WhileMuted__calls__title": {
+    "messageformat": "Calls",
+    "description": "In the 'While muted' panel, label for the switch that allows call notifications while the chat is muted"
+  },
+  "icu:WhileMuted__calls__description": {
+    "messageformat": "Ring or notify when a call is started while this chat is muted.",
+    "description": "In the 'While muted' panel, sub-label for the switch that allows call notifications while the chat is muted"
+  },
+  "icu:WhileMuted__mentions__title": {
     "messageformat": "Mentions",
-    "description": "In the conversation notifications settings, this is the label for the mentions option"
+    "description": "In the 'While muted' panel, label for the switch that allows @mention notifications while the chat is muted"
   },
-  "icu:ConversationNotificationsSettings__mentions__info": {
-    "messageformat": "Receive notifications when you're mentioned in muted chats",
-    "description": "In the conversation notifications settings, this is the sub-label for the mentions option"
+  "icu:WhileMuted__mentions__description": {
+    "messageformat": "Notify when you are @mentioned while this chat is muted.",
+    "description": "In the 'While muted' panel, sub-label for the switch that allows @mention notifications while the chat is muted"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__always-notify": {
-    "messageformat": "Always notify",
-    "description": "In the conversation notifications settings, this is the option that always notifies you for @mentions"
+  "icu:WhileMuted__replies__title": {
+    "messageformat": "Replies",
+    "description": "In the 'While muted' panel, label for the switch that allows reply notifications while the chat is muted"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__dont-notify-for-mentions-if-muted": {
-    "messageformat": "Don't notify if muted",
-    "description": "In the conversation notifications settings, this is the option that doesn't notify you for @mentions if the conversation is muted"
+  "icu:WhileMuted__replies__description": {
+    "messageformat": "Notify when someone replies to your message while this chat is muted.",
+    "description": "In the 'While muted' panel, sub-label for the switch that allows reply notifications while the chat is muted"
+  },
+  "icu:WhileMuted__value--none": {
+    "messageformat": "None",
+    "description": "Summary shown on the 'While muted' row when no notifications come through while the chat is muted"
+  },
+  "icu:WhileMuted__value--calls": {
+    "messageformat": "Calls",
+    "description": "Summary shown on the 'While muted' row when only calls notify while the chat is muted"
+  },
+  "icu:WhileMuted__value--mentions": {
+    "messageformat": "Mentions",
+    "description": "Summary shown on the 'While muted' row when only mentions notify while the chat is muted"
+  },
+  "icu:WhileMuted__value--replies": {
+    "messageformat": "Replies",
+    "description": "Summary shown on the 'While muted' row when only replies notify while the chat is muted"
+  },
+  "icu:WhileMuted__value--calls-mentions": {
+    "messageformat": "Calls, mentions",
+    "description": "Summary shown on the 'While muted' row when calls and mentions notify while the chat is muted"
+  },
+  "icu:WhileMuted__value--calls-replies": {
+    "messageformat": "Calls, replies",
+    "description": "Summary shown on the 'While muted' row when calls and replies notify while the chat is muted"
+  },
+  "icu:WhileMuted__value--mentions-replies": {
+    "messageformat": "Mentions, replies",
+    "description": "Summary shown on the 'While muted' row when mentions and replies notify while the chat is muted"
+  },
+  "icu:WhileMuted__value--calls-mentions-replies": {
+    "messageformat": "Calls, mentions, replies",
+    "description": "Summary shown on the 'While muted' row when calls, mentions, and replies all notify while the chat is muted"
+  },
+  "icu:Preferences__WhileMuted__description": {
+    "messageformat": "Choose notifications to show for muted chats.",
+    "description": "Sub-label of the row in notification settings that opens the global 'While muted' page"
+  },
+  "icu:Preferences__WhileMuted__calls__description": {
+    "messageformat": "Ring or notify when a call is started in muted chats.",
+    "description": "On the global 'While muted' settings page, sub-label for the switch that allows call notifications in muted chats"
+  },
+  "icu:Preferences__WhileMuted__mentions__description": {
+    "messageformat": "Notify when you are mentioned in muted chats.",
+    "description": "On the global 'While muted' settings page, sub-label for the switch that allows @mention notifications in muted chats"
+  },
+  "icu:Preferences__WhileMuted__replies__description": {
+    "messageformat": "Notify when someone replies to your message in muted chats.",
+    "description": "On the global 'While muted' settings page, sub-label for the switch that allows reply notifications in muted chats"
+  },
+  "icu:UnreadReminders__title": {
+    "messageformat": "Unread reminders",
+    "description": "Label of the switch, in both global and per-chat notification settings, that occasionally re-notifies about unread messages in muted chats"
+  },
+  "icu:UnreadReminders__description": {
+    "messageformat": "Occasionally notify when there are unread messages while this chat is muted.",
+    "description": "In conversation notification settings, sub-label for the 'Unread reminders' switch"
+  },
+  "icu:Preferences__UnreadReminders__description": {
+    "messageformat": "Occasionally notify when there are unread messages in muted chats.",
+    "description": "In the global notification settings, sub-label for the 'Unread reminders' switch"
+  },
+  "icu:UnreadReminders__notification--messages--1": {
+    "messageformat": "You have {messageCount, plural, one {# unread message} other {# unread messages}} from {person1}.",
+    "description": "Body of the 'unread reminder' notification for a muted chat when there are unread messages from one person"
+  },
+  "icu:UnreadReminders__notification--messages--2": {
+    "messageformat": "You have {messageCount, plural, one {# unread message} other {# unread messages}} from {person1} and {person2}.",
+    "description": "Body of the 'unread reminder' notification for a muted chat when there are unread messages from two people"
+  },
+  "icu:UnreadReminders__notification--messages--many": {
+    "messageformat": "You have {messageCount, plural, one {# unread message} other {# unread messages}} from {person1}, {person2}, and others.",
+    "description": "Body of the 'unread reminder' notification for a muted chat when there are unread messages from three or more people"
+  },
+  "icu:UnreadReminders__notification--messages-including-mentions": {
+    "messageformat": "You have {messageCount, plural, one {# unread message} other {# unread messages}}, including {mentionSummary}.",
+    "description": "Body of the 'unread reminder' notification for a muted chat when some unread messages mention you. {mentionSummary} is a phrase like 'a mention of you by Alice', see: icu:UnreadReminders__notification__mentionSummary--1"
+  },
+  "icu:UnreadReminders__notification--messages-including-replies": {
+    "messageformat": "You have {messageCount, plural, one {# unread message} other {# unread messages}}, including {replySummary}.",
+    "description": "Body of the 'unread reminder' notification for a muted chat when some unread messages are replies to you, none mention you, and there are no missed calls. {replySummary} is a phrase like 'a reply from Alice', see: icu:UnreadReminders__notification__replySummary--1"
+  },
+  "icu:UnreadReminders__notification--counts--messages": {
+    "messageformat": "You have {messageCount, plural, one {# unread message} other {# unread messages}}.",
+    "description": "Body of the 'unread reminder' notification for a muted chat when no names may be shown"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--1": {
+    "messageformat": "{mentionCount, plural, one {a mention} other {# mentions}} of you by {person1}",
+    "description": "Body of the 'unread reminder' notification for a muted chat when one person mentioned you"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--2": {
+    "messageformat": "{mentionCount, plural, one {# mention} other {# mentions}} of you by {person1} and {person2}",
+    "description": "Body of the 'unread reminder' notification for a muted chat when two people mentioned you"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--many": {
+    "messageformat": "{mentionCount, plural, one {# mention} other {# mentions}} of you by {person1} and others",
+    "description": "Body of the 'unread reminder' notification for a muted chat when three or more people mentioned you"
+  },
+  "icu:UnreadReminders__notification__replySummary--1": {
+    "messageformat": "{replyCount, plural, one {a reply} other {# replies}} from {person1}",
+    "description": "Body of the 'unread reminder' notification for a muted chat when one person replied to you"
+  },
+  "icu:UnreadReminders__notification__replySummary--2": {
+    "messageformat": "{replyCount, plural, one {# reply} other {# replies}} from {person1} and {person2}",
+    "description": "Body of the 'unread reminder' notification for a muted chat when two people replied to you"
+  },
+  "icu:UnreadReminders__notification__replySummary--many": {
+    "messageformat": "{replyCount, plural, one {# reply} other {# replies}} from {person1} and others",
+    "description": "Body of the 'unread reminder' notification for a muted chat when three or more people replied to you"
   },
   "icu:GroupLinkManagement--clipboard": {
     "messageformat": "Group link copied.",
@@ -6829,6 +7097,62 @@
   "icu:GroupLinkManagement__CopyGroupLinkButtonLabel": {
     "messageformat": "Copy signal.group link to clipboard",
     "description": "GroupLinkManagement > Header > Group link text > Button (looks like normal text) > Accessibility label"
+  },
+  "icu:GroupMembersSearchDialog__DialogTitle": {
+    "messageformat": "Search members",
+    "description": "GroupMembersSearchDialog > Dialog Title"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder": {
+    "messageformat": "Search",
+    "description": "GroupMembersSearchDialog > Search > Placeholder"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringByAdmins": {
+    "messageformat": "Search admins",
+    "description": "GroupMembersSearchDialog > Search > Placeholder"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringBySystemContacts": {
+    "messageformat": "Search contacts",
+    "description": "GroupMembersSearchDialog > Search > Placeholder"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Label": {
+    "messageformat": "Filter",
+    "description": "GroupMembersSearchDialog > Filter Menu > Label"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__AllMembers": {
+    "messageformat": "All members",
+    "description": "GroupMembersSearchDialog > Filter Menu > "
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Admins": {
+    "messageformat": "Admins",
+    "description": "GroupMembersSearchDialog > Filter Menu > Admins"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__SystemContacts": {
+    "messageformat": "Contacts",
+    "description": "GroupMembersSearchDialog > Filter Menu > System Contacts"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithoutSearchQuery": {
+    "messageformat": "No results",
+    "description": "GroupMembersSearchDialog > No results (without search query)"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithSearchQuery": {
+    "messageformat": "No results for “{searchQuery}”",
+    "description": "GroupMembersSearchDialog > No results (with search query)"
+  },
+  "icu:GroupMembersSearchDialog__MemberItem__Admin": {
+    "messageformat": "Admin",
+    "description": "GroupMembersSearchDialog > Member Item > Admin"
+  },
+  "icu:GroupMembersSearchDialog__SearchResults__Title": {
+    "messageformat": "Search Results",
+    "description": "GroupMembersSearchDialog > Search Results > Title"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__AddMembers": {
+    "messageformat": "Add members",
+    "description": "GroupMembersSearchDialog > Bottom Actions > Add members"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__InviteViaGroupLink": {
+    "messageformat": "Invite via group link",
+    "description": "GroupMembersSearchDialog > Bottom Actions > Invite via group link"
   },
   "icu:PendingInvites--tab-requests": {
     "messageformat": "Requests ({count, number})",
@@ -7210,6 +7534,10 @@
   "icu:CaptchaDialog__second-paragraph": {
     "messageformat": "After verifying, you can continue messaging. Any paused messages will automatically be sent.",
     "description": "First paragraph in the captcha dialog"
+  },
+  "icu:CaptchaDialog__continue": {
+    "messageformat": "Continue",
+    "description": "Continue action in dialog"
   },
   "icu:CaptchaDialog--can-close__title": {
     "messageformat": "Continue without verifying?",
@@ -7832,6 +8160,18 @@
     "messageformat": "Hear a notification sound for sent and received messages while in the chat.",
     "description": "Description for message audio setting"
   },
+  "icu:Preferences__reaction-notifications-title": {
+    "messageformat": "Reaction notifications",
+    "description": "Title of setting to enable/disable system notifications when someone reacts to your message"
+  },
+  "icu:Preferences__reaction-notifications-description": {
+    "messageformat": "Notify when someone reacts to your message",
+    "description": "Description of setting to enable/disable system notifications when someone reacts to your message"
+  },
+  "icu:Preferences__button--account": {
+    "messageformat": "Account",
+    "description": "Button to switch the settings view"
+  },
   "icu:Preferences__button--general": {
     "messageformat": "General",
     "description": "Button to switch the settings view"
@@ -7924,6 +8264,58 @@
     "messageformat": "System",
     "description": "Title for system type settings"
   },
+  "icu:Preferences--signal-login": {
+    "messageformat": "Signal Login",
+    "description": "Title for Signal Login part of Account settings"
+  },
+  "icu:Preferences--signal-login-description": {
+    "messageformat": "Your Signal Login is used to recover and restore your account. Keep these keys stored safely in a password manager you trust. <learnMoreLink>Learn more</learnMoreLink>.",
+    "description": "Footer for Signal Login part of Account settings"
+  },
+  "icu:Preferences--signal-login-description--learn-more": {
+    "messageformat": "Learn more",
+    "description": "Footer for Signal Login part of Account settings > Learn More"
+  },
+  "icu:Preferences__SignalAccount__label": {
+    "messageformat": "Account & Recovery",
+    "description": "Label for Signal Login preferences item"
+  },
+  "icu:Preferences__SignalAccount__description": {
+    "messageformat": "2 keys",
+    "description": "Description for Signal Login preferences item"
+  },
+  "icu:Preferences__SignalAccountKeys__Title": {
+    "messageformat": "Your Signal Login",
+    "description": "Title displayed in PDF version of Signal Account Keys preferences page"
+  },
+  "icu:Preferences__SignalAccountKeys__Description": {
+    "messageformat": "Store this in a safe place, your login info is required to recover your account and data. Never share it with anyone.",
+    "description": "Description displayed in PDF version of Signal Account Keys preferences page"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountKey": {
+    "messageformat": "Account key",
+    "description": "(Deleted 2026/09/10) Label for the Account Key in Signal Account Keys preferences page"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountID": {
+    "messageformat": "Account ID",
+    "description": "Label for the Account ID in Signal Account Keys preferences page"
+  },
+  "icu:Preferences__SignalAccountKeys__RecoveryKey": {
+    "messageformat": "Recovery key",
+    "description": "Label for the Recovery Key in Signal Account Keys preferences page"
+  },
+  "icu:Preferences__SignalAccountKeys__Save": {
+    "messageformat": "Save",
+    "description": "Text of button in Signal Account Keys preferences page"
+  },
+  "icu:Preferences__Account__LinkedDevice__label": {
+    "messageformat": "This is a linked device",
+    "description": "Label of linked device section of Account settings"
+  },
+  "icu:Preferences__Account__LinkedDevice__description": {
+    "messageformat": "To manage your account settings, open Signal on your primary device.",
+    "description": "Description of linked device section of Account settings"
+  },
   "icu:Preferences--zoom": {
     "messageformat": "Zoom level",
     "description": "Label for changing the zoom level"
@@ -7964,9 +8356,153 @@
     "messageformat": "Advanced",
     "description": "Title for advanced settings"
   },
-  "icu:Preferences--notification-content": {
-    "messageformat": "Notification content",
-    "description": "Label for the notification content setting select box"
+  "icu:Preferences--change-signal-pin": {
+    "messageformat": "Change your PIN",
+    "description": "Title for changing Signal PIN in settings"
+  },
+  "icu:Preferences--change-signal-pin-button": {
+    "messageformat": "Change",
+    "description": "Button for changing Signal PIN in settings"
+  },
+  "icu:Preferences--create-signal-pin": {
+    "messageformat": "Create a PIN",
+    "description": "Title for creating Signal PIN in settings when you don't have one"
+  },
+  "icu:Preferences--create-signal-pin-button": {
+    "messageformat": "Create",
+    "description": "Button for creating Signal PIN in settings when you don't have one"
+  },
+  "icu:Preferences--signal-pin": {
+    "messageformat": "Signal PIN",
+    "description": "Title for Signal PIN settings"
+  },
+  "icu:Preferences--signal-pin__footer": {
+    "messageformat": "PINs keep information stored with Signal encrypted so only you can access it. Your PIN cannot be recovered. Your profile, settings, and contacts will restore when you reinstall Signal. <learnMoreLink>Learn more</learnMoreLink>",
+    "description": "Footer text for Signal PIN settings section"
+  },
+  "icu:Preferences--signal-pin-advanced-settings": {
+    "messageformat": "Advanced PIN settings",
+    "description": "In Signal PIN settings, label of the row that opens an advanced panel for disabling and enabling Signal PIN."
+  },
+  "icu:Preferences--disable-signal-pin": {
+    "messageformat": "Disable PIN",
+    "description": "In Signal PIN advanced settings, label of the row to disable your Signal PIN."
+  },
+  "icu:Preferences--disable-signal-pin--button": {
+    "messageformat": "Disable",
+    "description": "In Signal PIN advanced settings, label of the button to disable your Signal PIN."
+  },
+  "icu:Preferences--disable-signal-pin--footer": {
+    "messageformat": "If you disable the PIN, you will lose all data when you re-register Signal unless you manually back up and restore. You can not turn on Registration Lock while the PIN is disabled.",
+    "description": "In Signal PIN advanced settings, footer description of the row to disable your Signal PIN."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--title": {
+    "messageformat": "Disable PIN failed due to registration lock",
+    "description": "Accessibility title of error dialog when trying to disable Signal PIN while registration lock is on."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--body": {
+    "messageformat": "You must disable Registration Lock before disabling your PIN.",
+    "description": "Body of error dialog when trying to disable Signal PIN while registration lock is on."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--ok": {
+    "messageformat": "OK",
+    "description": "Label of button in error dialog when trying to disable Signal PIN while registration lock is on."
+  },
+  "icu:DisableSignalPinErrorDialog--backups--title": {
+    "messageformat": "Disable PIN failed due to backups",
+    "description": "Accessibility title of error dialog when trying to disable Signal PIN while Signal Backups is enabled."
+  },
+  "icu:DisableSignalPinErrorDialog--backups--body": {
+    "messageformat": "You must disable backups before disabling your PIN.",
+    "description": "Body of error dialog when trying to disable Signal PIN while Signal Backups is enabled."
+  },
+  "icu:Preferences--enable-signal-pin": {
+    "messageformat": "Enable PIN",
+    "description": "In Signal PIN advanced settings, label of the row to enable Signal PIN."
+  },
+  "icu:Preferences--enable-signal-pin--button": {
+    "messageformat": "Enable",
+    "description": "In Signal PIN advanced settings, label of the button to enable Signal PIN."
+  },
+  "icu:Preferences--pin-reminders--header": {
+    "messageformat": "PIN reminders",
+    "description": "Header for Signal PIN reminders setting"
+  },
+  "icu:Preferences--pin-reminders--description": {
+    "messageformat": "You'll be asked less frequently over time",
+    "description": "(Deleted 2026/10/01) Description for Signal PIN reminders setting"
+  },
+  "icu:Preferences--registration-lock__label": {
+    "messageformat": "Registration Lock",
+    "description": "Label for Registration Lock settings"
+  },
+  "icu:Preferences--registration-lock__footer": {
+    "messageformat": "Require your Signal PIN to register your phone number again with Signal.",
+    "description": "Footer text for Registration Lock setting"
+  },
+  "icu:Preferences__Chats__TextInputSection__Title": {
+    "messageformat": "Text input",
+    "description": "Preferences > Chats > Text Input Section > Title"
+  },
+  "icu:Preferences__Chats__ChatFoldersSection__Title": {
+    "messageformat": "Chat folders",
+    "description": "Preferences > Chats > Chat Folders Section > Title"
+  },
+  "icu:Preferences__Notifications__Show__Label": {
+    "messageformat": "Show",
+    "description": "Preferences > Notifications > Label for the select box choosing how much content notifications display"
+  },
+  "icu:Preferences__Notifications__SoundsSection__Title": {
+    "messageformat": "Sounds",
+    "description": "Preferences > Notifications > Sounds Section > Title"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title": {
+    "messageformat": "App badge",
+    "description": "(Deleted 2026/09/23) Preferences > Notifications > App Badge Section > Title"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title-v2": {
+    "messageformat": "Unread badges",
+    "description": "Preferences > Notifications > App Badge Section > Title"
+  },
+  "icu:Preferences__Notifications__Reset__title": {
+    "messageformat": "Reset notification settings to default, including custom settings for your chats.",
+    "description": "Preferences > Notifications > Reset Section > Text of the row that restores the default notification settings"
+  },
+  "icu:Preferences__Notifications__Reset__button": {
+    "messageformat": "Reset",
+    "description": "Preferences > Notifications > Reset Section > Label of the button that restores the default notification settings"
+  },
+  "icu:Preferences__Notifications__Reset__modal--body": {
+    "messageformat": "Reset all notification settings to default for all chats?",
+    "description": "Preferences > Notifications > Reset Section > Confirmation Modal > Body. The modal has no visible title, so this is the only text in it."
+  },
+  "icu:Preferences__Notifications__Reset__modal--confirm": {
+    "messageformat": "Reset",
+    "description": "Preferences > Notifications > Reset Section > Confirmation Modal > Label of the button that confirms restoring the default notification settings"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Label": {
+    "messageformat": "Badge count",
+    "description": "Preferences > Notifications > App Badge Section > Label for the badge count setting select box"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Description": {
+    "messageformat": "Select if the badge count displays the number of unread messages or the number of unread chats",
+    "description": "Preferences > Notifications > App Badge Section > Description for the badge count setting select box"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadMessages": {
+    "messageformat": "Unread messages",
+    "description": "Preferences > Notifications > App Badge Section > Option for showing the number of unread messages in the badge count"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadChats": {
+    "messageformat": "Unread chats",
+    "description": "Preferences > Notifications > App Badge Section > Option for showing the number of unread chats in the badge count"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats": {
+    "messageformat": "Include muted chats in app badge",
+    "description": "Title for counting muted conversations in badge setting"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats__description": {
+    "messageformat": "Chat folder badges will always include muted chats",
+    "description": "Description for counting muted conversations in badge setting"
   },
   "icu:PlaintextExport--PreferencesRow--Header": {
     "messageformat": "Export chat history",
@@ -8168,10 +8704,6 @@
     "messageformat": "Notification profiles",
     "description": "Label for the notification profiles setting button"
   },
-  "icu:NotificationProfiles--setup": {
-    "messageformat": "Set up",
-    "description": "Button text to setup notification profiles"
-  },
   "icu:NotificationProfiles--title": {
     "messageformat": "Notification Profiles",
     "description": "Header text for notification profiles"
@@ -8187,10 +8719,6 @@
   "icu:NotificationProfiles--manage-description": {
     "messageformat": "Add or edit notification profiles",
     "description": "Description text on the Notifications preferences page when the user already has profiles"
-  },
-  "icu:NotificationProfiles--manage-profiles": {
-    "messageformat": "{profileCount, plural, one {One profile} other {# profiles}}",
-    "description": "Button text to take user to profile list page when they already have notification profiles"
   },
   "icu:NotificationProfiles--create": {
     "messageformat": "Create profile",
@@ -8443,6 +8971,10 @@
   "icu:Preferences--blocked-groups": {
     "messageformat": "Blocked Groups",
     "description": "Header for groups section on the blocked preferences subpage"
+  },
+  "icu:Preferences--blocked--blocked-on": {
+    "messageformat": "Blocked on {blockedAt}",
+    "description": "A second line shown under the contact's name in block list if we have a timestamp for that blocked contact or group"
   },
   "icu:Preferences--signal-backups": {
     "messageformat": "Signal Secure Backups",
@@ -8720,10 +9252,6 @@
     "messageformat": "Choose who can see your phone number and who can contact you on Signal with it.",
     "description": "Body of Phone Number row in Privacy section of Preferences window"
   },
-  "icu:Preferences__pnp__row--button": {
-    "messageformat": "Change\u2026",
-    "description": "Text of Phone Number row button in Privacy section of Preferences window"
-  },
   "icu:Preferences__pnp__sharing--title": {
     "messageformat": "Who can see my number",
     "description": "Title for the phone number sharing setting row"
@@ -8788,17 +9316,13 @@
     "messageformat": "Read receipts",
     "description": "Label for the read receipts setting"
   },
-  "icu:Preferences--read-receipts--description": {
-    "messageformat": "If disabled, you won't see read receipts from others.",
-    "description": "Description for the read receipts setting"
-  },
   "icu:Preferences--typing-indicators": {
     "messageformat": "Typing indicators",
     "description": "Label for the typing indicators setting"
   },
-  "icu:Preferences--typing-indicators--description": {
-    "messageformat": "If disabled, you won't see typing indicators from others.",
-    "description": "Description for the typing indicators setting"
+  "icu:Preferences--messaging-help": {
+    "messageformat": "See and share when message are being read and typed. If disabled, you won’t see read receipts or typing indicators from others.",
+    "description": "Help text at the bottom of the messaging section of privacy preferences"
   },
   "icu:Preferences--updates": {
     "messageformat": "Updates",
@@ -8936,13 +9460,29 @@
     "messageformat": "Update Required",
     "description": "The title of update dialog on install screen when app update is required before proceeding with backup import"
   },
+  "icu:InstallScreenUpdateDialog--checking-for-updates": {
+    "messageformat": "Checking for updates",
+    "description": "Text shown with an indeterminate spinner while Signal Desktop checks the internet for newer versions"
+  },
+  "icu:InstallScreenUpdateDialog--updating-signal": {
+    "messageformat": "Updating Signal",
+    "description": "Text shown with a progress bar as Signal Desktop is downloading an updated version"
+  },
+  "icu:InstallScreenUpdateDialog--download-progress": {
+    "messageformat": "Downloading {currentBytes} of {totalBytes} ({percentage, number, percent})...",
+    "description": "Shown below progress bar to provide the details of download. currentBytes and totalBytes will be like 5 GB or 10 GB."
+  },
   "icu:InstallScreenUpdateDialog--update-required__body": {
-    "messageformat": "To complete syncing your messages, update Signal desktop now.",
-    "description": "The body of update dialog on install screen when app update is required before proceeding with backup import"
+    "messageformat": "To continue, update Signal Desktop.",
+    "description": "The body of update dialog on install screen when app update is required before proceeding"
   },
   "icu:InstallScreenUpdateDialog--update-required__action-update": {
     "messageformat": "Update",
-    "description": "The update action of update dialog on install screen when app update is required before proceeding with backup import"
+    "description": "The update action of update dialog on install screen when app update is required"
+  },
+  "icu:InstallScreenUpdateDialog--update-required__action-update__mas": {
+    "messageformat": "Go to the App Store",
+    "description": "The update action of update dialog on install screen when update is required, but app was installed via Mac App Store"
   },
   "icu:InstallScreenUpdateDialog--unsupported-os__title": {
     "messageformat": "Update Required",
@@ -8987,6 +9527,10 @@
   "icu:StandaloneRegistration--PhoneNumber--waiting": {
     "messageformat": "Please try again in {duration}",
     "description": "Wait time countdown shown on the standalone registration screen where phone number is entered"
+  },
+  "icu:StandaloneRegistration--PhoneNumber--RegionCodeSelector--Label": {
+    "messageformat": "Select region code",
+    "description": "Accessibility label for region code selector in phone number input in standalone registration"
   },
   "icu:StandaloneRegistration--PhoneNumber--placeholder": {
     "messageformat": "Phone number",
@@ -9284,6 +9828,10 @@
     "messageformat": "Incorrect PIN. {triesRemaining, plural, one {# attempt remaining} other {# attempts remaining}}.",
     "description": "Error shown when entered PIN is incorrect, and "
   },
+  "icu:StandaloneRegistration--VerifyPIN--just-count": {
+    "messageformat": "{triesRemaining, plural, one {# attempt remaining} other {# attempts remaining}}.",
+    "description": "Shown when few tries remain as the user attempts to enter the proper PIN"
+  },
   "icu:StandaloneRegistration--VerifyPIN--NeedHelp--header": {
     "messageformat": "Need help?",
     "description": "Header for dialog shown when user clicks Need Help?"
@@ -9340,6 +9888,10 @@
     "messageformat": "Learn more about PINs",
     "description": "Button for dialog shown when user has tried an incorrect PIN there are no remaining tries left"
   },
+  "icu:StandaloneRegistration--VerifyPIN--open-menu": {
+    "messageformat": "Open menu",
+    "description": "Accessibility text for the triple-dot button on the screen asking user to verify their PIN"
+  },
   "icu:StandaloneRegistration--VerifyPIN--menu--skip-pin": {
     "messageformat": "Skip PIN",
     "description": "Menu item on Verify PIN screens, allowing skip of restoring data with PIN, instead starting over from scratch with a new PIN"
@@ -9349,7 +9901,7 @@
     "description": "Header for dialog shown when user chooses to skip PIN entry on the Verify PIN screen"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--description": {
-    "messageformat": "If you can\u2019t remember your PIN, you can create a new one. You can register and use your account but you\u2019ll lose some saved settings like your profile information. Learn more.",
+    "messageformat": "If you can’t remember your PIN, you can create a new one. You can register and use your account but you’ll lose some saved settings like your profile information. <learnMore>Learn more</learnMore>.",
     "description": "Description for dialog shown when user chooses to skip PIN entry on the Verify PIN screen"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--skip-button": {
@@ -9397,7 +9949,7 @@
     "description": "Header on dialog shown when user chooses to disable the PIN entirely"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--description": {
-    "messageformat": "If you disable the PIN, you will lose all data when you re-register Signal unless you transfer it from another iOS device. You can not turn on Registration Lock while the PIN is disabled.",
+    "messageformat": "If you disable the PIN, you will lose all data when you re-register Signal. You can not turn on Registration Lock while the PIN is disabled.",
     "description": "Description on dialog shown when user chooses to disable the PIN entirely"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--disable-button": {
@@ -9671,8 +10223,16 @@
     "description": "Text of the first step of the instructions from MediaPermissionsModal"
   },
   "icu:MediaPermissionsModal__step-2": {
-    "messageformat": "Turn on \u201cSignal\u201d",
-    "description": "Text of the second step of the instructions from MediaPermissionsModal"
+    "messageformat": "Turn on “Signal”",
+    "description": "macOS only. Text of the second step of the instructions from MediaPermissionsModal"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--microphone": {
+    "messageformat": "Enable microphone access for Signal",
+    "description": "Windows only. Text of the second step of the instructions from MediaPermissionsModal"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--camera": {
+    "messageformat": "Enable camera access for Signal",
+    "description": "Windows only. Text of the second step of the instructions from MediaPermissionsModal"
   },
   "icu:MediaPermissionsModal__open": {
     "messageformat": "Go to settings",
@@ -10394,6 +10954,10 @@
     "messageformat": "Context menu",
     "description": "Default aria-label for the context menu buttons"
   },
+  "icu:EditUsernameModalBody__username-label": {
+    "messageformat": "Username",
+    "description": "Accessibility label for the nickname portion of the username editor"
+  },
   "icu:EditUsernameModalBody__username-placeholder": {
     "messageformat": "Username",
     "description": "Placeholder for the username field"
@@ -10401,6 +10965,10 @@
   "icu:EditUsernameModalBody__username-helper": {
     "messageformat": "Usernames are always paired with a set of numbers.",
     "description": "Shown on the edit username screen"
+  },
+  "icu:EditUsernameModalBody__discriminator-label": {
+    "messageformat": "Username digits",
+    "description": "Accessibility label for the discriminator portion of the username editor"
   },
   "icu:EditUsernameModalBody__learn-more": {
     "messageformat": "Learn More",
@@ -10530,16 +11098,108 @@
     "messageformat": "Dismiss",
     "description": "Text of the secondary button on username megaphone"
   },
+  "icu:PinReminderMegaphone__title": {
+    "messageformat": "Verify your Signal PIN",
+    "description": "Title of Signal PIN reminder megaphone"
+  },
+  "icu:PinReminderMegaphone__body": {
+    "messageformat": "We’ll occasionally ask you to verify your PIN so that you remember it.",
+    "description": "Body of Signal PIN reminder megaphone"
+  },
+  "icu:PinReminderMegaphone__verify": {
+    "messageformat": "Verify",
+    "description": "Text of the primary button on Signal PIN reminder megaphone"
+  },
+  "icu:PinReminderMegaphone__not-now": {
+    "messageformat": "Not now",
+    "description": "Text of the secondary button on Signal PIN reminder megaphone"
+  },
+  "icu:PinReminderModal__title": {
+    "messageformat": "Enter your Signal PIN",
+    "description": "Title of Signal PIN reminder dialog"
+  },
+  "icu:PinReminderModal__body": {
+    "messageformat": "To help you memorize your PIN, we’ll ask you to enter it periodically. We’ll ask less over time.",
+    "description": "Body of Signal PIN reminder dialog"
+  },
+  "icu:PinReminderModal__pin-input-placeholder": {
+    "messageformat": "Enter your PIN",
+    "description": "Placeholder text of PIN input box in Signal PIN reminder dialog"
+  },
+  "icu:PinReminderModal__pin-input-error": {
+    "messageformat": "Incorrect PIN. Try again",
+    "description": "Error text shown in PIN input box in Signal PIN reminder dialog, when the input was incorrect"
+  },
+  "icu:PinReminderModal__forgot": {
+    "messageformat": "Forgot PIN",
+    "description": "Forgot PIN button in Signal PIN reminder dialog"
+  },
+  "icu:PinReminderModal__confirm": {
+    "messageformat": "Confirm",
+    "description": "Confirm button in Signal PIN reminder dialog"
+  },
+  "icu:PinReminderCompletedToast": {
+    "messageformat": "PIN correct. We’ll remind you again later.",
+    "description": "Toast message when Signal PIN reminder was completed successfully."
+  },
+  "icu:PinChangeModal__title--create": {
+    "messageformat": "Change your Signal PIN",
+    "description": "Title of Signal PIN change dialog when creating a new PIN with an existing PIN"
+  },
+  "icu:PinChangeModal__title--create--without-pin": {
+    "messageformat": "Create your Signal PIN",
+    "description": "Title of Signal PIN change dialog when creating a new PIN without an existing PIN"
+  },
+  "icu:PinChangeModal__body--create": {
+    "messageformat": "You can change your PIN as long as this device is registered. <learnMoreLink>Learn more</learnMoreLink>",
+    "description": "Body of Signal PIN change dialog when creating a new PIN"
+  },
+  "icu:PinChangeModal__body--create--without-pin": {
+    "messageformat": "PINs keep information stored with Signal encrypted so only you can access it. Your profile, settings, and contacts will restore when you reinstall. You won't need your PIN to open the app. <learnMoreLink>Learn more</learnMoreLink>",
+    "description": "Body of Signal PIN change dialog when creating a new PIN without an existing PIN"
+  },
+  "icu:PinChangeModal__title--confirm": {
+    "messageformat": "Confirm your Signal PIN",
+    "description": "Title of Signal PIN change dialog when confirming a new PIN"
+  },
+  "icu:PinChangeModal__body--confirm": {
+    "messageformat": "Enter the PIN you just created.",
+    "description": "Body of Signal PIN change dialog when confirming a new PIN"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--create": {
+    "messageformat": "Enter a new PIN",
+    "description": "Placeholder text of PIN input box in Signal PIN change dialog when creating a new PIN"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--confirm": {
+    "messageformat": "Confirm PIN",
+    "description": "Placeholder text of PIN input box in Signal PIN change dialog when confirming PIN"
+  },
+  "icu:PinChangeModal__cancel": {
+    "messageformat": "Cancel",
+    "description": "Cancel button in Signal PIN change dialog"
+  },
+  "icu:PinChangeModal__continue": {
+    "messageformat": "Continue",
+    "description": "Continue button in Signal PIN change dialog, to go to the Confirm step"
+  },
+  "icu:PinChangeModal__confirm": {
+    "messageformat": "Confirm",
+    "description": "Confirm button in Signal PIN change dialog"
+  },
+  "icu:PinChangeCompletedToast": {
+    "messageformat": "New PIN created.",
+    "description": "Toast message when Signal PIN was changed successfully."
+  },
   "icu:UnsupportedOSWarningDialog__body": {
-    "messageformat": "Signal desktop will no longer support your computer\u2019s version of {OS} soon. To keep using Signal, update your computer\u2019s operating system by {expirationDate}. <learnMoreLink>Learn more</learnMoreLink>",
+    "messageformat": "Signal Desktop will no longer support your computer’s version of {OS} soon. To keep using Signal, update your computer’s operating system by {expirationDate}. <learnMoreLink>Learn more</learnMoreLink>",
     "description": "Body of a dialog displayed on unsupported operating systems"
   },
   "icu:UnsupportedOSErrorDialog__body": {
-    "messageformat": "Signal desktop no longer works on this computer. To use Signal desktop again, update your computer\u2019s version of {OS}. <learnMoreLink>Learn more</learnMoreLink>",
+    "messageformat": "Signal Desktop no longer works on this computer. To use Signal Desktop again, update your computer’s version of {OS}. <learnMoreLink>Learn more</learnMoreLink>",
     "description": "Body of a dialog displayed on unsupported operating systems"
   },
   "icu:UnsupportedOSErrorToast": {
-    "messageformat": "Signal desktop no longer works on this computer. To use Signal desktop again, update your computer\u2019s version of {OS}.",
+    "messageformat": "Signal Desktop no longer works on this computer. To use Signal Desktop again, update your computer’s version of {OS}.",
     "description": "Body of a dialog displayed on unsupported operating systems"
   },
   "icu:MessageMetadata__edited": {
@@ -10900,11 +11560,11 @@
   },
   "icu:CallLinkRestrictionsSelect__Option--Off": {
     "messageformat": "Off",
-    "description": "Call Link Edit Modal > Require admin approval checkbox > Option > Off"
+    "description": "(Deleted 2026/09/10) Call Link Edit Modal > Require admin approval checkbox > Option > Off"
   },
   "icu:CallLinkRestrictionsSelect__Option--On": {
     "messageformat": "On",
-    "description": "Call Link Edit Modal > Require admin approval checkbox > Option > On"
+    "description": "(Deleted 2026/09/10) Call Link Edit Modal > Require admin approval checkbox > Option > On"
   },
   "icu:CallLinkAddNameModal__Title": {
     "messageformat": "Add call name",
@@ -11186,9 +11846,13 @@
     "messageformat": "One time",
     "description": "Value shown for one-time donations on donation receipt"
   },
-  "icu:DonationReceipt__footer-text": {
-    "messageformat": "Thank you for supporting Signal. Your contribution helps fuel the mission of protecting free expression and enabling secure global communication for millions around the world, through open source privacy technology. If you\u2019re a resident of the United States, please retain this receipt for your tax records. Signal Technology Foundation is a tax-exempt nonprofit organization in the United States under section 501c3 of the Internal Revenue Code. Our Federal Tax ID is 82-4506840.",
+  "icu:DonationReceipt__footer-text-v2": {
+    "messageformat": "Thank you for supporting Signal. Your contribution helps fuel the mission of protecting free expression and enabling secure global communication for millions around the world, through open source privacy technology. If you’re a resident of the United States, please retain this receipt for your tax records. Signal Technology Foundation is a tax-exempt nonprofit organization in the United States under section 501c3 of the Internal Revenue Code. Our Federal Tax ID is 82-4506840. Signal did not provide any goods or services in consideration of this contribution.",
     "description": "Footer text shown on donation receipts explaining tax deductibility and Signal's mission"
+  },
+  "icu:MessageCta__Donate": {
+    "messageformat": "Donate Now",
+    "description": "In the Signal Release Notes chat, button text shown when the release note asks the user to donate to Signal."
   },
   "icu:Donations__OfflineTooltip": {
     "messageformat": "You are offline. Please connect to the internet to complete a donation.",
@@ -11597,112 +12261,12 @@
     "description": "Release notes for releases that only include bug fixes",
     "ignoreUnused": true
   },
-  "icu:WhatsNew__8.18--0": {
-    "messageformat": "Polls can now be created in individual chats too. Present a curated list of choices to your indecisive friend, or recapture the magic of passing a note to your crush by creating a \u201cDo you like me? Y/N/Maybe\u201d poll.",
-    "description": "(Deleted 2026/07/09) Release notes for 8.18"
+  "icu:WhatsNew__8.30--0": {
+    "messageformat": "Thanks to a few performance improvements, your CPU will be slightly happier during video calls (even if you're not smiling).",
+    "description": "(Deleted 2026/10/07)  Release notes for 8.30"
   },
-  "icu:WhatsNew__8.19--0": {
-    "messageformat": "Group admins can now bring chats to their natural conclusion with the new \"End Group\" option in group settings. Ending a group prevents group members from sending messages or starting calls, and also disables invites. Now you can make sure everyone stays on the right thread by ending last year's sewing meetup group before stitching a new one together.",
-    "description": "(Deleted 2026/07/15) Release notes for 8.19"
-  },
-  "icu:WhatsNew__8.20--0": {
-    "messageformat": "Introducing disappearing call events: Missed, outgoing, and received calls that occur after you install this update will now automatically disappear in any chat where disappearing messages are enabled.",
-    "description": "Release notes for 8.20"
-  },
-  "icu:WhatsNew__8.20--1": {
-    "messageformat": "Now you can reorder installed sticker packs so your new favorites don\u2019t get stuck in the back of the line.",
-    "description": "Release notes for 8.20"
-  },
-  "icu:Beacon__modules-description": {
-    "messageformat": "Addons extend Beacon with extra features. Changes apply immediately, no restart needed.",
-    "description": "Description of the Beacon modules page"
-  },
-  "icu:Beacon__modules-empty": {
-    "messageformat": "No addons installed. Use the CSS Editor or console to add one.",
-    "description": "Message when no addons are installed"
-  },
-  "icu:Beacon__modules-enabled": {
-    "messageformat": "Enabled",
-    "description": "Badge for enabled addon"
-  },
-  "icu:Beacon__modules-disabled": {
-    "messageformat": "Disabled",
-    "description": "Badge for disabled addon"
-  },
-  "icu:Beacon__modules-enable": {
-    "messageformat": "Enable",
-    "description": "Button to enable an addon"
-  },
-  "icu:Beacon__modules-disable": {
-    "messageformat": "Disable",
-    "description": "Button to disable an addon"
-  },
-  "icu:Beacon__modules-delete": {
-    "messageformat": "Delete",
-    "description": "Button to delete an addon"
-  },
-  "icu:Beacon__modules-note": {
-    "messageformat": "Disabling or deleting an addon requires an app restart to take effect.",
-    "description": "Note about addon changes requiring restart"
-  },
-  "icu:Preferences__button--beacon-modules": {
-    "messageformat": "Modules",
-    "description": "Left nav button for Beacon modules (addons)"
-  },
-  "icu:Beacon__modules-search": {
-    "messageformat": "Search addons",
-    "description": "Placeholder for the addon search box on the Beacon modules page"
-  },
-  "icu:Beacon__modules-filter-all": {
-    "messageformat": "All",
-    "description": "Filter on the Beacon modules page: show every addon"
-  },
-  "icu:Beacon__modules-filter-enabled": {
-    "messageformat": "Enabled",
-    "description": "Filter on the Beacon modules page: show enabled addons"
-  },
-  "icu:Beacon__modules-filter-disabled": {
-    "messageformat": "Disabled",
-    "description": "Filter on the Beacon modules page: show disabled addons"
-  },
-  "icu:Beacon__modules-count": {
-    "messageformat": "{enabled, number} of {total, number} enabled",
-    "description": "Summary on the Beacon modules page"
-  },
-  "icu:Beacon__modules-no-matches": {
-    "messageformat": "No addons match your search.",
-    "description": "Shown when the addon search has no results"
-  },
-  "icu:Beacon__modules-settings": {
-    "messageformat": "Settings",
-    "description": "Button that expands an addon's settings"
-  },
-  "icu:Beacon__modules-reset": {
-    "messageformat": "Reset to defaults",
-    "description": "Button that resets an addon's settings"
-  },
-  "icu:Beacon__modules-commands": {
-    "messageformat": "Commands",
-    "description": "Heading for the slash commands an addon provides"
-  },
-  "icu:Beacon__modules-shortcuts": {
-    "messageformat": "Shortcuts",
-    "description": "Heading for the keyboard shortcuts an addon provides"
-  },
-  "icu:Beacon__modules-error": {
-    "messageformat": "Failed to start: {message}",
-    "description": "Shown on an addon card when the addon threw while starting"
-  },
-  "icu:Beacon__modules-toggle": {
-    "messageformat": "Enable {name}",
-    "description": "Accessible label for the switch that enables or disables an addon"
-  },
-  "icu:Beacon__modules-title": {
-    "messageformat": "Modules",
-    "description": "Title of the Beacon modules settings page"
-  },
-  "icu:Beacon__restart-now": {
-    "messageformat": "Reload Now",
-    "description": "Button to reload app after addon change"
+  "icu:WhatsNew__8.30--1": {
+    "messageformat": "We also added a convenient shortcut to open your system settings on Windows if you try to join a video call and Signal doesn't have permission to access the camera. Now it's easier to see what you need to do so that people can see you.",
+    "description": "(Deleted 2026/10/07)  Release notes for 8.30"
   }
 }

@@ -16,7 +16,6 @@ import {
   type GetSharedGroupNamesType,
 } from '../../util/sharedGroupNames.dom.ts';
 import { AxoButton } from '../../axo/AxoButton.dom.tsx';
-import { FlexWrapDetector } from '../../axo/_internal/FlexWrapDetector.dom.tsx';
 import { tw } from '../../axo/tw.dom.tsx';
 import { AxoSymbol } from '../../axo/AxoSymbol.dom.tsx';
 
@@ -58,10 +57,7 @@ export function MessageRequestActions({
   if (conversationType === 'direct') {
     strictAssert(nameValue != null, 'nameValue is null');
     const name = (
-      <strong
-        key="name"
-        className="module-message-request-actions__message__name"
-      >
+      <strong key="name" className={tw('font-semibold')}>
         <ContactName {...nameValue} preferFirstName />
       </strong>
     );
@@ -121,90 +117,82 @@ export function MessageRequestActions({
           onChangeState={setMrState}
         />
       ) : null}
-      <div className="module-message-request-actions">
-        <div
-          className={tw(
-            // oxlint-disable-next-line better-tailwindcss/no-restricted-classes
-            'mb-2 text-center type-body-medium text-[#C84118]'
-          )}
-        >
+      <div
+        data-testid="message-request-actions"
+        className={tw('px-4 pt-2 pb-3')}
+      >
+        <div className={tw('mb-2 text-center type-body-medium text-safety')}>
           <AxoSymbol.InlineGlyph symbol="error-triangle" label={null} />
           &nbsp;
           {i18n('icu:MessageRequestWarning__review-carefully')}
         </div>
-        <p className="module-message-request-actions__message">{message}</p>
-        <FlexWrapDetector>
-          <div
-            className={tw(
-              'flex flex-wrap justify-center gap-2 p-1',
-              '[&>button]:min-w-24',
-              'container-scrollable:[&>button]:w-full'
-            )}
-          >
-            {!isBlocked && (
-              <AxoButton.Root
-                onClick={() => {
-                  setMrState(MessageRequestState.blocking);
-                }}
-                size="md"
-                variant="subtle-destructive"
-              >
-                {i18n('icu:MessageRequests--block')}
-              </AxoButton.Root>
-            )}
-            {(isReported || isBlocked) && (
-              <AxoButton.Root
-                onClick={() => {
-                  setMrState(MessageRequestState.deleting);
-                }}
-                size="md"
-                variant="subtle-destructive"
-              >
-                {i18n('icu:MessageRequests--delete')}
-              </AxoButton.Root>
-            )}
-            {!isReported && (
-              <AxoButton.Root
-                onClick={() => {
-                  setMrState(MessageRequestState.reportingAndMaybeBlocking);
-                }}
-                size="md"
-                variant="subtle-destructive"
-              >
-                {i18n('icu:MessageRequests--reportAndMaybeBlock')}
-              </AxoButton.Root>
-            )}
-            {isBlocked && (
-              <AxoButton.Root
-                onClick={() => {
-                  setMrState(MessageRequestState.unblocking);
-                }}
-                size="md"
-                variant="subtle-secondary"
-              >
-                {i18n('icu:MessageRequests--unblock')}
-              </AxoButton.Root>
-            )}
-            {!isBlocked ? (
-              <AxoButton.Root
-                onClick={() => {
-                  if (
-                    conversationType === 'direct' &&
-                    sharedGroupNames.length > 1
-                  ) {
-                    acceptConversation(conversationId);
-                  } else {
-                    setMrState(MessageRequestState.accepting);
-                  }
-                }}
-                size="md"
-                variant="subtle-secondary"
-              >
-                {i18n('icu:MessageRequests--accept')}
-              </AxoButton.Root>
-            ) : null}
-          </div>
-        </FlexWrapDetector>
+        <p className={tw('mb-3 text-center type-body-medium text-secondary')}>
+          {message}
+        </p>
+        <AxoButton.Group>
+          {!isBlocked && (
+            <AxoButton.Root
+              onClick={() => {
+                setMrState(MessageRequestState.blocking);
+              }}
+              size="md"
+              variant="subtle-destructive"
+            >
+              {i18n('icu:MessageRequests--block')}
+            </AxoButton.Root>
+          )}
+          {(isReported || isBlocked) && (
+            <AxoButton.Root
+              onClick={() => {
+                setMrState(MessageRequestState.deleting);
+              }}
+              size="md"
+              variant="subtle-destructive"
+            >
+              {i18n('icu:MessageRequests--delete')}
+            </AxoButton.Root>
+          )}
+          {!isReported && (
+            <AxoButton.Root
+              onClick={() => {
+                setMrState(MessageRequestState.reportingAndMaybeBlocking);
+              }}
+              size="md"
+              variant="subtle-destructive"
+            >
+              {i18n('icu:MessageRequests--reportAndMaybeBlock')}
+            </AxoButton.Root>
+          )}
+          {isBlocked && (
+            <AxoButton.Root
+              onClick={() => {
+                setMrState(MessageRequestState.unblocking);
+              }}
+              size="md"
+              variant="subtle-secondary"
+            >
+              {i18n('icu:MessageRequests--unblock')}
+            </AxoButton.Root>
+          )}
+          {!isBlocked ? (
+            <AxoButton.Root
+              onClick={() => {
+                if (
+                  conversationType === 'direct' &&
+                  sharedGroupNames.length > 1
+                ) {
+                  acceptConversation(conversationId);
+                } else {
+                  setMrState(MessageRequestState.accepting);
+                }
+              }}
+              size="md"
+              variant="subtle-secondary"
+            >
+              {i18n('icu:MessageRequests--accept')}
+            </AxoButton.Root>
+          ) : null}
+        </AxoButton.Group>
       </div>
     </>
   );

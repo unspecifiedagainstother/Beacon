@@ -62,6 +62,7 @@ export function EditConversationAttributesModal({
   const focusDescriptionRef = useRef<undefined | boolean>(
     initiallyFocusDescription
   );
+  // oxlint-disable-next-line react/refs
   const focusDescription = focusDescriptionRef.current;
 
   const startingTitleRef = useRef<string>(externalTitle);
@@ -97,7 +98,9 @@ export function EditConversationAttributesModal({
   };
 
   const hasChangedExternally =
+    // oxlint-disable-next-line react/refs
     startingAvatarUrlRef.current !== externalAvatarUrl ||
+    // oxlint-disable-next-line react/refs
     startingTitleRef.current !== externalTitle;
   const hasTitleChanged = trimmedTitle !== externalTitle.trim();
   const hasGroupDescriptionChanged =
@@ -131,6 +134,7 @@ export function EditConversationAttributesModal({
     hasTitleChanged,
     onClose,
   ]);
+  // oxlint-disable-next-line react/refs
   tryClose.current = onTryClose;
 
   function onRequestSubmit() {
@@ -169,7 +173,7 @@ export function EditConversationAttributesModal({
         conversationId={conversationId}
         deleteAvatarFromDisk={deleteAvatarFromDisk}
         i18n={i18n}
-        isDisplayedAsPanel={false}
+        isInsideDialog
         isGroup
         onCancel={() => {
           setHasAvatarChanged(false);
@@ -250,28 +254,32 @@ export function EditConversationAttributesModal({
             {i18n('icu:updateGroupAttributes__title')}
           </AxoDialog.Title>
         </AxoDialog.Header>
-        <AxoDialog.Body>{content}</AxoDialog.Body>
-        {/* AvatarEditor brings its own footer with it so no need to duplicate it. */}
-        {!editingAvatar && (
-          <AxoDialog.Footer>
-            <AxoDialog.Actions>
-              <AxoDialog.Action
-                variant="strong-secondary"
-                onClick={onClose}
-                disabled={isRequestActive}
-              >
-                {i18n('icu:cancel')}
-              </AxoDialog.Action>
-              <AxoDialog.Action
-                variant="strong-primary"
-                onClick={onRequestSubmit}
-                disabled={!canSubmit}
-                pending={isRequestActive}
-              >
-                {i18n('icu:save')}
-              </AxoDialog.Action>
-            </AxoDialog.Actions>
-          </AxoDialog.Footer>
+        {/* AvatarEditor brings its own Body and Footer; no need to duplicate. */}
+        {editingAvatar ? (
+          content
+        ) : (
+          <>
+            <AxoDialog.Body>{content}</AxoDialog.Body>
+            <AxoDialog.Footer>
+              <AxoDialog.Actions>
+                <AxoDialog.Action
+                  variant="strong-secondary"
+                  onClick={onClose}
+                  disabled={isRequestActive}
+                >
+                  {i18n('icu:cancel')}
+                </AxoDialog.Action>
+                <AxoDialog.Action
+                  variant="strong-primary"
+                  onClick={onRequestSubmit}
+                  disabled={!canSubmit}
+                  pending={isRequestActive}
+                >
+                  {i18n('icu:save')}
+                </AxoDialog.Action>
+              </AxoDialog.Actions>
+            </AxoDialog.Footer>
+          </>
         )}
       </AxoDialog.Content>
     </AxoDialog.Root>

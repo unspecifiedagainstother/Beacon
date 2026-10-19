@@ -11,6 +11,9 @@
   "icu:AxoDialog.Close": {
     "messageformat": "Maak toe"
   },
+  "icu:AxoPasswordField.Reveal": {
+    "messageformat": "Wys Wagwoord"
+  },
   "icu:AxoTextField.Clear": {
     "messageformat": "Vee uit"
   },
@@ -61,6 +64,24 @@
   },
   "icu:Preferences__DonateTitle": {
     "messageformat": "Dra by tot Signal"
+  },
+  "icu:LinkedDevicesOnboardingDialog__description": {
+    "messageformat": "<bold>Gekoppelde Toestelle</bold> laat jou toe om veilig op enige van jou bykomende toestelle toegang tot jou Signal-rekening en -boodskappe te verkry."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--1": {
+    "messageformat": "Jy kan 'n rekenaar, tablet of bykomende telefoon koppel."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--2": {
+    "messageformat": "Jy bestuur van jou primêre toestel af wat gekoppel word; jy kan tot vyf toestelle koppel."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3": {
+    "messageformat": "Rekeninginstellings word slegs op jou primêre toestel bestuur, waaronder jou rekeninginstellings en rugsteun."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--1": {
+    "messageformat": "Rekeninginstellings en rugsteun kan slegs op jou primêre toestel bestuur word."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--2": {
+    "messageformat": "Rekeninginstellings en Signal se Veilige Rugsteun kan slegs op jou primêre toestel bestuur word."
   },
   "icu:sentMediaQualityStandard": {
     "messageformat": "Standaard"
@@ -317,11 +338,8 @@
   "icu:LeftPaneChatFolders__ItemLabel--All": {
     "messageformat": "Alle kletse"
   },
-  "icu:LeftPaneChatFolders__ItemUnreadBadge__MaxCount": {
-    "messageformat": "{maxCount,number}+"
-  },
   "icu:LeftPaneChatFolders__ItemUnreadBadge__AccessibleLabel": {
-    "messageformat": "{count, plural, one {{count,number} Unread Message} other {{count,number} Unread Messages}}"
+    "messageformat": "{count, plural, one {{count,number} ongeleesde boodskap} other {{count,number} ongeleesde boodskappe}}"
   },
   "icu:LeftPaneChatFolders__Item__ContextMenu__MarkAllRead": {
     "messageformat": "Merk alles as gelees"
@@ -364,9 +382,6 @@
   },
   "icu:NavTabs__ItemIconLabel--UnreadCount": {
     "messageformat": "{count,number} ongelees"
-  },
-  "icu:NavTabs__ItemIconLabel--MarkedUnread": {
-    "messageformat": "As ongelees gemerk"
   },
   "icu:NavTabs__ItemLabel--Chats": {
     "messageformat": "Kletse"
@@ -635,20 +650,23 @@
   "icu:SafetyNumberNotReady__learn-more": {
     "messageformat": "Vind meer uit"
   },
-  "icu:KeyTransparencyErrorDialog__Title": {
-    "messageformat": "Outomatiese Sleutelverifiëring is tans nie vir jou toestel beskikbaar nie. Dien ontfout-log in?"
+  "icu:KeyTransparencyErrorDialog__Title-v2": {
+    "messageformat": "Outomatiese Sleutelverifiëring is tans nie vir jou toestel beskikbaar nie. Wil jy 'n verslag indien om ons te help verbeter?"
   },
-  "icu:KeyTransparencyErrorDialog__Description": {
-    "messageformat": "Ontfout-logs help ons om die probleem te diagnoseer en reg te stel, en bevat nie identifiserende inligting nie."
+  "icu:KeyTransparencyErrorDialog__Description-v2": {
+    "messageformat": "Deur jou ontfout-logs in te sluit, help jy ons om die probleem te diagnoseer en reg te stel, en dit bevat nie identifiserende inligting nie. Deling daarvan is opsioneel."
   },
-  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label": {
-    "messageformat": "Deel ontfout-log"
+  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label-v2": {
+    "messageformat": "Sluit ontfout-log in"
   },
   "icu:KeyTransparencyErrorDialog__ShareDebugLog__ViewButton": {
     "messageformat": "Bekyk"
   },
   "icu:KeyTransparencyErrorDialog__Submit": {
     "messageformat": "Dien in"
+  },
+  "icu:KeyTransparencyErrorDialog__Cancel": {
+    "messageformat": "Nee dankie"
   },
   "icu:KeyTransparencyOnboardingDialog__Title": {
     "messageformat": "Signal kan nou enkriptering outoverifieer"
@@ -746,11 +764,11 @@
   "icu:maximumAttachments": {
     "messageformat": "Jy kan nie nog aanhegsels by hierdie boodskap voeg nie."
   },
-  "icu:fileSizeWarning": {
-    "messageformat": "Jammer, die geselekteerde lêer oorskry die boodskap se groottebeperkings. {limit,number} {units}"
+  "icu:fileTooLargeWarning": {
+    "messageformat": "Kan nie hierdie lêer stuur nie, want dis te groot. Jy kan lêers van tot {limit,number}{units} stuur."
   },
-  "icu:videoFileSizeWarning": {
-    "messageformat": "Jammer, die geselekteerde videolêer oorskry die boodskapgroottebeperkings. {limit,number}{units}"
+  "icu:videoFileTooLargeWarning": {
+    "messageformat": "Kan nie hierdie videolêer stuur nie, want dis te groot. Jy kan videolêers van tot {limit,number}{units} stuur."
   },
   "icu:unableToLoadAttachment": {
     "messageformat": "Kan nie die geselekteerde aanhegsel laai nie."
@@ -772,6 +790,9 @@
   },
   "icu:checkNetworkConnection": {
     "messageformat": "Kontroleer jou netwerkverbinding."
+  },
+  "icu:clockSkewDetected": {
+    "messageformat": "Jou toestel se datum is nie akkuraat nie. Stel jou horlosie reg en probeer weer. Jou toestel se datum en tyd is:"
   },
   "icu:submitDebugLog": {
     "messageformat": "Onfout-log"
@@ -994,6 +1015,9 @@
   },
   "icu:mute": {
     "messageformat": "Demp"
+  },
+  "icu:muted": {
+    "messageformat": "Gedemp"
   },
   "icu:cannotUpdateDetail-v2": {
     "messageformat": "Signal kon nie opdateer nie. <retryUpdateButton>Probeer weer opdateer</retryUpdateButton> of besoek {url} om dit handmatig te installeer. <contactSupportLink>Kontak ons steundiens</contactSupportLink> daarna oor hierdie probleem"
@@ -1261,6 +1285,9 @@
   },
   "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync": {
     "messageformat": "Al die boodskappe in hierdie klets sal van al jou toestelle af geskrap word."
+  },
+  "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync--still-member": {
+    "messageformat": "Al die boodskappe in hierdie klets sal van al jou toestelle af geskrap word. Jy sal steeds 'n lid van die groep wees."
   },
   "icu:ConversationHeader__ContextMenu__LeaveGroupAction__title": {
     "messageformat": "Verlaat groep"
@@ -1610,9 +1637,6 @@
   "icu:Preferences__EmojiSkinToneDefaultSetting__Label": {
     "messageformat": "Emoji-velkleur"
   },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__Title": {
-    "messageformat": "Kletsvouers"
-  },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Title": {
     "messageformat": "Voeg 'n kletsvouer by"
   },
@@ -1624,12 +1648,6 @@
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Description--WithChatFolders": {
     "messageformat": "{chatFoldersCount, plural, one {{chatFoldersCount,number} vouer} other {{chatFoldersCount,number} vouers}}"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button": {
-    "messageformat": "Stel op"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button--WithChatFolders": {
-    "messageformat": "Bestuur"
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__ChatFolderItem__ContextMenu__EditFolder": {
     "messageformat": "Wysig vouer"
@@ -2384,9 +2402,6 @@
   "icu:SafetyNumberModal__title": {
     "messageformat": "Verifieer veiligheidsnommer"
   },
-  "icu:safetyNumberChanged": {
-    "messageformat": "Veiligheidsnommer het verander"
-  },
   "icu:safetyNumberChanges": {
     "messageformat": "Veiligheidsnommerveranderinge"
   },
@@ -2826,16 +2841,16 @@
     "messageformat": "Verwyder"
   },
   "icu:stickers--StickerManagerPackDragHandle--Label": {
-    "messageformat": "Drag to reorder sticker pack"
+    "messageformat": "Sleep om plakkerpakket te herrangskik"
   },
   "icu:stickers--StickerManagerBlessedPacksList--Label": {
-    "messageformat": "Signal Artist Series sticker packs"
+    "messageformat": "Plakkerpakkette in die Signal-kunstenaarreeks"
   },
   "icu:stickers--StickerManagerReceivedPacksList--Label": {
-    "messageformat": "Received sticker packs"
+    "messageformat": "Ontvangde plakkerpakkette"
   },
   "icu:stickers--StickerManagerInstalledPacksList--Label": {
-    "messageformat": "Installed sticker packs"
+    "messageformat": "Geïnstalleerde plakkerpakkette"
   },
   "icu:stickers--StickerPreview--Title": {
     "messageformat": "Plakkerpakket"
@@ -3081,16 +3096,16 @@
     "messageformat": "Voeg ’n plakker toe"
   },
   "icu:FunPicker__Label--StickerReply": {
-    "messageformat": "Reply"
+    "messageformat": "Antwoord"
   },
   "icu:FunPicker__Label--SendStickerReply": {
-    "messageformat": "Send"
+    "messageformat": "Stuur"
   },
   "icu:FunPicker__Label--CancelStickerReply": {
-    "messageformat": "Cancel"
+    "messageformat": "Kanselleer"
   },
   "icu:FunPicker__Label--Sticker": {
-    "messageformat": "Sticker"
+    "messageformat": "Plakker"
   },
   "icu:confirmation-dialog--Cancel": {
     "messageformat": "Kanselleer"
@@ -3872,20 +3887,20 @@
   "icu:calling__preview--minimize": {
     "messageformat": "Minimaliseer voorskou"
   },
-  "icu:calling__change-view": {
-    "messageformat": "Verander uitleg"
-  },
-  "icu:calling__view_mode--paginated": {
-    "messageformat": "Roosteruitleg"
-  },
-  "icu:calling__view_mode--overflow": {
-    "messageformat": "Sykolom-uitleg"
-  },
-  "icu:calling__view_mode--speaker": {
-    "messageformat": "Sprekeruitleg"
-  },
   "icu:calling__view_mode--updated": {
     "messageformat": "Uitleg opgedateer"
+  },
+  "icu:calling__change-layout": {
+    "messageformat": "Verander uitleg"
+  },
+  "icu:calling__layout--paginated": {
+    "messageformat": "Roosteruitleg"
+  },
+  "icu:calling__layout--overflow": {
+    "messageformat": "Kantbalk"
+  },
+  "icu:calling__layout--speaker": {
+    "messageformat": "Spreker"
   },
   "icu:calling__SelectPresentingSourcesModal--title": {
     "messageformat": "Deel jou skerm"
@@ -3950,23 +3965,47 @@
   "icu:notMuted": {
     "messageformat": "Nie gedemp nie"
   },
-  "icu:muteHour": {
-    "messageformat": "Demp vir een uur"
-  },
-  "icu:muteEightHours": {
-    "messageformat": "Demp vir agt uur"
-  },
-  "icu:muteDay": {
-    "messageformat": "Demp vir een dag"
-  },
-  "icu:muteWeek": {
-    "messageformat": "Demp vir een week"
-  },
-  "icu:muteAlways": {
-    "messageformat": "Demp altyd"
-  },
   "icu:unmute": {
     "messageformat": "Ontdemp"
+  },
+  "icu:MuteMenu__label": {
+    "messageformat": "Demp hierdie klets vir…"
+  },
+  "icu:MuteMenu__hour": {
+    "messageformat": "1 uur"
+  },
+  "icu:MuteMenu__eightHours": {
+    "messageformat": "8 uur"
+  },
+  "icu:MuteMenu__day": {
+    "messageformat": "1 dag"
+  },
+  "icu:MuteMenu__week": {
+    "messageformat": "1 week"
+  },
+  "icu:MuteMenu__until": {
+    "messageformat": "Tot…"
+  },
+  "icu:MuteMenu__always": {
+    "messageformat": "Altyd"
+  },
+  "icu:DatePicker__popupTitle": {
+    "messageformat": "Kies 'n datum"
+  },
+  "icu:TimePicker__popupTitle": {
+    "messageformat": "Kies 'n tyd"
+  },
+  "icu:MuteUntilDialog__title": {
+    "messageformat": "Demp hierdie klets tot…"
+  },
+  "icu:MuteUntilDialog__dateLabel": {
+    "messageformat": "Datum"
+  },
+  "icu:MuteUntilDialog__timeLabel": {
+    "messageformat": "Tyd"
+  },
+  "icu:MuteUntilDialog__timeZoneNote": {
+    "messageformat": "Alle tye in {timeZone}"
   },
   "icu:muteExpirationLabelAlways": {
     "messageformat": "Altyd gedemp"
@@ -4874,9 +4913,6 @@
   "icu:showConversationDetails--direct": {
     "messageformat": "Kletsinstellings"
   },
-  "icu:ConversationDetails__unmute--title": {
-    "messageformat": "Ontdemp hierdie klets?"
-  },
   "icu:ConversationDetails--group-link": {
     "messageformat": "Groepskakel"
   },
@@ -5072,6 +5108,9 @@
   "icu:ConversationDetailsMembershipList--show-all": {
     "messageformat": "Sien alle"
   },
+  "icu:ConversationDetailsMembershipList__Search__AccessibilityLabel": {
+    "messageformat": "Soek"
+  },
   "icu:ConversationDetailsGroups--title": {
     "messageformat": "{count, plural, one {{count,number} groep in gemeen} other {{count,number} groepe in gemeen}}"
   },
@@ -5108,17 +5147,110 @@
   "icu:EditNicknameAndNoteModal__Note__Placeholder": {
     "messageformat": "Nota"
   },
-  "icu:ConversationNotificationsSettings__mentions__label": {
+  "icu:WhileMuted__title": {
+    "messageformat": "Terwyl gedemp"
+  },
+  "icu:WhileMuted__description": {
+    "messageformat": "Kies kennisgewings wat gewys moet word terwyl hierdie kletse gedemp is."
+  },
+  "icu:WhileMuted__calls__title": {
+    "messageformat": "Oproepe"
+  },
+  "icu:WhileMuted__calls__description": {
+    "messageformat": "Lui of stel in kennis wanneer 'n oproep begin word terwyl hierdie klets gedemp is."
+  },
+  "icu:WhileMuted__mentions__title": {
     "messageformat": "Meldings"
   },
-  "icu:ConversationNotificationsSettings__mentions__info": {
-    "messageformat": "Ontvang kennisgewings wanneer jy in gedempte kletse genoem word"
+  "icu:WhileMuted__mentions__description": {
+    "messageformat": "Stel in kennis wanneer jy @genoem word terwyl hierdie klets gedemp is."
   },
-  "icu:ConversationNotificationsSettings__mentions__select__always-notify": {
-    "messageformat": "Laat altyd weet"
+  "icu:WhileMuted__replies__title": {
+    "messageformat": "Antwoorde"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__dont-notify-for-mentions-if-muted": {
-    "messageformat": "Indien gedemp, moenie kennisgewings stuur nie"
+  "icu:WhileMuted__replies__description": {
+    "messageformat": "Stel in kennis wanneer iemand op jou boodskap antwoord terwyl hierdie klets gedemp is."
+  },
+  "icu:WhileMuted__value--none": {
+    "messageformat": "Geen"
+  },
+  "icu:WhileMuted__value--calls": {
+    "messageformat": "Oproepe"
+  },
+  "icu:WhileMuted__value--mentions": {
+    "messageformat": "Meldings"
+  },
+  "icu:WhileMuted__value--replies": {
+    "messageformat": "Antwoorde"
+  },
+  "icu:WhileMuted__value--calls-mentions": {
+    "messageformat": "Oproepe, vermeldings"
+  },
+  "icu:WhileMuted__value--calls-replies": {
+    "messageformat": "Oproepe, antwoorde"
+  },
+  "icu:WhileMuted__value--mentions-replies": {
+    "messageformat": "Vermeldings, antwoorde"
+  },
+  "icu:WhileMuted__value--calls-mentions-replies": {
+    "messageformat": "Oproepe, vermeldings, antwoorde"
+  },
+  "icu:Preferences__WhileMuted__description": {
+    "messageformat": "Kies kennisgewings om vir gedempte kletse te wys."
+  },
+  "icu:Preferences__WhileMuted__calls__description": {
+    "messageformat": "Lui of stel in kennis wanneer 'n oproep in gedempte kletse begin word."
+  },
+  "icu:Preferences__WhileMuted__mentions__description": {
+    "messageformat": "Stel in kennis wanneer jy in gedempte kletse genoem word."
+  },
+  "icu:Preferences__WhileMuted__replies__description": {
+    "messageformat": "Stel in kennis wanneer iemand op jou boodskappe in gedempte kletse antwoord."
+  },
+  "icu:UnreadReminders__title": {
+    "messageformat": "Ongeleesde herinnerings"
+  },
+  "icu:UnreadReminders__description": {
+    "messageformat": "Stel af en toe in kennis wanneer daar ongeleesde boodskappe is terwyl hierdie klets gedemp is."
+  },
+  "icu:Preferences__UnreadReminders__description": {
+    "messageformat": "Stel 'n mens af en toe in kennis wanneer daar ongeleesde boodskappe in gedempte kletse is."
+  },
+  "icu:UnreadReminders__notification--messages--1": {
+    "messageformat": "{messageCount, plural, one {Jy het {messageCount,number} ongeleeste boodskap van {person1}.} other {Jy het {messageCount,number} ongeleeste boodskappe van {person1}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--2": {
+    "messageformat": "{messageCount, plural, one {Jy het {messageCount,number} ongeleeste boodskap van {person1} en {person2}.} other {Jy het {messageCount,number} ongeleeste boodskappe van {person1} en {person2}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--many": {
+    "messageformat": "{messageCount, plural, one {Jy het {messageCount,number} ongeleeste boodskap van {person1} en {person2}.} other {Jy het {messageCount,number} ongeleeste boodskappe van {person1}, {person2} en andere.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-mentions": {
+    "messageformat": "{messageCount, plural, one {Jy het {messageCount,number} ongeleeste boodskap, met inbegrip van {mentionSummary}.} other {Jy het {messageCount,number} ongeleeste boodskappe, met inbegrip van {mentionSummary}.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-replies": {
+    "messageformat": "{messageCount, plural, one {Jy het {messageCount,number} ongeleeste boodskap, met inbegrip van {replySummary}.} other {Jy het {messageCount,number} ongeleeste boodskappe, met inbegrip van {replySummary}.}}"
+  },
+  "icu:UnreadReminders__notification--counts--messages": {
+    "messageformat": "{messageCount, plural, one {Jy het {messageCount,number} ongeleeste boodskap.} other {Jy het {messageCount,number} ongeleeste boodskappe.}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--1": {
+    "messageformat": "{mentionCount, plural, one {'n vermelding van jou deur {person1}} other {{mentionCount,number} vermeldings van jou deur {person1}}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--2": {
+    "messageformat": "{mentionCount, plural, one {{mentionCount,number} vermelding van jou deur {person1} en {person2}} other {{mentionCount,number} vermeldings van jou deur {person1} en {person2}}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--many": {
+    "messageformat": "{mentionCount, plural, one {{mentionCount,number} vermelding van jou deur {person1} en nog ander} other {{mentionCount,number} vermeldings van jou deur {person1} en nog ander}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--1": {
+    "messageformat": "{replyCount, plural, one {'n antwoord van {person1}} other {{replyCount,number} antwoorde van {person1}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--2": {
+    "messageformat": "{replyCount, plural, one {{replyCount,number} antwoord van {person1} en {person2}} other {{replyCount,number} antwoorde van {person1} en {person2}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--many": {
+    "messageformat": "{replyCount, plural, one {{replyCount,number} antwoord van {person1} en nog ander} other {{replyCount,number} antwoorde van {person1} en nog ander}}"
   },
   "icu:GroupLinkManagement--clipboard": {
     "messageformat": "Groepskakel gekopieer."
@@ -5140,6 +5272,48 @@
   },
   "icu:GroupLinkManagement__CopyGroupLinkButtonLabel": {
     "messageformat": "Kopieer signal.group-skakel na knipbord"
+  },
+  "icu:GroupMembersSearchDialog__DialogTitle": {
+    "messageformat": "Soek lede"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder": {
+    "messageformat": "Soek"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringByAdmins": {
+    "messageformat": "Soek deur admins"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringBySystemContacts": {
+    "messageformat": "Soek deur kontakte"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Label": {
+    "messageformat": "Filter"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__AllMembers": {
+    "messageformat": "Alle lede"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Admins": {
+    "messageformat": "Admins"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__SystemContacts": {
+    "messageformat": "Kontakte"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithoutSearchQuery": {
+    "messageformat": "Geen resultate nie"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithSearchQuery": {
+    "messageformat": "Geen resultate vir \"{searchQuery}\" nie"
+  },
+  "icu:GroupMembersSearchDialog__MemberItem__Admin": {
+    "messageformat": "Admin"
+  },
+  "icu:GroupMembersSearchDialog__SearchResults__Title": {
+    "messageformat": "Soekresultate"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__AddMembers": {
+    "messageformat": "Voeg lede by"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__InviteViaGroupLink": {
+    "messageformat": "Nooi via groepskakel"
   },
   "icu:PendingInvites--tab-requests": {
     "messageformat": "Versoeke ({count,number})"
@@ -5426,6 +5600,9 @@
   },
   "icu:CaptchaDialog__second-paragraph": {
     "messageformat": "Jy kan na verifikasie boodskappe stuur. Enige wagtende boodskappe sal outomaties verstuur word."
+  },
+  "icu:CaptchaDialog__continue": {
+    "messageformat": "Gaan voort"
   },
   "icu:CaptchaDialog--can-close__title": {
     "messageformat": "Gaan voort sonder verifikasie?"
@@ -5893,6 +6070,15 @@
   "icu:Preferences__message-audio-description": {
     "messageformat": "Hoor 'n kennisgewingklank vir gestuurde en ontvangde boodskappe terwyl jy in die klets is."
   },
+  "icu:Preferences__reaction-notifications-title": {
+    "messageformat": "Reaksiekennisgewings"
+  },
+  "icu:Preferences__reaction-notifications-description": {
+    "messageformat": "Stel in kennis wanneer iemand op jou boodskap reageer"
+  },
+  "icu:Preferences__button--account": {
+    "messageformat": "Rekening"
+  },
   "icu:Preferences__button--general": {
     "messageformat": "Algemeen"
   },
@@ -5962,6 +6148,45 @@
   "icu:Preferences--system": {
     "messageformat": "Stelsel"
   },
+  "icu:Preferences--signal-login": {
+    "messageformat": "Signal Login"
+  },
+  "icu:Preferences--signal-login-description": {
+    "messageformat": "Jou Signal Login word gebruik om jou rekening te herwin en te herstel. Stoor hierdie sleutels veilig in 'n wagwoordbestuurstelsel wat jy vertrou. <learnMoreLink>Vind meer uit</learnMoreLink>."
+  },
+  "icu:Preferences--signal-login-description--learn-more": {
+    "messageformat": "Vind meer uit"
+  },
+  "icu:Preferences__SignalAccount__label": {
+    "messageformat": "Rekening & herwinning"
+  },
+  "icu:Preferences__SignalAccount__description": {
+    "messageformat": "2 sleutels"
+  },
+  "icu:Preferences__SignalAccountKeys__Title": {
+    "messageformat": "Jou Signal Login"
+  },
+  "icu:Preferences__SignalAccountKeys__Description": {
+    "messageformat": "Bewaar dié op 'n veilige plek, jou aantekeninligting is nodig om jou rekening en data te herwin. Moet dit nooit met enigiemand deel nie."
+  },
+  "icu:Preferences__SignalAccountKeys__AccountKey": {
+    "messageformat": "Rekeningsleutel"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountID": {
+    "messageformat": "Rekening-ID"
+  },
+  "icu:Preferences__SignalAccountKeys__RecoveryKey": {
+    "messageformat": "Herwinsleutel"
+  },
+  "icu:Preferences__SignalAccountKeys__Save": {
+    "messageformat": "Stoor"
+  },
+  "icu:Preferences__Account__LinkedDevice__label": {
+    "messageformat": "Hierdie is 'n gekoppelde toestel"
+  },
+  "icu:Preferences__Account__LinkedDevice__description": {
+    "messageformat": "Om jou rekeninginstellings te bestuur, maak Signal op jou primêre toestel oop."
+  },
   "icu:Preferences--zoom": {
     "messageformat": "Zoemvlak"
   },
@@ -5992,8 +6217,116 @@
   "icu:Preferences--advanced": {
     "messageformat": "Gevorderd"
   },
-  "icu:Preferences--notification-content": {
-    "messageformat": "Kennisgewinginhoud"
+  "icu:Preferences--change-signal-pin": {
+    "messageformat": "Verander jou PIN"
+  },
+  "icu:Preferences--change-signal-pin-button": {
+    "messageformat": "Verander"
+  },
+  "icu:Preferences--create-signal-pin": {
+    "messageformat": "Skep ’n PIN"
+  },
+  "icu:Preferences--create-signal-pin-button": {
+    "messageformat": "Skep"
+  },
+  "icu:Preferences--signal-pin": {
+    "messageformat": "Signal-PIN"
+  },
+  "icu:Preferences--signal-pin__footer": {
+    "messageformat": "PIN’s hou inligting wat in Signal gestoor word, geënkripteer sodat slegs jy toegang daartoe het. Jou PIN kan nie herwin word nie. Jou profiel, instellings en kontakte sal herwin word wanneer jy Signal herinstalleer. <learnMoreLink>Vind meer uit</learnMoreLink>"
+  },
+  "icu:Preferences--signal-pin-advanced-settings": {
+    "messageformat": "Gevorderde PIN-instellings"
+  },
+  "icu:Preferences--disable-signal-pin": {
+    "messageformat": "Deaktiveer PIN"
+  },
+  "icu:Preferences--disable-signal-pin--button": {
+    "messageformat": "Deaktiveer"
+  },
+  "icu:Preferences--disable-signal-pin--footer": {
+    "messageformat": "Indien jy die PIN deaktiveer sal jy alle data verloor wanneer jy Signal herregistreer, tensy jy met die hand 'n rugsteun maak en dit herwin. Jy kan nie Registrasiesluiting aanskakel terwyl die PIN gedeaktiveer is nie."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--title": {
+    "messageformat": "Deaktivering van jou PIN het misluk omdat registrasieblokkering aan is"
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--body": {
+    "messageformat": "Jy moet Registrasieblokkering deaktiveer voordat jy jou PIN deaktiveer."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--ok": {
+    "messageformat": "Goed"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--title": {
+    "messageformat": "Deaktivering van jou PIN het misluk omdat rugsteun aan is"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--body": {
+    "messageformat": "Jy moet rugsteun deaktiveer voordat jy jou PIN deaktiveer."
+  },
+  "icu:Preferences--enable-signal-pin": {
+    "messageformat": "Aktiveer PIN"
+  },
+  "icu:Preferences--enable-signal-pin--button": {
+    "messageformat": "Aktiveer"
+  },
+  "icu:Preferences--pin-reminders--header": {
+    "messageformat": "PIN-herinnerings"
+  },
+  "icu:Preferences--pin-reminders--description": {
+    "messageformat": "Jy sal mettertyd al hoe minder gevra word"
+  },
+  "icu:Preferences--registration-lock__label": {
+    "messageformat": "Registrasieslot"
+  },
+  "icu:Preferences--registration-lock__footer": {
+    "messageformat": "Vereis jou Signal-PIN om jou telefoonnommer weer by Signal te registreer."
+  },
+  "icu:Preferences__Chats__TextInputSection__Title": {
+    "messageformat": "Teksinvoer"
+  },
+  "icu:Preferences__Chats__ChatFoldersSection__Title": {
+    "messageformat": "Kletsvouers"
+  },
+  "icu:Preferences__Notifications__Show__Label": {
+    "messageformat": "Wys"
+  },
+  "icu:Preferences__Notifications__SoundsSection__Title": {
+    "messageformat": "Klanke"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title": {
+    "messageformat": "Toepassingswapen"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title-v2": {
+    "messageformat": "Ongelees-wapens"
+  },
+  "icu:Preferences__Notifications__Reset__title": {
+    "messageformat": "Stel kennisgewinginstellings terug na verstekinstellings, waaronder pasgemaakte instellings vir jou kletse."
+  },
+  "icu:Preferences__Notifications__Reset__button": {
+    "messageformat": "Herstel"
+  },
+  "icu:Preferences__Notifications__Reset__modal--body": {
+    "messageformat": "Stel alle kennisgewinginstellings terug na die verstekinstelling vir alle kletse?"
+  },
+  "icu:Preferences__Notifications__Reset__modal--confirm": {
+    "messageformat": "Herstel"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Label": {
+    "messageformat": "Wapentelling"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Description": {
+    "messageformat": "Kies of die wapentelling die getal ongeleesde boodskappe of die getal ongeleeste kletse moet wys"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadMessages": {
+    "messageformat": "Ongeleesde boodskappe"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadChats": {
+    "messageformat": "Ongeleesde kletse"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats": {
+    "messageformat": "Sluit gedempte kletse in toepassingswapen in"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats__description": {
+    "messageformat": "Kletsvouerwapens sal altyd gedempte kletse insluit"
   },
   "icu:PlaintextExport--PreferencesRow--Header": {
     "messageformat": "Voer kletsgeskiedenis uit"
@@ -6145,9 +6478,6 @@
   "icu:NotificationProfiles--setting": {
     "messageformat": "Kennisgewingsprofiele"
   },
-  "icu:NotificationProfiles--setup": {
-    "messageformat": "Stel op"
-  },
   "icu:NotificationProfiles--title": {
     "messageformat": "Kennisgewingsprofiele"
   },
@@ -6159,9 +6489,6 @@
   },
   "icu:NotificationProfiles--manage-description": {
     "messageformat": "Voeg kennisgewingprofiele by of wysig dit"
-  },
-  "icu:NotificationProfiles--manage-profiles": {
-    "messageformat": "{profileCount, plural, one {Een profiel} other {{profileCount,number} profiele}}"
   },
   "icu:NotificationProfiles--create": {
     "messageformat": "Skep profiel"
@@ -6351,6 +6678,9 @@
   },
   "icu:Preferences--blocked-groups": {
     "messageformat": "Versperde Groepe"
+  },
+  "icu:Preferences--blocked--blocked-on": {
+    "messageformat": "Versper op {blockedAt}"
   },
   "icu:Preferences--signal-backups": {
     "messageformat": "Signal se Veilige Rugsteun"
@@ -6559,9 +6889,6 @@
   "icu:Preferences__pnp__row--body": {
     "messageformat": "Kies wie jou telefoonnommer kan sien en wie jou daarmee op Signal kan kontak."
   },
-  "icu:Preferences__pnp__row--button": {
-    "messageformat": "Verander…"
-  },
   "icu:Preferences__pnp__sharing--title": {
     "messageformat": "Wie my nommer kan sien"
   },
@@ -6610,14 +6937,11 @@
   "icu:Preferences--read-receipts": {
     "messageformat": "Leesbewyse"
   },
-  "icu:Preferences--read-receipts--description": {
-    "messageformat": "Indien dit gedeaktiveer is, sal jy nie leesbewyse vanaf andere kan sien nie."
-  },
   "icu:Preferences--typing-indicators": {
     "messageformat": "Tikaanduiders"
   },
-  "icu:Preferences--typing-indicators--description": {
-    "messageformat": "Indien dit gedeaktiveer is, sal jy nie tikaanwysers vanaf andere kan sien nie."
+  "icu:Preferences--messaging-help": {
+    "messageformat": "Sien en deel wanneer boodskap gelees of getik word. Indien dit gedeaktiveer is, sal jy nie leesbewyse of tikaanwysers van andere af ontvang nie."
   },
   "icu:Preferences--updates": {
     "messageformat": "Bywerkings"
@@ -6721,11 +7045,23 @@
   "icu:InstallScreenUpdateDialog--update-required__title": {
     "messageformat": "Opdatering benodig"
   },
+  "icu:InstallScreenUpdateDialog--checking-for-updates": {
+    "messageformat": "Besig om te kyk vir opdaterings"
+  },
+  "icu:InstallScreenUpdateDialog--updating-signal": {
+    "messageformat": "Besig met opdatering van Signal"
+  },
+  "icu:InstallScreenUpdateDialog--download-progress": {
+    "messageformat": "Besig om {currentBytes} van {totalBytes} ({percentage,number,percent}) af te laai…"
+  },
   "icu:InstallScreenUpdateDialog--update-required__body": {
-    "messageformat": "Om die sinchronisering van jou boodskappe te voltooi, doen nou opdatering van Signal Desktop."
+    "messageformat": "Om voort te gaan, doen 'n opdatering van Signal Desktop."
   },
   "icu:InstallScreenUpdateDialog--update-required__action-update": {
     "messageformat": "Werk by"
+  },
+  "icu:InstallScreenUpdateDialog--update-required__action-update__mas": {
+    "messageformat": "Gaan na die Toepassingswinkel"
   },
   "icu:InstallScreenUpdateDialog--unsupported-os__title": {
     "messageformat": "Opdatering benodig"
@@ -6759,6 +7095,9 @@
   },
   "icu:StandaloneRegistration--PhoneNumber--waiting": {
     "messageformat": "Probeer asseblief weer oor {duration}"
+  },
+  "icu:StandaloneRegistration--PhoneNumber--RegionCodeSelector--Label": {
+    "messageformat": "Kies streekskode"
   },
   "icu:StandaloneRegistration--PhoneNumber--placeholder": {
     "messageformat": "Telefoonnommer"
@@ -6982,6 +7321,9 @@
   "icu:StandaloneRegistration--VerifyPIN--incorrect-pin--with-count": {
     "messageformat": "{triesRemaining, plural, one {PIN verkeerd. {triesRemaining,number} poging oor.} other {PIN verkeerd. {triesRemaining,number} pogings oor.}}"
   },
+  "icu:StandaloneRegistration--VerifyPIN--just-count": {
+    "messageformat": "{triesRemaining, plural, one {{triesRemaining,number} poging oor.} other {{triesRemaining,number} pogings oor.}}"
+  },
   "icu:StandaloneRegistration--VerifyPIN--NeedHelp--header": {
     "messageformat": "Hulp nodig?"
   },
@@ -7024,6 +7366,9 @@
   "icu:StandaloneRegistration--VerifyPIN--NoRemainingTries--learn-more": {
     "messageformat": "Vind meer uit oor PIN’s"
   },
+  "icu:StandaloneRegistration--VerifyPIN--open-menu": {
+    "messageformat": "Maak kieslys oop"
+  },
   "icu:StandaloneRegistration--VerifyPIN--menu--skip-pin": {
     "messageformat": "Slaan PIN oor"
   },
@@ -7031,7 +7376,7 @@
     "messageformat": "Slaan PIN-invoer oor?"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--description": {
-    "messageformat": "As jy nie jou PIN kan onthou nie, kan jy 'n nuwe een skep. Jy kan registreer en jou rekening gebruik, maar jy sal sekere gestoorde instellings verloor, bv. jou profielinligting. Vind meer uit."
+    "messageformat": "As jy nie jou PIN kan onthou nie, kan jy 'n nuwe een skep. Jy kan registreer en jou rekening gebruik, maar jy sal sekere gestoorde instellings verloor, bv. jou profielinligting. <learnMore>Vind meer uit</learnMore>."
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--skip-button": {
     "messageformat": "Slaan oor en skep nuwe PIN"
@@ -7067,7 +7412,7 @@
     "messageformat": "Waarskuwing"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--description": {
-    "messageformat": "Indien jy die PIN deaktiveer sal jy alle data verloor wanneer jy Signal herregistreer, tensy jy dit van 'n ander iOS-toestel af oordra. Jy kan nie Registrasieblokkering aanskakel terwyl die PIN gedeaktiveer is nie."
+    "messageformat": "Indien jy die PIN deaktiveer, sal jy alle data verloor wanneer jy Signal herregistreer. Jy kan nie Registrasieblokkering aanskakel terwyl die PIN gedeaktiveer is nie."
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--disable-button": {
     "messageformat": "Deaktiveer PIN"
@@ -7275,6 +7620,12 @@
   },
   "icu:MediaPermissionsModal__step-2": {
     "messageformat": "Skakel \"Signal\" aan"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--microphone": {
+    "messageformat": "Aktiveer mikrofoontoegang vir Signal"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--camera": {
+    "messageformat": "Aktiveer kameratoegang vir Signal"
   },
   "icu:MediaPermissionsModal__open": {
     "messageformat": "Gaan na instellings"
@@ -7816,11 +8167,17 @@
   "icu:ContextMenu--button": {
     "messageformat": "Kontekskieslys"
   },
+  "icu:EditUsernameModalBody__username-label": {
+    "messageformat": "Gebruikersnaam"
+  },
   "icu:EditUsernameModalBody__username-placeholder": {
     "messageformat": "Gebruikersnaam"
   },
   "icu:EditUsernameModalBody__username-helper": {
     "messageformat": "Gebruikersname gaan altyd met 'n stel syfers gepaard."
+  },
+  "icu:EditUsernameModalBody__discriminator-label": {
+    "messageformat": "Gebruikersnaamsyfers"
   },
   "icu:EditUsernameModalBody__learn-more": {
     "messageformat": "Vind meer uit"
@@ -7918,6 +8275,75 @@
   },
   "icu:UsernameMegaphone__dismiss": {
     "messageformat": "Wys weg"
+  },
+  "icu:PinReminderMegaphone__title": {
+    "messageformat": "Verifieer jou Signal-PIN"
+  },
+  "icu:PinReminderMegaphone__body": {
+    "messageformat": "Ons sal jou af en toe vra om jou PIN te verifieer sodat jy dit kan onthou."
+  },
+  "icu:PinReminderMegaphone__verify": {
+    "messageformat": "Verifieer"
+  },
+  "icu:PinReminderMegaphone__not-now": {
+    "messageformat": "Nie nou nie"
+  },
+  "icu:PinReminderModal__title": {
+    "messageformat": "Voer jou Signal-PIN in"
+  },
+  "icu:PinReminderModal__body": {
+    "messageformat": "Om jou te help om jou PIN te memoriseer, sal ons jou af en toe vra om dit in te voer. Ons sal dit mettertyd al minder vra."
+  },
+  "icu:PinReminderModal__pin-input-placeholder": {
+    "messageformat": "Voer jou PIN in"
+  },
+  "icu:PinReminderModal__pin-input-error": {
+    "messageformat": "Verkeerde PIN. Probeer weer"
+  },
+  "icu:PinReminderModal__forgot": {
+    "messageformat": "PIN vergeet"
+  },
+  "icu:PinReminderModal__confirm": {
+    "messageformat": "Bevestig"
+  },
+  "icu:PinReminderCompletedToast": {
+    "messageformat": "PIN korrek. Ons sal jou weer later herinner."
+  },
+  "icu:PinChangeModal__title--create": {
+    "messageformat": "Verander jou Signal-PIN"
+  },
+  "icu:PinChangeModal__title--create--without-pin": {
+    "messageformat": "Skep jou Signal-PIN"
+  },
+  "icu:PinChangeModal__body--create": {
+    "messageformat": "Jy kan jou PIN verander solank hierdie toestel geregistreer is. <learnMoreLink>Vind meer uit</learnMoreLink>"
+  },
+  "icu:PinChangeModal__body--create--without-pin": {
+    "messageformat": "PIN’s hou inligting wat in Signal gestoor word, geënkripteer sodat slegs jy toegang daartoe het. Jou profiel, instellings en kontakte sal herwin word wanneer jy Signal herinstalleer. Jy sal nie jou PIN nodig hê om die toepassing oop te maak nie. <learnMoreLink>Vind meer uit</learnMoreLink>"
+  },
+  "icu:PinChangeModal__title--confirm": {
+    "messageformat": "Bevestig jou Signal-PIN"
+  },
+  "icu:PinChangeModal__body--confirm": {
+    "messageformat": "Voer die PIN in wat jy pas geskep het."
+  },
+  "icu:PinChangeModal__pin-input-placeholder--create": {
+    "messageformat": "Voer 'n nuwe PIN in"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--confirm": {
+    "messageformat": "Bevestig PIN"
+  },
+  "icu:PinChangeModal__cancel": {
+    "messageformat": "Kanselleer"
+  },
+  "icu:PinChangeModal__continue": {
+    "messageformat": "Gaan voort"
+  },
+  "icu:PinChangeModal__confirm": {
+    "messageformat": "Bevestig"
+  },
+  "icu:PinChangeCompletedToast": {
+    "messageformat": "Nuwe PIN geskep."
   },
   "icu:UnsupportedOSWarningDialog__body": {
     "messageformat": "Signal vir rekenaars sal binnekort nie meer jou rekenaar se weergawe van {OS} ondersteun nie. Om voort te gaan om Signal te gebruik, doen 'n opdatering van jou rekenaar se bedryfstelsel teen {expirationDate}. <learnMoreLink>Vind meer uit</learnMoreLink>"
@@ -8351,8 +8777,11 @@
   "icu:DonationReceipt__type-value--one-time": {
     "messageformat": "Een keer"
   },
-  "icu:DonationReceipt__footer-text": {
-    "messageformat": "Dankie vir jou ondersteuning van Signal. Jou bydrae help om deur oopbron-privaatheidstegnologie die missie van die beskerming van vryheid van uitdrukking te befonds en veilige globale kommunikasie vir miljoene mense regoor die wêreld moontlik maak. Indien jy 'n inwoner van die Verenigde State is, behou asseblief hierdie kwitansie vir jou belastingrekords. Signal Technology Foundation is 'n niewinsgewende organisasie in die Verenigde State wat van belasting vrygestel is ingevolge artikel 501c3 van die Internal Revenue Code. Ons Federale Belasting-ID is 82-4506840."
+  "icu:DonationReceipt__footer-text-v2": {
+    "messageformat": "Dankie vir jou ondersteuning van Signal. Jou bydrae help om deur oopbron-privaatheidstegnologie die missie van die beskerming van vryheid van uitdrukking te befonds en veilige globale kommunikasie vir miljoene mense regoor die wêreld moontlik maak. Indien jy 'n inwoner van die Verenigde State is, behou asseblief hierdie kwitansie vir jou belastingrekords. Signal Technology Foundation is 'n niewinsgewende organisasie in die Verenigde State wat van belasting vrygestel is ingevolge artikel 501c3 van die Internal Revenue Code. Ons Federal Tax ID is 82-4506840. Signal het nie enige goedere of dienste as teenprestasie vir hierdie bydrae gelewer nie."
+  },
+  "icu:MessageCta__Donate": {
+    "messageformat": "Skenk nou"
   },
   "icu:Donations__OfflineTooltip": {
     "messageformat": "Jy is aflyn. Verbind asseblief aan die internet om 'n skenking te voltooi."
@@ -8661,16 +9090,10 @@
     "messageformat": "Klein veranderings, foutregstellings en prestasieverbeterings. Dankie dat jy Signal gebruik!",
     "ignoreUnused": true
   },
-  "icu:WhatsNew__8.18--0": {
-    "messageformat": "Meningsopnames kan nou ook in individuele kletse geskep word."
+  "icu:WhatsNew__8.30--0": {
+    "messageformat": "Prestasieverbeterings vir video-oproepe."
   },
-  "icu:WhatsNew__8.19--0": {
-    "messageformat": "Groepadmins kan nou kletse beëindig met die nuwe \"Beëindig Groep\" in die groepinstellings. Beëindiging van 'n groep verhoed dat groeplede boodskappe stuur of oproepe begin, en dit deaktiveer ook uitnodigings."
-  },
-  "icu:WhatsNew__8.20--0": {
-    "messageformat": "Introducing disappearing call events: Missed, outgoing, and received calls that occur after you install this update will now automatically disappear in any chat where disappearing messages are enabled."
-  },
-  "icu:WhatsNew__8.20--1": {
-    "messageformat": "Now you can reorder installed sticker packs so your new favorites don’t get stuck in the back of the line."
+  "icu:WhatsNew__8.30--1": {
+    "messageformat": "Ons het ook 'n gerieflike kortpad bygevoeg om jou stelselinstellings in Windows oop te maak as jy by 'n video-oproep probeer aansluit en Signal nie toestemming het om toegang tot die kamera te verkry nie."
   }
 }

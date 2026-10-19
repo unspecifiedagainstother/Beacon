@@ -185,8 +185,6 @@ function TextInputField(props: { placeholder: string }) {
 
   return (
     <div className={tw('py-1.5')} style={style}>
-      {/* FIXME */}
-      {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label */}
       <input
         placeholder={props.placeholder}
         className={tw(
@@ -359,9 +357,7 @@ export function ExampleLanguageDialog(): JSX.Element {
           <AxoDialog.Title>Language</AxoDialog.Title>
           <AxoDialog.Close />
         </AxoDialog.Header>
-        <AxoDialog.ExperimentalSearch>
-          {/* FIXME */}
-          {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label */}
+        <AxoDialog.Search>
           <input
             type="search"
             autoFocus
@@ -371,8 +367,8 @@ export function ExampleLanguageDialog(): JSX.Element {
               'forced-colors:border forced-colors:border-[ButtonBorder] forced-colors:bg-[ButtonFace] forced-colors:text-[ButtonText]'
             )}
           />
-        </AxoDialog.ExperimentalSearch>
-        <AxoDialog.Body padding="only-scrollbar-gutter">
+        </AxoDialog.Search>
+        <AxoDialog.Body padding="sm">
           <div
             role="listbox"
             style={{

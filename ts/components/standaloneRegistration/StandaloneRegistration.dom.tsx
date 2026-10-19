@@ -25,6 +25,7 @@ import { AccountLockedScreen } from './stages/AccountLocked.dom.tsx';
 import { Spacer } from './util/StepComponents.dom.tsx';
 import { CONTACT_SUPPORT_URL } from '../../util/contactSupport.dom.tsx';
 import { openLinkInWebBrowser } from '../../util/openLinkInWebBrowser.dom.ts';
+import { InstallScreenUpdateDialog } from '../installScreen/InstallScreenUpdateDialog.dom.tsx';
 
 import type { LocalizerType } from '../../types/I18N.std.ts';
 import type { ActionCreator } from '../../state/types.std.ts';
@@ -54,6 +55,7 @@ import type {
   verifyPIN as doVerifyPIN,
 } from '../../state/ducks/standaloneInstaller.preload.ts';
 import type { CountryDataType } from '../../util/getCountryData.dom.ts';
+import type { UpdatesStateType } from '../../state/ducks/updates.preload.ts';
 
 const SPRING = {
   type: 'spring' as const,
@@ -89,6 +91,14 @@ export type PropsType = Readonly<{
   verifyPIN: ActionCreator<typeof doVerifyPIN>;
   workflow: RegistrationWorkflow;
 
+  // Updates
+  currentVersion: string;
+  forceCheck: () => unknown;
+  kickOffForcedUpgrade: () => unknown;
+  OS: string;
+  startUpdate: () => unknown;
+  updates: UpdatesStateType;
+
   // AvatarEditor support
   deleteAvatarFromDisk: DeleteAvatarFromDiskActionType;
   replaceAvatar: ReplaceAvatarActionType;
@@ -122,6 +132,14 @@ export function StandaloneRegistration({
   verifyPIN,
   workflow,
 
+  // Updates
+  currentVersion,
+  forceCheck,
+  kickOffForcedUpgrade,
+  OS,
+  startUpdate,
+  updates,
+
   // AvatarEditor support
   deleteAvatarFromDisk,
   replaceAvatar,
@@ -140,7 +158,9 @@ export function StandaloneRegistration({
     useState(false);
 
   const previousFatalError = useRef<FatalErrorType>(undefined);
+  // oxlint-disable-next-line react/refs
   if (fatalError !== previousFatalError.current) {
+    // oxlint-disable-next-line react/refs
     previousFatalError.current = fatalError;
 
     if (!fatalError) {
@@ -236,6 +256,17 @@ export function StandaloneRegistration({
     body = (
       <AccountLockedScreen i18n={i18n} startRegistration={startRegistration} />
     );
+  } else if (workflow.stage === RegistrationStage.UPDATE_REQUIRED) {
+    return (
+      <InstallScreenUpdateDialog
+        i18n={i18n}
+        currentVersion={currentVersion}
+        forceCheck={forceCheck}
+        OS={OS}
+        startUpdate={startUpdate}
+        {...updates}
+      />
+    );
   } else {
     throw missingCaseError(workflow);
   }
@@ -297,9 +328,7 @@ export function StandaloneRegistration({
         </AxoConfirmDialog.Action>
         <AxoConfirmDialog.Action
           variant="strong-primary"
-          onClick={() => {
-            // TODO: kick off update process - how to represent this during updates?
-          }}
+          onClick={() => kickOffForcedUpgrade()}
         >
           {i18n('icu:StandaloneRegistration--UpdateRequired--update')}
         </AxoConfirmDialog.Action>

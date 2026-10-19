@@ -11,6 +11,9 @@
   "icu:AxoDialog.Close": {
     "messageformat": "Închide"
   },
+  "icu:AxoPasswordField.Reveal": {
+    "messageformat": "Arată parola"
+  },
   "icu:AxoTextField.Clear": {
     "messageformat": "Eliminare"
   },
@@ -61,6 +64,24 @@
   },
   "icu:Preferences__DonateTitle": {
     "messageformat": "Donează pentru Signal"
+  },
+  "icu:LinkedDevicesOnboardingDialog__description": {
+    "messageformat": "Funcția <bold>Dispozitive conectate</bold> te lasă să accesezi mesajele și contul Signal în siguranță pe oricare dintre dispozitivele tale suplimentare."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--1": {
+    "messageformat": "Poți conecta un computer, o tabletă sau un telefon suplimentar."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--2": {
+    "messageformat": "Dispozitivul principal gestionează dispozitivele conectate; poți asocia până la 5 dispozitive."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3": {
+    "messageformat": "Anumite setări ale contului sunt gestionate exclusiv pe dispozitivul principal, inclusiv setările contului și copiile de rezervă."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--1": {
+    "messageformat": "Setările contului și backup-urile pot fi gestionate doar pe dispozitivul primar."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--2": {
+    "messageformat": "Setările contului și Backup-urile securizate Signal pot fi gestionare doar pe dispozitivul tău principal."
   },
   "icu:sentMediaQualityStandard": {
     "messageformat": "Standard"
@@ -317,11 +338,8 @@
   "icu:LeftPaneChatFolders__ItemLabel--All": {
     "messageformat": "Toate conversațiile"
   },
-  "icu:LeftPaneChatFolders__ItemUnreadBadge__MaxCount": {
-    "messageformat": "{maxCount,number}+"
-  },
   "icu:LeftPaneChatFolders__ItemUnreadBadge__AccessibleLabel": {
-    "messageformat": "{count, plural, one {{count,number} Unread Message} other {{count,number} Unread Messages}}"
+    "messageformat": "{count, plural, one {{count,number} mesaj necitit} few {{count,number} mesaje necitite} other {{count,number} de mesaje necitite}}"
   },
   "icu:LeftPaneChatFolders__Item__ContextMenu__MarkAllRead": {
     "messageformat": "Marchează tot ca citit"
@@ -364,9 +382,6 @@
   },
   "icu:NavTabs__ItemIconLabel--UnreadCount": {
     "messageformat": "{count,number} necitite"
-  },
-  "icu:NavTabs__ItemIconLabel--MarkedUnread": {
-    "messageformat": "Marchează necitit"
   },
   "icu:NavTabs__ItemLabel--Chats": {
     "messageformat": "Conversații"
@@ -635,20 +650,23 @@
   "icu:SafetyNumberNotReady__learn-more": {
     "messageformat": "Află mai multe"
   },
-  "icu:KeyTransparencyErrorDialog__Title": {
-    "messageformat": "Verificarea automată a codului nu este disponibilă în prezent pentru dispozitivul tău. Trimiți jurnalul de depanare?"
+  "icu:KeyTransparencyErrorDialog__Title-v2": {
+    "messageformat": "Verificarea automată a codului nu este disponibilă în prezent pentru dispozitivul tău. Trimiți un raport ca să ne ajuți să ne îmbunătățim?"
   },
-  "icu:KeyTransparencyErrorDialog__Description": {
-    "messageformat": "Jurnalele de depanare ne ajută să diagnosticăm și să remediem problema și nu conțin informații de identificare."
+  "icu:KeyTransparencyErrorDialog__Description-v2": {
+    "messageformat": "Dacă incluzi jurnalele de depanare ne ajută să diagnosticăm și să remediem problema și nu conțin informații de identificare. Împărtășirea este opțională."
   },
-  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label": {
-    "messageformat": "Trimite jurnalul de depanare"
+  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label-v2": {
+    "messageformat": "Includere jurnale depanare"
   },
   "icu:KeyTransparencyErrorDialog__ShareDebugLog__ViewButton": {
     "messageformat": "Vizualizare"
   },
   "icu:KeyTransparencyErrorDialog__Submit": {
     "messageformat": "Trimite"
+  },
+  "icu:KeyTransparencyErrorDialog__Cancel": {
+    "messageformat": "Nu, mulțumesc"
   },
   "icu:KeyTransparencyOnboardingDialog__Title": {
     "messageformat": "Signal poate acum verifica automat criptarea codului"
@@ -746,11 +764,11 @@
   "icu:maximumAttachments": {
     "messageformat": "Nu mai poți adăuga alte atașamente la acest mesaj."
   },
-  "icu:fileSizeWarning": {
-    "messageformat": "Ne pare rău, fișierul selectat depășește limita de mărime a mesajului. {limit,number} {units}"
+  "icu:fileTooLargeWarning": {
+    "messageformat": "Nu se poate trimite acest fișier pentru că e prea mare. Poți să trimiți fișiere de până la {limit,number}{units}."
   },
-  "icu:videoFileSizeWarning": {
-    "messageformat": "Ne pare rău, fișierul video selectat depășește limita de mărime pentru mesaje. {limit,number}{units}"
+  "icu:videoFileTooLargeWarning": {
+    "messageformat": "Nu se poate trimite acest fișier video pentru că este prea mare. Poți să trimiți fișiere video de până la {limit,number}{units}."
   },
   "icu:unableToLoadAttachment": {
     "messageformat": "Nu s-a putut încărca atașamentul selectat."
@@ -772,6 +790,9 @@
   },
   "icu:checkNetworkConnection": {
     "messageformat": "Verifică-ți conexiunea la rețea."
+  },
+  "icu:clockSkewDetected": {
+    "messageformat": "Data dispozitivului nu este corectă. Ajustează-ți ceasul și încearcă din nou. Data și timpul dispozitivului tău este:"
   },
   "icu:submitDebugLog": {
     "messageformat": "Jurnal depanare"
@@ -994,6 +1015,9 @@
   },
   "icu:mute": {
     "messageformat": "Silențios"
+  },
+  "icu:muted": {
+    "messageformat": "Fără sunet"
   },
   "icu:cannotUpdateDetail-v2": {
     "messageformat": "Signal nu s-a putut actualiza. <retryUpdateButton>Reîncearcă actualizarea</retryUpdateButton> sau vizitează {url} ca să-l instalezi manual. Apoi, <contactSupportLink>contactează asistența</contactSupportLink> referitor la problemă"
@@ -1261,6 +1285,9 @@
   },
   "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync": {
     "messageformat": "Toate mesajele din această conversație vor fi eliminate de pe toate dispozitivele tale."
+  },
+  "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync--still-member": {
+    "messageformat": "Toate mesajele din această conversație vor fi eliminate de pe toate dispozitivele tale. Încă vei fi membru al acestui grup."
   },
   "icu:ConversationHeader__ContextMenu__LeaveGroupAction__title": {
     "messageformat": "Părăsește grupul"
@@ -1610,9 +1637,6 @@
   "icu:Preferences__EmojiSkinToneDefaultSetting__Label": {
     "messageformat": "Tonul pielii emoji"
   },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__Title": {
-    "messageformat": "Dosare de conversații"
-  },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Title": {
     "messageformat": "Adaugă un dosar de conversații"
   },
@@ -1624,12 +1648,6 @@
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Description--WithChatFolders": {
     "messageformat": "{chatFoldersCount, plural, one {{chatFoldersCount,number} dosar} few {{chatFoldersCount,number} dosare} other {{chatFoldersCount,number} de dosare}}"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button": {
-    "messageformat": "Stabilește"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button--WithChatFolders": {
-    "messageformat": "Administrează"
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__ChatFolderItem__ContextMenu__EditFolder": {
     "messageformat": "Editează dosarul"
@@ -2384,9 +2402,6 @@
   "icu:SafetyNumberModal__title": {
     "messageformat": "Verifică numărul de siguranță"
   },
-  "icu:safetyNumberChanged": {
-    "messageformat": "Numărul de siguranță s-a schimbat"
-  },
   "icu:safetyNumberChanges": {
     "messageformat": "Schimbări ale numărului de siguranță"
   },
@@ -2826,16 +2841,16 @@
     "messageformat": "Elimină"
   },
   "icu:stickers--StickerManagerPackDragHandle--Label": {
-    "messageformat": "Drag to reorder sticker pack"
+    "messageformat": "Trage pentru a reordona pachetul de abțibilduri"
   },
   "icu:stickers--StickerManagerBlessedPacksList--Label": {
-    "messageformat": "Signal Artist Series sticker packs"
+    "messageformat": "Pachete de abțibilduri Signal Artist Series"
   },
   "icu:stickers--StickerManagerReceivedPacksList--Label": {
-    "messageformat": "Received sticker packs"
+    "messageformat": "Pachete de abțibilduri primite"
   },
   "icu:stickers--StickerManagerInstalledPacksList--Label": {
-    "messageformat": "Installed sticker packs"
+    "messageformat": "Pachete de abțibilduri instalate"
   },
   "icu:stickers--StickerPreview--Title": {
     "messageformat": "Pachet autocolante"
@@ -3081,16 +3096,16 @@
     "messageformat": "Adaugă un autocolant"
   },
   "icu:FunPicker__Label--StickerReply": {
-    "messageformat": "Reply"
+    "messageformat": "Răspunde"
   },
   "icu:FunPicker__Label--SendStickerReply": {
-    "messageformat": "Send"
+    "messageformat": "Trimite"
   },
   "icu:FunPicker__Label--CancelStickerReply": {
-    "messageformat": "Cancel"
+    "messageformat": "Anulează"
   },
   "icu:FunPicker__Label--Sticker": {
-    "messageformat": "Sticker"
+    "messageformat": "Autocolant"
   },
   "icu:confirmation-dialog--Cancel": {
     "messageformat": "Anulează"
@@ -3872,20 +3887,20 @@
   "icu:calling__preview--minimize": {
     "messageformat": "Minimizează previzualizarea"
   },
-  "icu:calling__change-view": {
-    "messageformat": "Schimbă vizualizarea"
-  },
-  "icu:calling__view_mode--paginated": {
-    "messageformat": "Vizualizare grilă"
-  },
-  "icu:calling__view_mode--overflow": {
-    "messageformat": "Vizualizare bara laterală"
-  },
-  "icu:calling__view_mode--speaker": {
-    "messageformat": "Vizualizare vorbitor"
-  },
   "icu:calling__view_mode--updated": {
     "messageformat": "Vizualizare actualizată"
+  },
+  "icu:calling__change-layout": {
+    "messageformat": "Schimbă aspectul"
+  },
+  "icu:calling__layout--paginated": {
+    "messageformat": "Grilă"
+  },
+  "icu:calling__layout--overflow": {
+    "messageformat": "Bară laterală"
+  },
+  "icu:calling__layout--speaker": {
+    "messageformat": "Difuzor"
   },
   "icu:calling__SelectPresentingSourcesModal--title": {
     "messageformat": "Partajează ecranul tău"
@@ -3950,23 +3965,47 @@
   "icu:notMuted": {
     "messageformat": "Nu este pe silențios"
   },
-  "icu:muteHour": {
-    "messageformat": "Silențios pentru o oră"
-  },
-  "icu:muteEightHours": {
-    "messageformat": "Silențios pentru opt ore"
-  },
-  "icu:muteDay": {
-    "messageformat": "Silențios pentru o zi"
-  },
-  "icu:muteWeek": {
-    "messageformat": "Silențios pentru o săptămână"
-  },
-  "icu:muteAlways": {
-    "messageformat": "Silențios întotdeauna"
-  },
   "icu:unmute": {
     "messageformat": "Microfon"
+  },
+  "icu:MuteMenu__label": {
+    "messageformat": "Pune pe silențios această conversație pentru…"
+  },
+  "icu:MuteMenu__hour": {
+    "messageformat": "o oră"
+  },
+  "icu:MuteMenu__eightHours": {
+    "messageformat": "8 ore"
+  },
+  "icu:MuteMenu__day": {
+    "messageformat": "1 zi"
+  },
+  "icu:MuteMenu__week": {
+    "messageformat": "1 săptămână"
+  },
+  "icu:MuteMenu__until": {
+    "messageformat": "Până…"
+  },
+  "icu:MuteMenu__always": {
+    "messageformat": "Întotdeauna"
+  },
+  "icu:DatePicker__popupTitle": {
+    "messageformat": "Alege o dată"
+  },
+  "icu:TimePicker__popupTitle": {
+    "messageformat": "Alege o oră"
+  },
+  "icu:MuteUntilDialog__title": {
+    "messageformat": "Pune pe silențios această conversație până…"
+  },
+  "icu:MuteUntilDialog__dateLabel": {
+    "messageformat": "Data"
+  },
+  "icu:MuteUntilDialog__timeLabel": {
+    "messageformat": "Timp"
+  },
+  "icu:MuteUntilDialog__timeZoneNote": {
+    "messageformat": "Toate zonele în {timeZone}"
   },
   "icu:muteExpirationLabelAlways": {
     "messageformat": "Silențios întotdeauna"
@@ -4874,9 +4913,6 @@
   "icu:showConversationDetails--direct": {
     "messageformat": "Setări conversaţie"
   },
-  "icu:ConversationDetails__unmute--title": {
-    "messageformat": "Activezi notificările conversației?"
-  },
   "icu:ConversationDetails--group-link": {
     "messageformat": "Link grup"
   },
@@ -5072,6 +5108,9 @@
   "icu:ConversationDetailsMembershipList--show-all": {
     "messageformat": "Vezi tot"
   },
+  "icu:ConversationDetailsMembershipList__Search__AccessibilityLabel": {
+    "messageformat": "Caută"
+  },
   "icu:ConversationDetailsGroups--title": {
     "messageformat": "{count, plural, one {{count,number} grup în comun} few {{count,number} grupuri în comun} other {{count,number} de grupuri în comun}}"
   },
@@ -5108,17 +5147,110 @@
   "icu:EditNicknameAndNoteModal__Note__Placeholder": {
     "messageformat": "Notă"
   },
-  "icu:ConversationNotificationsSettings__mentions__label": {
+  "icu:WhileMuted__title": {
+    "messageformat": "În timp ce sunetul e dezactivat"
+  },
+  "icu:WhileMuted__description": {
+    "messageformat": "Alege notificările pe care să le vezi când sunetul conversației este dezactivat."
+  },
+  "icu:WhileMuted__calls__title": {
+    "messageformat": "Apeluri"
+  },
+  "icu:WhileMuted__calls__description": {
+    "messageformat": "Sună sau anunță când un apel a început în timp ce conversația este pe silențios."
+  },
+  "icu:WhileMuted__mentions__title": {
     "messageformat": "Mențiuni"
   },
-  "icu:ConversationNotificationsSettings__mentions__info": {
-    "messageformat": "Primiți notificări atunci când sunteți menționați în conversații pe mod silențios"
+  "icu:WhileMuted__mentions__description": {
+    "messageformat": "Notifică atunci când cineva te menționează în timp ce conversația este pe silențios."
   },
-  "icu:ConversationNotificationsSettings__mentions__select__always-notify": {
-    "messageformat": "Notifică întotdeauna"
+  "icu:WhileMuted__replies__title": {
+    "messageformat": "Răspunsuri"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__dont-notify-for-mentions-if-muted": {
-    "messageformat": "Nu notifica pe silențios"
+  "icu:WhileMuted__replies__description": {
+    "messageformat": "Notifică atunci când cineva răspunde la mesaje atunci când acea conversația este pe silențios."
+  },
+  "icu:WhileMuted__value--none": {
+    "messageformat": "Niciunul"
+  },
+  "icu:WhileMuted__value--calls": {
+    "messageformat": "Apeluri"
+  },
+  "icu:WhileMuted__value--mentions": {
+    "messageformat": "Mențiuni"
+  },
+  "icu:WhileMuted__value--replies": {
+    "messageformat": "Răspunsuri"
+  },
+  "icu:WhileMuted__value--calls-mentions": {
+    "messageformat": "Apeluri, mențiuni"
+  },
+  "icu:WhileMuted__value--calls-replies": {
+    "messageformat": "Apeluri, răspunsuri"
+  },
+  "icu:WhileMuted__value--mentions-replies": {
+    "messageformat": "Mențiuni, răspunsuri"
+  },
+  "icu:WhileMuted__value--calls-mentions-replies": {
+    "messageformat": "Apeluri, mențiuni, răspunsuri"
+  },
+  "icu:Preferences__WhileMuted__description": {
+    "messageformat": "Alege notificările care să apară la conversațiile pe silențios."
+  },
+  "icu:Preferences__WhileMuted__calls__description": {
+    "messageformat": "Sună sau anunță când un apel începe în conversațiile pe silențios."
+  },
+  "icu:Preferences__WhileMuted__mentions__description": {
+    "messageformat": "Anunță când te menționează cineva în conversațiile pe silențios."
+  },
+  "icu:Preferences__WhileMuted__replies__description": {
+    "messageformat": "Anunță când cineva răspunde la mesajul tău în timp ce conversațiile sunt pe silențios."
+  },
+  "icu:UnreadReminders__title": {
+    "messageformat": "Remindere necitite"
+  },
+  "icu:UnreadReminders__description": {
+    "messageformat": "Notifică ocazional când există mesaje necitite în timp ce această conversație este dezactivată."
+  },
+  "icu:Preferences__UnreadReminders__description": {
+    "messageformat": "Afișează ocazional o notificare atunci când există mesaje necitite în conversațiile puse pe silențios."
+  },
+  "icu:UnreadReminders__notification--messages--1": {
+    "messageformat": "{messageCount, plural, one {Ai {messageCount,number} mesaj necitit de la {person1}.} few {Ai {messageCount,number} mesaje necitite de la {person1}.} other {Ai {messageCount,number} de mesaje necitite de la {person1}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--2": {
+    "messageformat": "{messageCount, plural, one {Ai {messageCount,number} mesaj necitit de la {person1} și {person2}.} few {Ai {messageCount,number} mesaje necitite de la {person1} și {person2}.} other {Ai {messageCount,number} de mesaje necitite de la {person1} și {person2}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--many": {
+    "messageformat": "{messageCount, plural, one {Ai {messageCount,number} mesaj necitit de la {person1}, {person2} și alte persoane.} few {Ai {messageCount,number} mesaje necitite de la {person1}, {person2} și alte persoane.} other {Ai {messageCount,number} de mesaje necitite de la {person1}, {person2} și alte persoane.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-mentions": {
+    "messageformat": "{messageCount, plural, one {Ai {messageCount,number} mesaj necitit, inclusiv {mentionSummary}.} few {Ai {messageCount,number} mesaje necitite, inclusiv {mentionSummary}.} other {Ai {messageCount,number} de mesaje necitite, inclusiv {mentionSummary}.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-replies": {
+    "messageformat": "{messageCount, plural, one {Ai {messageCount,number} mesaj necitit, inclusiv {replySummary}.} few {Ai {messageCount,number} mesaje necitite, inclusiv {replySummary}.} other {Ai {messageCount,number} de mesaje necitite, inclusiv {replySummary}.}}"
+  },
+  "icu:UnreadReminders__notification--counts--messages": {
+    "messageformat": "{messageCount, plural, one {Ai {messageCount,number} mesaj necitit.} few {Ai {messageCount,number} mesaje necitite.} other {Ai {messageCount,number} de mesaje necitite.}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--1": {
+    "messageformat": "{mentionCount, plural, one {{person1} te-a menționat o dată} few {{person1} te-a menționat de {mentionCount,number} ori} other {{person1} te-a menționat de {mentionCount,number} de ori}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--2": {
+    "messageformat": "{mentionCount, plural, one {{person1} și {person2} te-au menționat o dată} few {{person1} și {person2} te-au menționat de {mentionCount,number} ori} other {{person1} și {person2} te-au menționat de {mentionCount,number} de ori}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--many": {
+    "messageformat": "{mentionCount, plural, one {{person1} și alte persoane te-au menționat o dată} few {{person1} și alte persoane te-au menționat de {mentionCount,number} ori} other {{person1} și alte persoane te-au menționat de {mentionCount,number} de ori}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--1": {
+    "messageformat": "{replyCount, plural, one {un răspuns de la {person1}} few {{replyCount,number} răspunsuri de la {person1}} other {{replyCount,number} de răspunsuri de la {person1}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--2": {
+    "messageformat": "{replyCount, plural, one {{replyCount,number} răspuns de la {person1} și {person2}} few {{replyCount,number} răspunsuri de la {person1} și {person2}} other {{replyCount,number} de răspunsuri de la {person1} și {person2}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--many": {
+    "messageformat": "{replyCount, plural, one {{replyCount,number} răspuns de la {person1} și alte persoane} few {{replyCount,number} răspunsuri de la {person1} și alte persoane} other {{replyCount,number} de răspunsuri de la {person1} și alte persoane}}"
   },
   "icu:GroupLinkManagement--clipboard": {
     "messageformat": "Linkul grupului a fost copiat."
@@ -5140,6 +5272,48 @@
   },
   "icu:GroupLinkManagement__CopyGroupLinkButtonLabel": {
     "messageformat": "Copiază linkul grup.signal în clipboard"
+  },
+  "icu:GroupMembersSearchDialog__DialogTitle": {
+    "messageformat": "Caută membri"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder": {
+    "messageformat": "Caută"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringByAdmins": {
+    "messageformat": "Caută administratori"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringBySystemContacts": {
+    "messageformat": "Caută contacte"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Label": {
+    "messageformat": "Filtrează"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__AllMembers": {
+    "messageformat": "Toți membrii"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Admins": {
+    "messageformat": "Administratori"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__SystemContacts": {
+    "messageformat": "Contacte"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithoutSearchQuery": {
+    "messageformat": "Niciun rezultat"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithSearchQuery": {
+    "messageformat": "Fără rezultate pentru „{searchQuery}“"
+  },
+  "icu:GroupMembersSearchDialog__MemberItem__Admin": {
+    "messageformat": "Administrator"
+  },
+  "icu:GroupMembersSearchDialog__SearchResults__Title": {
+    "messageformat": "Rezultatele căutării"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__AddMembers": {
+    "messageformat": "Adăugare membri"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__InviteViaGroupLink": {
+    "messageformat": "Invită prin linkul de grup"
   },
   "icu:PendingInvites--tab-requests": {
     "messageformat": "Solicitări ({count,number})"
@@ -5426,6 +5600,9 @@
   },
   "icu:CaptchaDialog__second-paragraph": {
     "messageformat": "După verificare, poți continua să trimiți mesaje. Toate mesajele aflate în pauză vor fi trimise automat."
+  },
+  "icu:CaptchaDialog__continue": {
+    "messageformat": "Continuă"
   },
   "icu:CaptchaDialog--can-close__title": {
     "messageformat": "Continui fără verificare?"
@@ -5893,6 +6070,15 @@
   "icu:Preferences__message-audio-description": {
     "messageformat": "Auzi un sunet de notificare pentru mesajele trimise și primite în timp ce ești în chat."
   },
+  "icu:Preferences__reaction-notifications-title": {
+    "messageformat": "Notificări privind reacțiile"
+  },
+  "icu:Preferences__reaction-notifications-description": {
+    "messageformat": "Anunță când cineva reacționează la mesajul tău"
+  },
+  "icu:Preferences__button--account": {
+    "messageformat": "Cont"
+  },
   "icu:Preferences__button--general": {
     "messageformat": "General"
   },
@@ -5962,6 +6148,45 @@
   "icu:Preferences--system": {
     "messageformat": "Sistem"
   },
+  "icu:Preferences--signal-login": {
+    "messageformat": "Login Signal"
+  },
+  "icu:Preferences--signal-login-description": {
+    "messageformat": "Loginul Signal este folosit pentru a-ți recupera și restaura contul. Păstrează aceste coduri cheie în siguranță într-un manager de parole în care ai încredere. <learnMoreLink>Află mai multe</learnMoreLink>."
+  },
+  "icu:Preferences--signal-login-description--learn-more": {
+    "messageformat": "Află mai multe"
+  },
+  "icu:Preferences__SignalAccount__label": {
+    "messageformat": "Cont și recuperare"
+  },
+  "icu:Preferences__SignalAccount__description": {
+    "messageformat": "2 coduri"
+  },
+  "icu:Preferences__SignalAccountKeys__Title": {
+    "messageformat": "Login-ul tău Signal"
+  },
+  "icu:Preferences__SignalAccountKeys__Description": {
+    "messageformat": "Păstrează aceste informații într-un loc sigur; datele de autentificare îți sunt necesare pentru a-ți recupera contul și datele. Nu-l trimite nimănui."
+  },
+  "icu:Preferences__SignalAccountKeys__AccountKey": {
+    "messageformat": "Cod pentru cont"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountID": {
+    "messageformat": "ID cont"
+  },
+  "icu:Preferences__SignalAccountKeys__RecoveryKey": {
+    "messageformat": "Cod de recuperare"
+  },
+  "icu:Preferences__SignalAccountKeys__Save": {
+    "messageformat": "Salvează"
+  },
+  "icu:Preferences__Account__LinkedDevice__label": {
+    "messageformat": "Acesta este un dispozitiv asociat"
+  },
+  "icu:Preferences__Account__LinkedDevice__description": {
+    "messageformat": "Ca să-ți gestionezi setările contului, deschide Signal pe dispozitivul principal."
+  },
   "icu:Preferences--zoom": {
     "messageformat": "Nivel zoom"
   },
@@ -5992,8 +6217,116 @@
   "icu:Preferences--advanced": {
     "messageformat": "Avansat"
   },
-  "icu:Preferences--notification-content": {
-    "messageformat": "Conținut notificare"
+  "icu:Preferences--change-signal-pin": {
+    "messageformat": "Modificare PIN"
+  },
+  "icu:Preferences--change-signal-pin-button": {
+    "messageformat": "Schimbă"
+  },
+  "icu:Preferences--create-signal-pin": {
+    "messageformat": "Creează un PIN"
+  },
+  "icu:Preferences--create-signal-pin-button": {
+    "messageformat": "Creează"
+  },
+  "icu:Preferences--signal-pin": {
+    "messageformat": "PIN Signal"
+  },
+  "icu:Preferences--signal-pin__footer": {
+    "messageformat": "PIN-urile îți păstrează informațiile stocate în Signal criptate ca doar tu să le poți accesa. PIN-ul tău nu poate fi recuperat. Profilul, setările și contactele vor fi restaurate când reinstalezi Signal. <learnMoreLink>Află mai multe</learnMoreLink>"
+  },
+  "icu:Preferences--signal-pin-advanced-settings": {
+    "messageformat": "Setări PIN avansate"
+  },
+  "icu:Preferences--disable-signal-pin": {
+    "messageformat": "Dezactivare PIN"
+  },
+  "icu:Preferences--disable-signal-pin--button": {
+    "messageformat": "Dezactivează"
+  },
+  "icu:Preferences--disable-signal-pin--footer": {
+    "messageformat": "Dacă dezactivezi codul PIN, vei pierde toate datele când te înregistrezi din nou la Signal, cu excepția cazului când faci backup și restaurezi manual. Nu poți activa Blocarea înregistrării în timp ce codul PIN este dezactivat."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--title": {
+    "messageformat": "Dezactivarea PIN-ului a eșuat din cauza blocării înregistrării"
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--body": {
+    "messageformat": "Trebuie să dezactivezi blocarea înregistrării înainte de a dezactiva codul PIN."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--ok": {
+    "messageformat": "OK"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--title": {
+    "messageformat": "Dezactivarea PIN-ului a eșuat din cauza backup-urilor"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--body": {
+    "messageformat": "Trebuie să dezactivezi Backup-urile înainte de a dezactiva codul PIN."
+  },
+  "icu:Preferences--enable-signal-pin": {
+    "messageformat": "Activare PIN"
+  },
+  "icu:Preferences--enable-signal-pin--button": {
+    "messageformat": "Activează"
+  },
+  "icu:Preferences--pin-reminders--header": {
+    "messageformat": "Mementouri PIN"
+  },
+  "icu:Preferences--pin-reminders--description": {
+    "messageformat": "Vei fi întrebat mai rar în timp"
+  },
+  "icu:Preferences--registration-lock__label": {
+    "messageformat": "Blocarea Înregistrării"
+  },
+  "icu:Preferences--registration-lock__footer": {
+    "messageformat": "Solicitați PIN-ul Signal pentru a vă înregistra din nou numărul de telefon cu Signal."
+  },
+  "icu:Preferences__Chats__TextInputSection__Title": {
+    "messageformat": "Introducerea textului"
+  },
+  "icu:Preferences__Chats__ChatFoldersSection__Title": {
+    "messageformat": "Dosare de conversații"
+  },
+  "icu:Preferences__Notifications__Show__Label": {
+    "messageformat": "Afișează"
+  },
+  "icu:Preferences__Notifications__SoundsSection__Title": {
+    "messageformat": "Sunete"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title": {
+    "messageformat": "Insigna aplicației"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title-v2": {
+    "messageformat": "Insigne necitite"
+  },
+  "icu:Preferences__Notifications__Reset__title": {
+    "messageformat": "Resetează setările notificărilor la standard, inclusiv setările personalizate pentru conversațiile tale."
+  },
+  "icu:Preferences__Notifications__Reset__button": {
+    "messageformat": "Resetare"
+  },
+  "icu:Preferences__Notifications__Reset__modal--body": {
+    "messageformat": "Resetezi toate setările notificărilor la standard pentru toate conversațiile?"
+  },
+  "icu:Preferences__Notifications__Reset__modal--confirm": {
+    "messageformat": "Resetare"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Label": {
+    "messageformat": "Număr insignă"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Description": {
+    "messageformat": "Selectează dacă numărul de insigne afișează numărul de mesaje necitite sau numărul de conversații necitite"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadMessages": {
+    "messageformat": "Mesaje necitite"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadChats": {
+    "messageformat": "Conversații necitite"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats": {
+    "messageformat": "Include conversațiile puse pe silențios în insigna aplicației"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats__description": {
+    "messageformat": "Insignele folderului conversațiilor vor include mereu conversațiile puse pe silențios"
   },
   "icu:PlaintextExport--PreferencesRow--Header": {
     "messageformat": "Exportă istoricul conversațiilor"
@@ -6145,9 +6478,6 @@
   "icu:NotificationProfiles--setting": {
     "messageformat": "Profiluri de notificare"
   },
-  "icu:NotificationProfiles--setup": {
-    "messageformat": "Stabilește"
-  },
   "icu:NotificationProfiles--title": {
     "messageformat": "Profiluri de notificare"
   },
@@ -6159,9 +6489,6 @@
   },
   "icu:NotificationProfiles--manage-description": {
     "messageformat": "Adaugă sau editează profilurile de notificare"
-  },
-  "icu:NotificationProfiles--manage-profiles": {
-    "messageformat": "{profileCount, plural, one {Un profil} few {{profileCount,number} profiluri} other {{profileCount,number} de profiluri}}"
   },
   "icu:NotificationProfiles--create": {
     "messageformat": "Creează profil"
@@ -6351,6 +6678,9 @@
   },
   "icu:Preferences--blocked-groups": {
     "messageformat": "Grupuri blocate"
+  },
+  "icu:Preferences--blocked--blocked-on": {
+    "messageformat": "Blocat pe {blockedAt}"
   },
   "icu:Preferences--signal-backups": {
     "messageformat": "Backup-uri securizate Signal"
@@ -6559,9 +6889,6 @@
   "icu:Preferences__pnp__row--body": {
     "messageformat": "Alege cine îți poate vedea numărul de telefon și cine te poate contacta pe Signal cu el."
   },
-  "icu:Preferences__pnp__row--button": {
-    "messageformat": "Schimbă…"
-  },
   "icu:Preferences__pnp__sharing--title": {
     "messageformat": "Cine îmi poate vedea numărul"
   },
@@ -6610,14 +6937,11 @@
   "icu:Preferences--read-receipts": {
     "messageformat": "Confirmări de citire"
   },
-  "icu:Preferences--read-receipts--description": {
-    "messageformat": "Dacă dezactivezi, nu vei vedea confirmările de citire de la alte persoane."
-  },
   "icu:Preferences--typing-indicators": {
     "messageformat": "Indicatori tastare"
   },
-  "icu:Preferences--typing-indicators--description": {
-    "messageformat": "Dacă dezactivezi, nu vei vedea indicatorii de scris de la alte persoane."
+  "icu:Preferences--messaging-help": {
+    "messageformat": "Vezi și distribuie când sunt citite și scrise mesajele. Dacă dezactivezi, nu o să vezi confirmările de citire și indicatoarele de scris de la ceilalți."
   },
   "icu:Preferences--updates": {
     "messageformat": "Actualizări"
@@ -6721,11 +7045,23 @@
   "icu:InstallScreenUpdateDialog--update-required__title": {
     "messageformat": "Actualizare necesară"
   },
+  "icu:InstallScreenUpdateDialog--checking-for-updates": {
+    "messageformat": "Verifică actualizări"
+  },
+  "icu:InstallScreenUpdateDialog--updating-signal": {
+    "messageformat": "Se actualizează Signal"
+  },
+  "icu:InstallScreenUpdateDialog--download-progress": {
+    "messageformat": "Se descarcă {currentBytes} din {totalBytes} ({percentage,number,percent})..."
+  },
   "icu:InstallScreenUpdateDialog--update-required__body": {
-    "messageformat": "Pentru a finaliza sincronizarea mesajelor, actualizează acum Signal Desktop."
+    "messageformat": "Ca să continui, actualizează Signal Desktop."
   },
   "icu:InstallScreenUpdateDialog--update-required__action-update": {
     "messageformat": "Actualizează"
+  },
+  "icu:InstallScreenUpdateDialog--update-required__action-update__mas": {
+    "messageformat": "Mergi la App Store"
   },
   "icu:InstallScreenUpdateDialog--unsupported-os__title": {
     "messageformat": "Actualizare necesară"
@@ -6759,6 +7095,9 @@
   },
   "icu:StandaloneRegistration--PhoneNumber--waiting": {
     "messageformat": "Încearcă din nou în {duration}"
+  },
+  "icu:StandaloneRegistration--PhoneNumber--RegionCodeSelector--Label": {
+    "messageformat": "Selectează codul regiunii"
   },
   "icu:StandaloneRegistration--PhoneNumber--placeholder": {
     "messageformat": "Număr de telefon"
@@ -6982,6 +7321,9 @@
   "icu:StandaloneRegistration--VerifyPIN--incorrect-pin--with-count": {
     "messageformat": "{triesRemaining, plural, one {PIN incorect. {triesRemaining,number} încercare rămasă.} few {PIN incorect. {triesRemaining,number} încercări rămase.} other {PIN incorect. {triesRemaining,number} de încercări rămase.}}"
   },
+  "icu:StandaloneRegistration--VerifyPIN--just-count": {
+    "messageformat": "{triesRemaining, plural, one {{triesRemaining,number} încercare rămasă.} few {{triesRemaining,number} încercări rămase.} other {{triesRemaining,number} de încercări rămase.}}"
+  },
   "icu:StandaloneRegistration--VerifyPIN--NeedHelp--header": {
     "messageformat": "Ai nevoie de ajutor?"
   },
@@ -7024,6 +7366,9 @@
   "icu:StandaloneRegistration--VerifyPIN--NoRemainingTries--learn-more": {
     "messageformat": "Află mai multe despre PIN-uri"
   },
+  "icu:StandaloneRegistration--VerifyPIN--open-menu": {
+    "messageformat": "Deschide meniul"
+  },
   "icu:StandaloneRegistration--VerifyPIN--menu--skip-pin": {
     "messageformat": "Sări peste PIN"
   },
@@ -7031,7 +7376,7 @@
     "messageformat": "Sari peste introducerea PIN-ului?"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--description": {
-    "messageformat": "Dacă nu poți reține PIN-ul, poți crea unul nou. Poți înregistra și folosi contul tău, dar îți vei pierde niște setări precum informațiile de la profil. Află mai multe."
+    "messageformat": "Dacă nu poți reține PIN-ul, poți crea unul nou. Poți înregistra și folosi contul tău, dar îți vei pierde niște setări precum informațiile de la profil. <learnMore>Află mai multe</learnMore>."
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--skip-button": {
     "messageformat": "Omite și creează un PIN nou"
@@ -7067,7 +7412,7 @@
     "messageformat": "Avertizare"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--description": {
-    "messageformat": "Dacă dezactivezi codul PIN, vei pierde toate datele atunci când te vei înregistra din nou la Signal, dacă nu le transferi de pe alt dispozitiv iOS. Nu poți activa Blocarea înregistrării în timp ce codul PIN este dezactivat."
+    "messageformat": "Dacă dezactivezi codul PIN, vei pierde toate datele atunci când vei înregistra din nou aplicația Signal. Nu poți activa funcția „Blocare înregistrare” cât timp codul PIN este dezactivat."
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--disable-button": {
     "messageformat": "Dezactivare PIN"
@@ -7275,6 +7620,12 @@
   },
   "icu:MediaPermissionsModal__step-2": {
     "messageformat": "Activează „Signal”"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--microphone": {
+    "messageformat": "Activează-ți accesul la microfon pentru Signal"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--camera": {
+    "messageformat": "Activează accesul la cameră pentru Signal"
   },
   "icu:MediaPermissionsModal__open": {
     "messageformat": "Mergi la setări"
@@ -7816,11 +8167,17 @@
   "icu:ContextMenu--button": {
     "messageformat": "Meniu context"
   },
+  "icu:EditUsernameModalBody__username-label": {
+    "messageformat": "Nume de utilizator"
+  },
   "icu:EditUsernameModalBody__username-placeholder": {
     "messageformat": "Nume de utilizator"
   },
   "icu:EditUsernameModalBody__username-helper": {
     "messageformat": "Numele de utilizator sunt întotdeauna asociate cu un set de numere."
+  },
+  "icu:EditUsernameModalBody__discriminator-label": {
+    "messageformat": "Cifrele numelui de utilizator"
   },
   "icu:EditUsernameModalBody__learn-more": {
     "messageformat": "Află mai multe"
@@ -7918,6 +8275,75 @@
   },
   "icu:UsernameMegaphone__dismiss": {
     "messageformat": "Revocare"
+  },
+  "icu:PinReminderMegaphone__title": {
+    "messageformat": "Verifică PIN-ul Signal"
+  },
+  "icu:PinReminderMegaphone__body": {
+    "messageformat": "Ocazional îți vom solicita să confirmi codul PIN pentru a-l reține mai ușor."
+  },
+  "icu:PinReminderMegaphone__verify": {
+    "messageformat": "Verifică"
+  },
+  "icu:PinReminderMegaphone__not-now": {
+    "messageformat": "Nu acum"
+  },
+  "icu:PinReminderModal__title": {
+    "messageformat": "Introdu PIN-ul tău Signal"
+  },
+  "icu:PinReminderModal__body": {
+    "messageformat": "Pentru a te ajuta să memorezi codul PIN, te vom ruga să îl introduci periodic. În timp, o să-l cerem mai rar."
+  },
+  "icu:PinReminderModal__pin-input-placeholder": {
+    "messageformat": "Introdu PIN-ul tău"
+  },
+  "icu:PinReminderModal__pin-input-error": {
+    "messageformat": "PIN incorect. Încearcă din nou"
+  },
+  "icu:PinReminderModal__forgot": {
+    "messageformat": "Am uitat PIN-ul"
+  },
+  "icu:PinReminderModal__confirm": {
+    "messageformat": "Confirmă"
+  },
+  "icu:PinReminderCompletedToast": {
+    "messageformat": "PIN corect. Îți reamintim din nou mai târziu."
+  },
+  "icu:PinChangeModal__title--create": {
+    "messageformat": "Schimbă-ți PIN-ul Signal"
+  },
+  "icu:PinChangeModal__title--create--without-pin": {
+    "messageformat": "Creează PIN-ul Signal"
+  },
+  "icu:PinChangeModal__body--create": {
+    "messageformat": "Poți schimba codul PIN atât timp cât acest dispozitiv este înregistrat. <learnMoreLink>Află mai multe</learnMoreLink>"
+  },
+  "icu:PinChangeModal__body--create--without-pin": {
+    "messageformat": "PIN-urile îți păstrează informațiile stocate în Signal criptate ca doar tu să le poți accesa. Profilul, setările și contactele se vor restabili atunci când reinstalezi Signal. Nu o să ai nevoie de PIN ca să deschizi aplicația. <learnMoreLink>Află mai multe</learnMoreLink>"
+  },
+  "icu:PinChangeModal__title--confirm": {
+    "messageformat": "Confirmă PIN-ul tău Signal"
+  },
+  "icu:PinChangeModal__body--confirm": {
+    "messageformat": "Introdu codul PIN pe care tocmai l-ai creat."
+  },
+  "icu:PinChangeModal__pin-input-placeholder--create": {
+    "messageformat": "Introdu un nou PIN"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--confirm": {
+    "messageformat": "Confirmare PIN"
+  },
+  "icu:PinChangeModal__cancel": {
+    "messageformat": "Anulează"
+  },
+  "icu:PinChangeModal__continue": {
+    "messageformat": "Continuă"
+  },
+  "icu:PinChangeModal__confirm": {
+    "messageformat": "Confirmă"
+  },
+  "icu:PinChangeCompletedToast": {
+    "messageformat": "Nou PIN creat."
   },
   "icu:UnsupportedOSWarningDialog__body": {
     "messageformat": "Signal desktop nu va mai accepta versiunea calculatorului tău de {OS} în curând. Ca să continui să folosești Signal, actualizează-ți sistemul de operare al calculatorului până la {expirationDate}. <learnMoreLink>Află mai multe</learnMoreLink>"
@@ -8351,8 +8777,11 @@
   "icu:DonationReceipt__type-value--one-time": {
     "messageformat": "O dată"
   },
-  "icu:DonationReceipt__footer-text": {
-    "messageformat": "Mulțumesc pentru susținerea acordată Signal. Contribuția ta ajută la îndeplinirea misiunii de a proteja libertatea de exprimare și de a permite o comunicare globală sigură pentru milioane de oameni din întreaga lume, prin intermediul tehnologiei open source pentru confidențialitate. Dacă ești rezident al Statelor Unite, păstrează această chitanță pentru evidența fiscală. Signal Technology Foundation este o organizație non-profit scutită de impozite din Statele Unite, în conformitate cu secțiunea 501c3 din Codul Veniturilor Interne. Codul nostru fiscal federal este 82-4506840."
+  "icu:DonationReceipt__footer-text-v2": {
+    "messageformat": "Mulțumesc pentru susținerea acordată Signal. Contribuția ta ajută la îndeplinirea misiunii de a proteja libertatea de exprimare și de a permite o comunicare globală sigură pentru milioane de oameni din întreaga lume, prin intermediul tehnologiei open source pentru confidențialitate. Dacă ești rezident al Statelor Unite, păstrează această chitanță pentru evidența fiscală. Signal Technology Foundation este o organizație non-profit scutită de impozite din Statele Unite, în conformitate cu secțiunea 501c3 din Codul Veniturilor Interne. Codul nostru fiscal federal este 82-4506840. Signal nu a oferit bunuri sau servicii referitoare la această contribuție."
+  },
+  "icu:MessageCta__Donate": {
+    "messageformat": "Donează Acum"
   },
   "icu:Donations__OfflineTooltip": {
     "messageformat": "Ești offline. Conectează-te la internet pentru a finaliza o donație."
@@ -8661,16 +9090,10 @@
     "messageformat": "Mici ajustări, soluționări de bug-uri și îmbunătățiri ale performanței. Mersi că folosești Signal!",
     "ignoreUnused": true
   },
-  "icu:WhatsNew__8.18--0": {
-    "messageformat": "Sondajele pot fi acum create și în conversații individuale. Prezintă-i prietenului tău indecis o listă de opțiuni atent selecționate sau retrăiește magia momentului în care îi dădeai un bilet celui pe care îl plăceai, creând un sondaj de tipul „Mă placi? Da/Nu/Poate”."
+  "icu:WhatsNew__8.30--0": {
+    "messageformat": "Mulțumită unor îmbunătățiri de performanță, procesorul tău va fi un pic mai rapid în timpul apelurilor video (chiar dacă tu stai pe loc)."
   },
-  "icu:WhatsNew__8.19--0": {
-    "messageformat": "Administratorii grupurilor pot acum încheia discuțiile în mod natural, folosind noua opțiune „Încheie grupul” din setările grupului. Încheierea unui grup împiedică membrii acestuia să mai trimită mesaje sau să inițieze apeluri și, de asemenea, dezactivează invitațiile. Acum poți să te asiguri că toată lumea rămâne la zi, încheind grupul de croșetat de anul trecut, înainte de a forma unul nou."
-  },
-  "icu:WhatsNew__8.20--0": {
-    "messageformat": "Introducing disappearing call events: Missed, outgoing, and received calls that occur after you install this update will now automatically disappear in any chat where disappearing messages are enabled."
-  },
-  "icu:WhatsNew__8.20--1": {
-    "messageformat": "Now you can reorder installed sticker packs so your new favorites don’t get stuck in the back of the line."
+  "icu:WhatsNew__8.30--1": {
+    "messageformat": "Am adăugat și o scurtătură utilă ca să-ți deschizi setările de sistem pe Windows dacă încerci să te alături unui apel video și Signal nu are permisiunea să-ți acceseze camera. Acum este mai ușor să vezi ce e nevoie să faci ca oamenii să te vadă."
   }
 }

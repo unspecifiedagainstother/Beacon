@@ -56,13 +56,13 @@ persists, and survives unlinking. Nothing else to wire.
 
 ## What the registry generates
 
-| Derived | Where |
-| --- | --- |
-| Storage key type (`beaconX: boolean`) | `ts/types/StorageKeys.std.ts` via `BeaconStorageKeys` |
-| Unlink policy (preserved on unlink) | same file, via `...BEACON_FEATURE_KEYS` |
-| Checkbox in Settings → Beacon | `ts/components/Preferences.dom.tsx` maps `BEACON_FEATURES` |
-| Redux read/write | `ts/state/smart/Preferences.preload.tsx` loops the registry |
-| Storybook props | `getBeaconDefaults()` |
+| Derived                               | Where                                                       |
+| ------------------------------------- | ----------------------------------------------------------- |
+| Storage key type (`beaconX: boolean`) | `ts/types/StorageKeys.std.ts` via `BeaconStorageKeys`       |
+| Unlink policy (preserved on unlink)   | same file, via `...BEACON_FEATURE_KEYS`                     |
+| Checkbox in Settings → Beacon         | `ts/components/Preferences.dom.tsx` maps `BEACON_FEATURES`  |
+| Redux read/write                      | `ts/state/smart/Preferences.preload.tsx` loops the registry |
+| Storybook props                       | `getBeaconDefaults()`                                       |
 
 Upstream files touched: 4, at a fixed diff size. Adding the 50th feature costs
 the same as the 1st.

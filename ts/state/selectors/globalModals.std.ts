@@ -5,7 +5,10 @@ import { createSelector } from 'reselect';
 
 import type { StateType } from '../reducer.preload.ts';
 import type { GlobalModalsStateType } from '../ducks/globalModals.preload.ts';
-import { UsernameOnboardingState } from '../../types/globalModals.std.ts';
+import {
+  PinReminderState,
+  UsernameOnboardingState,
+} from '../../types/globalModals.std.ts';
 import type { StateSelector } from '../types.std.ts';
 import type { PinMessageDialogData } from '../smart/PinMessageDialog.preload.tsx';
 
@@ -18,6 +21,10 @@ export const isShowingAnyModal = createSelector(
     Object.entries(globalModalsState).some(([key, value]) => {
       if (key === 'usernameOnboardingState') {
         return value === UsernameOnboardingState.Open;
+      }
+
+      if (key === 'pinReminderState') {
+        return value === PinReminderState.Modal;
       }
 
       return Boolean(value);
@@ -115,3 +122,8 @@ export const getPinMessageDialogData: StateSelector<PinMessageDialogData | null>
     getGlobalModalsState,
     ({ pinMessageDialogData }) => pinMessageDialogData
   );
+
+export const getPinReminderModalProps = createSelector(
+  getGlobalModalsState,
+  ({ pinReminderState }) => pinReminderState
+);

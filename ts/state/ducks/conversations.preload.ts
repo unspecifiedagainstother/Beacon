@@ -5,7 +5,7 @@ import type { ThunkAction } from 'redux-thunk';
 import lodash from 'lodash';
 import { type PhoneNumber } from 'google-libphonenumber';
 
-import { clipboard, ipcRenderer } from 'electron';
+import { ipcRenderer } from 'electron';
 import type { ReadonlyDeep, SetOptional } from 'type-fest';
 import { DataReader, DataWriter } from '../../sql/Client.preload.ts';
 import type { AttachmentType } from '../../types/Attachment.std.ts';
@@ -46,9 +46,10 @@ import {
   TOGGLE_DISCARD_DRAFT_DIALOG,
 } from './globalModals.preload.ts';
 import {
-  MODIFY_LIST,
   DELETE_LIST,
   HIDE_MY_STORIES_FROM,
+  MARK_AS_DELETED,
+  MODIFY_LIST,
   VIEWERS_CHANGED,
 } from './storyDistributionLists.preload.ts';
 import type { StoryDistributionListsActionType } from './storyDistributionLists.preload.ts';
@@ -90,6 +91,7 @@ import {
   getGroupSizeHardLimit,
 } from '../../groups/limits.dom.ts';
 import { isMessageUnread } from '../../util/isMessageUnread.std.ts';
+import type { NotifyWhileMutedKey } from '../../util/notifyWhileMuted.std.ts';
 import { toggleSelectedContactForGroupAddition } from '../../groups/toggleSelectedContactForGroupAddition.std.ts';
 import type { GroupNameCollisionsWithIdsByTitle } from '../../util/groupMemberNameCollisions.std.ts';
 import { writeProfile } from '../../services/writeProfile.preload.ts';
@@ -263,6 +265,7 @@ import type { Emoji } from '../../axo/emoji.std.ts';
 import { isSignalConversation } from '../../util/isSignalConversation.dom.ts';
 import {
   type DurationSecs,
+  MuteExpiration,
   SentTimestampMs,
   TimestampMs,
 } from '@signalapp/types';
@@ -281,20 +284,11 @@ export type DBConversationType = ReadonlyDeep<{
   type: string;
 }>;
 
-export const InteractionModes = ['mouse', 'keyboard'] as const;
-export type InteractionModeType = ReadonlyDeep<
-  (typeof InteractionModes)[number]
->;
-
 export type MessageTimestamps = ReadonlyDeep<
   Pick<ReadonlyMessageAttributesType, 'sent_at' | 'received_at'>
 >;
 
-export type MessageType = ReadonlyDeep<
-  ReadonlyMessageAttributesType & {
-    interactionType?: InteractionModeType;
-  }
->;
+export type MessageType = ReadonlyDeep<ReadonlyMessageAttributesType>;
 export type MessageWithUIFieldsType = ReadonlyDeep<
   ReadonlyMessageAttributesType & {
     displayLimit?: number;
@@ -418,8 +412,11 @@ export type ConversationType = ReadonlyDeep<
       aci: AciString;
     }>;
     bannedMemberships?: ReadonlyArray<ServiceIdString>;
-    muteExpiresAt?: number;
-    dontNotifyForMentionsIfMuted?: boolean;
+    muteExpiresAt?: MuteExpiration;
+    notifyForCallsIfMuted?: boolean;
+    notifyForMentionsIfMuted?: boolean;
+    notifyForRepliesIfMuted?: boolean;
+    showUnreadReminders?: boolean;
     isMe: boolean;
     lastUpdated?: number;
     // This is used by the CompositionInput for @mentions
@@ -638,9 +635,9 @@ export type ConversationsStateType = ReadonlyDeep<{
   conversationsByGroupId: ConversationLookupType;
   conversationsByUsername: ConversationLookupType;
 
-  targetedMessage: string | undefined;
+  targetedMessage: string | null;
   targetedMessageCounter: number;
-  targetedMessageSource: TargetedMessageSource | undefined;
+  targetedMessageSource: TargetedMessageSource | null;
 
   lastSelectedMessage: MessageTimestamps | undefined;
   selectedMessageIds: ReadonlyArray<string> | undefined;
@@ -835,6 +832,7 @@ export type MessageTargetedActionType = ReadonlyDeep<{
   type: 'MESSAGE_TARGETED';
   payload: {
     messageId: string;
+    targetedMessageSource: TargetedMessageSource;
   };
 }>;
 export type ToggleSelectMessagesActionType = ReadonlyDeep<{
@@ -1230,6 +1228,7 @@ export const actions = {
   repairOldestMessage,
   replaceAvatar,
   resetAllChatColors,
+  resetAllNotificationSettings,
   copyMessageText,
   retryDeleteForEveryone,
   retryMessageSend,
@@ -1258,12 +1257,13 @@ export const actions = {
   setComposeSearchTerm,
   setComposeSelectedRegion,
   setDisappearingMessages,
-  setDontNotifyForMentionsIfMuted,
   setIsFetchingUUID,
   setIsNearBottom,
   setMessageLoadingState,
   setMessageToEdit,
-  setMuteDuration,
+  setMuteExpiration,
+  setNotifyWhileMuted,
+  setShowUnreadReminders,
   setChatFolderMuteExpiration,
   setPinned,
   setPreJoinConversation,
@@ -1572,14 +1572,16 @@ function removeMember(
   return noopAction('removeMember');
 }
 
-function filterAvatarData(
+export function filterAvatarData(
   avatars: ReadonlyArray<AvatarDataType>,
   data: AvatarDataType
 ): Array<AvatarDataType> {
   return avatars.filter(avatarData => !isSameAvatarData(data, avatarData));
 }
 
-function getNextAvatarId(avatars: ReadonlyArray<AvatarDataType>): number {
+export function getNextAvatarId(
+  avatars: ReadonlyArray<AvatarDataType>
+): number {
   return Math.max(...avatars.map(x => Number(x.id))) + 1;
 }
 
@@ -1769,23 +1771,38 @@ function setDisappearingMessages(
   };
 }
 
-function setDontNotifyForMentionsIfMuted(
+function setNotifyWhileMuted(
+  conversationId: string,
+  key: NotifyWhileMutedKey,
+  newValue: boolean
+): NoopActionType {
+  const conversation = window.ConversationController.get(conversationId);
+  if (!conversation) {
+    throw new Error('setNotifyWhileMuted: No conversation found');
+  }
+
+  conversation.setNotifyWhileMuted(key, newValue);
+
+  return noopAction('setNotifyWhileMuted');
+}
+
+function setShowUnreadReminders(
   conversationId: string,
   newValue: boolean
 ): NoopActionType {
   const conversation = window.ConversationController.get(conversationId);
   if (!conversation) {
-    throw new Error('setDontNotifyForMentionsIfMuted: No conversation found');
+    throw new Error('setShowUnreadReminders: No conversation found');
   }
 
-  conversation.setDontNotifyForMentionsIfMuted(newValue);
+  conversation.setShowUnreadReminders(newValue);
 
-  return noopAction('setDontNotifyForMentionsIfMuted');
+  return noopAction('setShowUnreadReminders');
 }
 
 function setChatFolderMuteExpiration(
   chatFolderId: ChatFolderId,
-  muteDuration: number
+  muteExpiration: MuteExpiration
 ): ThunkAction<void, RootStateType, unknown, NoopActionType> {
   return async (dispatch, getState) => {
     const chatFolderConversations = _getAllConversationsInChatFolder(
@@ -1794,29 +1811,23 @@ function setChatFolderMuteExpiration(
     );
 
     for (const conversation of chatFolderConversations) {
-      dispatch(setMuteDuration(conversation.id, muteDuration));
+      dispatch(setMuteExpiration(conversation.id, muteExpiration));
     }
   };
 }
 
-function setMuteDuration(
+function setMuteExpiration(
   conversationId: string,
-  muteDuration = 0
+  muteExpiration: MuteExpiration = MuteExpiration.UNMUTED
 ): NoopActionType {
   const conversation = window.ConversationController.get(conversationId);
   if (!conversation) {
-    throw new Error('setMuteDuration: No conversation found');
+    throw new Error('setMuteExpiration: No conversation found');
   }
 
-  if (muteDuration === 0) {
-    conversation.setMuteExpiration(0);
-  } else {
-    conversation.setMuteExpiration(
-      Math.min(Date.now() + muteDuration, Number.MAX_SAFE_INTEGER)
-    );
-  }
+  conversation.setMuteExpiration(muteExpiration);
 
-  return noopAction('setMuteDuration');
+  return noopAction('setMuteExpiration');
 }
 
 function setPinned(
@@ -2402,6 +2413,14 @@ function resetAllChatColors(): ThunkAction<
   };
 }
 
+function resetAllNotificationSettings(): NoopActionType {
+  for (const conversation of window.ConversationController.getAll()) {
+    conversation.resetNotificationSettings();
+  }
+
+  return noopAction('resetAllNotificationSettings');
+}
+
 function kickOffAttachmentDownload(
   options: Readonly<{ messageId: string }>
 ): ThunkAction<void, RootStateType, unknown, NoopActionType> {
@@ -2631,7 +2650,7 @@ function copyMessageText(
     }
 
     const body = getNotificationTextForMessage(message.attributes);
-    clipboard.writeText(body);
+    await navigator.clipboard.writeText(body);
 
     dispatch(noopAction('copyMessageText'));
   };
@@ -3147,7 +3166,8 @@ function removeAllConversations(): RemoveAllConversationsActionType {
 
 function targetMessage(
   messageId: string,
-  conversationId: string
+  conversationId: string,
+  targetedMessageSource: TargetedMessageSource
 ): ThunkAction<void, RootStateType, unknown, MessageTargetedActionType> {
   return async (dispatch, getState) => {
     const selectedConversationId = getSelectedConversationId(getState());
@@ -3163,6 +3183,7 @@ function targetMessage(
       type: 'MESSAGE_TARGETED',
       payload: {
         messageId,
+        targetedMessageSource,
       },
     });
   };
@@ -3768,7 +3789,7 @@ async function syncMessageRequestResponse(
     response,
     {
       source: MessageRequestResponseSource.LOCAL,
-      timestamp: Date.now(),
+      blockedAt: Date.now(),
     },
     { shouldSave }
   );
@@ -4007,7 +4028,7 @@ function acceptConversation(
         messageRequestEnum.ACCEPT,
         {
           source: MessageRequestResponseSource.LOCAL,
-          timestamp: Date.now(),
+          blockedAt: Date.now(),
         },
         { shouldSave: true }
       );
@@ -4083,7 +4104,7 @@ function blockConversation(
         messageRequestEnum.BLOCK,
         {
           source: MessageRequestResponseSource.LOCAL,
-          timestamp: Date.now(),
+          blockedAt: Date.now(),
         },
         { shouldSave: true }
       );
@@ -4893,7 +4914,7 @@ function showConversation({
 function onConversationOpened(
   conversationId: string,
   messageId: string | undefined,
-  targetedMessageSource: TargetedMessageSource | undefined
+  targetedMessageSource: TargetedMessageSource | null
 ): ThunkAction<
   void,
   RootStateType,
@@ -5265,9 +5286,9 @@ export function getEmptyState(): ConversationsStateType {
     lastCenterMessageByConversation: {},
     messagesByConversation: {},
     messagesLookup: {},
-    targetedMessage: undefined,
+    targetedMessage: null,
     targetedMessageCounter: 0,
-    targetedMessageSource: undefined,
+    targetedMessageSource: null,
     lastSelectedMessage: undefined,
     selectedMessageIds: undefined,
     showArchived: false,
@@ -6065,7 +6086,7 @@ export function reducer(
       ...state,
       targetedMessage: messageId,
       targetedMessageCounter: state.targetedMessageCounter + 1,
-      targetedMessageSource: TargetedMessageSource.Focus,
+      targetedMessageSource: action.payload.targetedMessageSource,
     };
   }
 
@@ -6146,7 +6167,7 @@ export function reducer(
       verificationDataByConversation: nextVerificationData,
     };
   }
-  if (action.type === DELETE_LIST) {
+  if (action.type === DELETE_LIST || action.type === MARK_AS_DELETED) {
     const { listId } = action.payload;
 
     const nextVerificationData = visitListsInVerificationData(
@@ -6828,9 +6849,9 @@ export function reducer(
   if (action.type === 'CLEAR_TARGETED_MESSAGE') {
     return {
       ...state,
-      targetedMessage: undefined,
+      targetedMessage: null,
       targetedMessageCounter: 0,
-      targetedMessageSource: undefined,
+      targetedMessageSource: null,
     };
   }
   if (action.type === 'CLEAR_UNREAD_METRICS') {
@@ -6869,7 +6890,7 @@ export function reducer(
           ? state.preloadData
           : undefined,
       hasContactSpoofingReview: false,
-      targetedMessage: messageId,
+      targetedMessage: messageId ?? null,
       targetedMessageSource: messageId
         ? TargetedMessageSource.NavigateToMessage
         : TargetedMessageSource.Reset,

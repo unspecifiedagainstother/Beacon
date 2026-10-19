@@ -89,6 +89,64 @@ export async function typeIntoInput(
   }
 }
 
+const VERIFICATION_CODE_LENGTH = 6;
+
+async function getVerificationCodeInputs(window: Page): Promise<Locator> {
+  const locators = window
+    .getByRole('group', { name: 'Verification code' })
+    .getByRole('textbox', { name: /^Character \d+ of \d+$/ });
+  // Wait for the items to be fully rendered
+  await expect(locators).toHaveCount(VERIFICATION_CODE_LENGTH);
+  return locators;
+}
+
+export async function typeVerificationCode(
+  window: Page,
+  code: string
+): Promise<void> {
+  const inputs = await getVerificationCodeInputs(window);
+  const all = await inputs.all();
+
+  expect(code.length).toEqual(VERIFICATION_CODE_LENGTH);
+
+  await inputs.first().focus();
+
+  for (const [index, input] of all.entries()) {
+    // oxlint-disable-next-line no-await-in-loop
+    await expect(input).toBeFocused();
+    // oxlint-disable-next-line no-await-in-loop
+    await window.keyboard.press(code.charAt(index));
+  }
+
+  await expect(inputs.last()).toBeFocused();
+
+  for (const [index, input] of all.entries()) {
+    // oxlint-disable-next-line no-await-in-loop
+    await expect(input).toHaveValue(code.charAt(index));
+  }
+}
+
+export async function clearVerificationCode(window: Page): Promise<void> {
+  const inputs = await getVerificationCodeInputs(window);
+  const all = await inputs.all();
+
+  await inputs.last().focus();
+
+  for (const input of all.toReversed()) {
+    // oxlint-disable-next-line no-await-in-loop
+    await expect(input).toBeFocused();
+    // oxlint-disable-next-line no-await-in-loop
+    await window.keyboard.press('Backspace');
+  }
+
+  await expect(inputs.first()).toBeFocused();
+
+  for (const input of all) {
+    // oxlint-disable-next-line no-await-in-loop
+    await expect(input).toHaveValue('');
+  }
+}
+
 export async function expectItemsWithText(
   items: Locator,
   expected: ReadonlyArray<string | RegExp>
@@ -353,7 +411,8 @@ export async function pinContact(
 
 export async function acceptConversation(page: Page): Promise<void> {
   await page
-    .locator('.module-message-request-actions button >> "Accept"')
+    .getByTestId('message-request-actions')
+    .getByRole('button', { name: 'Accept' })
     .click();
 
   const confirmationButton = page
@@ -417,6 +476,10 @@ export async function composerAttachFiles(
   );
 }
 
+export function getLoadedImagesInside(parent: Locator): Locator {
+  return parent.locator('img.module-image__image[data-loaded="true"]');
+}
+
 export async function sendMessageWithAttachments(
   page: Page,
   receiver: PrimaryDevice,
@@ -434,14 +497,13 @@ export async function sendMessageWithAttachments(
   await input.press('Enter');
 
   const Message = getTimelineMessageWithText(page, text);
-  const MessageImageLoaded = Message.locator('.module-image__image');
 
   await Message.waitFor();
 
   await Promise.all(
     filePaths.map(async (_, index) => {
       debug(`waiting for ${index} image to render in timeline`);
-      await MessageImageLoaded.nth(index).waitFor({
+      await getLoadedImagesInside(Message).nth(index).waitFor({
         state: 'visible',
       });
     })
@@ -509,19 +571,21 @@ export async function createCallLink(
   await editModal.waitFor();
 
   if (isAdminApprovalRequired !== undefined) {
-    const restrictionsInput = editModal.getByLabel('Require admin approval');
+    const restrictions = editModal.getByRole('switch', {
+      name: 'Require admin approval',
+    });
     if (isAdminApprovalRequired) {
-      await expect(restrictionsInput).toHaveJSProperty('value', '0');
-      await restrictionsInput.selectOption({ label: 'On' });
-      await expect(restrictionsInput).toHaveJSProperty('value', '1');
+      await expect(restrictions).toBeChecked({ checked: false });
+      await restrictions.click();
+      await expect(restrictions).toBeChecked();
     } else {
-      await expect(restrictionsInput).toHaveJSProperty('value', '0');
+      await expect(restrictions).toBeChecked({ checked: false });
     }
   }
 
   await editModal.getByRole('button', { name: 'Add call name' }).click();
 
-  const addNameModal = page.locator('.CallLinkAddNameModal');
+  const addNameModal = page.getByRole('dialog', { name: 'Add call name' });
   await addNameModal.waitFor();
 
   const nameInput = addNameModal.getByLabel('Call name');

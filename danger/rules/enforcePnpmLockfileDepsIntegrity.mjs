@@ -9,20 +9,22 @@ import * as YAML from 'js-yaml';
 const rootDir = resolve(import.meta.dirname, '..', '..');
 const lockPath = resolve(rootDir, 'pnpm-lock.yaml');
 const lockContents = readFileSync(lockPath, 'utf8');
-/** @type {any} */
-const lockYaml = YAML.load(lockContents);
+/** @type {any[]} */
+const lockYaml = YAML.loadAll(lockContents);
 
-for (const name of Object.keys(lockYaml.packages)) {
-  const spec = lockYaml.packages[name];
+for (const document of lockYaml) {
+  for (const name of Object.keys(document.packages)) {
+    const spec = document.packages[name];
 
-  if (spec.resolution?.integrity == null) {
-    fail(
-      `**Dependency resolution missing integrity**\n` +
-        `All dependencies should have a resolution with an integrity field.\n` +
-        `You may need to override it or provide it manually.\n` +
-        `\n` +
-        `See "${name}".`,
-      'pnpm-lock.yaml'
-    );
+    if (spec.resolution?.integrity == null) {
+      fail(
+        `**Dependency resolution missing integrity**\n` +
+          `All dependencies should have a resolution with an integrity field.\n` +
+          `You may need to override it or provide it manually.\n` +
+          `\n` +
+          `See "${name}".`,
+        'pnpm-lock.yaml'
+      );
+    }
   }
 }

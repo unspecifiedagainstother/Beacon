@@ -90,7 +90,7 @@ describe('messaging/relink', function (this: Mocha.Suite) {
       await app.unlink();
       await app.waitForUnlink();
       await phone.unlink(desktop);
-      await server.removeDevice(desktop.number, desktop.deviceId);
+      await server.removeDeviceByServiceId(desktop.aci, desktop.deviceId);
 
       debug('closing');
       await app.close();
@@ -132,7 +132,7 @@ describe('messaging/relink', function (this: Mocha.Suite) {
       state = state.unpin(second);
       state = state.pin(first);
 
-      await phone.setStorageState(state);
+      state = await phone.setStorageState(state);
       await phone.sendFetchStorage({
         timestamp: bootstrap.getTimestamp(),
       });
@@ -147,7 +147,7 @@ describe('messaging/relink', function (this: Mocha.Suite) {
         )
         .click();
 
-      await expectSystemMessages(window, [/Safety Number has changed/]);
+      await expectSystemMessages(window, [/Safety Number with Alice/]);
     }
   });
 });

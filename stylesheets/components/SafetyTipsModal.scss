@@ -41,12 +41,10 @@
     );
   }
 
-  &:focus {
+  &:focus-visible {
     outline: none;
-    @include mixins.keyboard-mode {
-      &::before {
-        @include mixins.axo-focus-ring;
-      }
+    &::before {
+      @include mixins.axo-focus-ring;
     }
   }
 }

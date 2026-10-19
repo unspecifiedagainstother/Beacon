@@ -1,13 +1,12 @@
 {
   "$schema": "./package.schema.json",
-  "packageManager": "pnpm@11.5.2",
   "private": true,
   "name": "beacon-desktop",
   "productName": "Beacon",
   "description": "A Signal fork for privacy freaks",
   "desktopName": "beacon.desktop",
   "repository": "https://github.com/signalapp/Signal-Desktop.git",
-  "version": "8.22.0-alpha.1",
+  "version": "8.31.0",
   "license": "AGPL-3.0-only",
   "author": {
     "name": "Signal Messenger, LLC",
@@ -64,17 +63,17 @@
     "lint-deps": "tsx ts/util/lint/linter.node.ts",
     "lint-deps:sort": "tsx ts/util/lint/sort_exceptions.node.ts",
     "lint-license-comments": "tsx ts/util/lint/license_comments.node.ts",
-    "lint-prettier": "prettier --check --cache --cache-strategy metadata '**/*.{ts,tsx,d.ts,js,json,html,scss,md,yml,yaml}' '!node_modules/**'",
+    "lint-prettier": "prettier --check --cache --cache-strategy content '**/*.{ts,tsx,d.ts,js,json,html,scss,md,yml,yaml}' '!node_modules/**'",
     "lint-intl": "tsx ./build/intl-linter/linter.node.ts",
     "lint-css": "stylelint '**/*.scss' --cache",
     "lint-knip": "pnpm run lint-knip:all && pnpm run lint-knip:prod",
     "lint-knip:all": "knip --cache",
     "lint-knip:prod": "knip --production --cache",
-    "danger:local": "cd danger && npm run danger:local",
-    "format": "prettier --write --cache --cache-strategy metadata '**/*.{ts,tsx,d.ts,js,json,html,scss,md,yml,yaml}' '!node_modules/**'",
+    "danger:local": "cd danger && pnpm run danger:local",
+    "format": "prettier --write --cache --cache-strategy content '**/*.{ts,tsx,d.ts,js,json,html,scss,md,yml,yaml}' '!node_modules/**'",
     "svgo": "svgo --multipass images/**/*.svg images/*.svg",
     "transpile": "run-p check:types build:rolldown",
-    "check:types": "tsgo --noEmit",
+    "check:types": "tsc --noEmit",
     "clean-transpile": "node scripts/clean-transpile.mjs",
     "ready": "npm-run-all --print-label clean-transpile generate --parallel lint lint-deps lint-intl test-node test-electron",
     "dev": "pnpm run build:protobuf && cross-env SIGNAL_ENV=storybook storybook dev --port 6006",
@@ -86,7 +85,6 @@
     "dev:icu-types": "chokidar ./_locales/en/messages.json --initial --command \"pnpm run build:icu-types\"",
     "dev:protobuf": "chokidar ./protos/**/*.proto --command \"pnpm run build:protobuf\"",
     "build:storybook": "pnpm run build:protobuf && pnpm run build:emoji-data && cross-env SIGNAL_ENV=storybook storybook build",
-    "test:storybook": "pnpm run build:storybook && run-p --race test:storybook:*",
     "test:storybook:serve": "http-server storybook-static --port 6006 --silent",
     "test:storybook:test": "wait-on http://127.0.0.1:6006/ --timeout 5000 && test-storybook --testTimeout 60000",
     "build": "run-s --print-label generate build:rolldown:prod build:release",
@@ -118,8 +116,7 @@
     "build:preload-cache": "node scripts/generate-preload-cache.mjs",
     "electron:install-app-deps": "electron-builder install-app-deps",
     "check-upgradeable-deps": "node scripts/check-upgradeable-deps.mjs",
-    "react-devtools": "react-devtools",
-    "run-with-devtools": "cross-env REACT_DEVTOOLS=1 run-p --print-label react-devtools start",
+    "check:unused-icons": "node scripts/check-unused-icons.mjs",
     "update-signal-symbols": "node scripts/update-signal-symbols.mjs",
     "changeset:version": "changeset version && pnpm install --lockfile-only",
     "changeset:publish": "changeset publish"
@@ -130,10 +127,10 @@
   "dependencies": {
     "@indutny/mac-screen-share": "1.2.5",
     "@indutny/simple-windows-notifications": "2.0.21",
-    "@signalapp/libsignal-client": "0.97.3",
+    "@signalapp/libsignal-client": "0.103.0",
     "@signalapp/mute-state-change": "workspace:*",
-    "@signalapp/ringrtc": "2.69.7",
-    "@signalapp/sqlcipher": "3.3.9",
+    "@signalapp/ringrtc": "2.72.1",
+    "@signalapp/sqlcipher": "4.1.0",
     "@signalapp/types": "workspace:*",
     "@signalapp/windows-ucv": "workspace:*",
     "google-libphonenumber": "3.2.44"
@@ -145,7 +142,7 @@
     "@babel/plugin-transform-typescript": "7.28.6",
     "@babel/preset-react": "7.28.5",
     "@babel/preset-typescript": "7.28.5",
-    "@changesets/cli": "3.0.0-next.8",
+    "@changesets/cli": "3.0.1",
     "@csstools/stylelint-formatter-github": "2.0.0",
     "@electron/asar": "3.4.1",
     "@electron/fuses": "1.5.0",
@@ -168,7 +165,7 @@
     "@react-spring/web": "10.0.3",
     "@signalapp/lame": "workspace:*",
     "@signalapp/minimask": "1.0.1",
-    "@signalapp/mock-server": "24.0.3",
+    "@signalapp/mock-server": "workspace:*",
     "@signalapp/parchment-cjs": "3.0.1",
     "@signalapp/quill-cjs": "2.1.2",
     "@storybook/addon-a11y": "8.4.4",
@@ -222,7 +219,7 @@
     "@types/write-file-atomic": "4.0.3",
     "@typescript-eslint/rule-tester": "8.59.3",
     "@typescript-eslint/utils": "8.59.3",
-    "@typescript/native-preview": "7.0.0-dev.20260515.1",
+    "@typescript/native": "npm:typescript@7.0.2",
     "babel-plugin-lodash": "3.3.4",
     "better-blockmap": "2.0.1",
     "blob-util": "2.0.2",
@@ -248,7 +245,7 @@
     "debug": "4.4.3",
     "direction": "2.0.1",
     "dom-accessibility-api": "0.7.1",
-    "electron": "43.0.0",
+    "electron": "44.7.2",
     "electron-builder": "26.11.1",
     "electron-mocha": "13.1.0",
     "emoji-regex-xs": "2.0.1",
@@ -271,10 +268,10 @@
     "https-proxy-agent": "7.0.6",
     "humanize-duration": "3.33.2",
     "is-glob": "4.0.3",
-    "js-yaml": "4.1.1",
+    "js-yaml": "4.3.2",
     "json-to-ast": "2.1.0",
     "knip": "6.14.0",
-    "linkify-it": "5.0.1",
+    "linkify-it": "5.0.2",
     "lodash": "4.18.1",
     "log-symbols": "7.0.1",
     "lru-cache": "11.2.7",
@@ -288,8 +285,8 @@
     "normalize-path": "3.0.0",
     "npm-run-all2": "8.0.4",
     "oxc-transform": "0.131.0",
-    "oxlint": "1.65.0",
-    "oxlint-tsgolint": "0.22.1",
+    "oxlint": "1.80.0",
+    "oxlint-tsgolint": "7.0.2001",
     "p-limit": "7.3.0",
     "p-map": "7.0.4",
     "p-queue": "9.1.0",
@@ -306,13 +303,11 @@
     "prettier-plugin-tailwindcss": "0.8.0",
     "qrcode-generator": "2.0.4",
     "radix-ui": "1.5.0",
-    "react": "19.2.4",
+    "react": "19.3.0",
     "react-aria": "3.47.0",
     "react-aria-components": "1.16.0",
     "react-blurhash": "0.3.0",
-    "react-devtools": "7.0.1",
-    "react-devtools-core": "7.0.1",
-    "react-dom": "19.2.4",
+    "react-dom": "19.3.0",
     "react-intl": "10.1.0",
     "react-popper": "2.3.0",
     "react-redux": "9.2.0",
@@ -337,13 +332,14 @@
     "stylelint-config-css-modules": "4.6.0",
     "stylelint-config-recommended-scss": "17.0.1",
     "stylelint-use-logical-spec": "5.0.1",
-    "svgo": "4.0.1",
+    "svgo": "4.1.0",
     "synckit": "0.11.12",
     "tailwindcss": "4.3.0",
-    "tinykeys": "3.1.0",
+    "tinykeys": "4.0.1",
     "tsx": "4.23.0",
     "type-fest": "5.5.0",
-    "typescript": "6.0.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "unicode-number": "1.1.0",
     "url": "0.11.4",
     "uuid": "13.0.0",
     "wait-on": "9.0.5",
@@ -352,7 +348,17 @@
     "zod": "4.3.6"
   },
   "engines": {
-    "node": "24.17.0"
+    "node": "24.21.0"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.21.0"
+    },
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.24.0"
+    }
   },
   "build": {
     "appId": "im.beacon.desktop",
@@ -376,7 +382,7 @@
       "signInstaller": "scripts/sign-mas-installer.mjs",
       "releaseInfo": {
         "vendor": {
-          "minOSVersion": "21.0.1"
+          "minOSVersion": "22.1.0"
         }
       },
       "singleArchFiles": "node_modules/{@signalapp,@indutny}/{libsignal-client/prebuilds/**,ringrtc/build/**,sqlcipher/prebuilds/**,mac-screen-share/prebuilds/**}",
@@ -574,6 +580,7 @@
       "about.html",
       "screenShare.html",
       "settings.html",
+      "pdf.html",
       "permissions_popup.html",
       "debug_log.html",
       "loading.html",
@@ -637,6 +644,6 @@
     ]
   },
   "volta": {
-    "node": "24.17.0"
+    "node": "24.21.0"
   }
 }

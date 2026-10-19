@@ -24,6 +24,7 @@ import {
   getMessageInTimelineByTimestamp,
   sendTextMessage,
   sendReaction,
+  getLoadedImagesInside,
 } from '../helpers.node.ts';
 import { toBase64 } from '../../Bytes.std.ts';
 import { strictAssert } from '../../util/assert.std.ts';
@@ -286,9 +287,9 @@ describe('backups', function (this: Mocha.Suite) {
     let catPlaintextHash: string;
     {
       const window = await app.getWindow();
-      await getMessageInTimelineByTimestamp(window, catTimestamp)
-        .locator('img')
-        .waitFor();
+      await getLoadedImagesInside(
+        getMessageInTimelineByTimestamp(window, catTimestamp)
+      ).waitFor();
 
       const [catMessage] = await app.getMessagesBySentAt(catTimestamp);
       const [image] = catMessage?.attachments ?? [];
@@ -357,11 +358,13 @@ describe('backups', function (this: Mocha.Suite) {
         await window.locator('.module-Modal__close-button').click();
 
         debug('Switching to settings tab');
-        await window.getByTestId('NavTabsItem--Settings').click();
+        await window.getByRole('tab', { name: 'Settings' }).click();
 
         debug('Opening Notification Profiles list screen');
         await window.getByRole('button', { name: 'Notifications' }).click();
-        await window.getByTestId('ManageNotificationProfiles').click();
+        await window
+          .getByRole('button', { name: 'Notification profiles' })
+          .click();
         await expect(
           window.getByTestId(`EditProfile--${notificationProfileName1}`)
         ).toBeVisible();

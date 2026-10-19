@@ -9,9 +9,9 @@ import {
   useState,
   Fragment,
   type JSX,
+  useEffectEvent,
 } from 'react';
 import classNames from 'classnames';
-import lodash from 'lodash';
 
 import type { ToFindType } from './leftPane/LeftPaneHelper.dom.tsx';
 import { FindDirection } from './leftPane/LeftPaneHelper.dom.tsx';
@@ -40,7 +40,6 @@ import { usePreviousDeprecated } from '../hooks/usePrevious.std.ts';
 import { missingCaseError } from '../util/missingCaseError.std.ts';
 import type { DurationInSeconds } from '../util/durations/index.std.ts';
 import { WidthBreakpoint, getNavSidebarWidthBreakpoint } from './_util.std.ts';
-import * as KeyboardLayout from '../services/keyboardLayout.dom.ts';
 import type { LookupConversationWithoutServiceIdActionsType } from '../util/lookupConversationWithoutServiceId.preload.ts';
 import type { ShowConversationType } from '../state/ducks/conversations.preload.ts';
 import type { PropsType as UnsupportedOSDialogPropsType } from '../state/smart/UnsupportedOSDialog.preload.tsx';
@@ -48,6 +47,7 @@ import type { SmartPropsType as SmartToastManagerPropsType } from '../state/smar
 
 import { ConversationList } from './ConversationList.dom.tsx';
 import { ContactCheckboxDisabledReason } from './conversationList/ContactCheckbox.dom.tsx';
+import type { PropsType as DialogClockSkewPropsType } from './DialogClockSkew.dom.tsx';
 import type { PropsType as DialogExpiredBuildPropsType } from './DialogExpiredBuild.dom.tsx';
 import { LeftPaneBanner } from './LeftPaneBanner.dom.tsx';
 
@@ -62,7 +62,6 @@ import {
   NavSidebarActionButton,
   NavSidebarSearchHeader,
 } from './NavSidebar.dom.tsx';
-import type { UnreadStats } from '../util/countUnreadStats.std.ts';
 import { BackupMediaDownloadProgress } from './BackupMediaDownloadProgress.dom.tsx';
 import type {
   ServerAlertsType,
@@ -76,8 +75,9 @@ import { AxoDropdownMenu } from '../axo/AxoDropdownMenu.dom.tsx';
 import type { ChatFolder } from '../types/ChatFolder.std.ts';
 import { ProfileAvatar } from './PreferencesNotificationProfiles.dom.tsx';
 import { tw } from '../axo/tw.dom.tsx';
-
-const { isNumber } = lodash;
+import { strictAssert } from '../util/assert.std.ts';
+import { createKeybindingsHandler, tinykeys } from 'tinykeys';
+import { useHasAnyOverlay } from '../hooks/useKeyboardShortcuts.dom.tsx';
 
 export type PropsType = {
   backupMediaDownloadProgress: {
@@ -88,8 +88,9 @@ export type PropsType = {
     isPaused: boolean;
     downloadBannerDismissed: boolean;
   };
-  otherTabsUnreadStats: UnreadStats;
+  otherTabsUnreadCount: number;
   hasAnyCurrentCustomChatFolders: boolean;
+  hasClockSkewDialog: boolean;
   hasExpiredDialog: boolean;
   hasFailedStorySends: boolean;
   hasNetworkDialog: boolean;
@@ -133,7 +134,6 @@ export type PropsType = {
   getPreferredBadge: PreferredBadgeSelectorType;
   getServerAlertToShow: (alerts: ServerAlertsType) => ServerAlert | null;
   i18n: LocalizerType;
-  isMacOS: boolean;
   isMAS: boolean;
   isNotificationProfileActive: boolean;
   preferredWidthFromStorage: number;
@@ -212,6 +212,7 @@ export type PropsType = {
   renderUpdateDialog: (
     _: Readonly<{ containerWidthBreakpoint: WidthBreakpoint }>
   ) => JSX.Element;
+  renderClockSkewDialog: (_: DialogClockSkewPropsType) => JSX.Element;
   renderCaptchaDialog: (props: { onSkip: () => void }) => JSX.Element;
   renderCrashReportDialog: () => JSX.Element;
   renderExpiredBuildDialog: (_: DialogExpiredBuildPropsType) => JSX.Element;
@@ -222,7 +223,7 @@ export type PropsType = {
 
 export function LeftPane({
   backupMediaDownloadProgress,
-  otherTabsUnreadStats,
+  otherTabsUnreadCount,
   blockConversation,
   cancelBackupMediaDownload,
   challengeStatus,
@@ -242,6 +243,7 @@ export function LeftPane({
   getPreferredBadge,
   getServerAlertToShow,
   hasAnyCurrentCustomChatFolders,
+  hasClockSkewDialog,
   hasExpiredDialog,
   hasFailedStorySends,
   hasNetworkDialog,
@@ -250,7 +252,6 @@ export function LeftPane({
   hasUpdateDialog,
   i18n,
   lookupConversationWithoutServiceId,
-  isMacOS,
   isMAS,
   isNotificationProfileActive,
   isOnline,
@@ -267,6 +268,7 @@ export function LeftPane({
   preloadConversation,
   removeConversation,
   renderCaptchaDialog,
+  renderClockSkewDialog,
   renderCrashReportDialog,
   renderExpiredBuildDialog,
   renderLeftPaneChatFolders,
@@ -319,6 +321,8 @@ export function LeftPane({
     modeSpecificProps,
     modeSpecificProps
   );
+
+  const hasOverlay = useHasAnyOverlay();
 
   const [shouldRecomputeRowHeights, setShouldRecomputeRowHeights] =
     useState(false);
@@ -467,113 +471,159 @@ export function LeftPane({
       throw missingCaseError(modeSpecificProps);
   }
 
+  const onEscapeShortcut = useEffectEvent((event: KeyboardEvent) => {
+    if (hasOverlay) {
+      return;
+    }
+
+    const backAction = helper.getBackAction({
+      showInbox,
+      startComposing,
+      showChooseGroupMembers,
+    });
+
+    if (backAction) {
+      event.preventDefault();
+      event.stopPropagation();
+      backAction();
+    }
+  });
+
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      const { ctrlKey, shiftKey, altKey, metaKey } = event;
-      const commandOrCtrl = isMacOS ? metaKey : ctrlKey;
-      const key = KeyboardLayout.lookup(event);
-
-      if (key === 'Escape') {
-        const backAction = helper.getBackAction({
-          showInbox,
-          startComposing,
-          showChooseGroupMembers,
-        });
-        if (backAction) {
-          event.preventDefault();
-          event.stopPropagation();
-          backAction();
-          return;
-        }
+    return tinykeys(
+      document,
+      {
+        Escape: onEscapeShortcut,
+      },
+      {
+        // Override default ignore so shortcuts work while textboxes are focused
+        ignore: () => false,
       }
+    );
+  }, []);
 
-      if (
-        commandOrCtrl &&
-        !shiftKey &&
-        !altKey &&
-        (key === 'n' || key === 'N')
-      ) {
-        startComposing();
+  const onStartComposingShortcut = useEffectEvent((event: KeyboardEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    startComposing();
+  });
 
-        event.preventDefault();
-        event.stopPropagation();
+  function handleSelectChatShortcut(
+    event: KeyboardEvent,
+    target: { conversationId: string; messageId?: string } | undefined,
+    options: { clearSearch: boolean }
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (target != null) {
+      if (options.clearSearch) {
+        clearSearchQuery();
+      }
+      showConversation(target);
+    }
+  }
+
+  function handleSelectChatInDirectionShortcut(
+    event: KeyboardEvent,
+    toFind: ToFindType
+  ) {
+    const target = helper.getConversationAndMessageInDirection(
+      toFind,
+      selectedConversationId,
+      targetedMessageId
+    );
+    handleSelectChatShortcut(event, target, { clearSearch: false });
+  }
+
+  const onSelectChatNumberShortcut = useEffectEvent((event: KeyboardEvent) => {
+    const number = Number(event.key);
+    strictAssert(Number.isInteger(number), `${event.key} is not an integer`);
+    const index = number - 1; // 1-9 becomes 0-8
+    strictAssert(index >= 0 && index <= 8, `Index ${index} is out of range`);
+    const target = helper.getConversationAndMessageAtIndex(index);
+    handleSelectChatShortcut(event, target, { clearSearch: true });
+  });
+
+  const onSelectPrevChatShortcut = useEffectEvent((event: KeyboardEvent) => {
+    handleSelectChatInDirectionShortcut(event, {
+      direction: FindDirection.Up,
+      unreadOnly: false,
+    });
+  });
+
+  const onSelectNextChatShortcut = useEffectEvent((event: KeyboardEvent) => {
+    handleSelectChatInDirectionShortcut(event, {
+      direction: FindDirection.Down,
+      unreadOnly: false,
+    });
+  });
+
+  const onSelectPrevUnreadChatShortcut = useEffectEvent(
+    (event: KeyboardEvent) => {
+      handleSelectChatInDirectionShortcut(event, {
+        direction: FindDirection.Up,
+        unreadOnly: true,
+      });
+    }
+  );
+
+  const onSelectNextUnreadChatShortcut = useEffectEvent(
+    (event: KeyboardEvent) => {
+      handleSelectChatInDirectionShortcut(event, {
+        direction: FindDirection.Down,
+        unreadOnly: true,
+      });
+    }
+  );
+
+  const onHelperKeydown = useEffectEvent((event: KeyboardEvent) => {
+    helper.onKeyDown(event, {
+      searchInConversation,
+      selectedConversationId,
+      startSearch,
+    });
+  });
+
+  useEffect(() => {
+    const handler = createKeybindingsHandler(
+      {
+        '$mod+N': onStartComposingShortcut,
+        '$mod+([1-9])': onSelectChatNumberShortcut,
+        'Alt+ArrowUp': onSelectPrevChatShortcut,
+        'Alt+ArrowDown': onSelectNextChatShortcut,
+        'Alt+Shift+ArrowUp': onSelectPrevUnreadChatShortcut,
+        'Alt+Shift+ArrowDown': onSelectNextUnreadChatShortcut,
+        '$mod+Shift+[': onSelectPrevChatShortcut,
+        '$mod+Shift+]': onSelectNextChatShortcut,
+        'Control+Shift+Tab': onSelectPrevChatShortcut,
+        'Control+Tab': onSelectNextChatShortcut,
+      },
+      {
+        // Override default ignore so shortcuts work while textboxes are focused
+        ignore: () => false,
+      }
+    );
+
+    function onKeydown(event: KeyboardEvent) {
+      // Check if media editor is visible and if so, do not handle the keydown event.
+      if (document.querySelector('.MediaEditor')?.checkVisibility()) {
         return;
       }
 
-      let conversationToOpen:
-        | undefined
-        | {
-            conversationId: string;
-            messageId?: string;
-          };
-
-      const numericIndex = keyboardKeyToNumericIndex(event.key);
-      const openedByNumber = commandOrCtrl && isNumber(numericIndex);
-      if (openedByNumber) {
-        conversationToOpen =
-          helper.getConversationAndMessageAtIndex(numericIndex);
-      } else {
-        let toFind: undefined | ToFindType;
-        if (
-          (altKey && !shiftKey && key === 'ArrowUp') ||
-          (commandOrCtrl && shiftKey && key === '[') ||
-          (ctrlKey && shiftKey && key === 'Tab')
-        ) {
-          toFind = { direction: FindDirection.Up, unreadOnly: false };
-        } else if (
-          (altKey && !shiftKey && key === 'ArrowDown') ||
-          (commandOrCtrl && shiftKey && key === ']') ||
-          (ctrlKey && key === 'Tab')
-        ) {
-          toFind = { direction: FindDirection.Down, unreadOnly: false };
-        } else if (altKey && shiftKey && key === 'ArrowUp') {
-          toFind = { direction: FindDirection.Up, unreadOnly: true };
-        } else if (altKey && shiftKey && key === 'ArrowDown') {
-          toFind = { direction: FindDirection.Down, unreadOnly: true };
-        }
-        if (toFind) {
-          conversationToOpen = helper.getConversationAndMessageInDirection(
-            toFind,
-            selectedConversationId,
-            targetedMessageId
-          );
-        }
+      // Check if any overlay is open and if so, do not handle the keydown event.
+      if (hasOverlay) {
+        return;
       }
 
-      if (conversationToOpen) {
-        const { conversationId, messageId } = conversationToOpen;
-        showConversation({ conversationId, messageId });
-        if (openedByNumber) {
-          clearSearchQuery();
-        }
-        event.preventDefault();
-        event.stopPropagation();
-      }
+      handler(event);
+      onHelperKeydown(event);
+    }
 
-      helper.onKeyDown(event, {
-        searchInConversation,
-        selectedConversationId,
-        startSearch,
-      });
-    };
-
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keydown', onKeydown);
     return () => {
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keydown', onKeydown);
     };
-  }, [
-    clearSearchQuery,
-    helper,
-    isMacOS,
-    searchInConversation,
-    selectedConversationId,
-    targetedMessageId,
-    showChooseGroupMembers,
-    showConversation,
-    showInbox,
-    startComposing,
-    startSearch,
-  ]);
+  }, [hasOverlay]);
 
   const isEmpty = helper.getRowCount() === 0;
 
@@ -722,6 +772,8 @@ export function LeftPane({
       ...commonDialogProps,
       isMAS,
     });
+  } else if (hasClockSkewDialog) {
+    maybeRedDialog = renderClockSkewDialog(commonDialogProps);
   }
 
   const dialogs = new Array<{ key: string; dialog: JSX.Element }>();
@@ -804,7 +856,7 @@ export function LeftPane({
       title={i18n('icu:LeftPane--chats')}
       hideHeader={hideHeader}
       i18n={i18n}
-      otherTabsUnreadStats={otherTabsUnreadStats}
+      otherTabsUnreadCount={otherTabsUnreadCount}
       hasFailedStorySends={hasFailedStorySends}
       hasPendingUpdate={hasPendingUpdate}
       navTabsCollapsed={navTabsCollapsed}
@@ -820,9 +872,7 @@ export function LeftPane({
               <AxoDropdownMenu.Trigger>
                 <button
                   type="button"
-                  className={tw(
-                    'rounded-full outline-none keyboard-mode:focus:axo-focus-ring'
-                  )}
+                  className={tw('rounded-full focus-visible:axo-focus-ring')}
                 >
                   <ProfileAvatar i18n={i18n} size="medium-small" />
                 </button>
@@ -1039,13 +1089,4 @@ export function LeftPane({
       </nav>
     </NavSidebar>
   );
-}
-
-function keyboardKeyToNumericIndex(key: string): undefined | number {
-  if (key.length !== 1) {
-    return undefined;
-  }
-  const result = parseInt(key, 10) - 1;
-  const isValidIndex = Number.isInteger(result) && result >= 0 && result <= 8;
-  return isValidIndex ? result : undefined;
 }

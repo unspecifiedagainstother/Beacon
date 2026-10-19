@@ -2518,7 +2518,7 @@ export async function initiateMigrationToGroupV2(
       });
 
       if (itemStorage.blocked.isGroupBlocked(previousGroupV1Id)) {
-        await itemStorage.blocked.addBlockedGroup(groupId);
+        await itemStorage.blocked.addBlockedGroup(groupId, undefined);
       }
 
       // Save these most recent updates to conversation
@@ -2605,7 +2605,7 @@ function buildMigrationBubble(
   newAttributes: ConversationAttributesType
 ): GroupChangeMessageType {
   const ourAci = itemStorage.user.getCheckedAci();
-  const ourPni = itemStorage.user.getPni();
+  const ourPni = itemStorage.user.getOptionalPni();
   const ourConversationId =
     window.ConversationController.getOurConversationId();
 
@@ -2862,14 +2862,14 @@ export async function respondToGroupV2Migration({
           );
 
           if (itemStorage.blocked.isGroupBlocked(previousGroupV1Id)) {
-            await itemStorage.blocked.addBlockedGroup(groupId);
+            await itemStorage.blocked.addBlockedGroup(groupId, undefined);
           }
 
           if (wereWePreviouslyAMember) {
             log.info(
               `respondToGroupV2Migration/${logId}: Upgrading group with migration/removed events`
             );
-            const ourNumber = itemStorage.user.getNumber();
+            const ourNumber = itemStorage.user.getOptionalNumber();
             await updateGroup({
               conversation,
               receivedAt,
@@ -2881,7 +2881,9 @@ export async function respondToGroupV2Migration({
                   addedBy: undefined,
                   left: true,
                   members: (conversation.get('members') || []).filter(
-                    item => item !== ourAci && item !== ourNumber
+                    item =>
+                      item !== ourAci &&
+                      (ourNumber == null || item !== ourNumber)
                   ),
                 },
                 groupChangeMessages: [
@@ -3001,7 +3003,7 @@ export async function respondToGroupV2Migration({
   });
 
   if (itemStorage.blocked.isGroupBlocked(previousGroupV1Id)) {
-    await itemStorage.blocked.addBlockedGroup(groupId);
+    await itemStorage.blocked.addBlockedGroup(groupId, undefined);
   }
 
   // Save these most recent updates to conversation
@@ -3167,7 +3169,7 @@ async function updateGroup(
 
   const { newAttributes, groupChangeMessages, newProfileKeys } = updates;
   const ourAci = itemStorage.user.getCheckedAci();
-  const ourPni = itemStorage.user.getPni();
+  const ourPni = itemStorage.user.getOptionalPni();
 
   const wasMemberOrPending =
     conversation.hasMember(ourAci) ||
@@ -3176,7 +3178,7 @@ async function updateGroup(
   const isMemberOrPending =
     !newAttributes.left ||
     newAttributes.pendingMembersV2?.some(
-      item => item.serviceId === ourAci || item.serviceId === ourPni
+      item => item.serviceId === ourAci || (ourPni && item.serviceId === ourPni)
     );
 
   // Ensure that all generated messages are ordered properly.
@@ -3262,7 +3264,7 @@ async function updateGroup(
   const justAdded = !wasMemberOrPending && isMemberOrPending;
   const addedBy =
     newAttributes.pendingMembersV2?.find(
-      item => item.serviceId === ourAci || item.serviceId === ourPni
+      item => item.serviceId === ourAci || (ourPni && item.serviceId === ourPni)
     )?.addedByUserId || newAttributes.addedBy;
 
   if (justAdded) {
@@ -4214,7 +4216,7 @@ async function generateLeftGroupChanges(
   const logId = idForLogging(group.groupId);
   log.info(`generateLeftGroupChanges/${logId}: Starting...`);
   const ourAci = itemStorage.user.getCheckedAci();
-  const ourPni = itemStorage.user.getCheckedPni();
+  const ourPni = itemStorage.user.getOptionalPni();
 
   const { masterKey, groupInviteLinkPassword } = group;
   let { revision } = group;
@@ -4243,7 +4245,8 @@ async function generateLeftGroupChanges(
     addedBy: undefined,
     membersV2: (group.membersV2 || []).filter(member => member.aci !== ourAci),
     pendingMembersV2: (group.pendingMembersV2 || []).filter(
-      member => member.serviceId !== ourAci && member.serviceId !== ourPni
+      member =>
+        member.serviceId !== ourAci && (!ourPni || member.serviceId !== ourPni)
     ),
     pendingAdminApprovalV2: (group.pendingAdminApprovalV2 || []).filter(
       member => member.aci !== ourAci
@@ -4636,7 +4639,7 @@ function extractDiffs({
   const logId = idForLogging(old.groupId);
   const details: Array<GroupV2ChangeDetailType> = [];
   const ourAci = itemStorage.user.getCheckedAci();
-  const ourPni = itemStorage.user.getPni();
+  const ourPni = itemStorage.user.getOptionalPni();
   const ACCESS_ENUM = Proto.AccessControl.AccessRequired;
 
   let areWeInGroup = false;
@@ -4645,7 +4648,7 @@ function extractDiffs({
   let whoInvitedUsUserId = null;
 
   function isUs(serviceId: ServiceIdString): boolean {
-    return serviceId === ourAci || serviceId === ourPni;
+    return serviceId === ourAci || (ourPni != null && serviceId === ourPni);
   }
   function keepOnlyOurAdds(
     list: Array<GroupV2ChangeDetailType>
@@ -6055,8 +6058,8 @@ async function applyGroupState({
   const ourAci = itemStorage.user.getCheckedAci();
 
   // members
-  const wasPreviouslyAMember = (result.membersV2 || []).some(
-    item => item.aci !== ourAci
+  const wasPreviouslyAMember = (group.membersV2 || []).some(
+    item => item.aci === ourAci
   );
   if (groupState.members) {
     result.membersV2 = groupState.members.map(member => {

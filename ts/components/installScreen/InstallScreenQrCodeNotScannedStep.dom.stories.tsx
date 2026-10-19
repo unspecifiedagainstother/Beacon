@@ -35,7 +35,7 @@ const DEFAULT_PROPS: Omit<PropsType, 'provisioningUrl'> = {
   updates: DEFAULT_UPDATES,
   OS: 'macOS',
   startUpdate: action('startUpdate'),
-  forceUpdate: action('forceUpdate'),
+  forceCheck: action('forceCheck'),
   currentVersion: 'v6.0.0',
   retryGetQrCode: action('retryGetQrCode'),
   isConfirmingDataDeletion: false,

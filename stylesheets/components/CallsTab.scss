@@ -112,8 +112,7 @@
   overflow: auto;
   width: 100%;
   height: 100%;
-  padding-block: 80px;
-  padding-inline: 24px;
+  padding-top: 80px;
 }
 
 .CallsList__Header {
@@ -156,11 +155,8 @@
     }
   }
 
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 
   &::before {
@@ -289,10 +285,6 @@
   width: 60%;
 }
 
-.CallsList__ItemTitle {
-  font-weight: bold;
-}
-
 // Override .ListTile__subtitle so ellipsis is correct color
 .CallsList__Item--missed .ListTile__subtitle,
 .CallsList__Item--declined .ListTile__subtitle {
@@ -377,11 +369,8 @@
       background: variables.$color-gray-62;
     }
   }
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
   &:disabled,
   &[aria-disabled='true'] {

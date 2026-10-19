@@ -1,5 +1,6 @@
 // Copyright 2018 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
+// oxlint-disable max-classes-per-file
 
 import type { LinkPreviewForUIType } from './message/LinkPreviews.std.ts';
 import type { MIMEType } from './MIME.std.ts';
@@ -8,6 +9,7 @@ import type {
   WithRequiredProperties,
 } from './Util.std.ts';
 import type { SignalService as Proto } from '../protobuf/index.std.ts';
+import type { DurationInSeconds } from '../util/durations/index.std.ts';
 
 export type ThumbnailType = EphemeralAttachmentFields & {
   size: number;
@@ -95,6 +97,8 @@ export type AttachmentType = EphemeralAttachmentFields & {
   chunkSize?: number;
   backupCdnNumber?: number;
   localBackupPath?: string;
+
+  audioWaveform?: ReadonlyArray<number>;
 
   // See app/attachment_channel.ts
   version?: 1 | 2;
@@ -192,9 +196,10 @@ export type InMemoryAttachmentDraftType =
       clientUuid: string;
       pending: false;
       screenshotData?: Uint8Array<ArrayBuffer>;
-      duration?: number;
+      duration?: DurationInSeconds;
       fileName?: string;
       path?: string;
+      audioWaveform?: ReadonlyArray<number>;
     } & BaseAttachmentDraftType)
   | {
       contentType: MIMEType;
@@ -203,7 +208,8 @@ export type InMemoryAttachmentDraftType =
       path?: string;
       pending: true;
       size: number;
-      duration?: number;
+      duration?: DurationInSeconds;
+      audioWaveform?: ReadonlyArray<number>;
     };
 
 // What's stored in conversation.draftAttachments
@@ -224,6 +230,8 @@ export type AttachmentDraftType =
       clientUuid: string;
       version?: 2;
       localKey?: string;
+      audioWaveform?: ReadonlyArray<number>;
+      duration?: DurationInSeconds;
     } & BaseAttachmentDraftType)
   | {
       clientUuid: string;
@@ -264,7 +272,6 @@ export class AttachmentSizeError extends Error {
   }
 }
 
-// oxlint-disable-next-line max-classes-per-file
 export class AttachmentUndownloadableFromTransitTierError extends Error {
   constructor(message: string) {
     super(`AttachmentUndownloadableFromTransitTierError: ${message}`);

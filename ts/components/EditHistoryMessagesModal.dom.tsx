@@ -53,6 +53,7 @@ const MESSAGE_DEFAULT_PROPS = {
   isMessageRequestAccepted: true,
   markAttachmentAsCorrupted: shouldNeverBeCalled,
   messageExpanded: shouldNeverBeCalled,
+  handleClickCtaButton: shouldNeverBeCalled,
   onReplyToMessage: shouldNeverBeCalled,
   onToggleSelect: shouldNeverBeCalled,
   openGiftBadge: shouldNeverBeCalled,
@@ -121,7 +122,7 @@ export function EditHistoryMessagesModal({
 
   return (
     <AxoDialog.Root open onOpenChange={closeEditHistoryModal}>
-      <AxoDialog.Content size="sm" escape="cancel-is-noop">
+      <AxoDialog.Content size="md" escape="cancel-is-noop">
         <AxoDialog.Header>
           <AxoDialog.Title screenReaderOnly>
             {i18n('icu:EditHistoryMessagesModal__title')}
@@ -267,7 +268,6 @@ export function EditHistoryMessagesModal({
             })}
           </div>
         </AxoDialog.Body>
-        <AxoDialog.Footer />
       </AxoDialog.Content>
     </AxoDialog.Root>
   );

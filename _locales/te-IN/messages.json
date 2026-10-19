@@ -11,6 +11,9 @@
   "icu:AxoDialog.Close": {
     "messageformat": "మూసివెయ్యి"
   },
+  "icu:AxoPasswordField.Reveal": {
+    "messageformat": "పాస్‌వర్డ్‌ను చూపించండి"
+  },
   "icu:AxoTextField.Clear": {
     "messageformat": "స్పష్టమైన"
   },
@@ -61,6 +64,24 @@
   },
   "icu:Preferences__DonateTitle": {
     "messageformat": "Signal కు దానం చేయండి"
+  },
+  "icu:LinkedDevicesOnboardingDialog__description": {
+    "messageformat": "<bold>లింక్ చేసిన పరికరాలు</bold> మీ అదనపు పరికరాలలో దేనిలోనైనా మీ Signal ఖాతా మరియు సందేశాలను సురక్షితంగా యాక్సెస్ చేయడానికి మిమ్మల్ని అనుమతిస్తాయి."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--1": {
+    "messageformat": "మీరు ఒక డెస్క్ టాప్, టాబ్లెట్ లేదా అదనపు ఫోన్ ‌ను లింక్ చేయవచ్చు"
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--2": {
+    "messageformat": "వేటిని లింక్ చేయాలనేది మీ ప్రాథమిక పరికరం నిర్వహిస్తుంది, మీరు గరిష్టంగా 5 పరికరాలను లింక్ చేయవచ్చు."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3": {
+    "messageformat": "ఖాతా సెట్టింగ్‌లు మరియు బ్యాకప్‌లతో సహా కొన్ని ఖాతా సెట్టింగ్‌లు మీ ప్రాథమిక పరికరంలో మాత్రమే నిర్వహించబడతాయి."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--1": {
+    "messageformat": "ఖాతా సెట్టింగులు మరియు బ్యాకప్‌లను మీ ప్రాథమిక పరికరంలో మాత్రమే నిర్వహించగలరు."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--2": {
+    "messageformat": "ఖాతా సెట్టింగ్లు మరియు Signal సురక్షిత బ్యాకప్‌లు మీ ప్రాథమిక పరికరంలో మాత్రమే నిర్వహించగలరు."
   },
   "icu:sentMediaQualityStandard": {
     "messageformat": "ప్రామాణికం"
@@ -317,11 +338,8 @@
   "icu:LeftPaneChatFolders__ItemLabel--All": {
     "messageformat": "అన్ని చాట్స్"
   },
-  "icu:LeftPaneChatFolders__ItemUnreadBadge__MaxCount": {
-    "messageformat": "{maxCount,number}+"
-  },
   "icu:LeftPaneChatFolders__ItemUnreadBadge__AccessibleLabel": {
-    "messageformat": "{count, plural, one {{count,number} Unread Message} other {{count,number} Unread Messages}}"
+    "messageformat": "{count, plural, one {{count,number} చదవని సందేశం} other {{count,number} చదవని సందేశాలు}}"
   },
   "icu:LeftPaneChatFolders__Item__ContextMenu__MarkAllRead": {
     "messageformat": "మార్క్ చేసినవన్నీ చదవండి"
@@ -364,9 +382,6 @@
   },
   "icu:NavTabs__ItemIconLabel--UnreadCount": {
     "messageformat": "{count,number} చదవనివి ఉన్నాయి"
-  },
-  "icu:NavTabs__ItemIconLabel--MarkedUnread": {
-    "messageformat": "చదవనివి మార్క్ చేయబడ్డాయి"
   },
   "icu:NavTabs__ItemLabel--Chats": {
     "messageformat": "చాట్స్"
@@ -635,20 +650,23 @@
   "icu:SafetyNumberNotReady__learn-more": {
     "messageformat": "ఇంకా నేర్చుకో"
   },
-  "icu:KeyTransparencyErrorDialog__Title": {
-    "messageformat": "మీ పరికరానికి ఆటోమేటిక్ కీ ధృవీకరణ ప్రస్తుతం అందుబాటులో లేదు. డీబగ్ లాగ్‌ను సమర్పించేదా?"
+  "icu:KeyTransparencyErrorDialog__Title-v2": {
+    "messageformat": "మీ పరికరానికి ఆటోమేటిక్ కీ ధృవీకరణ ప్రస్తుతం అందుబాటులో లేదు. మమ్మల్ని మెరుగుపరచుకోవడంలో సహాయపడేందుకు నివేదికను సమర్పించాలా?"
   },
-  "icu:KeyTransparencyErrorDialog__Description": {
-    "messageformat": "సమస్యను గుర్తించడానికి మరియు పరిష్కరించడానికి డీబగ్ లాగ్‌లు మాకు సహాయపడతాయి, మరియు గుర్తించే సమాచారం కలిగి ఉండవు."
+  "icu:KeyTransparencyErrorDialog__Description-v2": {
+    "messageformat": "సమస్యను గుర్తించడానికి మరియు పరిష్కరించడానికి డీబగ్ లాగ్‌లు మాకు సహాయపడతాయి, మరియు గుర్తించే సమాచారం కలిగి ఉండవు. పంచుకోవడం ఐచ్ఛికం."
   },
-  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label": {
-    "messageformat": "డీబగ్ లాగ్‌ను పంచుకోండి"
+  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label-v2": {
+    "messageformat": "డీబగ్ లాగ్‌ను చేర్చండి"
   },
   "icu:KeyTransparencyErrorDialog__ShareDebugLog__ViewButton": {
     "messageformat": "వీక్షించండి"
   },
   "icu:KeyTransparencyErrorDialog__Submit": {
     "messageformat": "సమర్పించండి"
+  },
+  "icu:KeyTransparencyErrorDialog__Cancel": {
+    "messageformat": "వద్దు ధన్యవాదాలు"
   },
   "icu:KeyTransparencyOnboardingDialog__Title": {
     "messageformat": "Signal ఇప్పుడు గుప్తీకరణను స్వయం-ధృవీకరణ చేయగలదు"
@@ -746,11 +764,11 @@
   "icu:maximumAttachments": {
     "messageformat": "మీరు ఈ సందేశానికి ఎక్కువ జోడింపులను జోడించలేరు."
   },
-  "icu:fileSizeWarning": {
-    "messageformat": "క్షమించండి, ఎంచుకున్న పంక్తి సందేశ పరిమాణ పరిమితులను మించిపోయింది. {limit,number} {units}"
+  "icu:fileTooLargeWarning": {
+    "messageformat": "ఈ ఫైల్ మరీ పెద్దదిగా ఉన్నందున దీనిని పంపలేము. మీరు {limit,number}{units} పరిమాణం వరకు ఉన్న ఫైల్‌లను పంపవచ్చు."
   },
-  "icu:videoFileSizeWarning": {
-    "messageformat": "క్షమించండి, ఎంచుకున్న వీడియో ఫైల్ సందేశ పరిమాణ పరిమితులను మించిపోయింది. {limit,number}{units}"
+  "icu:videoFileTooLargeWarning": {
+    "messageformat": "ఈ వీడియో ఫైల్ మరీ పెద్దదిగా ఉన్నందున దీనిని పంపలేము. మీరు {limit,number}{units} పరిమాణం వరకు ఉన్న వీడియో ఫైల్‌లను పంపవచ్చు."
   },
   "icu:unableToLoadAttachment": {
     "messageformat": "ఎంచుకున్న అటాచ్‌మెంట్‌ను లోడ్ చేయడం సాధ్యం కాలేదు."
@@ -772,6 +790,9 @@
   },
   "icu:checkNetworkConnection": {
     "messageformat": "మీ నెట్‌వర్క్ కనెక్షన్‌ను తనిఖీ చేయండి."
+  },
+  "icu:clockSkewDetected": {
+    "messageformat": "మీ పరికరం తేదీ సరిగ్గా లేదు. మీ గడియారాన్ని సరిచేసుకుని, మళ్ళీ ప్రయత్నించండి. మీ పరికరం యొక్క తేదీ మరియు సమయం:"
   },
   "icu:submitDebugLog": {
     "messageformat": "డీబగ్ సంఘటన లేకరి"
@@ -994,6 +1015,9 @@
   },
   "icu:mute": {
     "messageformat": "మ్యూట్"
+  },
+  "icu:muted": {
+    "messageformat": "మ్యూట్ చేయబడింది"
   },
   "icu:cannotUpdateDetail-v2": {
     "messageformat": "Signal ని అప్‌డేట్ చేయలేకపోయాము. <retryUpdateButton>అప్‌డేట్‌ను మళ్ళీ ప్రయత్నించండి</retryUpdateButton> లేదా దాన్ని మాన్యువల్‌గా ఇన్‌స్టాల్ చేయడానికి {url} సందర్శించండి. ఆ తర్వాత, ఈ సమస్య గురించి <contactSupportLink>మద్దతును సంప్రదించండి</contactSupportLink>"
@@ -1261,6 +1285,9 @@
   },
   "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync": {
     "messageformat": "ఈ చాట్‌లోని అన్ని సందేశాలు మీ పరికరాలు అన్నింటి నుండి తొలగించబడతాయి."
+  },
+  "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync--still-member": {
+    "messageformat": "ఈ చాట్‌లోని అన్ని సందేశాలు మీ పరికరాలు అన్నింటి నుండి తొలగించబడతాయి. మీరు ఇప్పటికీ ఈ గ్రూప్‌లో సభ్యులుగా ఉంటారు."
   },
   "icu:ConversationHeader__ContextMenu__LeaveGroupAction__title": {
     "messageformat": "గ్రూప్‌ను వదిలేయండి"
@@ -1610,9 +1637,6 @@
   "icu:Preferences__EmojiSkinToneDefaultSetting__Label": {
     "messageformat": "ఎమోజీ స్కిన్ టోన్"
   },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__Title": {
-    "messageformat": "చాట్ ఫోల్డర్‌లు"
-  },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Title": {
     "messageformat": "ఒక చాట్ ఫోల్డర్‌ను జోడించండి"
   },
@@ -1624,12 +1648,6 @@
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Description--WithChatFolders": {
     "messageformat": "{chatFoldersCount, plural, one {{chatFoldersCount,number} ఫోల్డర్} other {{chatFoldersCount,number} ఫోల్డర్‌లు}}"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button": {
-    "messageformat": "సెటప్ చేయండి"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button--WithChatFolders": {
-    "messageformat": "నిర్వహించండి"
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__ChatFolderItem__ContextMenu__EditFolder": {
     "messageformat": "ఫోల్డర్‌ను సవరించండి"
@@ -2384,9 +2402,6 @@
   "icu:SafetyNumberModal__title": {
     "messageformat": "భద్రత సంఖ్యను ధృవీకరించండి"
   },
-  "icu:safetyNumberChanged": {
-    "messageformat": "భద్రతా సంఖ్య మార్చబడింది"
-  },
   "icu:safetyNumberChanges": {
     "messageformat": "భద్రతా సంఖ్య మార్పులు"
   },
@@ -2826,16 +2841,16 @@
     "messageformat": "తొలగించండి"
   },
   "icu:stickers--StickerManagerPackDragHandle--Label": {
-    "messageformat": "Drag to reorder sticker pack"
+    "messageformat": "స్టిక్కర్ ప్యాక్ క్రమాన్ని మార్చడానికి లాగండి"
   },
   "icu:stickers--StickerManagerBlessedPacksList--Label": {
-    "messageformat": "Signal Artist Series sticker packs"
+    "messageformat": "Signal ఆర్టిస్ట్ సిరీస్ స్టిక్కర్ ప్యాక్‌లు"
   },
   "icu:stickers--StickerManagerReceivedPacksList--Label": {
-    "messageformat": "Received sticker packs"
+    "messageformat": "స్టిక్కర్ ప్యాక్‌లు అందాయి"
   },
   "icu:stickers--StickerManagerInstalledPacksList--Label": {
-    "messageformat": "Installed sticker packs"
+    "messageformat": "స్టిక్కర్ ప్యాక్‌లను ఇన్‌స్టాల్ చేసారు"
   },
   "icu:stickers--StickerPreview--Title": {
     "messageformat": "స్టిక్కర్ ప్యాక్"
@@ -3081,16 +3096,16 @@
     "messageformat": "స్టిక్కర్ జోడించండి"
   },
   "icu:FunPicker__Label--StickerReply": {
-    "messageformat": "Reply"
+    "messageformat": "స్పంధించు"
   },
   "icu:FunPicker__Label--SendStickerReply": {
-    "messageformat": "Send"
+    "messageformat": "పంపండి"
   },
   "icu:FunPicker__Label--CancelStickerReply": {
-    "messageformat": "Cancel"
+    "messageformat": "రద్దు చేయండి"
   },
   "icu:FunPicker__Label--Sticker": {
-    "messageformat": "Sticker"
+    "messageformat": "స్టికర్"
   },
   "icu:confirmation-dialog--Cancel": {
     "messageformat": "రద్దు"
@@ -3872,20 +3887,20 @@
   "icu:calling__preview--minimize": {
     "messageformat": "ప్రివ్యూను కనిష్ఠీకరించండి"
   },
-  "icu:calling__change-view": {
-    "messageformat": "వీక్షణను మార్చండి"
-  },
-  "icu:calling__view_mode--paginated": {
-    "messageformat": "గ్రిడ్ వీక్షణ"
-  },
-  "icu:calling__view_mode--overflow": {
-    "messageformat": "సైడ్‌బార్ వీక్షణ"
-  },
-  "icu:calling__view_mode--speaker": {
-    "messageformat": "స్పీకర్ వీక్షణ"
-  },
   "icu:calling__view_mode--updated": {
     "messageformat": "వీక్షణ అప్‌డేట్ చేయబడింది"
+  },
+  "icu:calling__change-layout": {
+    "messageformat": "లేఅవుట్‌ను మార్చండి"
+  },
+  "icu:calling__layout--paginated": {
+    "messageformat": "గ్రిడ్"
+  },
+  "icu:calling__layout--overflow": {
+    "messageformat": "సైడ్‌బార్"
+  },
+  "icu:calling__layout--speaker": {
+    "messageformat": "స్పీకర్"
   },
   "icu:calling__SelectPresentingSourcesModal--title": {
     "messageformat": "మీ స్క్రీన్‌ను భాగస్వామ్యం చేయండి"
@@ -3950,23 +3965,47 @@
   "icu:notMuted": {
     "messageformat": "మ్యూట్ చేయబడలేదు"
   },
-  "icu:muteHour": {
-    "messageformat": "ఒక గంట పాటు మ్యూట్ చేయండి"
-  },
-  "icu:muteEightHours": {
-    "messageformat": "ఎనిమిది గంటల పాటు మ్యూట్ చేయండి"
-  },
-  "icu:muteDay": {
-    "messageformat": "ఒక రోజుంతా మ్యూట్ చేయండి"
-  },
-  "icu:muteWeek": {
-    "messageformat": "ఒక వారం పాటు మ్యూట్ చేయండి"
-  },
-  "icu:muteAlways": {
-    "messageformat": "ఎల్లప్పుడూ మ్యూట్ చేయండి"
-  },
   "icu:unmute": {
     "messageformat": "అన్‌మ్యూట్"
+  },
+  "icu:MuteMenu__label": {
+    "messageformat": "ఈ చాట్‌ను దీని కోసం మ్యూట్ చేయండి…"
+  },
+  "icu:MuteMenu__hour": {
+    "messageformat": "1 గంట"
+  },
+  "icu:MuteMenu__eightHours": {
+    "messageformat": "8 గంటలు"
+  },
+  "icu:MuteMenu__day": {
+    "messageformat": "1 రోజు"
+  },
+  "icu:MuteMenu__week": {
+    "messageformat": "1 వారం"
+  },
+  "icu:MuteMenu__until": {
+    "messageformat": "అంతవరకు..."
+  },
+  "icu:MuteMenu__always": {
+    "messageformat": "ఎల్లప్పుడూ"
+  },
+  "icu:DatePicker__popupTitle": {
+    "messageformat": "ఒక తేదీని ఎంచుకోండి"
+  },
+  "icu:TimePicker__popupTitle": {
+    "messageformat": "ఒక సమయాన్ని ఎంచుకోండి"
+  },
+  "icu:MuteUntilDialog__title": {
+    "messageformat": "ఈ చాట్‌ను ఇంత వరకు మ్యూట్ చేయండి…"
+  },
+  "icu:MuteUntilDialog__dateLabel": {
+    "messageformat": "తేదీ"
+  },
+  "icu:MuteUntilDialog__timeLabel": {
+    "messageformat": "సమయం"
+  },
+  "icu:MuteUntilDialog__timeZoneNote": {
+    "messageformat": "{timeZone} లో సమయాలన్నీ"
   },
   "icu:muteExpirationLabelAlways": {
     "messageformat": "ఎల్లప్పుడూ మ్యూట్ చేయబడింది"
@@ -4874,9 +4913,6 @@
   "icu:showConversationDetails--direct": {
     "messageformat": "చాట్ సెట్టింగ్స్"
   },
-  "icu:ConversationDetails__unmute--title": {
-    "messageformat": "ఈ చాట్‌ను అన్‌మ్యూట్ చేసేదా?"
-  },
   "icu:ConversationDetails--group-link": {
     "messageformat": "సమూహ లింక్"
   },
@@ -5072,6 +5108,9 @@
   "icu:ConversationDetailsMembershipList--show-all": {
     "messageformat": "అన్నింటిని చూడు"
   },
+  "icu:ConversationDetailsMembershipList__Search__AccessibilityLabel": {
+    "messageformat": "వెతకండి"
+  },
   "icu:ConversationDetailsGroups--title": {
     "messageformat": "{count, plural, one {{count,number} సమూహం ఉమ్మడిగా ఉన్నాయి} other {{count,number} సమూహాలు ఉమ్మడిగా ఉన్నాయి}}"
   },
@@ -5108,17 +5147,110 @@
   "icu:EditNicknameAndNoteModal__Note__Placeholder": {
     "messageformat": "గమనిక"
   },
-  "icu:ConversationNotificationsSettings__mentions__label": {
+  "icu:WhileMuted__title": {
+    "messageformat": "మ్యూట్ చేసినప్పుడు"
+  },
+  "icu:WhileMuted__description": {
+    "messageformat": "ఈ చాట్ మ్యూట్‌లో ఉన్నప్పుడు చూపించాల్సిన నోటిఫికేషన్లను ఎంచుకోండి."
+  },
+  "icu:WhileMuted__calls__title": {
+    "messageformat": "కాల్స్"
+  },
+  "icu:WhileMuted__calls__description": {
+    "messageformat": "ఈ చాట్ మ్యూట్ చేయబడినప్పుడు కాల్ ప్రారంభమైతే రింగ్ చేయండి లేదా తెలియజేయండి."
+  },
+  "icu:WhileMuted__mentions__title": {
     "messageformat": "ప్రస్తావనలు"
   },
-  "icu:ConversationNotificationsSettings__mentions__info": {
-    "messageformat": "మ్యూట్ చేయబడిన చాట్‌లలో మీరు పేర్కొనబడినప్పుడు నోటిఫికేషన్‌లను అందుకోండి"
+  "icu:WhileMuted__mentions__description": {
+    "messageformat": "ఈ చాట్ మ్యూట్ చేయబడినప్పుడు, మిమ్మల్ని ప్రస్తావించినట్లయితే తెలియజేయండి."
   },
-  "icu:ConversationNotificationsSettings__mentions__select__always-notify": {
-    "messageformat": "ఎల్లప్పుడూ నోటిఫై చేయండి"
+  "icu:WhileMuted__replies__title": {
+    "messageformat": "రిప్లైలు"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__dont-notify-for-mentions-if-muted": {
-    "messageformat": "ఒకవేళ మ్యూట్ చేయబడినట్లయితే తెలియచేయకండి"
+  "icu:WhileMuted__replies__description": {
+    "messageformat": "ఈ చాట్ మ్యూట్ చేయబడినప్పుడు, ఎవరైనా మీ సందేశానికి ప్రత్యుత్తరం ఇస్తే తెలియజేయండి."
+  },
+  "icu:WhileMuted__value--none": {
+    "messageformat": "ఏదీ కాదు"
+  },
+  "icu:WhileMuted__value--calls": {
+    "messageformat": "కాల్స్"
+  },
+  "icu:WhileMuted__value--mentions": {
+    "messageformat": "ప్రస్తావనలు"
+  },
+  "icu:WhileMuted__value--replies": {
+    "messageformat": "రిప్లైలు"
+  },
+  "icu:WhileMuted__value--calls-mentions": {
+    "messageformat": "కాల్‌లు, ప్రస్తావనలు"
+  },
+  "icu:WhileMuted__value--calls-replies": {
+    "messageformat": "కాల్‌లు, ప్రత్యుత్తరం ఇవ్వడాలు"
+  },
+  "icu:WhileMuted__value--mentions-replies": {
+    "messageformat": "ప్రస్తావనలు, ప్రత్యుత్తరం ఇవ్వడాలు"
+  },
+  "icu:WhileMuted__value--calls-mentions-replies": {
+    "messageformat": "కాల్‌లు, ప్రస్తావనలు, ప్రత్యుత్తరం ఇవ్వడాలు"
+  },
+  "icu:Preferences__WhileMuted__description": {
+    "messageformat": "మ్యూట్ చేయబడిన చాట్ల కోసం నోటిఫికేషన్లను ఎంచుకోండి."
+  },
+  "icu:Preferences__WhileMuted__calls__description": {
+    "messageformat": "మ్యూట్ చేసిన చాట్‌లలో కాల్ ప్రారంభమైనప్పుడు రింగ్ చేయండి లేదా తెలియజేయండి."
+  },
+  "icu:Preferences__WhileMuted__mentions__description": {
+    "messageformat": "మ్యూట్ చేసిన చాట్‌లలో మిమ్మల్ని ప్రస్తావించినప్పుడు తెలియజేయండి."
+  },
+  "icu:Preferences__WhileMuted__replies__description": {
+    "messageformat": "మ్యూట్ చేసిన చాట్‌లలో ఎవరైనా మీ సందేశానికి ప్రత్యుత్తరం ఇచ్చినప్పుడు తెలియజేయండి."
+  },
+  "icu:UnreadReminders__title": {
+    "messageformat": "చదవని రిమైండర్‌లు"
+  },
+  "icu:UnreadReminders__description": {
+    "messageformat": "ఈ చాట్ మ్యూట్ చేయబడినప్పుడు, చదవని సందేశాలు ఉన్నట్లయితే అప్పుడప్పుడు తెలియజేయండి."
+  },
+  "icu:Preferences__UnreadReminders__description": {
+    "messageformat": "మ్యూట్ చేయబడిన చాట్‌లలో చదవని సందేశాలు ఉన్నప్పుడు అప్పుడప్పుడు తెలియజేయండి."
+  },
+  "icu:UnreadReminders__notification--messages--1": {
+    "messageformat": "{messageCount, plural, one {మీకు {person1} నుండి {messageCount,number} చదవని సందేశం ఉంది.} other {మీకు {person1} నుండి {messageCount,number} చదవని సందేశాలు ఉన్నాయి.}}"
+  },
+  "icu:UnreadReminders__notification--messages--2": {
+    "messageformat": "{messageCount, plural, one {మీకు {person1} మరియు {person2} నుండి {messageCount,number} చదవని సందేశం ఉంది.} other {మీకు {person1} మరియు {person2} నుండి {messageCount,number} చదవని సందేశాలు ఉన్నాయి.}}"
+  },
+  "icu:UnreadReminders__notification--messages--many": {
+    "messageformat": "{messageCount, plural, one {మీకు {person1}, {person2}, మరియు ఇతరుల నుండి {messageCount,number} చదవని సందేశం ఉంది.} other {మీకు {person1}, {person2}, మరియు ఇతరుల నుండి {messageCount,number} చదవని సందేశాలు ఉన్నాయి.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-mentions": {
+    "messageformat": "{messageCount, plural, one {మీకు {mentionSummary} తో సహా {messageCount,number} చదవని సందేశం ఉంది.} other {మీకు {mentionSummary} తో సహా {messageCount,number} చదవని సందేశాలు ఉన్నాయి.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-replies": {
+    "messageformat": "{messageCount, plural, one {మీకు {replySummary} తో సహా {messageCount,number} చదవని సందేశం వచ్చింది.} other {మీకు {replySummary} తో సహా {messageCount,number} చదవని సందేశాలు ఉన్నాయి.}}"
+  },
+  "icu:UnreadReminders__notification--counts--messages": {
+    "messageformat": "{messageCount, plural, one {మీకు {messageCount,number} చదవని సందేశం ఉంది.} other {మీకు {messageCount,number} చదవని సందేశాలు ఉన్నాయి.}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--1": {
+    "messageformat": "{mentionCount, plural, one {మీకు {person1} నుండి ఒక ప్రస్తావన ఉంది} other {మీకు {person1} నుండి {mentionCount,number} ప్రస్తావనలు ఉన్నాయి}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--2": {
+    "messageformat": "{mentionCount, plural, one {{person1} మరియు {person2} నుండి {mentionCount,number} ప్రస్తావనలు మీ గురించి వచ్చాయి} other {{person1} మరియు {person2} నుండి మీకు {mentionCount,number} ప్రస్తావనలు వచ్చాయి}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--many": {
+    "messageformat": "{mentionCount, plural, one {{person1} మరియు ఇతరుల నుండి మీకు {mentionCount,number} ప్రస్తావనలు వచ్చాయి} other {{person1} మరియు ఇతరులనుంచి మీకు {mentionCount,number} ప్రస్తావనలు వచ్చాయి}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--1": {
+    "messageformat": "{replyCount, plural, one {{person1} నుండి ఒక ప్రత్యుత్తరము ఇవ్వబడింది} other {{person1} నుండి {replyCount,number} ప్రత్యుత్తరములు ఇవ్వబడ్డాయి}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--2": {
+    "messageformat": "{replyCount, plural, one {{person1} మరియు {person2} నుండి మీకు {replyCount,number} ప్రత్యుత్తరాలు ఇవ్వబడ్డాయి} other {{person1} మరియు {person2} నుండి {replyCount,number} ప్రత్యుత్తరాలు ఇవ్వబడ్డాయి}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--many": {
+    "messageformat": "{replyCount, plural, one {{person1} మరియు ఇతరుల నుండి {replyCount,number} ప్రత్యుత్తరాలు ఇవ్వబడ్డాయి} other {{person1} మరియు ఇతరులనుండి {replyCount,number} ప్రత్యుత్తరాలు ఇవ్వబడ్డాయి}}"
   },
   "icu:GroupLinkManagement--clipboard": {
     "messageformat": "సమూహ లింక్ నకలు చేయబడింది."
@@ -5140,6 +5272,48 @@
   },
   "icu:GroupLinkManagement__CopyGroupLinkButtonLabel": {
     "messageformat": "signal.group లింక్‌ను క్లిప్‌బోర్డ్‌కు కాపీ చేయండి"
+  },
+  "icu:GroupMembersSearchDialog__DialogTitle": {
+    "messageformat": "సభ్యులను వెతకండి"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder": {
+    "messageformat": "వెతకండి"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringByAdmins": {
+    "messageformat": "అడ్మిన్‌లను వెతకండి"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringBySystemContacts": {
+    "messageformat": "పరిచయాలను వెతకండి"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Label": {
+    "messageformat": "ఫిల్టర్"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__AllMembers": {
+    "messageformat": "సభ్యులు అందరూ"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Admins": {
+    "messageformat": "అడ్మిన్‌లు"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__SystemContacts": {
+    "messageformat": "పరిచయాలు"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithoutSearchQuery": {
+    "messageformat": "ఏ ఫలితాలు లేవు"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithSearchQuery": {
+    "messageformat": "“{searchQuery}” కోసం ఏ ఫలితాలు లేవు"
+  },
+  "icu:GroupMembersSearchDialog__MemberItem__Admin": {
+    "messageformat": "అడ్మిన్"
+  },
+  "icu:GroupMembersSearchDialog__SearchResults__Title": {
+    "messageformat": "శోధన ఫలితాలు"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__AddMembers": {
+    "messageformat": "సభ్యులను జోడించండి"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__InviteViaGroupLink": {
+    "messageformat": "గ్రూప్ లింక్ ద్వారా ఆహ్వానించండి"
   },
   "icu:PendingInvites--tab-requests": {
     "messageformat": "అభ్యర్థనలు ({count,number})"
@@ -5426,6 +5600,9 @@
   },
   "icu:CaptchaDialog__second-paragraph": {
     "messageformat": "ధృవీకరించిన తర్వాత, మీరు సందేశాన్ని కొనసాగించవచ్చు. పాజ్ చేయబడిన ఏదైనా సందేశాలు స్వయంచాలకంగా పంపబడతాయి."
+  },
+  "icu:CaptchaDialog__continue": {
+    "messageformat": "కొనసాగించండి"
   },
   "icu:CaptchaDialog--can-close__title": {
     "messageformat": "ధృవీకరించుకుండానే ముందుకు సాగాలా?"
@@ -5893,6 +6070,15 @@
   "icu:Preferences__message-audio-description": {
     "messageformat": "చాట్‌లో ఉన్నప్పుడు పంపిన మరియు అందుకున్న సందేశాల కొరకు నోటిఫికేషన్ ధ్వనిని వినండి."
   },
+  "icu:Preferences__reaction-notifications-title": {
+    "messageformat": "ప్రతిచర్య నోటిఫికేషన్‌లు"
+  },
+  "icu:Preferences__reaction-notifications-description": {
+    "messageformat": "ఎవరైనా మీ సందేశానికి ప్రతిస్పందించినప్పుడు తెలియజేయండి"
+  },
+  "icu:Preferences__button--account": {
+    "messageformat": "ఖాతా"
+  },
   "icu:Preferences__button--general": {
     "messageformat": "సాధారణం"
   },
@@ -5962,6 +6148,45 @@
   "icu:Preferences--system": {
     "messageformat": "వ్యవస్థ"
   },
+  "icu:Preferences--signal-login": {
+    "messageformat": "Signal Login"
+  },
+  "icu:Preferences--signal-login-description": {
+    "messageformat": "మీ Signal Login మీ ఖాతాను తిరిగి పొందడానికి మరియు పునరుద్ధరించడానికి ఉపయోగించబడుతుంది. ఈ కీలను మీరు నమ్మకమున్న పాస్‌వర్డ్ మేనేజర్‌లో సురక్షితంగా భద్రపరచండి. <learnMoreLink>మరింత తెలుసుకోండి</learnMoreLink>."
+  },
+  "icu:Preferences--signal-login-description--learn-more": {
+    "messageformat": "మరింత నేర్చుకోండి"
+  },
+  "icu:Preferences__SignalAccount__label": {
+    "messageformat": "ఖాతా & పునరుద్ధరణ"
+  },
+  "icu:Preferences__SignalAccount__description": {
+    "messageformat": "రెండు కీలు"
+  },
+  "icu:Preferences__SignalAccountKeys__Title": {
+    "messageformat": "మీ Signal Login"
+  },
+  "icu:Preferences__SignalAccountKeys__Description": {
+    "messageformat": "దీనిని ఒక సురక్షితమైన ప్రదేశంలో దాచండి, మీ ఖాతా మరియు డేటాను తిరిగి పొందడానికి మీ లాగిన్ సమాచారం అవసరమవుతుంది. ఎప్పుడూ ఎవరితోనూ దీనిని పంచుకోవద్దు."
+  },
+  "icu:Preferences__SignalAccountKeys__AccountKey": {
+    "messageformat": "ఖాతా కీ"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountID": {
+    "messageformat": "ఖాతా ID"
+  },
+  "icu:Preferences__SignalAccountKeys__RecoveryKey": {
+    "messageformat": "రికవరీ కీ"
+  },
+  "icu:Preferences__SignalAccountKeys__Save": {
+    "messageformat": "భద్రపరుచు"
+  },
+  "icu:Preferences__Account__LinkedDevice__label": {
+    "messageformat": "ఇది లింక్ చేయబడిన పరికరం"
+  },
+  "icu:Preferences__Account__LinkedDevice__description": {
+    "messageformat": "మీ ఖాతా సెట్టింగ్‌లను నిర్వహించడానికి, మీ ప్రాథమిక పరికరంలో Signal ను తెరవండి."
+  },
   "icu:Preferences--zoom": {
     "messageformat": "జూమ్ లెవల్"
   },
@@ -5992,8 +6217,116 @@
   "icu:Preferences--advanced": {
     "messageformat": "ఆధునిక"
   },
-  "icu:Preferences--notification-content": {
-    "messageformat": "నోటిఫికేషన్ కంటెంట్"
+  "icu:Preferences--change-signal-pin": {
+    "messageformat": "మీ పిన్ మార్చండి"
+  },
+  "icu:Preferences--change-signal-pin-button": {
+    "messageformat": "మార్చండి"
+  },
+  "icu:Preferences--create-signal-pin": {
+    "messageformat": "PIN సృష్టించండి"
+  },
+  "icu:Preferences--create-signal-pin-button": {
+    "messageformat": "సృష్టించండి"
+  },
+  "icu:Preferences--signal-pin": {
+    "messageformat": "Signal పిన్"
+  },
+  "icu:Preferences--signal-pin__footer": {
+    "messageformat": "PIN లు సమాచారాన్ని సిగ్నల్‌లో గుప్తీకరించి నిల్వ చేస్తాయి, తద్వారా మీరు మాత్రమే దాన్ని యాక్సెస్ చేయగలరు. మీ PIN ను తిరిగి పొందడం సాధ్యం కాదు. మీరు Signal ను తిరిగి ఇన్‌స్టాల్ చేసినప్పుడు మీ ప్రొఫైల్, సెట్టింగ్లు, పరిచయాలు పునరుద్ధరించబడతాయి. <learnMoreLink>మరింత తెలుసుకోండి</learnMoreLink>"
+  },
+  "icu:Preferences--signal-pin-advanced-settings": {
+    "messageformat": "అధునాతన PIN సెట్టింగ్‌లు"
+  },
+  "icu:Preferences--disable-signal-pin": {
+    "messageformat": "PIN ను నిలిపివేయండి"
+  },
+  "icu:Preferences--disable-signal-pin--button": {
+    "messageformat": "నిలిపివేయండి"
+  },
+  "icu:Preferences--disable-signal-pin--footer": {
+    "messageformat": "ఒకవేళ మీరు పిన్‌ను నిలిపివేస్తే, మీరు మాన్యువల్‌గా బ్యాకప్ చేసి పునరుద్ధరించకపోతే Signal‌ను తిరిగి నమోదు చేసినప్పుడు మీరు మొత్తం డేటాను కోల్పోతారు. PIN నిలిపివేయబడినప్పుడు మీరు నమోదు లాక్‌ని ఆన్ చేయలేరు."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--title": {
+    "messageformat": "నమోదు లాక్ కారణంగా PIN ను నిలిపివేయడం విఫలమైంది"
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--body": {
+    "messageformat": "మీ PIN ను నిలిపివేయడానికి ముందు మీరు నమోదు లాక్ ను తప్పక నిలిపివేయాలి."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--ok": {
+    "messageformat": "అలాగే"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--title": {
+    "messageformat": "బ్యాకప్ల కారణంగా PIN ను నిలిపివేయడం విఫలమైంది"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--body": {
+    "messageformat": "మీ PIN ను నిలిపివేయడానికి ముందే మీరు బ్యాకప్లను తప్పక నిలిపివేయాలి."
+  },
+  "icu:Preferences--enable-signal-pin": {
+    "messageformat": "PIN ను ప్రారంభించండి"
+  },
+  "icu:Preferences--enable-signal-pin--button": {
+    "messageformat": "ప్రారంభించండి"
+  },
+  "icu:Preferences--pin-reminders--header": {
+    "messageformat": "పిన్ రిమైండర్‌లు"
+  },
+  "icu:Preferences--pin-reminders--description": {
+    "messageformat": "క్రమేపీ మిమ్మల్ని తక్కువసార్లు అడుగుతారు"
+  },
+  "icu:Preferences--registration-lock__label": {
+    "messageformat": "నమోదు లాక్"
+  },
+  "icu:Preferences--registration-lock__footer": {
+    "messageformat": "Signal లో మళ్ళీ మీ ఫోన్ నంబర్ ను నమోదు చేయడానికి మీ Signal PIN అవసరం."
+  },
+  "icu:Preferences__Chats__TextInputSection__Title": {
+    "messageformat": "పాఠ్య ఇన్‌పుట్"
+  },
+  "icu:Preferences__Chats__ChatFoldersSection__Title": {
+    "messageformat": "చాట్ ఫోల్డర్‌లు"
+  },
+  "icu:Preferences__Notifications__Show__Label": {
+    "messageformat": "కనబర్చు"
+  },
+  "icu:Preferences__Notifications__SoundsSection__Title": {
+    "messageformat": "శబ్దాలు"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title": {
+    "messageformat": "యాప్ బ్యాడ్జ్"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title-v2": {
+    "messageformat": "చదవని బ్యాడ్జ్‌లు"
+  },
+  "icu:Preferences__Notifications__Reset__title": {
+    "messageformat": "మీ చాట్ల కోసం అనుకూల సెట్టింగ్ల తో సహా, నోటిఫికేషన్ సెట్టింగ్లను డిఫాల్ట్‌కు రీసెట్ చేయండి"
+  },
+  "icu:Preferences__Notifications__Reset__button": {
+    "messageformat": "పునరుద్ధరించు"
+  },
+  "icu:Preferences__Notifications__Reset__modal--body": {
+    "messageformat": "అన్ని చాట్‌ల కోసం అన్ని నోటిఫికేషన్ సెట్టింగ్‌లను డిఫాల్ట్‌కు రీసెట్ చేయాలా?"
+  },
+  "icu:Preferences__Notifications__Reset__modal--confirm": {
+    "messageformat": "పునరుద్ధరించు"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Label": {
+    "messageformat": "బ్యాడ్జ్ కౌంట్"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Description": {
+    "messageformat": "బ్యాడ్జ్ కౌంట్ చదవని సందేశాల సంఖ్యనుగానీ లేదా చదవని చాట్ల సంఖ్యనుగానీ ప్రదర్శిస్తే ఎంచుకోండి"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadMessages": {
+    "messageformat": "చదవని సందేశాలు"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadChats": {
+    "messageformat": "చదవని చాట్లు"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats": {
+    "messageformat": "యాప్ బ్యాడ్జ్‌లో మ్యూట్ చేయబడిన చాట్లను కూడా చేర్చండి"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats__description": {
+    "messageformat": "చాట్ ఫోల్డర్ బ్యాడ్జ్‌లలో మ్యూట్ చేయబడిన చాట్లు ఎల్లప్పుడూ ఉంటాయి"
   },
   "icu:PlaintextExport--PreferencesRow--Header": {
     "messageformat": "చాట్ చరిత్రను ఎగుమతి చేయండి"
@@ -6145,9 +6478,6 @@
   "icu:NotificationProfiles--setting": {
     "messageformat": "నోటిఫికేషన్ ప్రొఫైల్‌లు"
   },
-  "icu:NotificationProfiles--setup": {
-    "messageformat": "సెటప్ చేయండి"
-  },
   "icu:NotificationProfiles--title": {
     "messageformat": "నోటిఫికేషన్ ప్రొఫైల్‌లు"
   },
@@ -6159,9 +6489,6 @@
   },
   "icu:NotificationProfiles--manage-description": {
     "messageformat": "నోటిఫికేషన్ ప్రొఫైళ్ళను జోడించండి లేదా సవరించండి"
-  },
-  "icu:NotificationProfiles--manage-profiles": {
-    "messageformat": "{profileCount, plural, one {ఒక ప్రొఫైల్} other {{profileCount,number} ప్రొఫైళ్ళు}}"
   },
   "icu:NotificationProfiles--create": {
     "messageformat": "ప్రొఫైల్ సృష్టించండి"
@@ -6351,6 +6678,9 @@
   },
   "icu:Preferences--blocked-groups": {
     "messageformat": "బ్లాక్ చేయబడిన గ్రూప్‌లు"
+  },
+  "icu:Preferences--blocked--blocked-on": {
+    "messageformat": "{blockedAt} రోజున బ్లాక్ చేయబడింది"
   },
   "icu:Preferences--signal-backups": {
     "messageformat": "Signal సురక్షిత బ్యాకప్‌లు"
@@ -6559,9 +6889,6 @@
   "icu:Preferences__pnp__row--body": {
     "messageformat": "మీ ఫోన్ నంబర్‌ను ఎవరు చూడగలరు మరియు దానితో Signal లో మిమ్మల్ని ఎవరు సంప్రదించగలరో ఎంచుకోండి."
   },
-  "icu:Preferences__pnp__row--button": {
-    "messageformat": "మార్చండి…"
-  },
   "icu:Preferences__pnp__sharing--title": {
     "messageformat": "నా నంబర్‌ను ఎవరు చూడగలరు"
   },
@@ -6610,14 +6937,11 @@
   "icu:Preferences--read-receipts": {
     "messageformat": "చదివిన రసీదులు"
   },
-  "icu:Preferences--read-receipts--description": {
-    "messageformat": "ఒకవేళ నిలిపివేయబడితే, మీరు ఇతరుల నుండి రీడ్ రిసీప్ట్‌లను చూడలేరు."
-  },
   "icu:Preferences--typing-indicators": {
     "messageformat": "టైపింగ్ సూచికలు"
   },
-  "icu:Preferences--typing-indicators--description": {
-    "messageformat": "ఒకవేళ నిలిపివేయబడితే, మీరు ఇతరుల టైపింగ్ ఇండికేటర్‌లను చూడలేరు."
+  "icu:Preferences--messaging-help": {
+    "messageformat": "సందేశాలు ఎప్పుడు చదవబడుతున్నాయో మరియు టైప్ చేయబడుతున్నాయో చూడండి మరియు పంచుకోండి. ఒకవేళ దీన్ని నిలిపివేస్తే, మీరు ఇతరుల నుండి రీడ్ రిసీప్ట్‌లు లేదా టైపింగ్ ఇండికేటర్‌లను చూడలేరు."
   },
   "icu:Preferences--updates": {
     "messageformat": "అప్‌డేట్‌లు"
@@ -6721,11 +7045,23 @@
   "icu:InstallScreenUpdateDialog--update-required__title": {
     "messageformat": "అప్‌డేట్ అవసరం"
   },
+  "icu:InstallScreenUpdateDialog--checking-for-updates": {
+    "messageformat": "అప్‌డేట్‌ల కోసం తనిఖీ చేస్తోంది"
+  },
+  "icu:InstallScreenUpdateDialog--updating-signal": {
+    "messageformat": "Signal ను అప్‌డేట్ చేస్తోంది"
+  },
+  "icu:InstallScreenUpdateDialog--download-progress": {
+    "messageformat": "{totalBytes} లో {currentBytes} ({percentage,number,percent}) డౌన్‌లోడ్ అవుతోంది..."
+  },
   "icu:InstallScreenUpdateDialog--update-required__body": {
-    "messageformat": "మీ సందేశాలను సమకాలీకరించడాన్ని పూర్తి చేయడానికి, ఇప్పుడు Signal డెస్క్‌టాప్‌ను అప్‌డేట్ చేయండి."
+    "messageformat": "కొనసాగడానికి, Signal Desktop ను అప్‌డేట్‌ చేయండి."
   },
   "icu:InstallScreenUpdateDialog--update-required__action-update": {
     "messageformat": "నవీకరణ"
+  },
+  "icu:InstallScreenUpdateDialog--update-required__action-update__mas": {
+    "messageformat": "యాప్ స్టోర్‌కు వెళ్ళండి"
   },
   "icu:InstallScreenUpdateDialog--unsupported-os__title": {
     "messageformat": "అప్‌డేట్ అవసరం"
@@ -6759,6 +7095,9 @@
   },
   "icu:StandaloneRegistration--PhoneNumber--waiting": {
     "messageformat": "దయచేసి {duration} లో మళ్ళీ ప్రయత్నించండి"
+  },
+  "icu:StandaloneRegistration--PhoneNumber--RegionCodeSelector--Label": {
+    "messageformat": "ప్రాంతపు కోడ్ ను ఎంచుకోండి"
   },
   "icu:StandaloneRegistration--PhoneNumber--placeholder": {
     "messageformat": "ఫోన్ నంబర్"
@@ -6982,6 +7321,9 @@
   "icu:StandaloneRegistration--VerifyPIN--incorrect-pin--with-count": {
     "messageformat": "{triesRemaining, plural, one {తప్పు పిన్. {triesRemaining,number} ప్రయత్నం మిగిలి ఉంది.} other {తప్పు పిన్. {triesRemaining,number} ప్రయత్నాలు మిగిలి ఉన్నాయి.}}"
   },
+  "icu:StandaloneRegistration--VerifyPIN--just-count": {
+    "messageformat": "{triesRemaining, plural, one {{triesRemaining,number} ప్రయత్నం మిగిలి ఉంది.} other {{triesRemaining,number} ప్రయత్నాలు మిగిలి ఉన్నాయి.}}"
+  },
   "icu:StandaloneRegistration--VerifyPIN--NeedHelp--header": {
     "messageformat": "సాయం అవసరమా?"
   },
@@ -7024,6 +7366,9 @@
   "icu:StandaloneRegistration--VerifyPIN--NoRemainingTries--learn-more": {
     "messageformat": "పిన్‌ల గురించి మరింత తెలుసుకోండి"
   },
+  "icu:StandaloneRegistration--VerifyPIN--open-menu": {
+    "messageformat": "మెనూను తెరవండి"
+  },
   "icu:StandaloneRegistration--VerifyPIN--menu--skip-pin": {
     "messageformat": "PIN ను దాటవేయండి"
   },
@@ -7031,7 +7376,7 @@
     "messageformat": "పిన్ నమోదుని దాటవేయమంటారా?"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--description": {
-    "messageformat": "ఒకవేళ మీ PIN ను మీరు గుర్తు పెట్టుకోలేకపోతే, ఒక కొత్త దానిని మీరు సృష్టించవచ్చు. మీరు మీ ఖాతాను నమోదు చేసుకుని ఉపయోగించవచ్చు, కానీ మీ ప్రొఫైల్ సమాచారం వంటి కొన్ని సేవ్ చేసిన సెట్టింగ్‌లను మీరు కోల్పోతారు. మరింత తెలుసుకోండి."
+    "messageformat": "ఒకవేళ మీ PIN ను మీరు గుర్తు పెట్టుకోలేకపోతే, ఒక కొత్త దానిని మీరు సృష్టించవచ్చు. మీరు మీ ఖాతాను నమోదు చేసుకుని ఉపయోగించవచ్చు, కానీ మీ ప్రొఫైల్ సమాచారం వంటి కొన్ని సేవ్ చేసిన సెట్టింగ్‌లను మీరు కోల్పోతారు. <learnMore>మరింత తెలుసుకోండి</learnMore>."
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--skip-button": {
     "messageformat": "దాటవేసి కొత్త PIN ను సృష్టించండి"
@@ -7067,7 +7412,7 @@
     "messageformat": "హెచ్చరిక"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--description": {
-    "messageformat": "ఒకవేళ మీరు PIN ని నిలిపివేస్తే, మరొక iOS పరికరం నుండి డేటాను బదిలీ చేయనంత వరకు, Signal లో మళ్ళీ నమోదు అయినప్పుడు మీరు మొత్తం డేటాను కోల్పోతారు. PIN నిలిపివేయబడినప్పుడు మీరు నమోదు లాక్‌ని ఆన్ చేయలేరు."
+    "messageformat": "ఒకవేళ మీరు PIN ని నిలిపివేస్తే, Signal ని మళ్ళీ నమోదు చేసుకునేటప్పుడు మీరు మొత్తం డేటాను కోల్పోతారు. PIN నిలిపివేయబడినప్పుడు మీరు నమోదు లాక్‌ని ఆన్ చేయలేరు."
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--disable-button": {
     "messageformat": "పిన్‌ను ఆపివేయి"
@@ -7275,6 +7620,12 @@
   },
   "icu:MediaPermissionsModal__step-2": {
     "messageformat": "“Signal” ను ఆన్ చేయండి"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--microphone": {
+    "messageformat": "Signal కోసం మైక్రోఫోన్ యాక్సెస్‌ను ప్రారంభించండి"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--camera": {
+    "messageformat": "Signal కోసం కెమెరా యాక్సెస్‌ను ప్రారంభించండి"
   },
   "icu:MediaPermissionsModal__open": {
     "messageformat": "సెట్టింగ్‌లకు వెళ్లండి"
@@ -7816,11 +8167,17 @@
   "icu:ContextMenu--button": {
     "messageformat": "సందర్భ మెనూ"
   },
+  "icu:EditUsernameModalBody__username-label": {
+    "messageformat": "యూజర్‌నేమ్"
+  },
   "icu:EditUsernameModalBody__username-placeholder": {
     "messageformat": "యూజర్‌నేమ్"
   },
   "icu:EditUsernameModalBody__username-helper": {
     "messageformat": "యూజర్‌నేమ్‌లు ఎల్లప్పుడూ అంకెల జతతో జత చేయబడతాయి."
+  },
+  "icu:EditUsernameModalBody__discriminator-label": {
+    "messageformat": "యూజర్‌నేమ్ అంకెలు"
   },
   "icu:EditUsernameModalBody__learn-more": {
     "messageformat": "మరింత తెలుసుకోండి"
@@ -7918,6 +8275,75 @@
   },
   "icu:UsernameMegaphone__dismiss": {
     "messageformat": "రద్దుచేసే"
+  },
+  "icu:PinReminderMegaphone__title": {
+    "messageformat": "మీ Signal పిన్ ను నిర్ధారించండి"
+  },
+  "icu:PinReminderMegaphone__body": {
+    "messageformat": "మీరు మీ పిన్‌ను గుర్తుంచుకోవడానికి మేము అప్పుడప్పుడు పిన్‌ను ధృవీకరించమని అడుగుతాము."
+  },
+  "icu:PinReminderMegaphone__verify": {
+    "messageformat": "ధృవీకరించండి"
+  },
+  "icu:PinReminderMegaphone__not-now": {
+    "messageformat": "ఇప్పుడు కాదు"
+  },
+  "icu:PinReminderModal__title": {
+    "messageformat": "మీ Signal పిన్ను నమోదు చేయండి"
+  },
+  "icu:PinReminderModal__body": {
+    "messageformat": "మీ PIN ను గుర్తుంచుకోవడంలో మీకు సహాయపడేందుకు, దానిని అప్పుడప్పుడు నమోదు చేయమని మేము మిమ్మల్ని అడుగుతాము. కాలక్రమేణా మేము తక్కువ అడుగుతాము."
+  },
+  "icu:PinReminderModal__pin-input-placeholder": {
+    "messageformat": "మీ పిన్ను నమోదు చేయండి"
+  },
+  "icu:PinReminderModal__pin-input-error": {
+    "messageformat": "తప్పు పిన్. మళ్ళీ ప్రయత్నించండి"
+  },
+  "icu:PinReminderModal__forgot": {
+    "messageformat": "PIN మరచిపోయారా"
+  },
+  "icu:PinReminderModal__confirm": {
+    "messageformat": "నిర్ధారించండి"
+  },
+  "icu:PinReminderCompletedToast": {
+    "messageformat": "PIN సరైనది. మేము మీకు తర్వాత మళ్ళీ గుర్తు చేస్తాము."
+  },
+  "icu:PinChangeModal__title--create": {
+    "messageformat": "మీ Signal PIN ను మార్చండి"
+  },
+  "icu:PinChangeModal__title--create--without-pin": {
+    "messageformat": "మీ Signal PIN ను సృష్టించండి"
+  },
+  "icu:PinChangeModal__body--create": {
+    "messageformat": "ఈ పరికరం నమోదు చేయబడినంత వరకు మీరు మీ పిన్‌ను మార్చవచ్చు. <learnMoreLink>మరింత తెలుసుకోండి</learnMoreLink>"
+  },
+  "icu:PinChangeModal__body--create--without-pin": {
+    "messageformat": "PIN లు సమాచారాన్ని సిగ్నల్‌లో గుప్తీకరించి నిల్వ చేస్తాయి, తద్వారా మీరు మాత్రమే దాన్ని యాక్సెస్ చేయగలరు. మీరు తిరిగి ఇన్‌స్టాల్ చేసినప్పుడు మీ ప్రొఫైల్, సెట్టింగ్‌లు మరియు పరిచయాలు పునరుద్ధరించబడతాయి. యాప్‌ను తెరవడానికి మీకు మీ PIN అవసరం లేదు. <learnMoreLink>మరింత తెలుసుకోండి</learnMoreLink>"
+  },
+  "icu:PinChangeModal__title--confirm": {
+    "messageformat": "మీ Signal పిన్ను నిర్ధారించండి"
+  },
+  "icu:PinChangeModal__body--confirm": {
+    "messageformat": "మీరు ఇప్పుడే సృష్టించిన PIN ను ఎంటర్ చేయండి."
+  },
+  "icu:PinChangeModal__pin-input-placeholder--create": {
+    "messageformat": "ఒక కొత్త PIN ను ఎంటర్ చేయండి"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--confirm": {
+    "messageformat": "పిన్ ని నిర్ధారించండి"
+  },
+  "icu:PinChangeModal__cancel": {
+    "messageformat": "రద్దు చేయండి"
+  },
+  "icu:PinChangeModal__continue": {
+    "messageformat": "కొనసాగించండి"
+  },
+  "icu:PinChangeModal__confirm": {
+    "messageformat": "నిర్ధారించండి"
+  },
+  "icu:PinChangeCompletedToast": {
+    "messageformat": "కొత్త PIN సృష్టించబడింది."
   },
   "icu:UnsupportedOSWarningDialog__body": {
     "messageformat": "త్వరలో {OS} యొక్క మీ కంప్యూటర్ వెర్షన్‌కు Signal డెస్క్‌టాప్ ఇక ఏమాత్రం మద్దతు ఇవ్వదు. Signal ఉపయోగించడాన్నికొనసాగించేందుకు, {expirationDate} లోపు మీ కంప్యూటర్ ఆపరేటింగ్ సిస్టమ్‌ను అప్‌డేట్ చేసుకోండి. <learnMoreLink>మరింత తెలుసుకోండి</learnMoreLink>"
@@ -8351,8 +8777,11 @@
   "icu:DonationReceipt__type-value--one-time": {
     "messageformat": "ఒక్కసారి"
   },
-  "icu:DonationReceipt__footer-text": {
-    "messageformat": "Signal కు మద్దతు ఇచ్చినందుకు ధన్యవాదాలు. ఓపెన్ సోర్స్ గోప్యతా సాంకేతికత ద్వారా ప్రపంచవ్యాప్తంగా లక్షలాది మందికి స్వేచ్ఛా వ్యక్తీకరణను రక్షించడం మరియు సురక్షితమైన భౌగోళిక కమ్యూనికేషన్‌ను ప్రారంభించడం అనే లక్ష్యాన్ని ముందుకు తీసుకెళ్ళడంలో మీ సహకారం సహాయపడుతుంది. ఒకవేళ మీరు యునైటెడ్ స్టేట్స్ పౌరులు అయితే, మీ పన్ను రికార్డ్‌ల కోసం దయచేసి ఈ రసీదును మీ దగ్గర ఉంచుకోండి. Signal టెక్నాలజీ ఫౌండేషన్ అనేది యునైటెడ్ స్టేట్స్‌లోని అంతర్గత రెవెన్యూ కోడ్ యొక్క సెక్షన్ 501c3 కింద పన్ను మినహాయింపు పొందిన లాభాపేక్షలేని సంస్థ. మా ఫెడరల్ పన్ను ID 82-4506840."
+  "icu:DonationReceipt__footer-text-v2": {
+    "messageformat": "Signal కు మద్దతు ఇచ్చినందుకు ధన్యవాదాలు. ఓపెన్ సోర్స్ గోప్యతా సాంకేతికత ద్వారా ప్రపంచవ్యాప్తంగా లక్షలాది మందికి స్వేచ్ఛా వ్యక్తీకరణను రక్షించడం మరియు సురక్షితమైన భౌగోళిక కమ్యూనికేషన్‌ను ప్రారంభించడం అనే లక్ష్యాన్ని ముందుకు తీసుకెళ్ళడంలో మీ సహకారం సహాయపడుతుంది. ఒకవేళ మీరు యునైటెడ్ స్టేట్స్ నివాసి అయితే, మీ పన్ను రికార్డ్‌ల కోసం దయచేసి ఈ రసీదును మీ దగ్గర ఉంచుకోండి. Signal టెక్నాలజీ ఫౌండేషన్ అనేది యునైటెడ్ స్టేట్స్‌లోని అంతర్గత రెవెన్యూ కోడ్ యొక్క సెక్షన్ 501c3 కింద పన్ను మినహాయింపు పొందిన లాభాపేక్షలేని సంస్థ. మా ఫెడరల్ పన్ను ID 82-4506840. ఈ విరాళానికి ప్రతిఫలంగా Signal ఎటువంటి వస్తువులను లేదా సేవలను అందించలేదు."
+  },
+  "icu:MessageCta__Donate": {
+    "messageformat": "ఇప్పుడు విరాళం ఇవ్వండి"
   },
   "icu:Donations__OfflineTooltip": {
     "messageformat": "మీరు ఆఫ్‌లైన్‌లో ఉన్నారు. విరాళాన్ని పూర్తి చేయడానికి దయచేసి ఇంటర్నెట్‌కు కనెక్ట్ అవ్వండి."
@@ -8661,16 +9090,10 @@
     "messageformat": "చిన్న ట్వీక్‌లు, బగ్ ఫిక్స్‌లు, మరియు పనితీరు మెరుగుదలలు. Signal ఉపయోగించినందుకు మీకు ధన్యవాదాలు!",
     "ignoreUnused": true
   },
-  "icu:WhatsNew__8.18--0": {
-    "messageformat": "ఇప్పుడు వ్యక్తిగత చాట్‌లలో కూడా పోల్‌లను సృష్టించవచ్చు. ఏది ఎంచుకోవాలో తేల్చుకోలేని మీ స్నేహితుడికి మీరు ఎంపిక చేసిన కొన్ని ఎంపికల జాబితాను అందించండి లేదా మీకు నచ్చిన వ్యక్తికి గమనిక పంపే పాత అనుభూతిని తిరిగి పొందడానికి “నీకు నేను ఇష్టమా? అవును/కాదు/కావచ్చు” అనే పోల్‌ను సృష్టించండి."
+  "icu:WhatsNew__8.30--0": {
+    "messageformat": "వీడియో కాల్స్ కోసం పనితీరు మెరుగుదలలు."
   },
-  "icu:WhatsNew__8.19--0": {
-    "messageformat": "గ్రూప్ సెట్టింగ్స్‌లోని కొత్త \"ఎండ్ గ్రూప్\" ఆప్షన్‌తో గ్రూప్ అడ్మిన్‌లు ఇప్పుడు చాట్‌లను ముగించవచ్చు. గ్రూప్‌ను ముగించడం వల్ల సభ్యులు సందేశాలు పంపలేరు లేదా కాల్స్ చేయలేరు, ఆహ్వానాలు కూడా నిలిపివేయబడతాయి. కొత్త సీవింగ్ మీటప్ గ్రూప్‌ను ప్రారంభించే ముందు, పాత గ్రూప్‌ను ముగించడం ద్వారా అందరూ సరైన క్రమంలోనే ఉండేలా చూసుకోవచ్చు."
-  },
-  "icu:WhatsNew__8.20--0": {
-    "messageformat": "Introducing disappearing call events: Missed, outgoing, and received calls that occur after you install this update will now automatically disappear in any chat where disappearing messages are enabled."
-  },
-  "icu:WhatsNew__8.20--1": {
-    "messageformat": "Now you can reorder installed sticker packs so your new favorites don’t get stuck in the back of the line."
+  "icu:WhatsNew__8.30--1": {
+    "messageformat": "ఒకవేళ మీరు వీడియో కాల్‌లో చేరడానికి ప్రయత్నించినప్పుడు Signal కు కెమెరాను యాక్సెస్ చేయడానికి అనుమతి లేకపోతే Windows లో మీ సిస్టమ్ సెట్టింగ్లను తెరవడానికి సౌకర్యవంతమైన షార్ట్‌కట్‌ను కూడా మేము జోడించాము. ఇప్పుడు ఇతరులు మిమ్మల్ని చూడగలిగేలా మీరు ఏం చెయ్యాలో తెలుసుకోవడం మరింత సులభం."
   }
 }

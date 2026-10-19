@@ -41,7 +41,12 @@ beacon_setup_node() {
   [ -s "$NVM_DIR/nvm.sh" ] || beacon_die "nvm not found at $NVM_DIR"
   # shellcheck disable=SC1091
   . "$NVM_DIR/nvm.sh"
-  nvm use >/dev/null || beacon_die "nvm: install the Node in .nvmrc: nvm install"
+  if ! nvm use >/dev/null 2>&1; then
+    # Upstream bumps .nvmrc on most releases; fetch it instead of failing.
+    beacon_log "installing Node $(cat .nvmrc) via nvm..."
+    nvm install >/dev/null || beacon_die "nvm install failed"
+    nvm use >/dev/null
+  fi
 
   # nvm's Node ships corepack but no pnpm binary, and package scripts call
   # `pnpm` by name, so `corepack pnpm install` alone fails halfway through.
@@ -59,25 +64,29 @@ beacon_setup_node() {
   export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 }
 
+# Never install with CI=true: pnpm 11 derives settings such as
+# enableGlobalVirtualStore from CI, so a CI install fails verifyDepsBeforeRun
+# on every later non-CI `pnpm run`.
+#
 # node_modules can end up stripped (no .bin) or out of sync with the lockfile;
 # either way the app won't build or start.
 beacon_ensure_deps() {
   if [ ! -x node_modules/.bin/electron ] || [ ! -x node_modules/.bin/rolldown ]; then
     beacon_log "dependencies missing, running pnpm install (first run is slow)..."
-    CI=true pnpm install --frozen-lockfile
+    pnpm install --config.confirm-modules-purge=false --frozen-lockfile
     return
   fi
   # Editing package.json invalidates pnpm's verifyDepsBeforeRun check, and it
   # cannot prompt non-interactively. Reconcile instead of failing later.
   if ! pnpm run --silent get-expire-time >/dev/null 2>&1; then
     beacon_log "lockfile out of date, reconciling..."
-    CI=true pnpm install
+    pnpm install --config.confirm-modules-purge=false
   fi
   # An install from a different environment (e.g. a host pnpm) can leave the
   # native bindings for the wrong platform/libc. Load them to be sure.
   if ! beacon_native_ok; then
     beacon_log "native bindings missing or wrong platform, reinstalling..."
-    CI=true pnpm install --force --frozen-lockfile
+    pnpm install --config.confirm-modules-purge=false --force --frozen-lockfile
     beacon_native_ok || beacon_die "native bindings still fail to load — see output above"
   fi
 }

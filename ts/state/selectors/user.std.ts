@@ -44,19 +44,19 @@ export const getUserPNI = createSelector(
   (state: UserStateType): PniString | undefined => state.ourPni
 );
 
-export const areWePrimaryDevice = createSelector(
+export const getAreWePrimaryDevice = createSelector(
   getUserDeviceId,
   (deviceId: number | undefined): boolean => deviceId === 1
+);
+
+export const getDoWeHaveOtherDevices = createSelector(
+  getAreWePrimaryDevice,
+  (areWePrimaryDevice: boolean): boolean => !areWePrimaryDevice
 );
 
 export const getIntl = createSelector(
   getUser,
   (state: UserStateType): LocalizerType => state.i18n
-);
-
-export const getInteractionMode = createSelector(
-  getUser,
-  (state: UserStateType) => state.interactionMode
 );
 
 export const getPlatform = createSelector(
@@ -93,9 +93,4 @@ export const getIsMainWindowMaximized = createSelector(
 export const getIsMainWindowFullScreen = createSelector(
   getUser,
   (state: UserStateType): boolean => state.isMainWindowFullScreen
-);
-
-export const getIsMacOS = createSelector(
-  getPlatform,
-  (platform: string): boolean => platform === 'darwin'
 );

@@ -79,7 +79,7 @@ export function toRootKeyBytes(rootKey: string): Uint8Array<ArrayBuffer> {
 }
 
 export function fromRootKeyBytes(rootKey: Uint8Array<ArrayBuffer>): string {
-  return CallLinkRootKey.fromBytes(rootKey as Buffer<ArrayBuffer>).toString();
+  return CallLinkRootKey.fromBytes(rootKey).toUnredactedString();
 }
 
 /**
@@ -146,6 +146,7 @@ export function defunctCallLinkFromRecord(
     roomId: record.roomId,
     rootKey,
     adminKey,
+    addedAt: record.addedAt,
     storageID: record.storageID || undefined,
     storageVersion: record.storageVersion || undefined,
     storageUnknownFields: record.storageUnknownFields || undefined,
@@ -168,6 +169,7 @@ export function defunctCallLinkToRecord(
     roomId: defunctCallLink.roomId,
     rootKey,
     adminKey,
+    addedAt: defunctCallLink.addedAt,
     storageID: defunctCallLink.storageID || null,
     storageVersion: defunctCallLink.storageVersion || null,
     storageUnknownFields: defunctCallLink.storageUnknownFields || null,

@@ -7,7 +7,7 @@ import type { z } from 'zod';
 import { createLogger } from '../logging/log.std.ts';
 import * as Errors from '../types/errors.std.ts';
 
-import { isStory } from './helpers.std.ts';
+import { isIncomingStory, isStory } from './helpers.std.ts';
 import { getAuthor } from './sources.preload.ts';
 import { messageHasPaymentEvent } from './payments.std.ts';
 import { getMessageIdForLogging } from '../util/idForLogging.preload.ts';
@@ -48,9 +48,10 @@ import { isAciString } from '../util/isAciString.std.ts';
 import { copyFromQuotedMessage } from './copyQuote.preload.ts';
 import { findStoryMessage } from '../util/findStoryMessage.preload.ts';
 import { getValidLinkPreviews } from '../util/getValidLinkPreviews.node.ts';
+import { getStoryExpirationStartTimestamp } from '../util/expirationTimer.std.ts';
 import { normalizeServiceId } from '../types/ServiceId.std.ts';
 import { BodyRange, trimMessageWhitespace } from '../types/BodyRange.std.ts';
-import { hydrateStoryContext } from '../util/hydrateStoryContext.preload.ts';
+import { getStoryReplyContext } from '../util/getStoryReplyContext.std.ts';
 import { isMessageEmpty } from '../util/isMessageEmpty.preload.ts';
 import { isValidTapToView } from '../util/isValidTapToView.std.ts';
 import { getNotificationTextForMessage } from '../util/getNotificationTextForMessage.preload.ts';
@@ -78,6 +79,7 @@ import type {
 import type { ServiceIdString } from '../types/ServiceId.std.ts';
 import { getCachedSubscriptionConfiguration } from '../util/subscriptionConfiguration.preload.ts';
 import { itemStorage } from '../textsecure/Storage.preload.ts';
+import { canConversationBeUnarchived } from '../util/canConversationBeUnarchived.preload.ts';
 
 const { isNumber } = lodash;
 
@@ -322,7 +324,7 @@ export async function handleDataMessage(
     // Drop an incoming GroupV2 message if we or the sender are not part of the group
     //   after applying the message's associated group changes.
     if (
-      type === 'incoming' &&
+      (type === 'incoming' || isIncomingStory(message.attributes, ourAci)) &&
       !isDirectConversation(conversation.attributes) &&
       hasGroupV2Prop &&
       (!areWeMember ||
@@ -497,9 +499,7 @@ export async function handleDataMessage(
       storyId: storyQuote?.id,
     };
 
-    // There are type conflicts between ModelAttributesType and protos passed in here
-    // oxlint-disable-next-line typescript/no-explicit-any
-    const dataMessage = await upgradeMessageSchema(withQuoteReference as any);
+    const dataMessage = await upgradeMessageSchema(withQuoteReference);
 
     const isGroupStoryReply =
       isGroup(conversation.attributes) && dataMessage.storyId;
@@ -520,8 +520,11 @@ export async function handleDataMessage(
         );
       }
 
-      const ourPni = itemStorage.user.getCheckedPni();
-      const ourServiceIds = new Set<ServiceIdString>([ourAci, ourPni]);
+      const ourPni = itemStorage.user.getOptionalPni();
+      const ourServiceIds = new Set<ServiceIdString>([ourAci]);
+      if (ourPni != null) {
+        ourServiceIds.add(ourPni);
+      }
 
       // oxlint-disable-next-line no-param-reassign
       message = window.MessageCache.register(message);
@@ -576,13 +579,10 @@ export async function handleDataMessage(
             }
           : undefined,
         storyId: dataMessage.storyId,
+        storyReplyContext: storyQuote
+          ? getStoryReplyContext(storyQuote)
+          : undefined,
       });
-
-      if (storyQuote) {
-        await hydrateStoryContext(message.id, storyQuote, {
-          shouldSave: true,
-        });
-      }
 
       const isSupported = !isUnsupportedMessage(message.attributes);
       if (!isSupported) {
@@ -625,7 +625,10 @@ export async function handleDataMessage(
           if (isStory(message.attributes)) {
             log.info(`${idLog}: Starting story expiration`);
             message.set({
-              expirationStartTimestamp: dataMessage.timestamp,
+              expirationStartTimestamp: getStoryExpirationStartTimestamp({
+                timestamp: dataMessage.timestamp,
+                serverTimestamp: dataMessage.serverTimestamp,
+              }),
             });
           }
         }
@@ -682,8 +685,9 @@ export async function handleDataMessage(
 
         if (initialMessage.profileKey) {
           const { profileKey } = initialMessage;
+          const ourE164 = itemStorage.user.getOptionalNumber();
           if (
-            source === itemStorage.user.getNumber() ||
+            (ourE164 != null && source === ourE164) ||
             sourceServiceId === itemStorage.user.getAci()
           ) {
             conversation.set({ profileSharing: true });
@@ -746,8 +750,10 @@ export async function handleDataMessage(
       message = window.MessageCache.register(message);
       conversation.incrementMessageCount();
 
-      // If we sent a message in a given conversation, unarchive it!
-      if (type === 'outgoing') {
+      if (
+        type === 'outgoing' &&
+        canConversationBeUnarchived(conversation.attributes)
+      ) {
         conversation.setArchived(false);
       }
 

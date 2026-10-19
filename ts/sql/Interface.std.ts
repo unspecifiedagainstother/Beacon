@@ -55,6 +55,11 @@ import type {
   GroupSendMemberEndorsementRecord,
 } from '../types/GroupSendEndorsements.std.ts';
 import type { SyncTaskType } from '../util/syncTasks.preload.ts';
+import type {
+  UnreadMessageTimeRange,
+  UnreadReminderConversationCandidate,
+  UnreadReminderSummaryData,
+} from './server/unreadReminders.std.ts';
 import type { AttachmentBackupJobType } from '../types/AttachmentBackup.std.ts';
 import type { AttachmentType } from '../types/Attachment.std.ts';
 import type { MediaItemMessageType } from '../types/MediaItem.std.ts';
@@ -589,7 +594,7 @@ export type PageMessagesResultType = Readonly<{
 export type PageBackupMessagesCursorType = Readonly<{
   __page_backup_messages_cursor: never;
 
-  nextRowid: number;
+  lastRowId: number;
   done: boolean;
 }>;
 
@@ -772,6 +777,7 @@ export const MESSAGE_ATTACHMENT_COLUMNS = [
   'copiedFromQuotedAttachment',
   'version',
   'pending',
+  'audioWaveform',
 ] as const satisfies Array<keyof MessageAttachmentDBType>;
 
 export type MessageAttachmentDBType = {
@@ -831,6 +837,7 @@ export type MessageAttachmentDBType = {
   wasTooBig: 1 | 0 | null;
   pending: 1 | 0 | null;
   copiedFromQuotedAttachment: 1 | 0 | null;
+  audioWaveform: Uint8Array<ArrayBuffer> | null;
 };
 
 // Test to make sure that MESSAGE_ATTACHMENT_COLUMNS &
@@ -928,6 +935,13 @@ type ReadableInterface = {
       includeStoryReplies: boolean;
     }
   ) => number;
+  getUnremindedUnreadMessageTimeRanges: (
+    conversations: ReadonlyArray<UnreadReminderConversationCandidate>
+  ) => ReadonlyArray<UnreadMessageTimeRange>;
+  getUnreadReminderSummaryData: (
+    conversationId: string,
+    options: { includeStoryReplies: boolean; ourAci: AciString }
+  ) => UnreadReminderSummaryData;
   getTotalUnreadMentionsOfMeForConversation: (
     conversationId: string,
     options: {
@@ -999,7 +1013,7 @@ type ReadableInterface = {
   }) => MessageType | undefined;
   getAllCallHistory: () => ReadonlyArray<CallHistoryDetails>;
   getCallHistoryUnreadCallConversationIds: () => ReadonlyArray<string>;
-  getCallHistoryUnreadCount: () => number;
+  getCallHistoryUnreadCountsByConversationId: () => Record<string, number>;
   getCallHistoryMessageByCallId: (options: {
     conversationId: string;
     callId: string;
@@ -1022,14 +1036,21 @@ type ReadableInterface = {
     receivedAt: number
   ) => string | null;
   callLinkExists: (roomId: string) => boolean;
-  defunctCallLinkExists: (roomId: string) => boolean;
   getAllCallLinks: () => ReadonlyArray<CallLinkType>;
   getCallLinkByRoomId: (roomId: string) => CallLinkType | undefined;
   getCallLinkRecordByRoomId: (roomId: string) => CallLinkRecord | undefined;
+  getDefunctCallLinkByRoomId: (
+    roomId: string
+  ) => DefunctCallLinkType | undefined;
   getAllAdminCallLinks: () => ReadonlyArray<CallLinkType>;
-  getAllCallLinkRecordsWithAdminKey: () => ReadonlyArray<CallLinkRecord>;
-  getAllDefunctCallLinksWithAdminKey: () => ReadonlyArray<DefunctCallLinkType>;
-  getAllMarkedDeletedCallLinkRoomIds: () => ReadonlyArray<string>;
+  getAllCallLinkRecordsForStorageService: () => ReadonlyArray<CallLinkRecord>;
+  getAllDefunctCallLinksForStorageService: () => ReadonlyArray<DefunctCallLinkType>;
+  getTimestampOfOldestDefunctCallLink: () =>
+    | { roomId: string; addedAt: number }
+    | undefined;
+  getTimestampOfOldestDeletedCallLink():
+    | { roomId: string; deletedAt: number }
+    | undefined;
   getMessagesBetween: (
     conversationId: string,
     options: GetMessagesBetweenOptions
@@ -1319,15 +1340,19 @@ type WritableInterface = {
     roomId: string,
     callLinkState: CallLinkStateType
   ) => CallLinkType;
-  beginDeleteAllCallLinks: () => boolean;
-  beginDeleteCallLink: (roomId: string) => boolean;
+  markAllCallLinksDeleted: () => boolean;
+  markCallLinkDeleted: (roomId: string, deletedAt: number) => boolean;
+  deleteCallLink: (roomId: string) => boolean;
+  deleteDefunctCallLink: (roomId: string) => boolean;
   deleteCallHistoryByRoomId: (roomid: string) => void;
   deleteCallLinkAndHistory: (roomId: string) => void;
-  finalizeDeleteCallLink: (roomId: string) => void;
+  deleteExpiredDefunctCallLinks(
+    messageQueueTime: number
+  ): ReadonlyArray<string>;
+  deleteExpiredCallLinks(messageQueueTime: number): ReadonlyArray<string>;
   _removeAllCallLinks: () => void;
   insertDefunctCallLink: (defunctCallLink: DefunctCallLinkType) => void;
   updateDefunctCallLink: (defunctCallLink: DefunctCallLinkType) => void;
-  deleteCallLinkFromSync: (roomId: string) => void;
   migrateConversationMessages: (obsoleteId: string, currentId: string) => void;
   saveEditedMessage: (
     mainMessage: ReadonlyDeep<MessageType>,
@@ -1431,6 +1456,7 @@ type WritableInterface = {
   ) => { wasPreviouslyUninstalled: boolean; position?: number };
   // Returns `true` if sticker pack was not previously uninstalled
   uninstallStickerPack: (packId: string, timestamp: number) => boolean;
+  removeUninstalledStickerPack: (packId: string) => void;
   clearAllErrorStickerPackAttempts: () => void;
 
   updateEmojiUsage: (emoji: Emoji.Parent, lastUsedAt: number) => void;
@@ -1497,6 +1523,7 @@ type WritableInterface = {
   deleteExpiredChatFolders: (
     messageQueueTime: number
   ) => ReadonlyArray<ChatFolderId>;
+  deleteChatFolderById: (id: ChatFolderId) => void;
 
   createMegaphone: (megaphone: RemoteMegaphoneType) => void;
   updateMegaphone: (megaphone: RemoteMegaphoneType) => void;
@@ -1563,11 +1590,13 @@ export type ServerReadableDirectInterface = ReadableInterface & {
     conversationId,
     options,
     contactServiceIdsMatchingQuery,
+    filterByUnread,
   }: {
     query: string;
     conversationId?: string;
     options?: { limit?: number };
     contactServiceIdsMatchingQuery?: Array<ServiceIdString>;
+    filterByUnread: boolean;
   }) => Array<ServerSearchResultMessageType>;
 
   getRecentStoryReplies: (
@@ -1696,11 +1725,13 @@ export type ClientOnlyReadableInterface = ClientInterfaceWrap<{
     conversationId,
     options,
     contactServiceIdsMatchingQuery,
+    filterByUnread,
   }: {
     query: string;
     conversationId?: string;
     options?: { limit?: number };
     contactServiceIdsMatchingQuery?: Array<ServiceIdString>;
+    filterByUnread: boolean;
   }) => Array<ClientSearchResultMessageType>;
 
   getRecentStoryReplies: (

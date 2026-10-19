@@ -1,9 +1,17 @@
 // Copyright 2025 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import type { ReactNode, MouseEvent, FC, Ref } from 'react';
-import { useLayoutEffect, mergeRefs } from '@react-aria/utils';
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useLayoutEffect,
+} from 'react';
+import type { ReactNode, MouseEvent, FC, Ref, CSSProperties } from 'react';
+import { mergeRefs } from '@react-aria/utils';
 import { computeAccessibleName } from 'dom-accessibility-api';
+import { Slot } from 'radix-ui';
 import { tw } from './tw.dom.tsx';
 import { assert } from './_internal/assert.std.tsx';
 import {
@@ -11,6 +19,7 @@ import {
   useStrictContext,
 } from './_internal/StrictContext.dom.tsx';
 import { isTestOrMockEnvironment } from '../environment.std.ts';
+import { forwardExtraPropsForRadix } from './_internal/props.dom.tsx';
 
 /**
  * Makes an arbitrary region clickable as a single accessible button, while
@@ -65,6 +74,7 @@ export namespace AriaClickable {
    */
 
   export type RootProps = Readonly<{
+    asChild?: boolean;
     /** Additional CSS classes applied to the container `<div>`. */
     className?: string;
     children: ReactNode;
@@ -75,6 +85,7 @@ export namespace AriaClickable {
    * and `data-focused` attributes driven by the `HiddenTrigger` state.
    */
   export const Root: FC<RootProps> = memo(props => {
+    const Comp = props.asChild ? Slot.Root : 'div';
     const [hovered, setHovered] = useState(INITIAL_TRIGGER_STATE.hovered);
     const [pressed, setPressed] = useState(INITIAL_TRIGGER_STATE.pressed);
     const [focused, setFocused] = useState(INITIAL_TRIGGER_STATE.focused);
@@ -87,7 +98,7 @@ export namespace AriaClickable {
 
     return (
       <TriggerStateUpdateContext.Provider value={handleTriggerStateUpdate}>
-        <div
+        <Comp
           // oxlint-disable-next-line better-tailwindcss/no-restricted-classes
           className={tw('relative!', props.className)}
           // For styling based on the HiddenTrigger state.
@@ -96,7 +107,7 @@ export namespace AriaClickable {
           data-pressed={pressed ? true : null}
         >
           {props.children}
-        </div>
+        </Comp>
       </TriggerStateUpdateContext.Provider>
     );
   });
@@ -155,8 +166,8 @@ export namespace AriaClickable {
    */
 
   export type DeadAreaProps = Readonly<{
-    /** Additional CSS classes for sizing/positioning the dead area. */
     className?: string;
+    style?: CSSProperties;
     children: ReactNode;
   }>;
 
@@ -168,10 +179,15 @@ export namespace AriaClickable {
    * more nested widgets.
    */
   export const DeadArea: FC<DeadAreaProps> = memo(props => {
+    const { className, style, children, ...rest } = props;
     return (
-      // oxlint-disable-next-line better-tailwindcss/no-restricted-classes
-      <div className={tw('relative! z-20!', props.className)}>
-        {props.children}
+      <div
+        // oxlint-disable-next-line better-tailwindcss/no-restricted-classes
+        className={tw('relative! z-20!', className)}
+        style={style}
+        {...forwardExtraPropsForRadix(rest)}
+      >
+        {children}
       </div>
     );
   });
@@ -201,6 +217,8 @@ export namespace AriaClickable {
      */
     labelledby?: string;
 
+    disabled?: boolean;
+
     /** Called when the button is clicked. */
     onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   }>;
@@ -215,7 +233,7 @@ export namespace AriaClickable {
    *   before any <AriaClickable.SubWidget>.
    */
   export const HiddenTrigger: FC<HiddenTriggerProps> = memo(props => {
-    const { onClick } = props;
+    const { ref, label, labelledby, disabled, onClick, ...rest } = props;
 
     const innerRef = useRef<HTMLButtonElement>(null);
     const onTriggerStateUpdate = useStrictContext(TriggerStateUpdateContext);
@@ -231,9 +249,11 @@ export namespace AriaClickable {
 
       function update() {
         onTriggerStateUpdateRef.current({
-          hovered: button.matches(':hover:not(:disabled)'),
-          pressed: button.matches(':active:not(:disabled)'),
-          focused: button.matches('.keyboard-mode :focus'),
+          hovered: button.matches(':hover:not(:disabled,[aria-disabled=true])'),
+          pressed: button.matches(
+            ':active:not(:disabled,[aria-disabled=true])'
+          ),
+          focused: button.matches(':focus-visible'),
         });
       }
 
@@ -280,19 +300,25 @@ export namespace AriaClickable {
     const handleClick = useCallback(
       (event: MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
+        if (disabled) {
+          event.preventDefault();
+          return;
+        }
         onClick(event);
       },
-      [onClick]
+      [disabled, onClick]
     );
 
     return (
       <button
-        ref={mergeRefs(props.ref, innerRef)}
+        ref={mergeRefs(ref, innerRef)}
         type="button"
-        aria-label={props.label}
-        aria-labelledby={props.labelledby}
+        aria-label={label}
+        aria-labelledby={labelledby}
+        aria-disabled={disabled}
         onClick={handleClick}
-        className={tw('absolute inset-0 z-10 outline-none')}
+        className={tw('absolute inset-0 z-10', 'focus-visible:outline-none')}
+        {...forwardExtraPropsForRadix(rest)}
       />
     );
   });

@@ -89,6 +89,7 @@ export const PinnedMessagesBar = memo(function PinnedMessagesBar(
 ) {
   const { i18n, pins, current, onCurrentChange } = props;
 
+  // oxlint-disable-next-line react/preserve-manual-memoization
   const currentEntry = useMemo(() => {
     if (current == null) {
       return null;
@@ -239,7 +240,7 @@ function Row(props: { children: ReactNode }) {
         'contain-strict',
         'flex h-14 items-center pe-3',
         'rounded-xs',
-        'outline-none data-focused:axo-focus-ring'
+        'data-focused:axo-focus-ring'
       )}
     >
       {props.children}
@@ -327,7 +328,8 @@ function TabTrigger(props: {
         pinNumber: props.pinNumber,
       })}
       className={tw(
-        'group flex-1 px-[7px] outline-none',
+        'group flex-1 px-[7px]',
+        'not-forced-colors:focus-visible:outline-none',
         props.pinsCount === 3 ? 'py-px' : 'py-0.5'
       )}
     >
@@ -336,7 +338,7 @@ function TabTrigger(props: {
           'block h-full w-0.5 rounded-full',
           'bg-(--axo-color-label-disabled)',
           'group-data-[state=active]:bg-(--axo-color-label-primary)',
-          'keyboard-mode:group-focus:axo-focus-ring'
+          'group-focus-visible:axo-focus-ring'
         )}
       />
     </Tabs.Trigger>
@@ -439,7 +441,10 @@ function PinActionsMenu(props: {
               {i18n('icu:PinnedMessagesBar__ActionsMenu__UnpinMessage')}
             </AxoDropdownMenu.Item>
           )}
-          <AxoDropdownMenu.Item symbol="message-arrow" onSelect={handlePinGoTo}>
+          <AxoDropdownMenu.Item
+            symbol="message-arrow-forward"
+            onSelect={handlePinGoTo}
+          >
             {i18n('icu:PinnedMessagesBar__ActionsMenu__GoToMessage')}
           </AxoDropdownMenu.Item>
           <AxoDropdownMenu.Item
@@ -482,7 +487,7 @@ function ImageThumbnail(props: { url: string }) {
 }
 
 type PreviewIcon = Readonly<{
-  symbol: AxoSymbol.InlineGlyphName;
+  symbol: AxoSymbol.Name;
   label: string;
 }>;
 

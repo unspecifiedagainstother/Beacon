@@ -3,7 +3,14 @@
 
 import { FocusScope } from 'react-aria';
 import type { UIEvent, JSX, KeyboardEvent as ReactKeyboardEvent } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useState,
+} from 'react';
+import { tinykeys } from 'tinykeys';
 import classNames from 'classnames';
 import type { DraftBodyRanges } from '../types/BodyRange.std.ts';
 import type { LocalizerType } from '../types/Util.std.ts';
@@ -209,6 +216,7 @@ export function StoryViewer({
   );
 
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect
     setCurrentViewTarget(viewTarget ?? null);
   }, [viewTarget]);
 
@@ -235,12 +243,14 @@ export function StoryViewer({
   >({});
 
   const caption = useMemo(() => {
-    if (!attachment?.caption) {
+    const value = attachment?.caption;
+
+    if (!value) {
       return;
     }
 
     return graphemeAndLinkAwareSlice(
-      attachment.caption,
+      value,
       hasExpandedCaption ? CAPTION_MAX_LENGTH : CAPTION_INITIAL_LENGTH,
       CAPTION_BUFFER
     );
@@ -248,9 +258,13 @@ export function StoryViewer({
 
   // Reset expansion if messageId changes
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect
     setHasExpandedCaption(false);
     setIsSpoilerExpanded({});
-  }, [messageId]);
+  }, [
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
+    messageId,
+  ]);
 
   // messageId is set as a dependency so that we can reset the story duration
   // when a new story is selected in case the same story (and same attachment)
@@ -277,7 +291,11 @@ export function StoryViewer({
     return () => {
       shouldCancel = true;
     };
-  }, [attachment, messageId]);
+  }, [
+    attachment,
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
+    messageId,
+  ]);
 
   // This guarantees that we'll have a valid ref to the animation when we need it
   strictAssert(currentIndex != null, "StoryViewer: currentIndex can't be null");
@@ -293,6 +311,7 @@ export function StoryViewer({
         setLongPress(true);
       }, 200);
     } else {
+      // oxlint-disable-next-line react/set-state-in-effect
       setLongPress(false);
     }
     return () => {
@@ -304,12 +323,14 @@ export function StoryViewer({
 
   useEffect(() => {
     if (!isWindowActive) {
+      // oxlint-disable-next-line react/set-state-in-effect
       setPauseStory(true);
     }
   }, [isWindowActive]);
 
   // Reset the stuff that pauses a story when you switch story views
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect
     setConfirmDeleteStory(undefined);
     setHasConfirmHideStory(false);
     setHasExpandedCaption(false);
@@ -317,7 +338,10 @@ export function StoryViewer({
     setIsShowingContextMenu(false);
     setPauseStory(false);
     setStoryDuration(undefined);
-  }, [story.messageId]);
+  }, [
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
+    story.messageId,
+  ]);
 
   const alertElement = renderAlert();
 
@@ -354,49 +378,51 @@ export function StoryViewer({
       currentIndex < numStories - 1) ||
     canFreelyNavigateStories;
 
-  const navigateStories = useCallback(
-    (ev: KeyboardEvent) => {
-      // the replies modal can consume arrow keys
-      // we don't want to navigate while someone is typing a reply
-      if (currentViewTarget != null) {
-        return;
-      }
+  function handleNavigatDirectionShortcut(
+    event: KeyboardEvent,
+    canNavigateInDirection: boolean,
+    viewDirection: StoryViewDirectionType
+  ) {
+    if (currentViewTarget != null) {
+      return;
+    }
 
-      if (canNavigateRight && ev.key === arrow('end')) {
-        viewStory({
-          storyId: story.messageId,
-          storyViewMode,
-          viewDirection: StoryViewDirectionType.Next,
-        });
-        ev.preventDefault();
-        ev.stopPropagation();
-      } else if (canNavigateLeft && ev.key === arrow('start')) {
-        viewStory({
-          storyId: story.messageId,
-          storyViewMode,
-          viewDirection: StoryViewDirectionType.Previous,
-        });
-        ev.preventDefault();
-        ev.stopPropagation();
-      }
-    },
-    [
-      currentViewTarget,
-      canNavigateLeft,
-      canNavigateRight,
-      story.messageId,
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!canNavigateInDirection) {
+      return;
+    }
+
+    viewStory({
+      storyId: story.messageId,
       storyViewMode,
-      viewStory,
-    ]
-  );
+      viewDirection,
+    });
+  }
+
+  const onNavigateNextShortcut = useEffectEvent((event: KeyboardEvent) => {
+    handleNavigatDirectionShortcut(
+      event,
+      canNavigateRight,
+      StoryViewDirectionType.Next
+    );
+  });
+
+  const onNavigatePrevShortcut = useEffectEvent((event: KeyboardEvent) => {
+    handleNavigatDirectionShortcut(
+      event,
+      canNavigateLeft,
+      StoryViewDirectionType.Previous
+    );
+  });
 
   useEffect(() => {
-    document.addEventListener('keydown', navigateStories);
-
-    return () => {
-      document.removeEventListener('keydown', navigateStories);
-    };
-  }, [navigateStories]);
+    return tinykeys(window, {
+      [arrow('start')]: onNavigatePrevShortcut,
+      [arrow('end')]: onNavigateNextShortcut,
+    });
+  }, []);
 
   const groupId = group?.id;
   const isGroupStory = Boolean(groupId);

@@ -80,8 +80,11 @@
     display: flex;
     height: 40px;
     justify-content: center;
-    outline: none;
     width: 40px;
+
+    &:focus-visible {
+      @include mixins.axo-focus-ring;
+    }
 
     &__container {
       border-radius: 40px;
@@ -93,17 +96,8 @@
     &--accept-video-as-audio {
       background-color: variables.$color-gray-45;
 
-      &:focus {
-        outline: none;
-        @include mixins.keyboard-mode {
-          @include mixins.axo-focus-ring;
-        }
-      }
-
-      @include mixins.mouse-mode {
-        &:hover {
-          box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-        }
+      &:hover {
+        box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
       }
 
       div {
@@ -121,17 +115,8 @@
     &--accept-video {
       background-color: variables.$color-accent-green;
 
-      &:focus {
-        outline: none;
-        @include mixins.keyboard-mode {
-          @include mixins.axo-focus-ring;
-        }
-      }
-
-      @include mixins.mouse-mode {
-        &:hover {
-          box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-        }
+      &:hover {
+        box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
       }
 
       div {
@@ -149,17 +134,8 @@
     &--accept-audio {
       background-color: variables.$color-accent-green;
 
-      &:focus {
-        outline: none;
-        @include mixins.keyboard-mode {
-          @include mixins.axo-focus-ring;
-        }
-      }
-
-      @include mixins.mouse-mode {
-        &:hover {
-          box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-        }
+      &:hover {
+        box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
       }
 
       div {
@@ -177,17 +153,8 @@
     &--decline {
       background-color: variables.$color-accent-red;
 
-      &:focus {
-        outline: none;
-        @include mixins.keyboard-mode {
-          @include mixins.axo-focus-ring;
-        }
-      }
-
-      @include mixins.mouse-mode {
-        &:hover {
-          box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
-        }
+      &:hover {
+        box-shadow: 0px 0px 0px 2px variables.$color-ultramarine;
       }
 
       div {

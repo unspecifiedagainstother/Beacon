@@ -8,6 +8,7 @@ import type {
   CallSummary,
   DeviceId,
   GroupCallObserver,
+  GroupCallSvcConfig,
   PeekInfo,
   UserId,
   VideoFrameSource,
@@ -109,6 +110,7 @@ import {
   makeSfuRequest,
 } from '../textsecure/WebAPI.preload.ts';
 import { missingCaseError } from '../util/missingCaseError.std.ts';
+import { getNotifyWhileMutedForConversation } from '../util/notifyWhileMuted.preload.ts';
 import { normalizeGroupCallTimestamp } from '../util/ringrtc/normalizeGroupCallTimestamp.std.ts';
 import { requestCameraPermissions } from '../util/callingPermissions.dom.ts';
 import {
@@ -121,6 +123,8 @@ import {
   REQUESTED_SCREEN_SHARE_WIDTH,
   REQUESTED_SCREEN_SHARE_HEIGHT,
   REQUESTED_SCREEN_SHARE_FRAMERATE,
+  SVC_DEFAULT_MODE,
+  SVC_DEFAULT_MODE_FOR_SCREENSHARE,
 } from '../calling/constants.std.ts';
 import { callingMessageToProto } from '../util/callingMessageToProto.node.ts';
 import { requestMicrophonePermissions } from '../util/requestMicrophonePermissions.dom.ts';
@@ -341,7 +345,7 @@ function maybeShowCallQualitySurvey(
   const lastFailureSurveyTime =
     itemStorage.get('lastCallQualityFailureSurveyTime') ?? null;
   const cqsTestMode = itemStorage.get('cqsTestMode') ?? false;
-  const ourE164 = itemStorage.user.getNumber();
+  const ourE164 = itemStorage.user.getOptionalNumber();
 
   if (
     !shouldShowCallQualitySurvey({
@@ -920,7 +924,7 @@ class CallingClass {
 
     log.info(`${logId}: success`);
     const state = callLinkStateFromRingRTC(result.value);
-    const maybeUpdatedRootKey = result.value.rootKey.toString();
+    const maybeUpdatedRootKey = result.value.rootKey.toUnredactedString();
 
     const callLink: CallLinkType = {
       roomId: roomIdHex,
@@ -1457,12 +1461,24 @@ class CallingClass {
     let isRequestingMembershipProof = false;
     const config = this.#getRemoteAndOverrideConfigValues();
 
+    const svcConfig: GroupCallSvcConfig | undefined =
+      config.isGroupSvcEnabled === true
+        ? {
+            mode: config.groupSvcMode ?? SVC_DEFAULT_MODE,
+            modeForScreenshare:
+              config.groupSvcModeForScreenshare ??
+              SVC_DEFAULT_MODE_FOR_SCREENSHARE,
+            maxBitrateBps: config.groupMaxBitrate,
+          }
+        : undefined;
+
     const outerGroupCall = RingRTC.getGroupCall(
       groupIdBuffer,
       this.sfuUrl,
       new Uint8Array(),
       AUDIO_LEVEL_INTERVAL_MS,
       config.dredDuration,
+      svcConfig,
       {
         ...this.#getGroupCallObserver(conversationId, CallMode.Group),
         async requestMembershipProof(groupCall) {
@@ -1536,6 +1552,17 @@ class CallingClass {
     }
     const config = this.#getRemoteAndOverrideConfigValues();
 
+    const svcConfig: GroupCallSvcConfig | undefined =
+      config.isGroupSvcEnabled === true
+        ? {
+            mode: config.groupSvcMode ?? SVC_DEFAULT_MODE,
+            modeForScreenshare:
+              config.groupSvcModeForScreenshare ??
+              SVC_DEFAULT_MODE_FOR_SCREENSHARE,
+            maxBitrateBps: config.groupMaxBitrate,
+          }
+        : undefined;
+
     const outerGroupCall = RingRTC.getCallLinkCall(
       this.sfuUrl,
       endorsementsPublicKey,
@@ -1545,6 +1572,7 @@ class CallingClass {
       new Uint8Array(),
       AUDIO_LEVEL_INTERVAL_MS,
       config.dredDuration,
+      svcConfig,
       this.#getGroupCallObserver(roomId, CallMode.Adhoc)
     );
 
@@ -2751,13 +2779,12 @@ class CallingClass {
         absolutePath = result.absolutePath;
       }
 
-      notificationService.notify({
+      notificationService.rawNotify({
         conversationId,
-        iconPath: absolutePath,
+        iconAbsolutePath: absolutePath ?? null,
         iconUrl: url,
-        message: i18n('icu:calling__presenting--notification-body'),
+        body: i18n('icu:calling__presenting--notification-body'),
         type: NotificationType.IsPresenting,
-        sentAt: 0,
         silent: true,
         title: i18n('icu:calling__presenting--notification-title'),
       });
@@ -2822,15 +2849,12 @@ class CallingClass {
 
       const { url, absolutePath } = await conversation.getAvatarOrIdenticon();
 
-      notificationService.notify({
+      notificationService.rawNotify({
         conversationId,
-        iconPath: absolutePath,
+        iconAbsolutePath: absolutePath ?? null,
         iconUrl: url,
-        message: i18n(
-          'icu:calling__presenting--reconnecting--notification-body'
-        ),
+        body: i18n('icu:calling__presenting--reconnecting--notification-body'),
         type: NotificationType.IsPresenting,
-        sentAt: 0,
         silent: true,
         title: i18n(
           'icu:calling__presenting--reconnecting--notification-title'
@@ -3423,6 +3447,11 @@ class CallingClass {
       return;
     }
 
+    if (!conversation.getAccepted({ ignoreEmptyConvo: true })) {
+      log.warn(`${logId}: conversation has not been accepted`);
+      return;
+    }
+
     const ourAci = itemStorage.user.getCheckedAci();
 
     if (conversation.get('left') || !conversation.hasMember(ourAci)) {
@@ -3457,6 +3486,13 @@ class CallingClass {
         RingRTC.cancelGroupRing(groupIdBytes, ringId, null);
       } else if (this.#areAnyCallsActiveOrRinging()) {
         RingRTC.cancelGroupRing(groupIdBytes, ringId, RingCancelReason.Busy);
+      } else if (
+        conversation.isMuted() &&
+        !getNotifyWhileMutedForConversation(conversation.attributes).calls
+      ) {
+        log.info(
+          `${logId}: not notifying for calls while muted. Ignoring ring request`
+        );
       } else if (getIncomingCallNotification()) {
         shouldRing = true;
       } else {
@@ -3590,6 +3626,31 @@ class CallingClass {
       log.warn(`${logId}: ${conversation.idForLogging()} is blocked`);
       return false;
     }
+
+    if (
+      conversation.isMuted() &&
+      !getNotifyWhileMutedForConversation(conversation.attributes).calls
+    ) {
+      log.info(`${logId}: not notifying for calls while muted, ignoring`);
+
+      const eventTimestamp = Date.now();
+      const callEvent = getCallEventDetails({
+        callDetails: getCallDetailsFromDirectCall({
+          peerId: getPeerIdFromConversation(conversation.attributes),
+          call,
+          eventTimestamp,
+        }),
+        event: LocalCallEvent.Missed,
+        eventSource: 'CallingClass.handleIncomingCall',
+        eventTimestamp,
+      });
+      await updateCallHistoryFromLocalEvent({
+        callEvent,
+      });
+
+      return false;
+    }
+
     try {
       // The peer must be 'trusted' before accepting a call from them.
       // This is mostly the safety number check, unverified meaning that they were
@@ -3931,10 +3992,14 @@ class CallingClass {
 
   #getRemoteAndOverrideConfigValues(): {
     dredDuration: number | undefined;
-    isDirectVp9Enabled: boolean | undefined;
+    enableVp9Encode: boolean | undefined;
+    enableVp9Decode: boolean | undefined;
     directMaxBitrate: number | undefined;
-    isGroupVp9Enabled: boolean | undefined;
     groupMaxBitrate: number | undefined;
+    isGroupSvcEnabled: boolean | undefined;
+    groupSvcMode: string | undefined;
+    groupSvcModeForScreenshare: string | undefined;
+    callStatsIntervalSecs: number | undefined;
   } {
     function dredDuration(version: string): number | undefined {
       const override = itemStorage.get('dredDuration');
@@ -3963,6 +4028,34 @@ class CallingClass {
       return undefined;
     }
 
+    function isGroupSvcEnabled(): boolean {
+      return (
+        itemStorage.get('isGroupSvcEnabled') ??
+        RemoteConfig.isEnabled('desktop.calling.enableSvc')
+      );
+    }
+
+    function groupSvcMode(): string | undefined {
+      return (
+        itemStorage.get('groupSvcMode') ??
+        RemoteConfig.getValue('desktop.calling.svcMode')
+      );
+    }
+
+    function groupSvcModeForScreenshare(): string | undefined {
+      return (
+        itemStorage.get('groupSvcModeForScreenshare') ??
+        RemoteConfig.getValue('desktop.calling.svcModeForScreenshare')
+      );
+    }
+
+    function groupSvcMaxBitrateBps(): number | undefined {
+      return (
+        itemStorage.get('groupMaxBitrate') ??
+        tryParseInt(RemoteConfig.getValue('desktop.calling.svcMaxBitrateBps'))
+      );
+    }
+
     function tryParseInt(v: string | undefined): number | undefined {
       try {
         return parseIntOrThrow(v, 'invalid');
@@ -3975,10 +4068,14 @@ class CallingClass {
 
     return {
       dredDuration: dredDuration(version),
-      isDirectVp9Enabled: itemStorage.get('isDirectVp9Enabled'),
+      enableVp9Encode: itemStorage.get('enableVp9Encode'),
+      enableVp9Decode: itemStorage.get('enableVp9Decode'),
       directMaxBitrate: itemStorage.get('directMaxBitrate'),
-      isGroupVp9Enabled: itemStorage.get('isGroupVp9Enabled'),
-      groupMaxBitrate: itemStorage.get('directMaxBitrate'),
+      groupMaxBitrate: groupSvcMaxBitrateBps(),
+      isGroupSvcEnabled: isGroupSvcEnabled(),
+      groupSvcMode: groupSvcMode(),
+      groupSvcModeForScreenshare: groupSvcModeForScreenshare(),
+      callStatsIntervalSecs: itemStorage.get('callStatsIntervalSecs'),
     };
   }
 
@@ -4105,6 +4202,9 @@ class CallingClass {
       dataMode: DataMode.Normal,
       audioLevelsIntervalMillis: AUDIO_LEVEL_INTERVAL_MS,
       dredDuration: config.dredDuration,
+      enableVp9Encode: config.enableVp9Encode,
+      enableVp9Decode: config.enableVp9Decode,
+      callStatsIntervalSecs: config.callStatsIntervalSecs,
     };
 
     log.info('CallingClass.handleStartCall(): Proceeding');
@@ -4327,13 +4427,12 @@ class CallingClass {
       }
     }
 
-    notificationService.notify({
+    notificationService.rawNotify({
       conversationId: conversation.id,
-      iconPath: absolutePath,
-      iconUrl: url,
-      message: notificationMessage,
+      iconAbsolutePath: absolutePath ?? null,
+      iconUrl: url ?? null,
+      body: notificationMessage,
       type: NotificationType.IncomingGroupCall,
-      sentAt: 0,
       silent: false,
       title: notificationTitle,
     });
@@ -4344,11 +4443,7 @@ class CallingClass {
     title: string,
     isVideoCall: boolean
   ): Promise<void> {
-    const shouldNotify =
-      !window.SignalContext.activeWindowService.isActive() &&
-      itemStorage.get('call-system-notification', true);
-
-    if (!shouldNotify) {
+    if (window.SignalContext.activeWindowService.isActive()) {
       return;
     }
 
@@ -4387,15 +4482,14 @@ class CallingClass {
       }
     }
 
-    notificationService.notify({
+    notificationService.rawNotify({
       conversationId,
       title: notificationTitle,
-      iconPath: absolutePath,
-      iconUrl: url,
-      message: isVideoCall
+      iconAbsolutePath: absolutePath ?? null,
+      iconUrl: url ?? null,
+      body: isVideoCall
         ? i18n('icu:incomingVideoCall')
         : i18n('icu:incomingAudioCall'),
-      sentAt: 0,
       // The ringtone plays so we don't need sound for the notification
       silent: true,
       type: NotificationType.IncomingCall,
