@@ -366,7 +366,7 @@ export type AddonContext = {
     bodyClass: (className: string) => Disposer;
   };
 
-  /** Keyboard shortcuts, e.g. 'mod+shift+f'. Auto-disposed. */
+  /** Keyboard shortcuts, e.g. 'mod+alt+f'. Auto-disposed. */
   keybinds: {
     register: (combo: string, fn: (ev: KeyboardEvent) => void) => Disposer;
   };

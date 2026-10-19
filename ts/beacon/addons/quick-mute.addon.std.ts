@@ -8,18 +8,18 @@ import { getSelectedConversationId } from '../../state/selectors/nav.std.ts';
 import { isConversationMuted } from '../../util/isConversationMuted.std.ts';
 
 /**
- * Quick Mute — mod+m toggles mute via the real action.
+ * Quick Mute — mod+alt+m toggles mute via the real action.
  */
 export default {
   id: 'quick-mute',
   icon: ICON_QUICK_MUTE,
   name: 'Quick Mute',
   version: '2.0.0',
-  description: 'Ctrl/⌘+M toggles mute on the open conversation.',
+  description: 'Ctrl/⌘+Alt+M toggles mute on the open conversation.',
   authors: ['Beacon'],
   tags: ['utility'],
   start(ctx) {
-    ctx.keybinds.register('mod+m', () => {
+    ctx.keybinds.register('mod+alt+m', () => {
       const state = ctx.redux.getState();
       const conversationId = getSelectedConversationId(state);
       if (!conversationId) {

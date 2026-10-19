@@ -240,7 +240,7 @@ export default {
       );
     };
 
-    ctx.keybinds.register('mod+shift+l', () => openViewer());
+    ctx.keybinds.register('mod+alt+g', () => openViewer());
 
     ctx.commands.register({
       id: 'messagelog',
