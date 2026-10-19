@@ -10,6 +10,7 @@
  */
 
 import type { AddonManifest } from '../core/types.dom.ts';
+import { ICON_NOTIFICATION_FILTER } from './icons.std.ts';
 
 function parseList(value: string): Array<string> {
   return value
@@ -20,6 +21,7 @@ function parseList(value: string): Array<string> {
 
 export default {
   id: 'notification-filter',
+  icon: ICON_NOTIFICATION_FILTER,
   name: 'Notification Filter',
   version: '1.0.0',
   description:

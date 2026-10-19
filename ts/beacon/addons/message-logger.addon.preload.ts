@@ -25,6 +25,7 @@
  */
 
 import type { AddonContext, AddonManifest } from '../core/types.dom.ts';
+import { ICON_MESSAGE_LOGGER } from './icons.std.ts';
 import type { BeaconMessageLogEntry } from '../features.std.ts';
 import type { ReadonlyMessageAttributesType } from '../../model-types.d.ts';
 import {
@@ -65,6 +66,7 @@ function formatTime(ts: number): string {
 
 export default {
   id: 'message-logger',
+  icon: ICON_MESSAGE_LOGGER,
   name: 'Message Logger',
   version: '3.0.0',
   description:

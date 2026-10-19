@@ -414,16 +414,6 @@
   border: 1px solid var(--axo-color-border-primary);
   border-radius: 14px;
   background: var(--axo-color-surface-secondary);
-  transition: border-color 120ms ease-out;
-
-  &--enabled {
-    border-color: color-mix(in srgb, var(--beacon-accent) 50%, transparent);
-    background: color-mix(
-      in srgb,
-      var(--beacon-accent) 5%,
-      var(--axo-color-surface-secondary)
-    );
-  }
 
   &--expanded {
     grid-column: 1 / -1;
@@ -455,6 +445,16 @@
   .BeaconModules__card--enabled & {
     color: var(--beacon-accent-text);
     background: var(--beacon-accent-tint);
+  }
+
+  // SVG icons from the manifest are drawn as a mask so they take the
+  // current color (see ts/beacon/core/icons.std.ts).
+  &--svg::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    background-color: currentColor;
+    mask: var(--beacon-addon-icon) center / contain no-repeat;
   }
 }
 

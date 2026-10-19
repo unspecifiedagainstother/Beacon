@@ -12,6 +12,7 @@
  */
 
 import type { AddonManifest } from '../core/types.dom.ts';
+import { ICON_CLEAR_URLS } from './icons.std.ts';
 import { ConversationModel } from '../../models/conversations.preload.ts';
 import {
   cleanUrlsInText,
@@ -21,6 +22,7 @@ import {
 
 export default {
   id: 'clear-urls',
+  icon: ICON_CLEAR_URLS,
   name: 'Clear URLs',
   version: '1.0.0',
   description: 'Strip tracking parameters from links before you send them.',
