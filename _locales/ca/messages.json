@@ -11,6 +11,9 @@
   "icu:AxoDialog.Close": {
     "messageformat": "Tanca"
   },
+  "icu:AxoPasswordField.Reveal": {
+    "messageformat": "Veure contrasenya"
+  },
   "icu:AxoTextField.Clear": {
     "messageformat": "Neteja"
   },
@@ -61,6 +64,24 @@
   },
   "icu:Preferences__DonateTitle": {
     "messageformat": "Feu una donació a Signal"
+  },
+  "icu:LinkedDevicesOnboardingDialog__description": {
+    "messageformat": "<bold>Dispositius connectats</bold> et permet accedir de forma segura al teu compte i als teus missatges de Signal des de qualsevol dels teus dispositius addicionals."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--1": {
+    "messageformat": "Pots vincular un ordinador, una tablet o un altre telèfon."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--2": {
+    "messageformat": "El teu dispositiu principal gestiona què està vinculat, i pots connectar fins a 5 dispositius."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3": {
+    "messageformat": "Els ajustos del compte només es poden editar des del teu dispositiu principal, com els ajustos del compte i les còpies de seguretat."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--1": {
+    "messageformat": "Els ajustos del compte i les còpies de seguretat només es poden administrar des del teu dispositiu principal."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--2": {
+    "messageformat": "Els ajustos del compte i les Còpies de seguretat segures de Signal només es poden administrar des del teu dispositiu principal."
   },
   "icu:sentMediaQualityStandard": {
     "messageformat": "Estàndard"
@@ -317,11 +338,8 @@
   "icu:LeftPaneChatFolders__ItemLabel--All": {
     "messageformat": "Tots els xats"
   },
-  "icu:LeftPaneChatFolders__ItemUnreadBadge__MaxCount": {
-    "messageformat": "{maxCount,number}+"
-  },
   "icu:LeftPaneChatFolders__ItemUnreadBadge__AccessibleLabel": {
-    "messageformat": "{count, plural, one {{count,number} Unread Message} other {{count,number} Unread Messages}}"
+    "messageformat": "{count, plural, one {{count,number} missatge sense llegir} other {{count,number} missatges sense llegir}}"
   },
   "icu:LeftPaneChatFolders__Item__ContextMenu__MarkAllRead": {
     "messageformat": "Marca-ho tot com a llegit"
@@ -364,9 +382,6 @@
   },
   "icu:NavTabs__ItemIconLabel--UnreadCount": {
     "messageformat": "{count,number} sense llegir"
-  },
-  "icu:NavTabs__ItemIconLabel--MarkedUnread": {
-    "messageformat": "Marcat com a no llegit"
   },
   "icu:NavTabs__ItemLabel--Chats": {
     "messageformat": "Xats"
@@ -635,20 +650,23 @@
   "icu:SafetyNumberNotReady__learn-more": {
     "messageformat": "Més informació"
   },
-  "icu:KeyTransparencyErrorDialog__Title": {
-    "messageformat": "Actualment, la verificació automàtica de claus no està disponible al teu dispositiu. Vols enviar un registre de depuració?"
+  "icu:KeyTransparencyErrorDialog__Title-v2": {
+    "messageformat": "Actualment, la verificació automàtica de claus no està disponible al teu dispositiu. Vols enviar-nos un informe per ajudar-nos a millorar?"
   },
-  "icu:KeyTransparencyErrorDialog__Description": {
-    "messageformat": "Els registres de depuració ens ajuden a diagnosticar i solucionar el problema i no contenen informació que pugui identificar-te."
+  "icu:KeyTransparencyErrorDialog__Description-v2": {
+    "messageformat": "Incloure els teus registres de depuració ens ajuda a diagnosticar i solucionar el problema i no contenen informació que pugui identificar-te. Compartir-los és opcional."
   },
-  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label": {
-    "messageformat": "Compartir registre de depuració"
+  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label-v2": {
+    "messageformat": "Inclou-hi el registre de depuració."
   },
   "icu:KeyTransparencyErrorDialog__ShareDebugLog__ViewButton": {
     "messageformat": "Mostra"
   },
   "icu:KeyTransparencyErrorDialog__Submit": {
     "messageformat": "Envia"
+  },
+  "icu:KeyTransparencyErrorDialog__Cancel": {
+    "messageformat": "No, gràcies."
   },
   "icu:KeyTransparencyOnboardingDialog__Title": {
     "messageformat": "Ara, Signal pot verificar automàticament la codificació"
@@ -746,11 +764,11 @@
   "icu:maximumAttachments": {
     "messageformat": "No podeu afegir cap altre adjunt a aquest missatge."
   },
-  "icu:fileSizeWarning": {
-    "messageformat": "Perdoneu, el fitxer seleccionat excedeix les restriccions de mida dels missatges. {limit,number} {units}"
+  "icu:fileTooLargeWarning": {
+    "messageformat": "No es pot enviar aquest arxiu perquè és massa gran. Pots enviar arxius de fins a {limit,number}{units}."
   },
-  "icu:videoFileSizeWarning": {
-    "messageformat": "Vaja, el vídeo seleccionat excedeix les restriccions de mida dels missatges. {limit,number}{units}"
+  "icu:videoFileTooLargeWarning": {
+    "messageformat": "No es pot enviar aquest arxiu de vídeo perquè és massa gran. Pots enviar arxius de vídeo de fins a {limit,number}{units}."
   },
   "icu:unableToLoadAttachment": {
     "messageformat": "No s'ha pogut carregar l'adjunt seleccionat"
@@ -772,6 +790,9 @@
   },
   "icu:checkNetworkConnection": {
     "messageformat": "Comproveu la connexió a xarxa."
+  },
+  "icu:clockSkewDetected": {
+    "messageformat": "La data del dispositiu no és la correcta. Ajusta el teu rellotge i torna-ho a provar. La data i l'hora del teu dispositiu:"
   },
   "icu:submitDebugLog": {
     "messageformat": "Registre de depuració"
@@ -994,6 +1015,9 @@
   },
   "icu:mute": {
     "messageformat": "Silenciats"
+  },
+  "icu:muted": {
+    "messageformat": "Silenciat"
   },
   "icu:cannotUpdateDetail-v2": {
     "messageformat": "Signal no s'ha pogut actualitzar. <retryUpdateButton>Prova de tornar-lo a actualitzar</retryUpdateButton>, o ves a {url} per instal·lar-lo manualment. Després, <contactSupportLink>posa't en contacte amb el servei d'assistència</contactSupportLink> per informar d'aquest problema"
@@ -1261,6 +1285,9 @@
   },
   "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync": {
     "messageformat": "Tots els missatges d'aquest xat s'eliminaran de tots els teus dispositius."
+  },
+  "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync--still-member": {
+    "messageformat": "Tots els missatges d'aquest xat s'eliminaran de tots els teus dispositius. Continuaràs formant part d'aquest grup."
   },
   "icu:ConversationHeader__ContextMenu__LeaveGroupAction__title": {
     "messageformat": "Sortir del grup"
@@ -1610,9 +1637,6 @@
   "icu:Preferences__EmojiSkinToneDefaultSetting__Label": {
     "messageformat": "To de pell de l'emoji"
   },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__Title": {
-    "messageformat": "Carpetes de xats"
-  },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Title": {
     "messageformat": "Afegir una carpeta de xats"
   },
@@ -1624,12 +1648,6 @@
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Description--WithChatFolders": {
     "messageformat": "{chatFoldersCount, plural, one {{chatFoldersCount,number} carpeta} other {{chatFoldersCount,number} carpetes}}"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button": {
-    "messageformat": "Configurar"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button--WithChatFolders": {
-    "messageformat": "Administrar"
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__ChatFolderItem__ContextMenu__EditFolder": {
     "messageformat": "Editar carpeta"
@@ -2384,9 +2402,6 @@
   "icu:SafetyNumberModal__title": {
     "messageformat": "Verifiqueu el número de seguretat"
   },
-  "icu:safetyNumberChanged": {
-    "messageformat": "El número de seguretat ha canviat"
-  },
   "icu:safetyNumberChanges": {
     "messageformat": "Canvis en el número de seguretat"
   },
@@ -2826,16 +2841,16 @@
     "messageformat": "Eliminar"
   },
   "icu:stickers--StickerManagerPackDragHandle--Label": {
-    "messageformat": "Drag to reorder sticker pack"
+    "messageformat": "Arrossega per reordenar el paquet d'stickers"
   },
   "icu:stickers--StickerManagerBlessedPacksList--Label": {
-    "messageformat": "Signal Artist Series sticker packs"
+    "messageformat": "Paquets d'stickers d'artistes de Signal"
   },
   "icu:stickers--StickerManagerReceivedPacksList--Label": {
-    "messageformat": "Received sticker packs"
+    "messageformat": "Paquets d'stickers rebuts"
   },
   "icu:stickers--StickerManagerInstalledPacksList--Label": {
-    "messageformat": "Installed sticker packs"
+    "messageformat": "Paquets d'stickers instal·lats"
   },
   "icu:stickers--StickerPreview--Title": {
     "messageformat": "Paquet d'adhesius"
@@ -3081,16 +3096,16 @@
     "messageformat": "Afegiu-hi un adhesiu"
   },
   "icu:FunPicker__Label--StickerReply": {
-    "messageformat": "Reply"
+    "messageformat": "Respon"
   },
   "icu:FunPicker__Label--SendStickerReply": {
-    "messageformat": "Send"
+    "messageformat": "Envia"
   },
   "icu:FunPicker__Label--CancelStickerReply": {
-    "messageformat": "Cancel"
+    "messageformat": "Cancel·la"
   },
   "icu:FunPicker__Label--Sticker": {
-    "messageformat": "Sticker"
+    "messageformat": "Adhesiu"
   },
   "icu:confirmation-dialog--Cancel": {
     "messageformat": "Cancel·la"
@@ -3872,20 +3887,20 @@
   "icu:calling__preview--minimize": {
     "messageformat": "Minimitzar vista prèvia"
   },
-  "icu:calling__change-view": {
-    "messageformat": "Canviar la vista"
-  },
-  "icu:calling__view_mode--paginated": {
-    "messageformat": "Vista de graella"
-  },
-  "icu:calling__view_mode--overflow": {
-    "messageformat": "Vista de la barra lateral"
-  },
-  "icu:calling__view_mode--speaker": {
-    "messageformat": "Vista de l'orador"
-  },
   "icu:calling__view_mode--updated": {
     "messageformat": "Vista actualitzada"
+  },
+  "icu:calling__change-layout": {
+    "messageformat": "Canviar vista"
+  },
+  "icu:calling__layout--paginated": {
+    "messageformat": "Quadrícula"
+  },
+  "icu:calling__layout--overflow": {
+    "messageformat": "Barra lateral"
+  },
+  "icu:calling__layout--speaker": {
+    "messageformat": "Orador"
   },
   "icu:calling__SelectPresentingSourcesModal--title": {
     "messageformat": "Compartiu la pantalla"
@@ -3950,23 +3965,47 @@
   "icu:notMuted": {
     "messageformat": "No silenciat"
   },
-  "icu:muteHour": {
-    "messageformat": "Silencia durant una hora"
-  },
-  "icu:muteEightHours": {
-    "messageformat": "Silencia durant 8 hores"
-  },
-  "icu:muteDay": {
-    "messageformat": "Silencia durant un dia"
-  },
-  "icu:muteWeek": {
-    "messageformat": "Silencia durant una setmana"
-  },
-  "icu:muteAlways": {
-    "messageformat": "Silencia sempre"
-  },
   "icu:unmute": {
     "messageformat": "No silenciats"
+  },
+  "icu:MuteMenu__label": {
+    "messageformat": "Silencia aquest xat durant…"
+  },
+  "icu:MuteMenu__hour": {
+    "messageformat": "1 hora"
+  },
+  "icu:MuteMenu__eightHours": {
+    "messageformat": "8 hores"
+  },
+  "icu:MuteMenu__day": {
+    "messageformat": "1 dia"
+  },
+  "icu:MuteMenu__week": {
+    "messageformat": "1 setmana"
+  },
+  "icu:MuteMenu__until": {
+    "messageformat": "Fins…"
+  },
+  "icu:MuteMenu__always": {
+    "messageformat": "Sempre"
+  },
+  "icu:DatePicker__popupTitle": {
+    "messageformat": "Selecciona una data"
+  },
+  "icu:TimePicker__popupTitle": {
+    "messageformat": "Selecciona una hora"
+  },
+  "icu:MuteUntilDialog__title": {
+    "messageformat": "Silencia aquest xat fins…"
+  },
+  "icu:MuteUntilDialog__dateLabel": {
+    "messageformat": "Data"
+  },
+  "icu:MuteUntilDialog__timeLabel": {
+    "messageformat": "Hora"
+  },
+  "icu:MuteUntilDialog__timeZoneNote": {
+    "messageformat": "Cada hora es mostra en {timeZone}"
   },
   "icu:muteExpirationLabelAlways": {
     "messageformat": "Silenciat sempre"
@@ -4874,9 +4913,6 @@
   "icu:showConversationDetails--direct": {
     "messageformat": "Ajustos del xat"
   },
-  "icu:ConversationDetails__unmute--title": {
-    "messageformat": "Vols silenciar aquest xat?"
-  },
   "icu:ConversationDetails--group-link": {
     "messageformat": "Enllaç del grup"
   },
@@ -5072,6 +5108,9 @@
   "icu:ConversationDetailsMembershipList--show-all": {
     "messageformat": "Mostra-ho tot"
   },
+  "icu:ConversationDetailsMembershipList__Search__AccessibilityLabel": {
+    "messageformat": "Cerca"
+  },
   "icu:ConversationDetailsGroups--title": {
     "messageformat": "{count, plural, one {{count,number} grup en comú} other {{count,number} grups en comú}}"
   },
@@ -5108,17 +5147,110 @@
   "icu:EditNicknameAndNoteModal__Note__Placeholder": {
     "messageformat": "Nota"
   },
-  "icu:ConversationNotificationsSettings__mentions__label": {
+  "icu:WhileMuted__title": {
+    "messageformat": "Mentre està silenciat"
+  },
+  "icu:WhileMuted__description": {
+    "messageformat": "Selecciona quines notificacions vols veure mentre aquest xat estigui silenciat."
+  },
+  "icu:WhileMuted__calls__title": {
+    "messageformat": "Trucades"
+  },
+  "icu:WhileMuted__calls__description": {
+    "messageformat": "Sonar o notificar quan s'iniciï una trucada mentre aquest xat estigui silenciat."
+  },
+  "icu:WhileMuted__mentions__title": {
     "messageformat": "Mencions"
   },
-  "icu:ConversationNotificationsSettings__mentions__info": {
-    "messageformat": "Rep notificacions quan se't mencioni en xats silenciats"
+  "icu:WhileMuted__mentions__description": {
+    "messageformat": "Notificar quan se't @mencioni mentre aquest xat estigui silenciat."
   },
-  "icu:ConversationNotificationsSettings__mentions__select__always-notify": {
-    "messageformat": "Notifica-m'ho sempre"
+  "icu:WhileMuted__replies__title": {
+    "messageformat": "Respostes"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__dont-notify-for-mentions-if-muted": {
-    "messageformat": "No m'ho notifiquis si està silenciada"
+  "icu:WhileMuted__replies__description": {
+    "messageformat": "Notificar quan algú respongui als teus missatges mentre aquest xat estigui silenciat."
+  },
+  "icu:WhileMuted__value--none": {
+    "messageformat": "Cap"
+  },
+  "icu:WhileMuted__value--calls": {
+    "messageformat": "Trucades"
+  },
+  "icu:WhileMuted__value--mentions": {
+    "messageformat": "Mencions"
+  },
+  "icu:WhileMuted__value--replies": {
+    "messageformat": "Respostes"
+  },
+  "icu:WhileMuted__value--calls-mentions": {
+    "messageformat": "Trucades, mencions"
+  },
+  "icu:WhileMuted__value--calls-replies": {
+    "messageformat": "Trucades, respostes"
+  },
+  "icu:WhileMuted__value--mentions-replies": {
+    "messageformat": "Mencions, respostes"
+  },
+  "icu:WhileMuted__value--calls-mentions-replies": {
+    "messageformat": "Trucades, mencions, respostes"
+  },
+  "icu:Preferences__WhileMuted__description": {
+    "messageformat": "Selecciona quines notificacions vols veure pels xats silenciats."
+  },
+  "icu:Preferences__WhileMuted__calls__description": {
+    "messageformat": "Sonar o notificar quan s'iniciï una trucada en xats silenciats."
+  },
+  "icu:Preferences__WhileMuted__mentions__description": {
+    "messageformat": "Notificar quan se't mencioni en xats silenciats."
+  },
+  "icu:Preferences__WhileMuted__replies__description": {
+    "messageformat": "Notificar quan algú respongui als teus missatges en xats silenciats."
+  },
+  "icu:UnreadReminders__title": {
+    "messageformat": "Recordatoris de missatges no llegits"
+  },
+  "icu:UnreadReminders__description": {
+    "messageformat": "Notificar de forma ocasional quan hi hagi missatges no llegits mentre aquest xat estigui silenciat."
+  },
+  "icu:Preferences__UnreadReminders__description": {
+    "messageformat": "Notificar de forma ocasional quan hi hagi missatges no llegits als xats silenciats."
+  },
+  "icu:UnreadReminders__notification--messages--1": {
+    "messageformat": "{messageCount, plural, one {Tens {messageCount,number} missatge sense llegir de part de {person1}.} other {Tens {messageCount,number} missatges sense llegir de part de {person1}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--2": {
+    "messageformat": "{messageCount, plural, one {Tens {messageCount,number} missatge sense llegir de part de {person1} i {person2}.} other {Tens {messageCount,number} missatges sense llegir de part de {person1} i {person2}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--many": {
+    "messageformat": "{messageCount, plural, one {Tens {messageCount,number} missatge sense llegir de part de {person1}, {person2} i altres persones.} other {Tens {messageCount,number} missatges sense llegir de part de {person1}, {person2} i altres persones.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-mentions": {
+    "messageformat": "{messageCount, plural, one {Tens {messageCount,number} missatge sense llegir, incloent-hi {mentionSummary}.} other {Tens {messageCount,number} missatges sense llegir, incloent-hi {mentionSummary}.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-replies": {
+    "messageformat": "{messageCount, plural, one {Tens {messageCount,number} missatge sense llegir, incloent-hi {replySummary}.} other {Tens {messageCount,number} missatges sense llegir, incloent-hi {replySummary}.}}"
+  },
+  "icu:UnreadReminders__notification--counts--messages": {
+    "messageformat": "{messageCount, plural, one {Tens {messageCount,number} missatge sense llegir.} other {Tens {messageCount,number} missatges sense llegir.}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--1": {
+    "messageformat": "{mentionCount, plural, one {una menció de part de {person1}} other {{mentionCount,number} mencions de part de {person1}}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--2": {
+    "messageformat": "{mentionCount, plural, one {{mentionCount,number} mencions de part de {person1} i {person2}} other {{mentionCount,number} mencions de part de {person1} i {person2}}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--many": {
+    "messageformat": "{mentionCount, plural, one {{mentionCount,number} menció de part de {person1} i altres} other {{mentionCount,number} mencions de part de {person1} i altres}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--1": {
+    "messageformat": "{replyCount, plural, one {una resposta de {person1}} other {{replyCount,number} respostes de {person1}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--2": {
+    "messageformat": "{replyCount, plural, one {{replyCount,number} resposta de {person1} i {person2}} other {{replyCount,number} respostes de {person1} i {person2}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--many": {
+    "messageformat": "{replyCount, plural, one {{replyCount,number} resposta de {person1} i altres} other {{replyCount,number} respostes de {person1} i altres}}"
   },
   "icu:GroupLinkManagement--clipboard": {
     "messageformat": "Enllaç del grup copiat"
@@ -5140,6 +5272,48 @@
   },
   "icu:GroupLinkManagement__CopyGroupLinkButtonLabel": {
     "messageformat": "Copiar l'enllaç signal.group al porta-retalls"
+  },
+  "icu:GroupMembersSearchDialog__DialogTitle": {
+    "messageformat": "Buscar membres"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder": {
+    "messageformat": "Cerca"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringByAdmins": {
+    "messageformat": "Buscar admins"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringBySystemContacts": {
+    "messageformat": "Buscar contactes"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Label": {
+    "messageformat": "Filtrar"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__AllMembers": {
+    "messageformat": "Tots els membres"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Admins": {
+    "messageformat": "Administradors"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__SystemContacts": {
+    "messageformat": "Contactes"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithoutSearchQuery": {
+    "messageformat": "No hi ha cap resultat."
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithSearchQuery": {
+    "messageformat": "No s'ha trobat cap resultat per a «{searchQuery}»"
+  },
+  "icu:GroupMembersSearchDialog__MemberItem__Admin": {
+    "messageformat": "Administrador"
+  },
+  "icu:GroupMembersSearchDialog__SearchResults__Title": {
+    "messageformat": "Resultats de la cerca"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__AddMembers": {
+    "messageformat": "Afegeix-hi membres"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__InviteViaGroupLink": {
+    "messageformat": "Convidar mitjançant enllaç de grup"
   },
   "icu:PendingInvites--tab-requests": {
     "messageformat": "Sol·licituds ({count,number})"
@@ -5426,6 +5600,9 @@
   },
   "icu:CaptchaDialog__second-paragraph": {
     "messageformat": "Després de verificar-ho, podeu continuar enviant missatges. Qualsevol missatge interromput s'enviarà automàticament."
+  },
+  "icu:CaptchaDialog__continue": {
+    "messageformat": "Continua"
   },
   "icu:CaptchaDialog--can-close__title": {
     "messageformat": "Voleu continuar sense la verificació?"
@@ -5893,6 +6070,15 @@
   "icu:Preferences__message-audio-description": {
     "messageformat": "Escolta un so de notificació dels missatges enviats i rebuts mentre estiguis al xat."
   },
+  "icu:Preferences__reaction-notifications-title": {
+    "messageformat": "Notificacions de reacció"
+  },
+  "icu:Preferences__reaction-notifications-description": {
+    "messageformat": "Notificar quan algú reaccioni als teus missatges"
+  },
+  "icu:Preferences__button--account": {
+    "messageformat": "Compte"
+  },
   "icu:Preferences__button--general": {
     "messageformat": "General"
   },
@@ -5962,6 +6148,45 @@
   "icu:Preferences--system": {
     "messageformat": "Sistema"
   },
+  "icu:Preferences--signal-login": {
+    "messageformat": "Signal Login"
+  },
+  "icu:Preferences--signal-login-description": {
+    "messageformat": "El teu Signal Login serveix per recuperar i restaurar el teu compte. Guarda aquestes claus de forma segura en un gestor de contrasenyes de confiança. <learnMoreLink>Més informació</learnMoreLink>."
+  },
+  "icu:Preferences--signal-login-description--learn-more": {
+    "messageformat": "Més informació"
+  },
+  "icu:Preferences__SignalAccount__label": {
+    "messageformat": "Compte i recuperació"
+  },
+  "icu:Preferences__SignalAccount__description": {
+    "messageformat": "2 claus"
+  },
+  "icu:Preferences__SignalAccountKeys__Title": {
+    "messageformat": "El teu Signal Login"
+  },
+  "icu:Preferences__SignalAccountKeys__Description": {
+    "messageformat": "Guarda-ho en un lloc segur, la teva informació d'inici de sessió és necessària per recuperar el teu compte i les teves dades. No ho comparteixis amb ningú."
+  },
+  "icu:Preferences__SignalAccountKeys__AccountKey": {
+    "messageformat": "Clau del compte"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountID": {
+    "messageformat": "ID del compte"
+  },
+  "icu:Preferences__SignalAccountKeys__RecoveryKey": {
+    "messageformat": "Clau de recuperació"
+  },
+  "icu:Preferences__SignalAccountKeys__Save": {
+    "messageformat": "Desa"
+  },
+  "icu:Preferences__Account__LinkedDevice__label": {
+    "messageformat": "Aquest és un dispositiu vinculat"
+  },
+  "icu:Preferences__Account__LinkedDevice__description": {
+    "messageformat": "Per gestionar els ajustos del teu compte, obre Signal al teu dispositiu principal."
+  },
   "icu:Preferences--zoom": {
     "messageformat": "Nivell de l'ampliació"
   },
@@ -5992,8 +6217,116 @@
   "icu:Preferences--advanced": {
     "messageformat": "Avançada"
   },
-  "icu:Preferences--notification-content": {
-    "messageformat": "Contingut de les notificacions"
+  "icu:Preferences--change-signal-pin": {
+    "messageformat": "Canvieu el PIN"
+  },
+  "icu:Preferences--change-signal-pin-button": {
+    "messageformat": "Canviar"
+  },
+  "icu:Preferences--create-signal-pin": {
+    "messageformat": "Crea un PIN"
+  },
+  "icu:Preferences--create-signal-pin-button": {
+    "messageformat": "Crea"
+  },
+  "icu:Preferences--signal-pin": {
+    "messageformat": "PIN del Signal"
+  },
+  "icu:Preferences--signal-pin__footer": {
+    "messageformat": "Els PINs mantenen xifrada la informació emmagatzemada a Signal de manera que no hi pugui accedir ningú més a part de tu. El PIN no es pot recuperar. El teu perfil, ajustos i contactes es restauraran quan reinstal·lis. <learnMoreLink>Més informació</learnMoreLink>"
+  },
+  "icu:Preferences--signal-pin-advanced-settings": {
+    "messageformat": "Configuració avançada del PIN"
+  },
+  "icu:Preferences--disable-signal-pin": {
+    "messageformat": "Desactiva el PIN"
+  },
+  "icu:Preferences--disable-signal-pin--button": {
+    "messageformat": "Desactiva"
+  },
+  "icu:Preferences--disable-signal-pin--footer": {
+    "messageformat": "Si desactiveu el PIN, perdreu totes les dades quan torneu a registrar-vos al Signal, si no és que en feu una còpia de seguretat i una restauració manualment. No podeu activar el bloqueig de registre mentre el PIN estigui desactivat."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--title": {
+    "messageformat": "No s'ha pogut desactivar el PIN degut al bloqueig del registre"
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--body": {
+    "messageformat": "Has de desactivar el bloqueig de registre abans de desactivar el PIN."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--ok": {
+    "messageformat": "D'acord"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--title": {
+    "messageformat": "No s'ha pogut desactivar el PIN degut a les còpies de seguretat"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--body": {
+    "messageformat": "Has de desactivar les còpies de seguretat abans de desactivar el PIN."
+  },
+  "icu:Preferences--enable-signal-pin": {
+    "messageformat": "Activa el PIN"
+  },
+  "icu:Preferences--enable-signal-pin--button": {
+    "messageformat": "Activar"
+  },
+  "icu:Preferences--pin-reminders--header": {
+    "messageformat": "Recordatoris del PIN"
+  },
+  "icu:Preferences--pin-reminders--description": {
+    "messageformat": "Amb el temps se us demanarà amb menys freqüència"
+  },
+  "icu:Preferences--registration-lock__label": {
+    "messageformat": "Bloqueig del registre"
+  },
+  "icu:Preferences--registration-lock__footer": {
+    "messageformat": "Demana el PIN del Signal per tornar-hi a registrar el número de telèfon."
+  },
+  "icu:Preferences__Chats__TextInputSection__Title": {
+    "messageformat": "Entrada de text"
+  },
+  "icu:Preferences__Chats__ChatFoldersSection__Title": {
+    "messageformat": "Carpetes de xats"
+  },
+  "icu:Preferences__Notifications__Show__Label": {
+    "messageformat": "Mostra"
+  },
+  "icu:Preferences__Notifications__SoundsSection__Title": {
+    "messageformat": "Sons"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title": {
+    "messageformat": "Insígnia de l'app"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title-v2": {
+    "messageformat": "Recompte de xats sense llegir"
+  },
+  "icu:Preferences__Notifications__Reset__title": {
+    "messageformat": "Restablir els ajustos de notificacions a la seva configuració per defecte, inclosos els ajustos personalitzats dels teus xats."
+  },
+  "icu:Preferences__Notifications__Reset__button": {
+    "messageformat": "Restableix"
+  },
+  "icu:Preferences__Notifications__Reset__modal--body": {
+    "messageformat": "Restablir tots els ajustos de notificacions a la seva configuració per defecte per a tots els xats?"
+  },
+  "icu:Preferences__Notifications__Reset__modal--confirm": {
+    "messageformat": "Restableix"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Label": {
+    "messageformat": "Recompte d'insígnies"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Description": {
+    "messageformat": "Selecciona si el comptador mostra el nombre de missatges per llegir o el nombre de xats sense llegir."
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadMessages": {
+    "messageformat": "Missatges per llegir"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadChats": {
+    "messageformat": "Xats sense llegir"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats": {
+    "messageformat": "Inclou els xats silenciats al recompte de notificacions"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats__description": {
+    "messageformat": "Els recomptes de notificacions de les carpetes de xats sempre inclouran els xats silenciats"
   },
   "icu:PlaintextExport--PreferencesRow--Header": {
     "messageformat": "Exportar l'historial del xat"
@@ -6145,9 +6478,6 @@
   "icu:NotificationProfiles--setting": {
     "messageformat": "Perfils de notificacions"
   },
-  "icu:NotificationProfiles--setup": {
-    "messageformat": "Configurar"
-  },
   "icu:NotificationProfiles--title": {
     "messageformat": "Perfils de notificacions"
   },
@@ -6159,9 +6489,6 @@
   },
   "icu:NotificationProfiles--manage-description": {
     "messageformat": "Afegir o editar perfils de notificacions"
-  },
-  "icu:NotificationProfiles--manage-profiles": {
-    "messageformat": "{profileCount, plural, one {Un perfil} other {{profileCount,number} perfils}}"
   },
   "icu:NotificationProfiles--create": {
     "messageformat": "Crea un perfil"
@@ -6351,6 +6678,9 @@
   },
   "icu:Preferences--blocked-groups": {
     "messageformat": "Grups bloquejats"
+  },
+  "icu:Preferences--blocked--blocked-on": {
+    "messageformat": "Bloquejat el {blockedAt}"
   },
   "icu:Preferences--signal-backups": {
     "messageformat": "Còpies de seguretat segures de Signal"
@@ -6559,9 +6889,6 @@
   "icu:Preferences__pnp__row--body": {
     "messageformat": "Tria qui pot veure el teu número de telèfon i qui pot contactar-te a Signal a través d'ell."
   },
-  "icu:Preferences__pnp__row--button": {
-    "messageformat": "Canviar…"
-  },
   "icu:Preferences__pnp__sharing--title": {
     "messageformat": "Qui pot veure el meu número"
   },
@@ -6610,14 +6937,11 @@
   "icu:Preferences--read-receipts": {
     "messageformat": "Confirmació de lectura"
   },
-  "icu:Preferences--read-receipts--description": {
-    "messageformat": "Si desactives aquesta opció, no podràs veure les confirmacions de lectura dels altres."
-  },
   "icu:Preferences--typing-indicators": {
     "messageformat": "Indicadors de tecleig"
   },
-  "icu:Preferences--typing-indicators--description": {
-    "messageformat": "Si desactives aquesta opció, no podràs veure els indicadors de tecleig dels altres."
+  "icu:Preferences--messaging-help": {
+    "messageformat": "Veure i compartir quan s'escriuen i es llegeixen els missatges. Si ho desactives, no veuràs confirmacions de lectura ni indicacions d'escriptura d'altres persones."
   },
   "icu:Preferences--updates": {
     "messageformat": "Actualitzacions"
@@ -6721,11 +7045,23 @@
   "icu:InstallScreenUpdateDialog--update-required__title": {
     "messageformat": "Actualització necessària"
   },
+  "icu:InstallScreenUpdateDialog--checking-for-updates": {
+    "messageformat": "Buscant actualitzacions"
+  },
+  "icu:InstallScreenUpdateDialog--updating-signal": {
+    "messageformat": "Actualitzant Signal"
+  },
+  "icu:InstallScreenUpdateDialog--download-progress": {
+    "messageformat": "Descarregant {currentBytes} de {totalBytes} ({percentage,number,percent})…"
+  },
   "icu:InstallScreenUpdateDialog--update-required__body": {
-    "messageformat": "Per completar la sincronització dels missatges, actualitza ara Signal Desktop."
+    "messageformat": "Per continuar, actualitza Signal Desktop."
   },
   "icu:InstallScreenUpdateDialog--update-required__action-update": {
     "messageformat": "Actualitza-la"
+  },
+  "icu:InstallScreenUpdateDialog--update-required__action-update__mas": {
+    "messageformat": "Anar a l'App Store"
   },
   "icu:InstallScreenUpdateDialog--unsupported-os__title": {
     "messageformat": "Actualització necessària"
@@ -6759,6 +7095,9 @@
   },
   "icu:StandaloneRegistration--PhoneNumber--waiting": {
     "messageformat": "Si us plau, torna-ho a provar en {duration}"
+  },
+  "icu:StandaloneRegistration--PhoneNumber--RegionCodeSelector--Label": {
+    "messageformat": "Selecciona el codi de regió"
   },
   "icu:StandaloneRegistration--PhoneNumber--placeholder": {
     "messageformat": "Número de telèfon"
@@ -6982,6 +7321,9 @@
   "icu:StandaloneRegistration--VerifyPIN--incorrect-pin--with-count": {
     "messageformat": "{triesRemaining, plural, one {PIN incorrecte. Us resta {triesRemaining,number} intent.} other {PIN incorrecte. Us resten {triesRemaining,number} intents.}}"
   },
+  "icu:StandaloneRegistration--VerifyPIN--just-count": {
+    "messageformat": "{triesRemaining, plural, one {Resta {triesRemaining,number} intent.} other {Resten {triesRemaining,number} intents.}}"
+  },
   "icu:StandaloneRegistration--VerifyPIN--NeedHelp--header": {
     "messageformat": "Us cal ajuda?"
   },
@@ -7024,6 +7366,9 @@
   "icu:StandaloneRegistration--VerifyPIN--NoRemainingTries--learn-more": {
     "messageformat": "Apreneu més coses sobre els PIN"
   },
+  "icu:StandaloneRegistration--VerifyPIN--open-menu": {
+    "messageformat": "Obrir menú"
+  },
   "icu:StandaloneRegistration--VerifyPIN--menu--skip-pin": {
     "messageformat": "Ometre PIN"
   },
@@ -7031,7 +7376,7 @@
     "messageformat": "Voleu ometre l'entrada del PIN?"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--description": {
-    "messageformat": "Si no recordes el teu PIN, pots crear-ne un de nou. Pots registrar-te i utilitzar el teu compte, però perdràs alguns dels teus ajustos, com ara la informació del perfil. Més informació"
+    "messageformat": "Si no recordes el teu PIN, pots crear-ne un de nou. Pots registrar-te i utilitzar el teu compte, però perdràs alguns dels teus ajustos, com ara la informació del perfil. <learnMore>Més informació</learnMore>."
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--skip-button": {
     "messageformat": "Omet i crea un PIN nou"
@@ -7067,7 +7412,7 @@
     "messageformat": "Advertiment"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--description": {
-    "messageformat": "Si desactiveu el PIN, perdreu totes les dades quan torneu a registrar-vos al Signal, si no és que les transferiu des d'un altre dispositiu iOS. No podeu activar el blocatge de registre mentre el PIN estigui desactivat."
+    "messageformat": "Si desactives el PIN, perdràs totes les dades quan et tornis a registrar a Signal. No podràs activar el bloqueig de registre mentre el PIN estigui desactivat."
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--disable-button": {
     "messageformat": "Desactiva el PIN"
@@ -7275,6 +7620,12 @@
   },
   "icu:MediaPermissionsModal__step-2": {
     "messageformat": "Activa “Signal”"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--microphone": {
+    "messageformat": "Permet a Signal l'accés al micròfon"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--camera": {
+    "messageformat": "Permet a Signal l'accés a la càmera"
   },
   "icu:MediaPermissionsModal__open": {
     "messageformat": "Anar a ajustos"
@@ -7816,11 +8167,17 @@
   "icu:ContextMenu--button": {
     "messageformat": "Menú de context"
   },
+  "icu:EditUsernameModalBody__username-label": {
+    "messageformat": "Àlies"
+  },
   "icu:EditUsernameModalBody__username-placeholder": {
     "messageformat": "Àlies"
   },
   "icu:EditUsernameModalBody__username-helper": {
     "messageformat": "Els àlies sempre es combinen amb un conjunt de números."
+  },
+  "icu:EditUsernameModalBody__discriminator-label": {
+    "messageformat": "Dígits de l'àlies"
   },
   "icu:EditUsernameModalBody__learn-more": {
     "messageformat": "Més informació"
@@ -7918,6 +8275,75 @@
   },
   "icu:UsernameMegaphone__dismiss": {
     "messageformat": "Descarta"
+  },
+  "icu:PinReminderMegaphone__title": {
+    "messageformat": "Verifiqueu el PIN del Signal"
+  },
+  "icu:PinReminderMegaphone__body": {
+    "messageformat": "De tant en tant us demanarem de verificar el PIN perquè el recordeu."
+  },
+  "icu:PinReminderMegaphone__verify": {
+    "messageformat": "Verificació"
+  },
+  "icu:PinReminderMegaphone__not-now": {
+    "messageformat": "Ara no"
+  },
+  "icu:PinReminderModal__title": {
+    "messageformat": "Marqueu el PIN del Signal"
+  },
+  "icu:PinReminderModal__body": {
+    "messageformat": "Per ajudar-vos a recordar el PIN, us el demanarem periòdicament. Amb el temps, ho farem menys."
+  },
+  "icu:PinReminderModal__pin-input-placeholder": {
+    "messageformat": "Marqueu el PIN"
+  },
+  "icu:PinReminderModal__pin-input-error": {
+    "messageformat": "PIN incorrecte. Torna a provar-ho"
+  },
+  "icu:PinReminderModal__forgot": {
+    "messageformat": "He oblidat el PIN"
+  },
+  "icu:PinReminderModal__confirm": {
+    "messageformat": "Confirmar"
+  },
+  "icu:PinReminderCompletedToast": {
+    "messageformat": "PIN correcte. T'ho recordarem més tard."
+  },
+  "icu:PinChangeModal__title--create": {
+    "messageformat": "Canviar el teu PIN de Signal"
+  },
+  "icu:PinChangeModal__title--create--without-pin": {
+    "messageformat": "Crea el teu PIN de Signal"
+  },
+  "icu:PinChangeModal__body--create": {
+    "messageformat": "Podeu canviar el PIN sempre que aquest dispositiu estigui registrat. <learnMoreLink>Més informació</learnMoreLink>"
+  },
+  "icu:PinChangeModal__body--create--without-pin": {
+    "messageformat": "Els PINs mantenen xifrada la informació emmagatzemada a Signal de manera que no hi pugui accedir ningú més a part de tu. El teu perfil, ajustos i contactes es restauraran quan reinstal·lis. No necessitaràs el PIN per obrir l'app. <learnMoreLink>Més informació</learnMoreLink>"
+  },
+  "icu:PinChangeModal__title--confirm": {
+    "messageformat": "Confirmeu el PIN del Signal"
+  },
+  "icu:PinChangeModal__body--confirm": {
+    "messageformat": "Marqueu el PIN que heu creat."
+  },
+  "icu:PinChangeModal__pin-input-placeholder--create": {
+    "messageformat": "Introdueix un PIN nou"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--confirm": {
+    "messageformat": "Confirmeu-lo"
+  },
+  "icu:PinChangeModal__cancel": {
+    "messageformat": "Cancel·la"
+  },
+  "icu:PinChangeModal__continue": {
+    "messageformat": "Continua"
+  },
+  "icu:PinChangeModal__confirm": {
+    "messageformat": "Confirmar"
+  },
+  "icu:PinChangeCompletedToast": {
+    "messageformat": "S'ha creat un nou PIN."
   },
   "icu:UnsupportedOSWarningDialog__body": {
     "messageformat": "Signal per a Escriptori aviat deixarà de ser compatible amb la versió de {OS} del teu ordinador. Per continuar utilitzant Signal, actualitza el sistema operatiu de l'ordinador abans de {expirationDate}. <learnMoreLink>Més informació</learnMoreLink>"
@@ -8351,8 +8777,11 @@
   "icu:DonationReceipt__type-value--one-time": {
     "messageformat": "1 vegada"
   },
-  "icu:DonationReceipt__footer-text": {
-    "messageformat": "Gràcies per donar suport a Signal. Amb la teva contribució, ens ajudes en la nostra missió de protegir la llibertat d'expressió i permetre una comunicació global segura per a milions de persones arreu del món gràcies a una tecnologia de codi obert centrada en la privacitat. Si vius als Estats Units, conserva aquest rebut per als teus registres fiscals. Signal Technology Foundation és una organització sense ànim de lucre exempta d'impostos als Estats Units segons la secció 501c3 del codi tributari dels Estats Units (Internal Revenue Code). El nostre número d'identificació fiscal federal és el 82–4506840."
+  "icu:DonationReceipt__footer-text-v2": {
+    "messageformat": "Gràcies per donar suport a Signal. Amb la teva contribució, ens ajudes a complir la nostra missió de protegir la llibertat d'expressió i fer possible una comunicació segura per a milions de persones arreu del món mitjançant una tecnologia de codi obert centrada en la privacitat. Si vius als Estats Units, conserva aquest rebut per als teus registres fiscals. Signal Technology Foundation és una organització sense ànim de lucre exempta d'impostos als Estats Units segons la secció 501c3 del codi tributari dels Estats Units (Internal Revenue Code). El nostre número d'identificació fiscal federal és el 82–4506840. Signal no ha proporcionat cap bé o servei a canvi d'aquesta contribució."
+  },
+  "icu:MessageCta__Donate": {
+    "messageformat": "Fer donació ara"
   },
   "icu:Donations__OfflineTooltip": {
     "messageformat": "No tens connexió. Connecta't a Internet per completar una donació."
@@ -8661,16 +9090,10 @@
     "messageformat": "Petits ajustos, correccions d'errors i tasques de millora de rendiment. Gràcies per utilitzar Signal!",
     "ignoreUnused": true
   },
-  "icu:WhatsNew__8.18--0": {
-    "messageformat": "A partir d'ara, també podràs crear enquestes als xats individuals."
+  "icu:WhatsNew__8.30--0": {
+    "messageformat": "Millores de funcionament a les videotrucades."
   },
-  "icu:WhatsNew__8.19--0": {
-    "messageformat": "Ara, els admins de grup poden finalitzar els xats amb la nova opció \"Tancar grup\" als ajustos del grup. Tancar un grup evita que els seus membres puguin enviar missatges o iniciar trucades. També desactiva les invitacions al grup."
-  },
-  "icu:WhatsNew__8.20--0": {
-    "messageformat": "Introducing disappearing call events: Missed, outgoing, and received calls that occur after you install this update will now automatically disappear in any chat where disappearing messages are enabled."
-  },
-  "icu:WhatsNew__8.20--1": {
-    "messageformat": "Now you can reorder installed sticker packs so your new favorites don’t get stuck in the back of the line."
+  "icu:WhatsNew__8.30--1": {
+    "messageformat": "També hem afegit una drecera d'allò més pràctica per obrir els ajustos del sistema a Windows si, en intentar unir-te a una videotrucada, Signal no té permís per accedir a la teva càmera."
   }
 }

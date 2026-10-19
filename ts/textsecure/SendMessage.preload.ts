@@ -1,5 +1,6 @@
 // Copyright 2020 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
+// oxlint-disable max-classes-per-file
 
 import { z } from 'zod';
 import PQueue from 'p-queue';
@@ -103,6 +104,7 @@ import type {
   SendUnpinMessageType,
 } from '../types/PinnedMessage.std.ts';
 import type { Emoji } from '../axo/emoji.std.ts';
+import type { BlockedNumber } from '../types/StorageKeys.std.ts';
 
 const log = createLogger('SendMessage');
 
@@ -747,7 +749,6 @@ export function addPniSignatureMessageToProto({
   };
 }
 
-// oxlint-disable-next-line max-classes-per-file
 export class MessageSender {
   pendingMessages: {
     [id: string]: PQueue;
@@ -1202,8 +1203,12 @@ export class MessageSender {
 
     const blockedIdentifiers = new Set(
       concat(
-        itemStorage.blocked.getBlockedServiceIds(),
-        itemStorage.blocked.getBlockedNumbers()
+        Array.from(itemStorage.blocked.getBlockedServiceIds().values()).map(
+          item => item.serviceId
+        ),
+        Array.from(itemStorage.blocked.getBlockedNumbers().values()).map(
+          item => item.e164
+        )
       )
     );
 
@@ -2242,25 +2247,44 @@ export class MessageSender {
 
   static getBlockSync(
     options: Readonly<{
-      e164s: Array<string>;
-      acis: Array<AciString>;
-      groupIds: Array<Uint8Array<ArrayBuffer>>;
+      e164s: ReadonlyArray<BlockedNumber>;
+      acis: ReadonlyArray<{
+        blockedAt: number | undefined;
+        aci: AciString;
+      }>;
+      groupIds: ReadonlyArray<{
+        blockedAt: number | undefined;
+        groupId: Uint8Array<ArrayBuffer>;
+      }>;
     }>
   ): SingleProtoJobData {
     const myAci = itemStorage.user.getCheckedAci();
 
     const blocked: Proto.SyncMessage.Blocked.Params = {
-      numbers: options.e164s,
+      numbers: options.e164s.map(item => item.e164),
+      blockedE164s: options.e164s.map(item => ({
+        timestamp: item.blockedAt ? BigInt(item.blockedAt) : null,
+        e164: item.e164,
+      })),
       acisBinary: null,
       acis: null,
-      groupIds: options.groupIds,
+      blockedAcis: options.acis.map(item => ({
+        timestamp: item.blockedAt ? BigInt(item.blockedAt) : null,
+        aci: item.aci,
+        aciBinary: toAciObject(item.aci).getRawUuidBytes(),
+      })),
+      groupIds: options.groupIds.map(item => item.groupId),
+      blockedGroups: options.groupIds.map(item => ({
+        timestamp: item.blockedAt ? BigInt(item.blockedAt) : null,
+        groupId: item.groupId,
+      })),
     };
     if (isProtoBinaryEncodingEnabled()) {
-      blocked.acisBinary = options.acis.map(aci =>
-        toAciObject(aci).getRawUuidBytes()
+      blocked.acisBinary = options.acis.map(item =>
+        toAciObject(item.aci).getRawUuidBytes()
       );
     } else {
-      blocked.acis = options.acis;
+      blocked.acis = options.acis.map(item => item.aci);
     }
 
     const syncMessage = MessageSender.padSyncMessage({
@@ -2675,9 +2699,11 @@ export class MessageSender {
     timestamp: number;
     urgent: boolean;
   }>): Promise<CallbackResultType> {
-    const myE164 = itemStorage.user.getNumber();
+    const myE164 = itemStorage.user.getOptionalNumber();
     const myAci = itemStorage.user.getAci();
-    const serviceIds = recipients.filter(id => id !== myE164 && id !== myAci);
+    const serviceIds = recipients.filter(id => {
+      return (myE164 == null || id !== myE164) && id !== myAci;
+    });
 
     if (serviceIds.length === 0) {
       const dataMessage = proto.content?.dataMessage

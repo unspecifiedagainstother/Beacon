@@ -26,15 +26,29 @@ import { getDefaultAvatars } from '../../types/Avatar.std.ts';
 import { MINUTE, SECOND } from '../../util/durations/constants.std.ts';
 import { VerificationTransport } from '../../types/VerificationTransport.std.ts';
 import { PhoneNumberDiscoverability } from '../../util/phoneNumberDiscoverability.std.ts';
+import { DialogType } from '../../types/Dialogs.std.ts';
 
 const i18n = setupI18n('en', messages);
 
 const meta = {
   component: StandaloneRegistration,
   title: 'Components/StandaloneRegistration',
+  parameters: {
+    layout: 'fullscreen',
+  },
+  decorators: [
+    Story => {
+      return (
+        <div style={{ width: '100vw', height: '100vh' }}>
+          <Story />
+        </div>
+      );
+    },
+  ],
 } satisfies Meta<typeof StandaloneRegistration>;
 
 const phoneNumber = '+14155551111';
+const verificationSessionId = 'verification-session-id';
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -85,6 +99,19 @@ export const StartingScreen: Story = {
       status: {
         type: 'ready',
       },
+    },
+
+    // Updates
+    currentVersion: 'v1.0.0',
+    forceCheck: action('forceCheck'),
+    kickOffForcedUpgrade: action('kickOffForcedUpgrade'),
+    OS: 'windows',
+    startUpdate: action('startUpdate'),
+    updates: {
+      dialogType: DialogType.None,
+      didSnooze: false,
+      showEventsCount: 0,
+      isCheckingForUpdates: false,
     },
 
     // AvatarEditor support
@@ -171,7 +198,7 @@ export const Captcha: Story = {
       status: {
         type: 'ready',
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
     },
   },
 };
@@ -187,7 +214,7 @@ export const CaptchaInProgress: Story = {
         type: 'in-progress',
         startedAt: Date.now() - 25 * SECOND,
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
     },
   },
 };
@@ -199,7 +226,7 @@ export const CaptchaWithWaitTime: Story = {
       stage: RegistrationStage.CAPTCHA,
       captchaCompleteCount: 0,
       phoneNumber,
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       status: {
         type: 'waiting',
         canDoCaptchaAt: Date.now() + MINUTE * 5,
@@ -218,7 +245,7 @@ export const CaptchaWithAnotherNeeded: Story = {
       status: {
         type: 'another-needed',
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
     },
   },
 };
@@ -233,7 +260,7 @@ export const CaptchaWithFailure: Story = {
       status: {
         type: 'failed',
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
     },
   },
 };
@@ -249,7 +276,7 @@ export const VerificationCode: Story = {
       status: {
         type: 'ready',
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: false,
       failedToCall: false,
     },
@@ -267,7 +294,7 @@ export const VerificationCodeWhileSubmittingCode: Story = {
       status: {
         type: 'submitting-code',
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: false,
       failedToCall: false,
     },
@@ -286,7 +313,7 @@ export const VerificationCodeWhileRequestingSMS: Story = {
         type: 'requesting-code',
         transport: VerificationTransport.SMS,
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: false,
       failedToCall: false,
     },
@@ -305,7 +332,7 @@ export const VerificationCodeWhileRequestingCall: Story = {
         type: 'requesting-code',
         transport: VerificationTransport.Voice,
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: false,
       failedToCall: false,
     },
@@ -323,7 +350,7 @@ export const VerificationCodeWithFailedToSendSMS: Story = {
       status: {
         type: 'ready',
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: true,
       failedToCall: false,
     },
@@ -340,7 +367,7 @@ export const VerificationCodeWithFailedToCall: Story = {
       status: {
         type: 'ready',
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: false,
       failedToCall: true,
     },
@@ -357,7 +384,7 @@ export const VerificationCodeWithHavingTrouble: Story = {
         type: 'ready',
       },
       phoneNumber,
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: false,
       failedToCall: false,
     },
@@ -374,7 +401,7 @@ export const VerificationCodeWithMaximumAttempts: Story = {
         type: 'ready',
       },
       phoneNumber,
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: false,
       failedToCall: false,
     },
@@ -392,7 +419,7 @@ export const VerificationCodeWithAllDelays: Story = {
       status: {
         type: 'ready',
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: false,
       failedToCall: false,
       timings: {
@@ -416,7 +443,7 @@ export const VerificationCodeWithIncorrectCode: Story = {
         type: 'failed',
         error: 'incorrect-code',
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: false,
       failedToCall: false,
     },
@@ -435,7 +462,7 @@ export const VerificationCodeWithInvalidCode: Story = {
         type: 'failed',
         error: 'invalid-code',
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: false,
       failedToCall: false,
     },
@@ -458,7 +485,7 @@ export const VerificationCodeWithCannotSendCodeTemporary: Story = {
         smsCanBeRequestedAt: Date.now() + 5 * MINUTE,
         codeCanBeSubmittedAt: Date.now() + 5 * MINUTE,
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: false,
       failedToCall: false,
     },
@@ -476,7 +503,7 @@ export const VerificationCodeWithCannotSendCodePermanent: Story = {
         type: 'failed',
         error: 'cannot-send-code-permanent',
       },
-      verificationSessionId: 'verification-session-id',
+      verificationSessionId,
       failedToSendSMS: false,
       failedToCall: false,
     },
@@ -546,6 +573,195 @@ export const VerifyPIN: Story = {
     },
   },
 };
+export const VerifyPINInProgress: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'in-progress',
+      },
+    },
+  },
+};
+export const VerifyPINIncorrectPinTries3: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'failed',
+        error: 'incorrect-pin',
+      },
+      triesRemaining: 3,
+    },
+  },
+};
+export const VerifyPINIncorrectPinTries2: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'failed',
+        error: 'incorrect-pin',
+      },
+      triesRemaining: 2,
+    },
+  },
+};
+export const VerifyPINIncorrectPinTries1: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'failed',
+        error: 'incorrect-pin',
+      },
+      triesRemaining: 1,
+    },
+  },
+};
+export const VerifyPINIncorrectPinTries0: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'failed',
+        error: 'incorrect-pin',
+      },
+      triesRemaining: 0,
+    },
+  },
+};
+
+export const VerifyPINStartingWithTries2: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'ready',
+      },
+      triesRemaining: 2,
+    },
+  },
+};
+export const VerifyPINStartingWithTries1: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'ready',
+      },
+      triesRemaining: 1,
+    },
+  },
+};
+
+const dataForReglockAccountCreate = {
+  phoneNumber,
+  verificationSessionId,
+  svrCredentials: {
+    username: 'fake-username',
+    password: 'fake-password',
+  },
+  profileData: {
+    firstName: 'John',
+    phoneNumberDiscoverability: PhoneNumberDiscoverability.Discoverable,
+  },
+  avatars: [],
+};
+
+export const VerifyPINWithReglock: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'ready',
+      },
+      dataForReglockAccountCreate,
+    },
+  },
+};
+
+export const VerifyPINWithReglockAndIncorrectPinTries5: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'failed',
+        error: 'incorrect-pin',
+      },
+      triesRemaining: 5,
+      dataForReglockAccountCreate,
+    },
+  },
+};
+
+export const VerifyPINWithReglockAndIncorrectPinTries3: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'failed',
+        error: 'incorrect-pin',
+      },
+      triesRemaining: 3,
+      dataForReglockAccountCreate,
+    },
+  },
+};
+
+export const VerifyPINWithReglockAndIncorrectPinTries1: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'failed',
+        error: 'incorrect-pin',
+      },
+      triesRemaining: 1,
+      dataForReglockAccountCreate,
+    },
+  },
+};
+
+export const VerifyPINWithReglockAndIncorrectPinTries0: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'failed',
+        error: 'incorrect-pin',
+      },
+      triesRemaining: 0,
+      dataForReglockAccountCreate,
+    },
+  },
+};
+
+export const VerifyPINWithReglockStartingWithTries1: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.VERIFY_PIN,
+      status: {
+        type: 'ready',
+      },
+      triesRemaining: 1,
+      dataForReglockAccountCreate,
+    },
+  },
+};
 
 export const CreatePIN: Story = {
   args: {
@@ -585,6 +801,21 @@ export const AccountLocked: Story = {
     ...StartingScreen.args,
     workflow: {
       stage: RegistrationStage.ACCOUNT_LOCKED,
+    },
+  },
+};
+
+export const UpdateRequiredWithDownloadingState: Story = {
+  args: {
+    ...StartingScreen.args,
+    workflow: {
+      stage: RegistrationStage.UPDATE_REQUIRED,
+    },
+    updates: {
+      ...StartingScreen.args.updates,
+      dialogType: DialogType.Downloading,
+      downloadedSize: 50_000_000,
+      downloadSize: 60_000_000,
     },
   },
 };
@@ -634,7 +865,7 @@ export function ProgressionWithVerify(): React.JSX.Element {
         status: {
           type: 'ready',
         },
-        verificationSessionId: 'verification-session-id',
+        verificationSessionId,
       });
     },
     moveToVerificationStage: async (...params: Array<unknown>) => {
@@ -647,7 +878,7 @@ export function ProgressionWithVerify(): React.JSX.Element {
         status: {
           type: 'ready',
         },
-        verificationSessionId: 'verification-session-id',
+        verificationSessionId,
         failedToSendSMS: false,
         failedToCall: false,
       });

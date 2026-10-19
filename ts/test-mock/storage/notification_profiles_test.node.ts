@@ -18,6 +18,24 @@ import { DayOfWeek } from '../../types/NotificationProfile.std.ts';
 
 const IdentifierType = Proto.ManifestRecord.Identifier.Type;
 
+export const DEFAULT_PROFILE = {
+  allowAllCalls: true,
+  allowAllMentions: false,
+  scheduleStartTime: 900,
+  scheduleEndTime: 1700,
+  scheduleEnabled: false,
+  scheduleDaysEnabled: [
+    DayOfWeek.MONDAY,
+    DayOfWeek.TUESDAY,
+    DayOfWeek.WEDNESDAY,
+    DayOfWeek.THURSDAY,
+    DayOfWeek.FRIDAY,
+  ],
+  emoji: null,
+  allowedMembers: null,
+  deletedAtTimestampMs: null,
+};
+
 describe('storage service/notification profiles', function (this: Mocha.Suite) {
   this.timeout(durations.MINUTE);
 
@@ -71,7 +89,7 @@ describe('storage service/notification profiles', function (this: Mocha.Suite) {
 
     const profileName = 'NewProfile';
     debug('Starting Notification Profiles onboarding');
-    await window.getByRole('button', { name: 'Set up' }).click();
+    await window.getByRole('button', { name: 'Notification profiles' }).click();
 
     debug('Dismiss onboarding dialog');
     await window.getByRole('button', { name: 'Continue' }).click();
@@ -91,7 +109,7 @@ describe('storage service/notification profiles', function (this: Mocha.Suite) {
     await window.locator('button[role="switch"]').click();
     await window.getByRole('button', { name: 'Next' }).click();
 
-    debug('Done page');
+    debug('Done with schedule page');
     await window.getByRole('button', { name: 'Done' }).click();
 
     debug('List page');
@@ -135,10 +153,10 @@ describe('storage service/notification profiles', function (this: Mocha.Suite) {
     await window.getByTestId('EditSchedule').click();
     await window.locator('button[role="switch"]').click();
 
-    debug('Done page');
+    debug('Done with schedule page');
     await window.getByRole('button', { name: 'Done' }).click();
 
-    debug('Done page');
+    debug('Done with edit page');
     await window.getByRole('button', { name: 'Done' }).click();
 
     debug('List page');
@@ -222,7 +240,7 @@ describe('storage service/notification profiles', function (this: Mocha.Suite) {
     await window.getByRole('button', { name: 'Notifications' }).click();
 
     debug('Open Notification Profiles list page');
-    await window.getByRole('button', { name: 'Set up' }).click();
+    await window.getByRole('button', { name: 'Notification profiles' }).click();
 
     debug('Dismiss onboarding dialog');
     await window.getByRole('button', { name: 'Continue' }).click();
@@ -246,24 +264,7 @@ describe('storage service/notification profiles', function (this: Mocha.Suite) {
       generateNotificationProfileId()
     );
 
-    const DEFAULT_PROFILE = {
-      allowAllCalls: true,
-      allowAllMentions: false,
-      scheduleStartTime: 900,
-      scheduleEndTime: 1700,
-      scheduleEnabled: false,
-      scheduleDaysEnabled: [
-        DayOfWeek.MONDAY,
-        DayOfWeek.TUESDAY,
-        DayOfWeek.WEDNESDAY,
-        DayOfWeek.THURSDAY,
-        DayOfWeek.FRIDAY,
-      ],
-      emoji: null,
-      allowedMembers: null,
-      deletedAtTimestampMs: null,
-    };
-
+    let uploadedState: StorageState;
     {
       let newState = firstState.addRecord({
         type: IdentifierType.NOTIFICATION_PROFILE,
@@ -303,14 +304,14 @@ describe('storage service/notification profiles', function (this: Mocha.Suite) {
         },
       });
 
-      await phone.setStorageState(newState);
+      uploadedState = await phone.setStorageState(newState);
     }
 
     debug('Waiting for desktop to process storage service updates');
     await phone.sendFetchStorage({
       timestamp: bootstrap.getTimestamp(),
     });
-    await app.waitForManifestVersion(firstState.version + 1n);
+    await app.waitForManifestVersion(uploadedState.version);
 
     debug('Now we should be on the Notification Profiles list page');
     await expect(
@@ -380,10 +381,10 @@ describe('storage service/notification profiles', function (this: Mocha.Suite) {
     await window.getByTestId('EditSchedule').click();
     await window.locator('button[role="switch"]').click();
 
-    debug('Done page');
+    debug('Done with schedule page');
     await window.getByRole('button', { name: 'Done' }).click();
 
-    debug('Done page');
+    debug('Done with edit page');
     await window.getByRole('button', { name: 'Done' }).click();
 
     debug('List page');
@@ -405,7 +406,7 @@ describe('storage service/notification profiles', function (this: Mocha.Suite) {
     debug('Schedule page');
     await window.getByRole('button', { name: 'Next' }).click();
 
-    debug('Done page');
+    debug('Done with schedule page');
     await window.getByRole('button', { name: 'Done' }).click();
 
     debug('List page');
@@ -484,7 +485,7 @@ describe('storage service/notification profiles', function (this: Mocha.Suite) {
         notificationProfileSyncDisabled: false,
       });
 
-      await phone.setStorageState(newState);
+      uploadedState = await phone.setStorageState(newState);
     }
 
     // now desktop will see the off->on flip for sync, and reconcile profiles:
@@ -496,7 +497,7 @@ describe('storage service/notification profiles', function (this: Mocha.Suite) {
     await phone.sendFetchStorage({
       timestamp: bootstrap.getTimestamp(),
     });
-    await app.waitForManifestVersion(secondState.version + 1n);
+    await app.waitForManifestVersion(uploadedState.version);
 
     debug('Check what is on the list page now');
     await expect(

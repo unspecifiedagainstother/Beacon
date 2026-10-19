@@ -26,7 +26,7 @@ import {
 } from '../../types/MIME.std.ts';
 import { ReadStatus } from '../../messages/MessageReadStatus.std.ts';
 import { MessageAudio } from './MessageAudio.dom.tsx';
-import { computePeaks } from '../VoiceNotesPlaybackContext.dom.tsx';
+import { computeWaveform } from '../VoiceNotesPlaybackContext.dom.tsx';
 import { pngUrl } from '../../storybook/Fixtures.std.ts';
 import { getDefaultConversation } from '../../test-helpers/getDefaultConversation.std.ts';
 import { WidthBreakpoint } from '../_util.std.ts';
@@ -150,6 +150,7 @@ function MessageAudioContainer({
 
     return {
       loadAndPlay(url: string, positionAsRatio: number) {
+        // oxlint-disable-next-line react/immutability
         onLoadedData = () => {
           play(positionAsRatio);
         };
@@ -159,12 +160,15 @@ function MessageAudioContainer({
       pause() {
         a.pause();
       },
+      // oxlint-disable-next-line react/todo
       set playbackRate(rate: number) {
         a.playbackRate = rate;
       },
+      // oxlint-disable-next-line react/todo
       set currentTime(value: number) {
         a.currentTime = value;
       },
+      // oxlint-disable-next-line react/todo
       get duration() {
         return a.duration;
       },
@@ -184,6 +188,7 @@ function MessageAudioContainer({
   };
 
   const setPlaybackRateAction = (rate: number) => {
+    // oxlint-disable-next-line react/immutability
     audioPlayer.playbackRate = rate;
     setPlaybackRate(rate);
   };
@@ -198,6 +203,7 @@ function MessageAudioContainer({
   };
 
   const setPosition = (value: number) => {
+    // oxlint-disable-next-line react/immutability
     audioPlayer.currentTime = value * audioPlayer.duration;
     setCurrentTime(audioPlayer.currentTime);
   };
@@ -215,7 +221,7 @@ function MessageAudioContainer({
     <MessageAudio
       {...props}
       active={active}
-      computePeaks={computePeaks}
+      computeWaveform={computeWaveform}
       isPinned={false}
       onPlayMessage={handlePlayMessage}
       played={_played}
@@ -270,13 +276,13 @@ const createProps = (overrideProps: Partial<Props> = {}): Props => ({
   expirationTimestamp: overrideProps.expirationTimestamp ?? 0,
   getPreferredBadge: overrideProps.getPreferredBadge || (() => undefined),
   giftBadge: overrideProps.giftBadge,
+  handleClickCtaButton: action('handleClickCtaButton'),
   handleDebugMessage: action('handleDebugMessage'),
   i18n,
   platform: 'darwin',
   id: overrideProps.id ?? 'random-message-id',
   // renderingContext: 'storybook',
   interactivity: MessageInteractivity.Normal,
-  interactionMode: overrideProps.interactionMode || 'keyboard',
   isSticker: isBoolean(overrideProps.isSticker)
     ? overrideProps.isSticker
     : false,
@@ -299,6 +305,9 @@ const createProps = (overrideProps: Partial<Props> = {}): Props => ({
   isTapToView: overrideProps.isTapToView,
   isTapToViewError: overrideProps.isTapToViewError,
   isTapToViewExpired: overrideProps.isTapToViewExpired,
+  isTargeted: false,
+  isTargetedCounter: null,
+  isTargetedSource: null,
   isVoiceMessagePlayed: false,
   cancelAttachmentDownload: action('cancelAttachmentDownload'),
   kickOffAttachmentDownload: action('kickOffAttachmentDownload'),
@@ -836,6 +845,22 @@ Sticker.args = {
   status: 'sent',
 };
 
+export const StickerThatFailsToLoad = Template.bind({});
+StickerThatFailsToLoad.args = {
+  attachments: [
+    fakeAttachment({
+      url: '/fixtures/this-sticker-does-not-exist.webp',
+      fileName: 'this-sticker-does-not-exist.webp',
+      contentType: IMAGE_WEBP,
+      width: 128,
+      height: 128,
+      blurHash: 'LDA,FDBnm+I=p{tkIUI;~UkpELV]',
+    }),
+  ],
+  isSticker: true,
+  status: 'sent',
+};
+
 export const StickerInGroup = Template.bind({});
 StickerInGroup.args = {
   attachments: [
@@ -977,6 +1002,7 @@ DeletedWithExpireTimer.args = {
 
 export function DeletedPending(): JSX.Element {
   const props = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -990,6 +1016,7 @@ export function DeletedPending(): JSX.Element {
 
 export function AdminDeletedPending(): JSX.Element {
   const props = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1004,6 +1031,7 @@ export function AdminDeletedPending(): JSX.Element {
     direction: 'outgoing',
   });
   const propsIncoming = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1028,6 +1056,7 @@ export function AdminDeletedPending(): JSX.Element {
 
 export function DeletedWithError(): JSX.Element {
   const propsPartialError = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1036,6 +1065,7 @@ export function DeletedWithError(): JSX.Element {
     direction: 'outgoing',
   });
   const propsError = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1054,6 +1084,7 @@ export function DeletedWithError(): JSX.Element {
 
 export function DeletedWithErrorCanRetry(): JSX.Element {
   const propsPartialError = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1063,6 +1094,7 @@ export function DeletedWithErrorCanRetry(): JSX.Element {
     direction: 'outgoing',
   });
   const propsError = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1090,6 +1122,7 @@ export function AdminDeletedWithError(): JSX.Element {
     },
   };
   const propsOutgoingPartialError = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1099,6 +1132,7 @@ export function AdminDeletedWithError(): JSX.Element {
     direction: 'outgoing',
   });
   const propsOutgoingError = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1108,6 +1142,7 @@ export function AdminDeletedWithError(): JSX.Element {
     direction: 'outgoing',
   });
   const propsIncomingPartialError = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1117,6 +1152,7 @@ export function AdminDeletedWithError(): JSX.Element {
     direction: 'incoming',
   });
   const propsIncomingError = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1146,6 +1182,7 @@ export function AdminDeletedWithErrorCanRetry(): JSX.Element {
     },
   };
   const propsOutgoingPartialError = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1156,6 +1193,7 @@ export function AdminDeletedWithErrorCanRetry(): JSX.Element {
     direction: 'outgoing',
   });
   const propsOutgoingError = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1166,6 +1204,7 @@ export function AdminDeletedWithErrorCanRetry(): JSX.Element {
     direction: 'outgoing',
   });
   const propsIncomingPartialError = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1176,6 +1215,7 @@ export function AdminDeletedWithErrorCanRetry(): JSX.Element {
     direction: 'incoming',
   });
   const propsIncomingError = createProps({
+    // oxlint-disable-next-line react/purity
     timestamp: Date.now() - 60 * 1000,
     conversationType: 'group',
     contactNameColor: '100',
@@ -1393,6 +1433,32 @@ LinkPreviewWithSmallImage.args = {
         height: 50,
         url: pngUrl,
         width: 50,
+      }),
+      isStickerPack: false,
+      isCallLink: false,
+      title: 'Signal',
+      description:
+        'Say "hello" to a different messaging experience. An unexpected focus on privacy, combined with all of the features you expect.',
+      url: 'https://www.signal.org',
+      date: new Date(2020, 2, 10).valueOf(),
+    },
+  ],
+  status: 'sent',
+  text: 'Be sure to look at https://www.signal.org',
+};
+
+export const LinkPreviewImageThatFailsToLoad = Template.bind({});
+LinkPreviewImageThatFailsToLoad.args = {
+  previews: [
+    {
+      domain: 'signal.org',
+      image: fakeAttachment({
+        contentType: IMAGE_PNG,
+        fileName: 'the-sax.png',
+        height: 50,
+        url: '/fixtures/this-preview-does-not-exist.png',
+        width: 50,
+        blurHash: 'LDA,FDBnm+I=p{tkIUI;~UkpELV]',
       }),
       isStickerPack: false,
       isCallLink: false,
@@ -1802,6 +1868,7 @@ export function BrokenImageWithExpirationTimer(): JSX.Element {
       }),
     ],
     expirationLength: 30 * 1000,
+    // oxlint-disable-next-line react/purity
     expirationTimestamp: Date.now() + 30 * 1000,
     status: 'sent',
   });
@@ -1816,6 +1883,7 @@ export function BrokenImageWithExpirationTimer(): JSX.Element {
       }),
     ],
     expirationLength: 30 * 1000,
+    // oxlint-disable-next-line react/purity
     expirationTimestamp: Date.now() + 30 * 1000,
     status: 'sent',
   });
@@ -2049,6 +2117,7 @@ export function BrokenVideoWithExpirationTimer(): JSX.Element {
       }),
     ],
     expirationLength: 30 * 1000,
+    // oxlint-disable-next-line react/purity
     expirationTimestamp: Date.now() + 30 * 1000,
     status: 'sent',
   });
@@ -2070,6 +2139,7 @@ export function BrokenVideoWithExpirationTimer(): JSX.Element {
       }),
     ],
     expirationLength: 30 * 1000,
+    // oxlint-disable-next-line react/purity
     expirationTimestamp: Date.now() + 30 * 1000,
     status: 'sent',
   });
@@ -2253,6 +2323,86 @@ MultipleImagesWithBodyTextOneTooBig.args = {
   status: 'sent',
 };
 
+export const ImageTooLargeToDisplay = Template.bind({});
+ImageTooLargeToDisplay.args = {
+  attachments: [
+    fakeAttachment({
+      url: pngUrl,
+      fileName: 'enormous.png',
+      contentType: IMAGE_PNG,
+      height: 10000,
+      width: 10000,
+      blurHash: 'LDA,FDBnm+I=p{tkIUI;~UkpELV]',
+    }),
+  ],
+  status: 'sent',
+};
+
+export const ImageMissingDimensions = Template.bind({});
+ImageMissingDimensions.args = {
+  attachments: [
+    fakeAttachment({
+      url: pngUrl,
+      fileName: 'the-sax.png',
+      contentType: IMAGE_PNG,
+      height: undefined,
+      width: undefined,
+      blurHash: 'LDA,FDBnm+I=p{tkIUI;~UkpELV]',
+    }),
+  ],
+  status: 'sent',
+};
+
+export const MultipleImagesWithFirstTooLargeToDisplay = Template.bind({});
+MultipleImagesWithFirstTooLargeToDisplay.args = {
+  attachments: [
+    fakeAttachment({
+      url: pngUrl,
+      fileName: 'enormous.png',
+      contentType: IMAGE_PNG,
+      height: 10000,
+      width: 10000,
+      blurHash: 'LDA,FDBnm+I=p{tkIUI;~UkpELV]',
+    }),
+    fakeAttachment({
+      url: pngUrl,
+      fileName: 'the-sax.png',
+      contentType: IMAGE_PNG,
+      height: 240,
+      width: 320,
+    }),
+    fakeAttachment({
+      url: pngUrl,
+      fileName: 'the-sax.png',
+      contentType: IMAGE_PNG,
+      height: 240,
+      width: 320,
+    }),
+  ],
+  status: 'sent',
+};
+
+export const VideoTooLargeToDisplay = Template.bind({});
+VideoTooLargeToDisplay.args = {
+  attachments: [
+    fakeAttachment({
+      contentType: VIDEO_MP4,
+      fileName: 'enormous.mp4',
+      screenshot: {
+        url: pngUrl,
+        size: 100000,
+        width: 10000,
+        height: 10000,
+        contentType: IMAGE_PNG,
+      },
+      width: 10000,
+      height: 10000,
+      blurHash: 'LDA,FDBnm+I=p{tkIUI;~UkpELV]',
+    }),
+  ],
+  status: 'sent',
+};
+
 export const ImageWithCaption = Template.bind({});
 ImageWithCaption.args = {
   attachments: [
@@ -2313,6 +2463,22 @@ GifInAGroup.args = {
   ],
   conversationType: 'group',
   contactNameColor: '100',
+  status: 'sent',
+};
+
+export const GifThatFailsToLoad = Template.bind({});
+GifThatFailsToLoad.args = {
+  attachments: [
+    fakeAttachment({
+      contentType: VIDEO_MP4,
+      flags: SignalService.AttachmentPointer.Flags.GIF,
+      fileName: 'cat-gif.mp4',
+      url: '/fixtures/this-gif-does-not-exist.mp4',
+      blurHash: 'LDA,FDBnm+I=p{tkIUI;~UkpELV]',
+      width: 400,
+      height: 332,
+    }),
+  ],
   status: 'sent',
 };
 
@@ -2899,8 +3065,6 @@ export function PollAnimationPlayground(): JSX.Element {
         )}
       >
         <label className={tw('mb-2 flex cursor-pointer items-center gap-2')}>
-          {/* FIXME */}
-          {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label */}
           <input
             type="checkbox"
             checked={allowMultiple}
@@ -2915,8 +3079,6 @@ export function PollAnimationPlayground(): JSX.Element {
         </label>
 
         <label className={tw('mb-4 flex cursor-pointer items-center gap-2')}>
-          {/* FIXME */}
-          {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label */}
           <input
             type="checkbox"
             checked={badNetwork}
@@ -4070,4 +4232,20 @@ SignalReleaseNoteMessage.args = {
       height: 400,
     }),
   ],
+};
+
+export const SignalReleaseNoteMessageCtaDonate = Template.bind({});
+SignalReleaseNoteMessageCtaDonate.args = {
+  isSignalConversation: true,
+  text: 'Signal. Proudly Nonprofit.\n\nDonating earns a badge on your profile. As an independent nonprofit, we rely on donations to securely send your messages, host your calls, and build new features.\n\nWe can’t do this without you.\n\nUS donations are tax deductible.',
+  attachments: [
+    fakeAttachment({
+      url: '/fixtures/donate-heart.png',
+      fileName: 'donate-heart.png',
+      contentType: IMAGE_PNG,
+      width: 400,
+      height: 400,
+    }),
+  ],
+  callToActionId: 'donate',
 };

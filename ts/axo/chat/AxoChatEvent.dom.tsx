@@ -47,7 +47,7 @@ export namespace AxoChatEvent {
    * @example Basic
    * ```tsx
    * <AxoChatEvent.Root>
-   *   <AxoChatEvent.Body variant="secondary" symbol="refresh">
+   *   <AxoChatEvent.Body variant="secondary" symbol="arrow-clockwise">
    *     Secure session reset
    *   </AxoChatEvent.Body>
    * </AxoChatEvent.Root>
@@ -116,7 +116,7 @@ export namespace AxoChatEvent {
     /** Visual style of the body */
     variant: BodyVariant;
     /** Leading icon */
-    symbol: AxoSymbol.InlineGlyphName;
+    symbol: AxoSymbol.Name;
     /** Chat event label */
     children: ReactNode;
   }>;
@@ -187,7 +187,7 @@ export namespace AxoChatEvent {
         className={tw(
           'inline',
           'hover:underline focus:underline active:text-primary',
-          'rounded-xs outline-none keyboard-mode:focus:axo-focus-ring',
+          'rounded-xs focus-visible:axo-focus-ring',
           'forced-colors:underline',
           'forced-colors:text-[LinkText]'
         )}

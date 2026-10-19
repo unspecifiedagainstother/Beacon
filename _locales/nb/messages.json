@@ -3,13 +3,16 @@
     "messageformat": "Avbryt"
   },
   "icu:AxoButton.Pending": {
-    "messageformat": "Avventer"
+    "messageformat": "Under behandling"
   },
   "icu:AxoDialog.Back": {
     "messageformat": "Tilbake"
   },
   "icu:AxoDialog.Close": {
     "messageformat": "Lukk"
+  },
+  "icu:AxoPasswordField.Reveal": {
+    "messageformat": "Vis passord"
   },
   "icu:AxoTextField.Clear": {
     "messageformat": "Slett"
@@ -18,7 +21,7 @@
     "messageformat": "{max,number}+"
   },
   "icu:AddUserToAnotherGroupModal__title": {
-    "messageformat": "Legg til i gruppen"
+    "messageformat": "Legg til i en gruppe"
   },
   "icu:AddUserToAnotherGroupModal__confirm-title": {
     "messageformat": "Vil du legge til et nytt medlem?"
@@ -27,13 +30,13 @@
     "messageformat": "Legg til"
   },
   "icu:AddUserToAnotherGroupModal__confirm-message": {
-    "messageformat": "Legg til {contact} i gruppen {group}"
+    "messageformat": "Legg til {contact} i gruppen «{group}»"
   },
   "icu:AddUserToAnotherGroupModal__search-placeholder": {
     "messageformat": "Søk"
   },
   "icu:AddUserToAnotherGroupModal__toast--user-added-to-group": {
-    "messageformat": "{contact} ble lagt til i {group}"
+    "messageformat": "{contact} ble lagt til i «{group}»"
   },
   "icu:AddUserToAnotherGroupModal__toast--adding-user-to-group": {
     "messageformat": "Legger til {contact} …"
@@ -62,6 +65,24 @@
   "icu:Preferences__DonateTitle": {
     "messageformat": "Gi penger til Signal"
   },
+  "icu:LinkedDevicesOnboardingDialog__description": {
+    "messageformat": "<bold>Tilkoblede enheter</bold> gir deg trygg tilgang til Signal-kontoen din og meldingene dine på alle de andre enhetene dine."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--1": {
+    "messageformat": "Du kan koble til en PC, et nettbrett eller en annen telefon."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--2": {
+    "messageformat": "På hovedenheten din kan du styre hva som er koblet til kontoen din, og du kan koble til opptil fem enheter."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3": {
+    "messageformat": "Enkelte innstillinger er kun tilgjengelig på hovedenheten din, blant annet kontoinnstillingene og sikkerhetskopier."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--1": {
+    "messageformat": "Kontoinnstillingene og sikkerhetskopiene kan kun endres på hovedenheten."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--2": {
+    "messageformat": "Kontoinnstillinger og Sikre sikkerhetskopier kan kun administreres på hovedenheten."
+  },
   "icu:sentMediaQualityStandard": {
     "messageformat": "Standard"
   },
@@ -69,7 +90,7 @@
     "messageformat": "Høy"
   },
   "icu:softwareAcknowledgments": {
-    "messageformat": "Kildekode henvisninger"
+    "messageformat": "Programvarebekreftelser"
   },
   "icu:privacyPolicy": {
     "messageformat": "Vilkår og personvernerklæring"
@@ -117,7 +138,7 @@
     "messageformat": "Alle meldingene og mediefilene dine slettes fra denne enheten for godt. Ingen data fra mobilen din slettes.\n\nDu kan bruke Signal på denne enheten hvis du kobler den til på nytt. Du har muligheten til å overføre meldingsloggen fra telefonen din."
   },
   "icu:databaseError__startOldVersion": {
-    "messageformat": "Versjonen av databasen passer ikke sammen med denne versjonen av Signal. Sørg for at du bruker den nyeste versjonen av Signal på datamaskinen din."
+    "messageformat": "Versjonen av databasen samsvarer ikke med denne versjonen av Signal. Sørg for at du bruker den nyeste versjonen av Signal på datamaskinen din."
   },
   "icu:databaseError__safeStorageBackendChange": {
     "messageformat": "Ingen tilgang til krypteringsnøkkelen for databasen fordi krypteringsringen til operativsystemet har endret seg fra {previousBackend} til {currentBackend}. Dette skjer hvis skrivebordsmiljøet endres, for eksempel fra GNOME til KDE.\n\nBytt tilbake til det forrige miljøet."
@@ -138,7 +159,7 @@
     "messageformat": "&Fil"
   },
   "icu:mainMenuCreateStickers": {
-    "messageformat": "Opprett/last opp etikettpakke"
+    "messageformat": "Opprett / last opp klistremerkepakke"
   },
   "icu:mainMenuEdit": {
     "messageformat": "&Rediger"
@@ -153,7 +174,7 @@
     "messageformat": "&Hjelp"
   },
   "icu:mainMenuSettings": {
-    "messageformat": "Innstillinger…"
+    "messageformat": "Innstillinger …"
   },
   "icu:appMenuServices": {
     "messageformat": "Tjenester"
@@ -162,10 +183,10 @@
     "messageformat": "Skjul"
   },
   "icu:appMenuHideOthers": {
-    "messageformat": "Gjem Andre"
+    "messageformat": "Skjul andre"
   },
   "icu:appMenuUnhide": {
-    "messageformat": "Vis Alle"
+    "messageformat": "Vis alle"
   },
   "icu:appMenuQuit": {
     "messageformat": "Avslutt Signal"
@@ -192,7 +213,7 @@
     "messageformat": "Slett"
   },
   "icu:editMenuSelectAll": {
-    "messageformat": "Velg Alt"
+    "messageformat": "Velg alt"
   },
   "icu:editMenuStartSpeaking": {
     "messageformat": "Begynn å snakke"
@@ -279,7 +300,7 @@
     "messageformat": "Fiks nå"
   },
   "icu:LeftPane--corrupted-username-link--text": {
-    "messageformat": "Noe gikk galt med QR-koden og profillenken din. De er ikke lenger gyldige. Opprett en ny lenke for å dele profilen din med andre."
+    "messageformat": "Noe gikk galt med QR-koden og brukernavnlenken din. De er ikke lenger gyldige. Opprett en ny lenke for å dele profilen din med andre."
   },
   "icu:LeftPane--corrupted-username-link--action-text": {
     "messageformat": "Fiks nå"
@@ -288,13 +309,13 @@
     "messageformat": "Søk etter brukernavn"
   },
   "icu:LeftPane__compose__findByPhoneNumber": {
-    "messageformat": "Søk på telefonnummer"
+    "messageformat": "Søk etter telefonnummer"
   },
   "icu:LeftPaneFindByHelper__title--findByUsername": {
     "messageformat": "Søk etter brukernavn"
   },
   "icu:LeftPaneFindByHelper__title--findByPhoneNumber": {
-    "messageformat": "Søk på telefonnummer"
+    "messageformat": "Søk etter telefonnummer"
   },
   "icu:LeftPaneFindByHelper__placeholder--findByUsername": {
     "messageformat": "Brukernavn"
@@ -303,7 +324,7 @@
     "messageformat": "Telefonnummer"
   },
   "icu:LeftPaneFindByHelper__description--findByUsername": {
-    "messageformat": "Angi brukernavnet etterfulgt av et punktum og tallrekken."
+    "messageformat": "Angi et brukernavn etterfulgt av et punktum og tallrekken."
   },
   "icu:LeftPane__EmptyView--WithSelectedChatFolder": {
     "messageformat": "Ingen samtaler å vise"
@@ -317,11 +338,8 @@
   "icu:LeftPaneChatFolders__ItemLabel--All": {
     "messageformat": "Alle samtaler"
   },
-  "icu:LeftPaneChatFolders__ItemUnreadBadge__MaxCount": {
-    "messageformat": "{maxCount,number}+"
-  },
   "icu:LeftPaneChatFolders__ItemUnreadBadge__AccessibleLabel": {
-    "messageformat": "{count, plural, one {{count,number} Unread Message} other {{count,number} Unread Messages}}"
+    "messageformat": "{count, plural, one {{count,number} ulest melding} other {{count,number} uleste meldinger}}"
   },
   "icu:LeftPaneChatFolders__Item__ContextMenu__MarkAllRead": {
     "messageformat": "Merk alle som lest"
@@ -360,13 +378,10 @@
     "messageformat": "Skjul faner"
   },
   "icu:NavTabs__ItemIconLabel--HasError": {
-    "messageformat": "En feil har oppstått"
+    "messageformat": "Det har oppstått en feil"
   },
   "icu:NavTabs__ItemIconLabel--UnreadCount": {
-    "messageformat": "{count,number} uleste"
-  },
-  "icu:NavTabs__ItemIconLabel--MarkedUnread": {
-    "messageformat": "Merket som ulest"
+    "messageformat": "{count,number} ulest"
   },
   "icu:NavTabs__ItemLabel--Chats": {
     "messageformat": "Samtaler"
@@ -635,20 +650,23 @@
   "icu:SafetyNumberNotReady__learn-more": {
     "messageformat": "Lær mer"
   },
-  "icu:KeyTransparencyErrorDialog__Title": {
-    "messageformat": "Automatisk kodebekreftelse er ikke tilgjengelig for øyeblikket. Vil du sende inn en feilsøkingslogg?"
+  "icu:KeyTransparencyErrorDialog__Title-v2": {
+    "messageformat": "Automatisk kodebekreftelse er ikke tilgjengelig for øyeblikket. Vil du sende inn en rapport for å hjelpe oss med å bli bedre?"
   },
-  "icu:KeyTransparencyErrorDialog__Description": {
-    "messageformat": "Feilsøkingslogger gjør det lettere for oss å løse problemet. De inneholder ikke opplysninger som kan brukes til å identifisere deg."
+  "icu:KeyTransparencyErrorDialog__Description-v2": {
+    "messageformat": "Deling av feilsøkingslogger gjør det lettere for oss å løse problemet. De inneholder ikke opplysninger som kan brukes til å identifisere deg. Dette er helt frivillig."
   },
-  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label": {
-    "messageformat": "Del feilsøkingslogg"
+  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label-v2": {
+    "messageformat": "Inkluder feilsøkingslogg"
   },
   "icu:KeyTransparencyErrorDialog__ShareDebugLog__ViewButton": {
     "messageformat": "Vis"
   },
   "icu:KeyTransparencyErrorDialog__Submit": {
     "messageformat": "Send inn"
+  },
+  "icu:KeyTransparencyErrorDialog__Cancel": {
+    "messageformat": "Nei takk"
   },
   "icu:KeyTransparencyOnboardingDialog__Title": {
     "messageformat": "Signal bekrefter nå krypteringer automatisk"
@@ -746,11 +764,11 @@
   "icu:maximumAttachments": {
     "messageformat": "Du kan ikke legge til flere vedlegg i denne meldingen."
   },
-  "icu:fileSizeWarning": {
-    "messageformat": "Den valgte filen overskrider begrensninger for meldingsstørrelse. {limit,number} {units}"
+  "icu:fileTooLargeWarning": {
+    "messageformat": "Filen er for stor til å sendes. Du kan sende filer som er opptil {limit,number}{units}."
   },
-  "icu:videoFileSizeWarning": {
-    "messageformat": "Den valgte videofilen overskrider begrensningen for meldingsstørrelse. {limit,number}{units}"
+  "icu:videoFileTooLargeWarning": {
+    "messageformat": "Videofilen er for stor til å sendes. Du kan sende videofiler som er opptil {limit,number}{units}."
   },
   "icu:unableToLoadAttachment": {
     "messageformat": "Kunne ikke laste valgt vedlegg."
@@ -772,6 +790,9 @@
   },
   "icu:checkNetworkConnection": {
     "messageformat": "Kontroller nettverkstilkoblingen."
+  },
+  "icu:clockSkewDetected": {
+    "messageformat": "Datoen på enheten stemmer ikke. Still inn klokken og prøv på nytt. Datoen og tidspunktet på enheten er:"
   },
   "icu:submitDebugLog": {
     "messageformat": "Feilsøkingslogg"
@@ -994,6 +1015,9 @@
   },
   "icu:mute": {
     "messageformat": "Demp"
+  },
+  "icu:muted": {
+    "messageformat": "Dempet"
   },
   "icu:cannotUpdateDetail-v2": {
     "messageformat": "Signal kunne ikke oppdateres. <retryUpdateButton>Prøv på nytt</retryUpdateButton>, eller gå til {url} for å installere oppdateringen manuelt. Etterpå kan du <contactSupportLink>gi Signals brukerstøtte beskjed</contactSupportLink> om problemet."
@@ -1261,6 +1285,9 @@
   },
   "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync": {
     "messageformat": "Alle meldingene i denne samtalen slettes fra alle enhetene dine."
+  },
+  "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync--still-member": {
+    "messageformat": "Alle meldingene i denne samtalen slettes fra alle enhetene dine. Du kommer fremdeles til å være medlem av denne gruppen."
   },
   "icu:ConversationHeader__ContextMenu__LeaveGroupAction__title": {
     "messageformat": "Forlat gruppen"
@@ -1610,9 +1637,6 @@
   "icu:Preferences__EmojiSkinToneDefaultSetting__Label": {
     "messageformat": "Emoji-hudtone"
   },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__Title": {
-    "messageformat": "Samtalemapper"
-  },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Title": {
     "messageformat": "Legg til en samtalemappe"
   },
@@ -1624,12 +1648,6 @@
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Description--WithChatFolders": {
     "messageformat": "{chatFoldersCount, plural, one {{chatFoldersCount,number} mappe} other {{chatFoldersCount,number} mapper}}"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button": {
-    "messageformat": "Konfigurer"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button--WithChatFolders": {
-    "messageformat": "Administrer"
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__ChatFolderItem__ContextMenu__EditFolder": {
     "messageformat": "Rediger mappe"
@@ -2384,9 +2402,6 @@
   "icu:SafetyNumberModal__title": {
     "messageformat": "Bekreft sikkerhetsnummer"
   },
-  "icu:safetyNumberChanged": {
-    "messageformat": "Sikkerhetsnummer er endret"
-  },
   "icu:safetyNumberChanges": {
     "messageformat": "Endringer av sikkerhetsnummer"
   },
@@ -2826,16 +2841,16 @@
     "messageformat": "Fjern"
   },
   "icu:stickers--StickerManagerPackDragHandle--Label": {
-    "messageformat": "Drag to reorder sticker pack"
+    "messageformat": "Dra for å endre rekkefølgen på klistremerkepakkene"
   },
   "icu:stickers--StickerManagerBlessedPacksList--Label": {
-    "messageformat": "Signal Artist Series sticker packs"
+    "messageformat": "Klistremerkepakker fra Signal Artist Series"
   },
   "icu:stickers--StickerManagerReceivedPacksList--Label": {
-    "messageformat": "Received sticker packs"
+    "messageformat": "Mottatte klistremerkepakker"
   },
   "icu:stickers--StickerManagerInstalledPacksList--Label": {
-    "messageformat": "Installed sticker packs"
+    "messageformat": "Installerte klistremerkepakker"
   },
   "icu:stickers--StickerPreview--Title": {
     "messageformat": "Klistremerkepakke"
@@ -3081,16 +3096,16 @@
     "messageformat": "Legg til et klistremerke"
   },
   "icu:FunPicker__Label--StickerReply": {
-    "messageformat": "Reply"
+    "messageformat": "Svar"
   },
   "icu:FunPicker__Label--SendStickerReply": {
     "messageformat": "Send"
   },
   "icu:FunPicker__Label--CancelStickerReply": {
-    "messageformat": "Cancel"
+    "messageformat": "Avbryt"
   },
   "icu:FunPicker__Label--Sticker": {
-    "messageformat": "Sticker"
+    "messageformat": "Klistremerke"
   },
   "icu:confirmation-dialog--Cancel": {
     "messageformat": "Avbryt"
@@ -3872,20 +3887,20 @@
   "icu:calling__preview--minimize": {
     "messageformat": "Lukk forhåndsvisning"
   },
-  "icu:calling__change-view": {
-    "messageformat": "Bytt visning"
-  },
-  "icu:calling__view_mode--paginated": {
-    "messageformat": "Rutenett"
-  },
-  "icu:calling__view_mode--overflow": {
-    "messageformat": "Sidestolpe"
-  },
-  "icu:calling__view_mode--speaker": {
-    "messageformat": "Den som snakker"
-  },
   "icu:calling__view_mode--updated": {
     "messageformat": "Visning oppdatert"
+  },
+  "icu:calling__change-layout": {
+    "messageformat": "Bytt visning"
+  },
+  "icu:calling__layout--paginated": {
+    "messageformat": "Rutenett"
+  },
+  "icu:calling__layout--overflow": {
+    "messageformat": "Sidestolpe"
+  },
+  "icu:calling__layout--speaker": {
+    "messageformat": "Personen som snakker"
   },
   "icu:calling__SelectPresentingSourcesModal--title": {
     "messageformat": "Del skjermen din"
@@ -3950,23 +3965,47 @@
   "icu:notMuted": {
     "messageformat": "Ikke dempet"
   },
-  "icu:muteHour": {
-    "messageformat": "Demp i én time"
-  },
-  "icu:muteEightHours": {
-    "messageformat": "Demp i åtte timer"
-  },
-  "icu:muteDay": {
-    "messageformat": "Demp i én dag"
-  },
-  "icu:muteWeek": {
-    "messageformat": "Demp i én uke"
-  },
-  "icu:muteAlways": {
-    "messageformat": "Demp for alltid"
-  },
   "icu:unmute": {
     "messageformat": "Vis varsler"
+  },
+  "icu:MuteMenu__label": {
+    "messageformat": "Demp samtalen i …"
+  },
+  "icu:MuteMenu__hour": {
+    "messageformat": "1 time"
+  },
+  "icu:MuteMenu__eightHours": {
+    "messageformat": "8 timer"
+  },
+  "icu:MuteMenu__day": {
+    "messageformat": "1 dag"
+  },
+  "icu:MuteMenu__week": {
+    "messageformat": "1 uke"
+  },
+  "icu:MuteMenu__until": {
+    "messageformat": "Frem til …"
+  },
+  "icu:MuteMenu__always": {
+    "messageformat": "For alltid"
+  },
+  "icu:DatePicker__popupTitle": {
+    "messageformat": "Velg en dato"
+  },
+  "icu:TimePicker__popupTitle": {
+    "messageformat": "Velg et klokkeslett"
+  },
+  "icu:MuteUntilDialog__title": {
+    "messageformat": "Deaktiver varsler for samtalen frem til …"
+  },
+  "icu:MuteUntilDialog__dateLabel": {
+    "messageformat": "Dato"
+  },
+  "icu:MuteUntilDialog__timeLabel": {
+    "messageformat": "Klokkeslett"
+  },
+  "icu:MuteUntilDialog__timeZoneNote": {
+    "messageformat": "Alle tider i {timeZone}"
   },
   "icu:muteExpirationLabelAlways": {
     "messageformat": "Dempet for alltid"
@@ -4874,9 +4913,6 @@
   "icu:showConversationDetails--direct": {
     "messageformat": "Samtaleinnstillinger"
   },
-  "icu:ConversationDetails__unmute--title": {
-    "messageformat": "Vil du dempe denne samtalen?"
-  },
   "icu:ConversationDetails--group-link": {
     "messageformat": "Gruppelenke"
   },
@@ -5072,6 +5108,9 @@
   "icu:ConversationDetailsMembershipList--show-all": {
     "messageformat": "Se alle"
   },
+  "icu:ConversationDetailsMembershipList__Search__AccessibilityLabel": {
+    "messageformat": "Søk"
+  },
   "icu:ConversationDetailsGroups--title": {
     "messageformat": "{count, plural, one {{count,number} gruppe til felles} other {{count,number} grupper til felles}}"
   },
@@ -5108,17 +5147,110 @@
   "icu:EditNicknameAndNoteModal__Note__Placeholder": {
     "messageformat": "Notat"
   },
-  "icu:ConversationNotificationsSettings__mentions__label": {
-    "messageformat": "Omtaler"
+  "icu:WhileMuted__title": {
+    "messageformat": "Når varsler er deaktivert"
   },
-  "icu:ConversationNotificationsSettings__mentions__info": {
-    "messageformat": "Motta varsler når du blir nevnt i samtaler som er dempet"
+  "icu:WhileMuted__description": {
+    "messageformat": "Velg hvilke varsler som skal vises mens varsler for denne samtalen er deaktivert."
   },
-  "icu:ConversationNotificationsSettings__mentions__select__always-notify": {
-    "messageformat": "Alltid varsle meg"
+  "icu:WhileMuted__calls__title": {
+    "messageformat": "Anrop"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__dont-notify-for-mentions-if-muted": {
-    "messageformat": "Ikke send varsler når dempet"
+  "icu:WhileMuted__calls__description": {
+    "messageformat": "Ring eller varsle når et nytt anrop starter mens varsler for denne samtalen er deaktivert."
+  },
+  "icu:WhileMuted__mentions__title": {
+    "messageformat": "Nevninger"
+  },
+  "icu:WhileMuted__mentions__description": {
+    "messageformat": "Få et varsel når du blir nevnt mens varsler for denne samtalen er deaktivert."
+  },
+  "icu:WhileMuted__replies__title": {
+    "messageformat": "Svar"
+  },
+  "icu:WhileMuted__replies__description": {
+    "messageformat": "Få et varsel når noen svarer på meldingen din mens varsler for denne samtalen er deaktivert."
+  },
+  "icu:WhileMuted__value--none": {
+    "messageformat": "Ingen"
+  },
+  "icu:WhileMuted__value--calls": {
+    "messageformat": "Anrop"
+  },
+  "icu:WhileMuted__value--mentions": {
+    "messageformat": "Nevninger"
+  },
+  "icu:WhileMuted__value--replies": {
+    "messageformat": "Svar"
+  },
+  "icu:WhileMuted__value--calls-mentions": {
+    "messageformat": "Nevninger, anrop"
+  },
+  "icu:WhileMuted__value--calls-replies": {
+    "messageformat": "Anrop, svar"
+  },
+  "icu:WhileMuted__value--mentions-replies": {
+    "messageformat": "Nevninger, svar"
+  },
+  "icu:WhileMuted__value--calls-mentions-replies": {
+    "messageformat": "Nevninger, anrop, svar"
+  },
+  "icu:Preferences__WhileMuted__description": {
+    "messageformat": "Velg hvilke varsler som skal vises i samtaler der varsler er deaktivert."
+  },
+  "icu:Preferences__WhileMuted__calls__description": {
+    "messageformat": "Ring eller varsle når et nytt anrop startes i samtaler der varsler er deaktivert."
+  },
+  "icu:Preferences__WhileMuted__mentions__description": {
+    "messageformat": "Få et varsel når du blir nevnt i samtaler der varsler er deaktivert."
+  },
+  "icu:Preferences__WhileMuted__replies__description": {
+    "messageformat": "Få et varsel når noen svarer på meldingene dine i samtaler der varsler er deaktivert."
+  },
+  "icu:UnreadReminders__title": {
+    "messageformat": "Uleste påminnelser"
+  },
+  "icu:UnreadReminders__description": {
+    "messageformat": "Varsle meg dersom det finnes uleste meldinger når varsler er deaktivert for denne samtalen."
+  },
+  "icu:Preferences__UnreadReminders__description": {
+    "messageformat": "Varsle meg når det finnes uleste meldinger i samtaler der varslene er deaktivert."
+  },
+  "icu:UnreadReminders__notification--messages--1": {
+    "messageformat": "{messageCount, plural, one {Du har {messageCount,number} ulest melding fra {person1}.} other {Du har {messageCount,number} uleste meldinger fra {person1}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--2": {
+    "messageformat": "{messageCount, plural, one {Du har {messageCount,number} ulest melding fra {person1} og {person2}.} other {Du har {messageCount,number} uleste meldinger fra {person1} og {person2}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--many": {
+    "messageformat": "{messageCount, plural, one {Du har {messageCount,number} ulest melding fra {person1}, {person2} og andre.} other {Du har {messageCount,number} uleste meldinger fra {person1}, {person2} og andre.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-mentions": {
+    "messageformat": "{messageCount, plural, one {Du har {messageCount,number} ulest melding og {mentionSummary}.} other {Du har {messageCount,number} uleste meldinger og {mentionSummary}.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-replies": {
+    "messageformat": "{messageCount, plural, one {Du har {messageCount,number} ulest melding og {replySummary}.} other {Du har {messageCount,number} uleste meldinger og {replySummary}.}}"
+  },
+  "icu:UnreadReminders__notification--counts--messages": {
+    "messageformat": "{messageCount, plural, one {Du har {messageCount,number} ulest melding.} other {Du har {messageCount,number} uleste meldinger.}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--1": {
+    "messageformat": "{mentionCount, plural, one {du ble nevnt av {person1}} other {du ble nevnt av {person1} {mentionCount,number} ganger}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--2": {
+    "messageformat": "{mentionCount, plural, one {Du ble nevnt {mentionCount,number} gang av {person1} og {person2}} other {Du ble nevnt {mentionCount,number} ganger av {person1} og {person2}}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--many": {
+    "messageformat": "{mentionCount, plural, one {Du ble nevnt {mentionCount,number} gang av {person1} og andre} other {Du ble nevnt {mentionCount,number} ganger av {person1} og andre}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--1": {
+    "messageformat": "{replyCount, plural, one {et svar fra {person1}} other {{replyCount,number} svar fra {person1}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--2": {
+    "messageformat": "{replyCount, plural, one {{replyCount,number} svar fra {person1} og {person2}} other {{replyCount,number} svar fra {person1} og {person2}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--many": {
+    "messageformat": "{replyCount, plural, one {{replyCount,number} svar fra {person1} og andre} other {{replyCount,number} svar fra {person1} og andre}}"
   },
   "icu:GroupLinkManagement--clipboard": {
     "messageformat": "Gruppelenke kopiert."
@@ -5140,6 +5272,48 @@
   },
   "icu:GroupLinkManagement__CopyGroupLinkButtonLabel": {
     "messageformat": "Kopier signal.group-lenken til utklippstavlen"
+  },
+  "icu:GroupMembersSearchDialog__DialogTitle": {
+    "messageformat": "Søk etter medlemmer"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder": {
+    "messageformat": "Søk"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringByAdmins": {
+    "messageformat": "Søk etter administratorer"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringBySystemContacts": {
+    "messageformat": "Søk etter kontakter"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Label": {
+    "messageformat": "Filtre"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__AllMembers": {
+    "messageformat": "Alle medlemmer"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Admins": {
+    "messageformat": "Administratorer"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__SystemContacts": {
+    "messageformat": "Kontakter"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithoutSearchQuery": {
+    "messageformat": "Ingen treff"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithSearchQuery": {
+    "messageformat": "«{searchQuery}» ga ingen resultater"
+  },
+  "icu:GroupMembersSearchDialog__MemberItem__Admin": {
+    "messageformat": "Administrator"
+  },
+  "icu:GroupMembersSearchDialog__SearchResults__Title": {
+    "messageformat": "Søkeresultater"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__AddMembers": {
+    "messageformat": "Legg til medlemmer"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__InviteViaGroupLink": {
+    "messageformat": "Inviter via gruppelenke"
   },
   "icu:PendingInvites--tab-requests": {
     "messageformat": "Forespørsler ({count,number})"
@@ -5426,6 +5600,9 @@
   },
   "icu:CaptchaDialog__second-paragraph": {
     "messageformat": "Etter verifisering kan du fortsette med meldingene. Meldinger satt på pause vil automatisk bli sendt."
+  },
+  "icu:CaptchaDialog__continue": {
+    "messageformat": "Fortsett"
   },
   "icu:CaptchaDialog--can-close__title": {
     "messageformat": "Fortsett uten å bekrefte?"
@@ -5893,6 +6070,15 @@
   "icu:Preferences__message-audio-description": {
     "messageformat": "Få et varsel om nye meldinger når du er inne i samtalen."
   },
+  "icu:Preferences__reaction-notifications-title": {
+    "messageformat": "Varsler om reaksjoner"
+  },
+  "icu:Preferences__reaction-notifications-description": {
+    "messageformat": "Få varsler når noen reagerer på meldingen din"
+  },
+  "icu:Preferences__button--account": {
+    "messageformat": "Konto"
+  },
   "icu:Preferences__button--general": {
     "messageformat": "Generelt"
   },
@@ -5962,6 +6148,45 @@
   "icu:Preferences--system": {
     "messageformat": "System"
   },
+  "icu:Preferences--signal-login": {
+    "messageformat": "Signal Login"
+  },
+  "icu:Preferences--signal-login-description": {
+    "messageformat": "Din Signal Login brukes til å gjenopprette kontoen din. Lagre disse kodene trygt i et passordverktøy du stoler på. <learnMoreLink>Les mer</learnMoreLink>."
+  },
+  "icu:Preferences--signal-login-description--learn-more": {
+    "messageformat": "Les mer"
+  },
+  "icu:Preferences__SignalAccount__label": {
+    "messageformat": "Konto og gjenoppretting"
+  },
+  "icu:Preferences__SignalAccount__description": {
+    "messageformat": "To koder"
+  },
+  "icu:Preferences__SignalAccountKeys__Title": {
+    "messageformat": "Din Signal Login"
+  },
+  "icu:Preferences__SignalAccountKeys__Description": {
+    "messageformat": "Lagre den på et trygt sted. Du trenger innloggingsinformasjonen din for å gjenopprette kontoen og dataene dine. Ikke del den med andre."
+  },
+  "icu:Preferences__SignalAccountKeys__AccountKey": {
+    "messageformat": "Kontokode"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountID": {
+    "messageformat": "Konto-ID"
+  },
+  "icu:Preferences__SignalAccountKeys__RecoveryKey": {
+    "messageformat": "Sikkerhetskode"
+  },
+  "icu:Preferences__SignalAccountKeys__Save": {
+    "messageformat": "Lagre"
+  },
+  "icu:Preferences__Account__LinkedDevice__label": {
+    "messageformat": "Dette er en tilkoblet enhet"
+  },
+  "icu:Preferences__Account__LinkedDevice__description": {
+    "messageformat": "Åpne Signal på hovedenheten din for å endre kontoinnstillingene."
+  },
   "icu:Preferences--zoom": {
     "messageformat": "Zoomnivå"
   },
@@ -5992,8 +6217,116 @@
   "icu:Preferences--advanced": {
     "messageformat": "Avansert"
   },
-  "icu:Preferences--notification-content": {
-    "messageformat": "Varslingsinnhold"
+  "icu:Preferences--change-signal-pin": {
+    "messageformat": "Endre PIN-koden"
+  },
+  "icu:Preferences--change-signal-pin-button": {
+    "messageformat": "Bytt"
+  },
+  "icu:Preferences--create-signal-pin": {
+    "messageformat": "Lag en PIN-kode"
+  },
+  "icu:Preferences--create-signal-pin-button": {
+    "messageformat": "Opprett"
+  },
+  "icu:Preferences--signal-pin": {
+    "messageformat": "Signal-PIN"
+  },
+  "icu:Preferences--signal-pin__footer": {
+    "messageformat": "PIN-koden holder informasjon lagret i Signal, kryptert slik at bare du har tilgang til den. PIN-koden din kan ikke gjenopprettes. Profilen din og innstillingene og kontaktene dine gjenopprettes når du installerer Signal på nytt. <learnMoreLink>Les mer</learnMoreLink>"
+  },
+  "icu:Preferences--signal-pin-advanced-settings": {
+    "messageformat": "Avanserte innstillinger for PIN-kode"
+  },
+  "icu:Preferences--disable-signal-pin": {
+    "messageformat": "Deaktiver PIN-koden"
+  },
+  "icu:Preferences--disable-signal-pin--button": {
+    "messageformat": "Deaktiver"
+  },
+  "icu:Preferences--disable-signal-pin--footer": {
+    "messageformat": "Hvis du deaktiverer PIN-koden vil du miste all data når du gjennomfører Signal-registrering på nytt, med mindre du manuelt tar en sikkerhetskopi og gjenoppretter innholdet. Du kan ikke skru på registreringslås mens PIN-koden er deaktivert."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--title": {
+    "messageformat": "PIN-koden kunne ikke deaktiveres på grunn av registreringslåsen"
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--body": {
+    "messageformat": "Du må deaktivere registreringslåsen før du kan deaktivere PIN-koden."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--ok": {
+    "messageformat": "OK"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--title": {
+    "messageformat": "PIN-koden kunne ikke deaktiveres på grunn av sikkerhetskopiering"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--body": {
+    "messageformat": "Du må deaktivere sikkerhetskopiering før du deaktiverer PIN-koden."
+  },
+  "icu:Preferences--enable-signal-pin": {
+    "messageformat": "Aktiver PIN-kode"
+  },
+  "icu:Preferences--enable-signal-pin--button": {
+    "messageformat": "Slå på"
+  },
+  "icu:Preferences--pin-reminders--header": {
+    "messageformat": "Påminnelser om PIN-kode"
+  },
+  "icu:Preferences--pin-reminders--description": {
+    "messageformat": "Du vil bli spurt sjeldnere over tid"
+  },
+  "icu:Preferences--registration-lock__label": {
+    "messageformat": "Registreringslås"
+  },
+  "icu:Preferences--registration-lock__footer": {
+    "messageformat": "Krev Signal-PIN for å registrere telefonnummeret på nytt hos Signal."
+  },
+  "icu:Preferences__Chats__TextInputSection__Title": {
+    "messageformat": "Tekstfelt"
+  },
+  "icu:Preferences__Chats__ChatFoldersSection__Title": {
+    "messageformat": "Samtalemapper"
+  },
+  "icu:Preferences__Notifications__Show__Label": {
+    "messageformat": "Vis"
+  },
+  "icu:Preferences__Notifications__SoundsSection__Title": {
+    "messageformat": "Lyder"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title": {
+    "messageformat": "App-merke"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title-v2": {
+    "messageformat": "Ulest-merker"
+  },
+  "icu:Preferences__Notifications__Reset__title": {
+    "messageformat": "Tilbakestill innstillingene til standard, inkludert de egendefinerte innstillingene for samtalene dine."
+  },
+  "icu:Preferences__Notifications__Reset__button": {
+    "messageformat": "Tilbakestill"
+  },
+  "icu:Preferences__Notifications__Reset__modal--body": {
+    "messageformat": "Vil du tilbakestille innstillingene for varsler for alle samtaler?"
+  },
+  "icu:Preferences__Notifications__Reset__modal--confirm": {
+    "messageformat": "Tilbakestill"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Label": {
+    "messageformat": "Antall varsler"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Description": {
+    "messageformat": "Velg om antall varsler skal vise antallet uleste meldinger eller antall uleste samtaler."
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadMessages": {
+    "messageformat": "Uleste meldinger"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadChats": {
+    "messageformat": "Uleste samtaler"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats": {
+    "messageformat": "Inkluder samtaler med deaktiverte varsler i appmerket"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats__description": {
+    "messageformat": "Merker for samtalemapper inkluderer alltid samtaler med deaktiverte varsler"
   },
   "icu:PlaintextExport--PreferencesRow--Header": {
     "messageformat": "Eksportere samtalelogg"
@@ -6145,9 +6478,6 @@
   "icu:NotificationProfiles--setting": {
     "messageformat": "Varslingsprofiler"
   },
-  "icu:NotificationProfiles--setup": {
-    "messageformat": "Konfigurer"
-  },
   "icu:NotificationProfiles--title": {
     "messageformat": "Varslingsprofiler"
   },
@@ -6159,9 +6489,6 @@
   },
   "icu:NotificationProfiles--manage-description": {
     "messageformat": "Legg til eller rediger varslingsprofiler"
-  },
-  "icu:NotificationProfiles--manage-profiles": {
-    "messageformat": "{profileCount, plural, one {Én profil} other {{profileCount,number} profiler}}"
   },
   "icu:NotificationProfiles--create": {
     "messageformat": "Opprett ny profil"
@@ -6351,6 +6678,9 @@
   },
   "icu:Preferences--blocked-groups": {
     "messageformat": "Blokkerte grupper"
+  },
+  "icu:Preferences--blocked--blocked-on": {
+    "messageformat": "Blokkert {blockedAt}"
   },
   "icu:Preferences--signal-backups": {
     "messageformat": "Sikre sikkerhetskopier på Signal"
@@ -6559,9 +6889,6 @@
   "icu:Preferences__pnp__row--body": {
     "messageformat": "Velg hvem som kan se telefonnummeret ditt og bruke det til å komme i kontakt med deg på Signal."
   },
-  "icu:Preferences__pnp__row--button": {
-    "messageformat": "Velg"
-  },
   "icu:Preferences__pnp__sharing--title": {
     "messageformat": "Hvem kan se telefonnummeret mitt?"
   },
@@ -6610,14 +6937,11 @@
   "icu:Preferences--read-receipts": {
     "messageformat": "Lesebekreftelser"
   },
-  "icu:Preferences--read-receipts--description": {
-    "messageformat": "Hvis du slår av dette, kan du ikke se lesebekreftelser fra andre."
-  },
   "icu:Preferences--typing-indicators": {
     "messageformat": "Skriveindikatorer"
   },
-  "icu:Preferences--typing-indicators--description": {
-    "messageformat": "Hvis du slår av dette, kan du ikke se skrivetegn fra andre."
+  "icu:Preferences--messaging-help": {
+    "messageformat": "Se og del at meldinger blir lest og skrevet. Dersom dette er deaktivert, ser du verken lesebekreftelser eller skrivetegn."
   },
   "icu:Preferences--updates": {
     "messageformat": "Oppdateringer"
@@ -6721,11 +7045,23 @@
   "icu:InstallScreenUpdateDialog--update-required__title": {
     "messageformat": "Oppdatering kreves"
   },
+  "icu:InstallScreenUpdateDialog--checking-for-updates": {
+    "messageformat": "Ser etter oppdateringer"
+  },
+  "icu:InstallScreenUpdateDialog--updating-signal": {
+    "messageformat": "Oppdaterer Signal"
+  },
+  "icu:InstallScreenUpdateDialog--download-progress": {
+    "messageformat": "Laster ned {currentBytes} av {totalBytes} ({percentage,number,percent}) …"
+  },
   "icu:InstallScreenUpdateDialog--update-required__body": {
-    "messageformat": "Du må oppdatere Signal Desktop for å synkronisere meldingene dine."
+    "messageformat": "Oppdater Signal Desktop for å gå videre."
   },
   "icu:InstallScreenUpdateDialog--update-required__action-update": {
     "messageformat": "Oppdater"
+  },
+  "icu:InstallScreenUpdateDialog--update-required__action-update__mas": {
+    "messageformat": "Gå til App Store"
   },
   "icu:InstallScreenUpdateDialog--unsupported-os__title": {
     "messageformat": "Oppdatering kreves"
@@ -6759,6 +7095,9 @@
   },
   "icu:StandaloneRegistration--PhoneNumber--waiting": {
     "messageformat": "Prøv igjen om {duration}"
+  },
+  "icu:StandaloneRegistration--PhoneNumber--RegionCodeSelector--Label": {
+    "messageformat": "Velg områdekode"
   },
   "icu:StandaloneRegistration--PhoneNumber--placeholder": {
     "messageformat": "Telefonnummer"
@@ -6982,6 +7321,9 @@
   "icu:StandaloneRegistration--VerifyPIN--incorrect-pin--with-count": {
     "messageformat": "{triesRemaining, plural, one {Feil PIN-kode. {triesRemaining,number} forsøk igjen.} other {Feil PIN-kode. {triesRemaining,number} forsøk igjen.}}"
   },
+  "icu:StandaloneRegistration--VerifyPIN--just-count": {
+    "messageformat": "{triesRemaining, plural, one {{triesRemaining,number} forsøk igjen.} other {{triesRemaining,number} forsøk igjen.}}"
+  },
   "icu:StandaloneRegistration--VerifyPIN--NeedHelp--header": {
     "messageformat": "Ønsker du hjelp?"
   },
@@ -7024,6 +7366,9 @@
   "icu:StandaloneRegistration--VerifyPIN--NoRemainingTries--learn-more": {
     "messageformat": "Les mer om PIN-koder"
   },
+  "icu:StandaloneRegistration--VerifyPIN--open-menu": {
+    "messageformat": "Åpne menyen"
+  },
   "icu:StandaloneRegistration--VerifyPIN--menu--skip-pin": {
     "messageformat": "Hopp over PIN-kode"
   },
@@ -7031,7 +7376,7 @@
     "messageformat": "Vil du hoppe over PIN-kode?"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--description": {
-    "messageformat": "Hvis du ikke husker PIN-koden din, kan du opprette en ny. Du kan registrere deg og bruke kontoen din, men du mister enkelte lagrede innstillinger, som profilinformasjonen din. Les mer."
+    "messageformat": "Hvis du ikke husker PIN-koden din, kan du opprette en ny. Du kan registrere deg og bruke kontoen din, men du mister enkelte lagrede innstillinger, som profilinformasjonen din. <learnMore>Les mer</learnMore>."
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--skip-button": {
     "messageformat": "Hopp over og opprett ny PIN-kode"
@@ -7067,7 +7412,7 @@
     "messageformat": "Advarsel"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--description": {
-    "messageformat": "Hvis du deaktiverer PIN-koden mister du all informasjon når du registrerer Signal på nytt, med mindre du manuelt tar en sikkerhetskopi og gjenoppretter innholdet. Du kan ikke slå på registreringslås mens PIN-koden er deaktivert."
+    "messageformat": "Hvis du deaktiverer PIN-koden, mister du alle data når du gjennomfører Signal-registreringen på nytt. Du kan ikke slå på registreringslåsen mens PIN-koden er deaktivert."
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--disable-button": {
     "messageformat": "Deaktiver PIN-koden"
@@ -7275,6 +7620,12 @@
   },
   "icu:MediaPermissionsModal__step-2": {
     "messageformat": "Aktiver Signal."
+  },
+  "icu:MediaPermissionsModal__step-2--windows--microphone": {
+    "messageformat": "Gi Signal tilgang til mikrofonen"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--camera": {
+    "messageformat": "Gi Signal tilgang til kameraet"
   },
   "icu:MediaPermissionsModal__open": {
     "messageformat": "Gå til innstillinger"
@@ -7816,11 +8167,17 @@
   "icu:ContextMenu--button": {
     "messageformat": "Kontekstmeny"
   },
+  "icu:EditUsernameModalBody__username-label": {
+    "messageformat": "Brukernavn"
+  },
   "icu:EditUsernameModalBody__username-placeholder": {
     "messageformat": "Brukernavn"
   },
   "icu:EditUsernameModalBody__username-helper": {
     "messageformat": "Alle brukernavn består av bokstaver og en tallrekke."
+  },
+  "icu:EditUsernameModalBody__discriminator-label": {
+    "messageformat": "Brukernavn-tall"
   },
   "icu:EditUsernameModalBody__learn-more": {
     "messageformat": "Les mer"
@@ -7919,14 +8276,83 @@
   "icu:UsernameMegaphone__dismiss": {
     "messageformat": "Avbryt"
   },
+  "icu:PinReminderMegaphone__title": {
+    "messageformat": "Bekreft Signal-PIN-kode"
+  },
+  "icu:PinReminderMegaphone__body": {
+    "messageformat": "Vi ber deg noen ganger om å bekrefte PIN-koden din slik at du husker den."
+  },
+  "icu:PinReminderMegaphone__verify": {
+    "messageformat": "Bekreft"
+  },
+  "icu:PinReminderMegaphone__not-now": {
+    "messageformat": "Ikke nå"
+  },
+  "icu:PinReminderModal__title": {
+    "messageformat": "Skriv inn Signal-PIN"
+  },
+  "icu:PinReminderModal__body": {
+    "messageformat": "For å hjelpe deg med å huske PIN-koden din ber vi deg om å oppgi den med jevne mellomrom. Vi spør deg sjeldnere etter hvert."
+  },
+  "icu:PinReminderModal__pin-input-placeholder": {
+    "messageformat": "Skriv inn PIN-koden din"
+  },
+  "icu:PinReminderModal__pin-input-error": {
+    "messageformat": "Feil PIN-kode. Prøv på nytt."
+  },
+  "icu:PinReminderModal__forgot": {
+    "messageformat": "Glemt PIN-koden?"
+  },
+  "icu:PinReminderModal__confirm": {
+    "messageformat": "Bekreft"
+  },
+  "icu:PinReminderCompletedToast": {
+    "messageformat": "PIN-koden stemmer. Vi sender deg en ny påminnelse senere."
+  },
+  "icu:PinChangeModal__title--create": {
+    "messageformat": "Endre Signal-PIN"
+  },
+  "icu:PinChangeModal__title--create--without-pin": {
+    "messageformat": "Opprett en Signal-PIN"
+  },
+  "icu:PinChangeModal__body--create": {
+    "messageformat": "Du kan endre PIN-koden din så lenge denne enheten er registrert. <learnMoreLink>Les mer</learnMoreLink>"
+  },
+  "icu:PinChangeModal__body--create--without-pin": {
+    "messageformat": "PIN-koden holder informasjon lagret i Signal, kryptert slik at bare du har tilgang til den. Profilen din og innstillingene og kontaktene dine gjenopprettes når du installerer Signal på nytt. Du trenger ikke PIN-koden for å åpne appen. <learnMoreLink>Les mer</learnMoreLink>"
+  },
+  "icu:PinChangeModal__title--confirm": {
+    "messageformat": "Bekreft Signal-PIN"
+  },
+  "icu:PinChangeModal__body--confirm": {
+    "messageformat": "Tast inn PIN-koden du nylig opprettet."
+  },
+  "icu:PinChangeModal__pin-input-placeholder--create": {
+    "messageformat": "Skriv inn en ny PIN-kode"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--confirm": {
+    "messageformat": "Bekreft PIN-koden"
+  },
+  "icu:PinChangeModal__cancel": {
+    "messageformat": "Avbryt"
+  },
+  "icu:PinChangeModal__continue": {
+    "messageformat": "Fortsett"
+  },
+  "icu:PinChangeModal__confirm": {
+    "messageformat": "Bekreft"
+  },
+  "icu:PinChangeCompletedToast": {
+    "messageformat": "Den nye PIN-koden ble opprettet."
+  },
   "icu:UnsupportedOSWarningDialog__body": {
-    "messageformat": "Signal Desktop vil snart ikke fungere på denne versjonen av {OS} på datamaskinen din. Du må oppdatere operativsystemet innen {expirationDate} for å fortsette å bruke Signal. <learnMoreLink>Les mer</learnMoreLink>"
+    "messageformat": "Signal Desktop støtter snart ikke lenger denne versjonen av {OS} på datamaskinen din. Du må oppdatere operativsystemet innen {expirationDate} for å fortsette å bruke Signal. <learnMoreLink>Les mer</learnMoreLink>"
   },
   "icu:UnsupportedOSErrorDialog__body": {
-    "messageformat": "Signal Desktop fungerer ikke lenger på denne datamaskinen. Du må oppdatere til en nyere versjon av {OS} for å kunne bruke Signal igjen. <learnMoreLink>Les mer</learnMoreLink>"
+    "messageformat": "Signal Desktop fungerer ikke lenger på denne datamaskinen. Du må oppdatere til en nyere versjon av {OS} for å kunne bruke Signal Desktop igjen. <learnMoreLink>Les mer</learnMoreLink>"
   },
   "icu:UnsupportedOSErrorToast": {
-    "messageformat": "Signal Desktop fungerer ikke lenger på denne datamaskinen. Du må oppdatere til en nyere versjon av {OS} for å kunne bruke Signal igjen."
+    "messageformat": "Signal Desktop fungerer ikke lenger på denne datamaskinen. Du må oppdatere til en nyere versjon av {OS} for å kunne bruke Signal Desktop igjen."
   },
   "icu:MessageMetadata__edited": {
     "messageformat": "Redigert"
@@ -8351,8 +8777,11 @@
   "icu:DonationReceipt__type-value--one-time": {
     "messageformat": "Én gang"
   },
-  "icu:DonationReceipt__footer-text": {
-    "messageformat": "Takk for at du støtter Signal. Bidraget ditt hjelper oss i kampen for å utvikle personvernteknologi med åpen kilde som gjør det mulig å kommunisere fritt og trygt for millioner av mennesker over hele verden. Ta vare på denne kvitteringen for skatteoppgjøret ditt hvis du har adresse i USA. Signal Technology Foundation er en ideell organisasjon som er fritatt skatt i USA under avsnitt 501c3 i den amerikanske skatteloven. Vårt nasjonale skattenummer er 82-4506840."
+  "icu:DonationReceipt__footer-text-v2": {
+    "messageformat": "Takk for at du støtter Signal. Bidraget ditt hjelper oss med å utvikle åpen kildekode-teknologi for personvern som muliggjør fri og trygg kommunikasjon for millioner av mennesker over hele verden. Hvis du er bosatt i USA, må du ta vare på denne kvitteringen til skatteoppgjøret ditt. Signal Technology Foundation er en ideell organisasjon som er fritatt skatt i USA under avsnitt 501c3 i den amerikanske skatteloven. Vårt nasjonale skattenummer er 82-4506840. Signal har ikke levert noen varer eller tjenester som vederlag for bidraget ditt."
+  },
+  "icu:MessageCta__Donate": {
+    "messageformat": "Gi penger nå"
   },
   "icu:Donations__OfflineTooltip": {
     "messageformat": "Du er ikke på nett. Koble deg til internett for å gi en pengegave."
@@ -8661,16 +9090,10 @@
     "messageformat": "Noen små justeringer, feilrettinger og ytelsesforbedringer. Takk for at du bruker Signal!",
     "ignoreUnused": true
   },
-  "icu:WhatsNew__8.18--0": {
-    "messageformat": "Nå kan du også lage avstemninger i en-til-en-samtaler."
+  "icu:WhatsNew__8.30--0": {
+    "messageformat": "Ytelsesforbedringer i videosamtaler."
   },
-  "icu:WhatsNew__8.19--0": {
-    "messageformat": "Gruppeadministratorer kan nå sette punktum for grupper med den nye «Steng gruppe»-funksjonen. Dersom en gruppe stenges, mister alle medlemmene muligheten til å sende meldinger og holde videosamtaler i gruppechatten, samt til å invitere nye medlemmer."
-  },
-  "icu:WhatsNew__8.20--0": {
-    "messageformat": "Introducing disappearing call events: Missed, outgoing, and received calls that occur after you install this update will now automatically disappear in any chat where disappearing messages are enabled."
-  },
-  "icu:WhatsNew__8.20--1": {
-    "messageformat": "Now you can reorder installed sticker packs so your new favorites don’t get stuck in the back of the line."
+  "icu:WhatsNew__8.30--1": {
+    "messageformat": "Vi har også lagt til en praktisk snarvei som lar deg åpne systeminnstillingene på Windows når du forsøker å bli med i en videosamtale, men først må gi Signal tillatelse til å bruke kameraet på enheten."
   }
 }

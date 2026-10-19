@@ -17,6 +17,7 @@ import type {
 import type { LocalizerType, ThemeType } from '../types/Util.std.ts';
 import {
   type ContactModalStateType,
+  PinReminderState,
   UsernameOnboardingState,
 } from '../types/globalModals.std.ts';
 import { missingCaseError } from '../util/missingCaseError.std.ts';
@@ -103,6 +104,7 @@ export type PropsType = {
     | {
         mediaType: 'camera' | 'microphone';
         requestor: 'call' | 'voiceNote';
+        osName: 'macos' | 'windows';
       }
     | undefined;
   closeMediaPermissionsModal: () => void;
@@ -180,6 +182,12 @@ export type PropsType = {
   // TerminateGroupFailedModal
   terminateGroupFailedModal: { conversationId: string } | null;
   renderTerminateGroupFailedModal: () => JSX.Element | null;
+  // PinChangeModal
+  isPinChangeModalVisible: boolean;
+  renderPinChangeModal: () => JSX.Element | null;
+  // PinReminderModal
+  pinReminderState: PinReminderState;
+  renderPinReminderModal: () => JSX.Element | null;
 };
 
 export function GlobalModalContainer({
@@ -245,6 +253,12 @@ export function GlobalModalContainer({
   // PinMessageDialog
   pinMessageDialogData,
   renderPinMessageDialog,
+  // PinChangeModal
+  isPinChangeModalVisible,
+  renderPinChangeModal,
+  // PinReminderModal
+  pinReminderState,
+  renderPinReminderModal,
   // SafetyNumberModal
   safetyNumberModalContactId,
   renderSafetyNumber,
@@ -411,6 +425,16 @@ export function GlobalModalContainer({
 
   if (pinMessageDialogData) {
     return renderPinMessageDialog();
+  }
+
+  // PIN change renders with precedence over the reminder modal, since
+  // the reminder modal can open the PIN change modal.
+  if (isPinChangeModalVisible) {
+    return renderPinChangeModal();
+  }
+
+  if (pinReminderState === PinReminderState.Modal) {
+    return renderPinReminderModal();
   }
 
   if (isProfileNameWarningModalVisible) {

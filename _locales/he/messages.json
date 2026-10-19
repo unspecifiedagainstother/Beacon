@@ -11,6 +11,9 @@
   "icu:AxoDialog.Close": {
     "messageformat": "סגירה"
   },
+  "icu:AxoPasswordField.Reveal": {
+    "messageformat": "הצגת סיסמה"
+  },
   "icu:AxoTextField.Clear": {
     "messageformat": "נקה"
   },
@@ -61,6 +64,24 @@
   },
   "icu:Preferences__DonateTitle": {
     "messageformat": "תרום אל Signal"
+  },
+  "icu:LinkedDevicesOnboardingDialog__description": {
+    "messageformat": "<bold>מכשירים מקושרים</bold> מאפשרים לך לגשת לחשבון Signal ולהודעות שלך באופן מאובטח בכל אחד מהמכשירים הנוספים שלך."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--1": {
+    "messageformat": "אפשר לקשר מחשב, טאבלט, או טלפון נוסף."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--2": {
+    "messageformat": "המכשיר הראשי שלך מנהל את מה שמקושר, ואפשר לקשר עד 5 מכשירים."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3": {
+    "messageformat": "הגדרות מסוימות מנוהלות אך ורק במכשיר הראשי שלך, כולל הגדרות החשבון והגיבויים."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--1": {
+    "messageformat": "ניתן לנהל את הגדרות החשבון והגיבויים רק דרך המכשיר הראשי שלך."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--2": {
+    "messageformat": "ניתן לנהל את הגדרות החשבון ואת גיבויי Signal המאובטחים רק דרך המכשיר הראשי שלך."
   },
   "icu:sentMediaQualityStandard": {
     "messageformat": "תקנית"
@@ -317,11 +338,8 @@
   "icu:LeftPaneChatFolders__ItemLabel--All": {
     "messageformat": "כל הצ׳אטים"
   },
-  "icu:LeftPaneChatFolders__ItemUnreadBadge__MaxCount": {
-    "messageformat": "{maxCount,number}+"
-  },
   "icu:LeftPaneChatFolders__ItemUnreadBadge__AccessibleLabel": {
-    "messageformat": "{count, plural, one {{count,number} Unread Message} other {{count,number} Unread Messages}}"
+    "messageformat": "{count, plural, one {הודעה {count,number} לא נקראה} two {{count,number} הודעות לא נקראו} many {{count,number} הודעות לא נקראו} other {{count,number} הודעות לא נקראו}}"
   },
   "icu:LeftPaneChatFolders__Item__ContextMenu__MarkAllRead": {
     "messageformat": "סמן הכול כנקרא"
@@ -364,9 +382,6 @@
   },
   "icu:NavTabs__ItemIconLabel--UnreadCount": {
     "messageformat": "{count,number} הודעות לא נקראו"
-  },
-  "icu:NavTabs__ItemIconLabel--MarkedUnread": {
-    "messageformat": "סימון כלא נקרא"
   },
   "icu:NavTabs__ItemLabel--Chats": {
     "messageformat": "צ'אטים"
@@ -635,20 +650,23 @@
   "icu:SafetyNumberNotReady__learn-more": {
     "messageformat": "למד עוד"
   },
-  "icu:KeyTransparencyErrorDialog__Title": {
-    "messageformat": "אימות מפתח אוטומטי אינו זמין כרגע עבור המכשיר שלך. להגיש יומן ניפוי באגים?"
+  "icu:KeyTransparencyErrorDialog__Title-v2": {
+    "messageformat": "אימות מפתח אוטומטי אינו זמין כרגע עבור המכשיר שלך. להגיש דוח כדי לעזור לנו להשתפר?"
   },
-  "icu:KeyTransparencyErrorDialog__Description": {
-    "messageformat": "יומני ניפוי באגים עוזרים לנו לאבחן ולתקן את הבעיה ולא מכילים מידע מזהה."
+  "icu:KeyTransparencyErrorDialog__Description-v2": {
+    "messageformat": "צירוף יומן ניפוי הבאגים שלך עוזר לנו לאבחן ולתקן את הבעיה ולא מכיל מידע מזהה. השיתוף הוא אופציונלי."
   },
-  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label": {
-    "messageformat": "שיתוף יומן ניפוי באגים"
+  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label-v2": {
+    "messageformat": "כלול יומן ניפוי תקלים"
   },
   "icu:KeyTransparencyErrorDialog__ShareDebugLog__ViewButton": {
     "messageformat": "צפיה"
   },
   "icu:KeyTransparencyErrorDialog__Submit": {
     "messageformat": "שלח"
+  },
+  "icu:KeyTransparencyErrorDialog__Cancel": {
+    "messageformat": "לא תודה"
   },
   "icu:KeyTransparencyOnboardingDialog__Title": {
     "messageformat": "Signal יכולה כעת לאמת הצפנה באופן אוטומטי"
@@ -746,11 +764,11 @@
   "icu:maximumAttachments": {
     "messageformat": "אינך יכול להוסיף צרופות כלשהן אל הודעה זו."
   },
-  "icu:fileSizeWarning": {
-    "messageformat": "הקובץ עובר את מגבלת הגודל המקסימלי. {limit,number} {units}"
+  "icu:fileTooLargeWarning": {
+    "messageformat": "לא ניתן לשלוח את הקובץ הזה כי הוא גדול מדי. אפשר לשלוח קבצים בגודל של עד {limit,number}{units}."
   },
-  "icu:videoFileSizeWarning": {
-    "messageformat": "מצטערים, הסרטון שנבחר חורג ממגבלת גודל ההודעה המקסימלי. {limit,number}{units}"
+  "icu:videoFileTooLargeWarning": {
+    "messageformat": "לא ניתן לשלוח את קובץ הווידאו הזה כי הוא גדול מדי. אפשר לשלוח קובצי וידאו בגודל של עד {limit,number}{units}."
   },
   "icu:unableToLoadAttachment": {
     "messageformat": "לא היה ניתן לטעון את הצרופה הנבחרת."
@@ -772,6 +790,9 @@
   },
   "icu:checkNetworkConnection": {
     "messageformat": "בדוק את חיבור הרשת שלך."
+  },
+  "icu:clockSkewDetected": {
+    "messageformat": "התאריך במכשיר שלך לא מדויק. יש לעדכן אותו ולנסות שוב. התאריך והשעה במכשיר שלך הם:"
   },
   "icu:submitDebugLog": {
     "messageformat": "יומן תקלים"
@@ -994,6 +1015,9 @@
   },
   "icu:mute": {
     "messageformat": "השתקה"
+  },
+  "icu:muted": {
+    "messageformat": "מושתק"
   },
   "icu:cannotUpdateDetail-v2": {
     "messageformat": "Signal לא הצליחה להתעדכן. אפשר <retryUpdateButton>לנסות לעדכן שוב</retryUpdateButton> או לבקר בכתובת {url} כדי להתקין באופן ידני. לאחר מכן, יש <contactSupportLink>ליצור קשר עם התמיכה</contactSupportLink> לגבי הבעיה הזו."
@@ -1261,6 +1285,9 @@
   },
   "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync": {
     "messageformat": "כל ההודעות בצ׳אט הזה יימחקו מכל המכשירים שלך."
+  },
+  "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync--still-member": {
+    "messageformat": "כל ההודעות בצ׳אט הזה יימחקו מכל המכשירים שלך. עדיין תישאר/י חבר/ה בקבוצה הזו."
   },
   "icu:ConversationHeader__ContextMenu__LeaveGroupAction__title": {
     "messageformat": "עזיבת קבוצה"
@@ -1610,9 +1637,6 @@
   "icu:Preferences__EmojiSkinToneDefaultSetting__Label": {
     "messageformat": "גוון עור של אמוג'י"
   },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__Title": {
-    "messageformat": "תיקיות צ׳אטים"
-  },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Title": {
     "messageformat": "הוספת תיקיית צ׳אטים"
   },
@@ -1624,12 +1648,6 @@
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Description--WithChatFolders": {
     "messageformat": "{chatFoldersCount, plural, one {תיקיה {chatFoldersCount,number}} two {{chatFoldersCount,number} תיקיות} many {{chatFoldersCount,number} תיקיות} other {{chatFoldersCount,number} תיקיות}}"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button": {
-    "messageformat": "הגדרה"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button--WithChatFolders": {
-    "messageformat": "ניהול"
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__ChatFolderItem__ContextMenu__EditFolder": {
     "messageformat": "עריכת תיקיה"
@@ -2384,9 +2402,6 @@
   "icu:SafetyNumberModal__title": {
     "messageformat": "וודא מספר ביטחון"
   },
-  "icu:safetyNumberChanged": {
-    "messageformat": "מספר הביטחון השתנה"
-  },
   "icu:safetyNumberChanges": {
     "messageformat": "שינויי מספר בטיחות"
   },
@@ -2826,16 +2841,16 @@
     "messageformat": "הסרה"
   },
   "icu:stickers--StickerManagerPackDragHandle--Label": {
-    "messageformat": "Drag to reorder sticker pack"
+    "messageformat": "יש לגרור כדי לסדר מחדש חבילת סטיקרים"
   },
   "icu:stickers--StickerManagerBlessedPacksList--Label": {
-    "messageformat": "Signal Artist Series sticker packs"
+    "messageformat": "חבילות סטיקרים מסדרת אומני Signal"
   },
   "icu:stickers--StickerManagerReceivedPacksList--Label": {
-    "messageformat": "Received sticker packs"
+    "messageformat": "חבילות סטיקרים שהתקבלו"
   },
   "icu:stickers--StickerManagerInstalledPacksList--Label": {
-    "messageformat": "Installed sticker packs"
+    "messageformat": "חבילות סטיקרים שהותקנו"
   },
   "icu:stickers--StickerPreview--Title": {
     "messageformat": "חבילת מדבקות"
@@ -3081,16 +3096,16 @@
     "messageformat": "הוסף מדבקה"
   },
   "icu:FunPicker__Label--StickerReply": {
-    "messageformat": "Reply"
+    "messageformat": "השב"
   },
   "icu:FunPicker__Label--SendStickerReply": {
-    "messageformat": "Send"
+    "messageformat": "שליחה"
   },
   "icu:FunPicker__Label--CancelStickerReply": {
-    "messageformat": "Cancel"
+    "messageformat": "ביטול"
   },
   "icu:FunPicker__Label--Sticker": {
-    "messageformat": "Sticker"
+    "messageformat": "מדבקה"
   },
   "icu:confirmation-dialog--Cancel": {
     "messageformat": "ביטול"
@@ -3872,20 +3887,20 @@
   "icu:calling__preview--minimize": {
     "messageformat": "הקטנת תצוגה מקדימה"
   },
-  "icu:calling__change-view": {
-    "messageformat": "שינוי תצוגה"
-  },
-  "icu:calling__view_mode--paginated": {
-    "messageformat": "תצוגת גריד"
-  },
-  "icu:calling__view_mode--overflow": {
-    "messageformat": "תצוגת סרגל צד"
-  },
-  "icu:calling__view_mode--speaker": {
-    "messageformat": "תצוגת דובר/ת"
-  },
   "icu:calling__view_mode--updated": {
     "messageformat": "תצוגה עודכנה"
+  },
+  "icu:calling__change-layout": {
+    "messageformat": "שינוי תצוגה"
+  },
+  "icu:calling__layout--paginated": {
+    "messageformat": "גריד"
+  },
+  "icu:calling__layout--overflow": {
+    "messageformat": "סרגל צד"
+  },
+  "icu:calling__layout--speaker": {
+    "messageformat": "רמקול"
   },
   "icu:calling__SelectPresentingSourcesModal--title": {
     "messageformat": "שתף את המסך שלך"
@@ -3950,23 +3965,47 @@
   "icu:notMuted": {
     "messageformat": "לא מושתק"
   },
-  "icu:muteHour": {
-    "messageformat": "השתקה לשעה אחת"
-  },
-  "icu:muteEightHours": {
-    "messageformat": "השתקה לשמונה שעות"
-  },
-  "icu:muteDay": {
-    "messageformat": "השתקה ליום אחד"
-  },
-  "icu:muteWeek": {
-    "messageformat": "השתקה לשבוע אחד"
-  },
-  "icu:muteAlways": {
-    "messageformat": "השתקה לתמיד"
-  },
   "icu:unmute": {
     "messageformat": "ביטול השתקה"
+  },
+  "icu:MuteMenu__label": {
+    "messageformat": "השתקת צ׳אט זה למשך…"
+  },
+  "icu:MuteMenu__hour": {
+    "messageformat": "שעה"
+  },
+  "icu:MuteMenu__eightHours": {
+    "messageformat": "8 שעות"
+  },
+  "icu:MuteMenu__day": {
+    "messageformat": "יום"
+  },
+  "icu:MuteMenu__week": {
+    "messageformat": "שבוע"
+  },
+  "icu:MuteMenu__until": {
+    "messageformat": "עד…"
+  },
+  "icu:MuteMenu__always": {
+    "messageformat": "תמיד"
+  },
+  "icu:DatePicker__popupTitle": {
+    "messageformat": "בחירת תאריך"
+  },
+  "icu:TimePicker__popupTitle": {
+    "messageformat": "בחירת שעה"
+  },
+  "icu:MuteUntilDialog__title": {
+    "messageformat": "השתקת צ׳אט זה עד…"
+  },
+  "icu:MuteUntilDialog__dateLabel": {
+    "messageformat": "תאריך"
+  },
+  "icu:MuteUntilDialog__timeLabel": {
+    "messageformat": "שעה"
+  },
+  "icu:MuteUntilDialog__timeZoneNote": {
+    "messageformat": "כל הזמנים ב–{timeZone}"
   },
   "icu:muteExpirationLabelAlways": {
     "messageformat": "מושתק תמיד"
@@ -4874,9 +4913,6 @@
   "icu:showConversationDetails--direct": {
     "messageformat": "הגדרות צ'אט"
   },
-  "icu:ConversationDetails__unmute--title": {
-    "messageformat": "לבטל השתקה של צ'אט זה?"
-  },
   "icu:ConversationDetails--group-link": {
     "messageformat": "קישור קבוצה"
   },
@@ -5072,6 +5108,9 @@
   "icu:ConversationDetailsMembershipList--show-all": {
     "messageformat": "ראה הכל"
   },
+  "icu:ConversationDetailsMembershipList__Search__AccessibilityLabel": {
+    "messageformat": "חיפוש"
+  },
   "icu:ConversationDetailsGroups--title": {
     "messageformat": "{count, plural, one {קבוצה {count,number} במשותף} two {{count,number} קבוצות במשותף} many {{count,number} קבוצות במשותף} other {{count,number} קבוצות במשותף}}"
   },
@@ -5108,17 +5147,110 @@
   "icu:EditNicknameAndNoteModal__Note__Placeholder": {
     "messageformat": "הערה"
   },
-  "icu:ConversationNotificationsSettings__mentions__label": {
+  "icu:WhileMuted__title": {
+    "messageformat": "כאשר הצליל מושתק"
+  },
+  "icu:WhileMuted__description": {
+    "messageformat": "לבחור התראות להצגה בזמן שהצ׳אט הזה מושתק."
+  },
+  "icu:WhileMuted__calls__title": {
+    "messageformat": "שיחות"
+  },
+  "icu:WhileMuted__calls__description": {
+    "messageformat": "צלצול או התראה כשמתחילה שיחה בזמן שהצ׳אט הזה מושתק."
+  },
+  "icu:WhileMuted__mentions__title": {
     "messageformat": "אזכורים"
   },
-  "icu:ConversationNotificationsSettings__mentions__info": {
-    "messageformat": "קבלת התראות אם מזכירים אותך בצ'אטים מושתקים"
+  "icu:WhileMuted__mentions__description": {
+    "messageformat": "התראה כאשר @הוזכרת בזמן שהצ׳אט הזה מושתק."
   },
-  "icu:ConversationNotificationsSettings__mentions__select__always-notify": {
-    "messageformat": "יידע תמיד"
+  "icu:WhileMuted__replies__title": {
+    "messageformat": "תשובות"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__dont-notify-for-mentions-if-muted": {
-    "messageformat": "לא לשלוח התראות אם מושתק"
+  "icu:WhileMuted__replies__description": {
+    "messageformat": "התראה כשמשיבים להודעות שלך בזמן שהצ׳אט הזה מושתק."
+  },
+  "icu:WhileMuted__value--none": {
+    "messageformat": "כלום"
+  },
+  "icu:WhileMuted__value--calls": {
+    "messageformat": "שיחות"
+  },
+  "icu:WhileMuted__value--mentions": {
+    "messageformat": "אזכורים"
+  },
+  "icu:WhileMuted__value--replies": {
+    "messageformat": "תשובות"
+  },
+  "icu:WhileMuted__value--calls-mentions": {
+    "messageformat": "שיחות, אזכורים"
+  },
+  "icu:WhileMuted__value--calls-replies": {
+    "messageformat": "שיחות, תשובות"
+  },
+  "icu:WhileMuted__value--mentions-replies": {
+    "messageformat": "אזכורים, תשובות"
+  },
+  "icu:WhileMuted__value--calls-mentions-replies": {
+    "messageformat": "שיחות, אזכורים, תשובות"
+  },
+  "icu:Preferences__WhileMuted__description": {
+    "messageformat": "לבחור התראות להצגה עבור צ׳אטים מושתקים."
+  },
+  "icu:Preferences__WhileMuted__calls__description": {
+    "messageformat": "צלצול או התראה כשמתחילה שיחה בצ׳אטים מושתקים."
+  },
+  "icu:Preferences__WhileMuted__mentions__description": {
+    "messageformat": "התראה כשהוזכרת בצ׳אטים מושתקים."
+  },
+  "icu:Preferences__WhileMuted__replies__description": {
+    "messageformat": "התראה כשמשיבים להודעות שלך בצ׳אטים מושתקים."
+  },
+  "icu:UnreadReminders__title": {
+    "messageformat": "תזכורות על הודעות שלא נקראו"
+  },
+  "icu:UnreadReminders__description": {
+    "messageformat": "התראות מזדמנות על הודעות שלא נקראו בזמן שהצ׳אט הזה מושתק."
+  },
+  "icu:Preferences__UnreadReminders__description": {
+    "messageformat": "התראה מדי פעם על הודעות שלא נקראו בצ'אטים מושתקים."
+  },
+  "icu:UnreadReminders__notification--messages--1": {
+    "messageformat": "{messageCount, plural, one {יש לך הודעה {messageCount,number} שלא נקראה מאת {person1}.} two {יש לך {messageCount,number} הודעות שלא נקראו מאת {person1}.} many {יש לך {messageCount,number} הודעות שלא נקראו מאת {person1}.} other {יש לך {messageCount,number} הודעות שלא נקראו מאת {person1}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--2": {
+    "messageformat": "{messageCount, plural, one {יש לך הודעה {messageCount,number} שלא נקראה מאת {person1} ומאת {person2}.} two {יש לך {messageCount,number} הודעות שלא נקראו מאת {person1} ומאת {person2}.} many {יש לך {messageCount,number} הודעות שלא נקראו מאת {person1} ומאת {person2}.} other {יש לך {messageCount,number} הודעות שלא נקראו מאת {person1} ומאת {person2}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--many": {
+    "messageformat": "{messageCount, plural, one {יש לך הודעה {messageCount,number} שלא נקראה מאת {person1}, {person2}, ואחרים.} two {יש לך {messageCount,number} הודעות שלא נקראו מאת {person1}, {person2} ואחרים.} many {יש לך {messageCount,number} הודעות שלא נקראו מאת {person1}, {person2} ואחרים.} other {יש לך {messageCount,number} הודעות שלא נקראו מאת {person1}, {person2} ואחרים.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-mentions": {
+    "messageformat": "{messageCount, plural, one {יש לך הודעה {messageCount,number} שלא נקראה, כולל {mentionSummary}.} two {יש לך {messageCount,number} הודעות שלא נקראו, כולל {mentionSummary}.} many {יש לך {messageCount,number} הודעות שלא נקראו, כולל {mentionSummary}.} other {יש לך {messageCount,number} הודעות שלא נקראו, כולל {mentionSummary}.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-replies": {
+    "messageformat": "{messageCount, plural, one {יש לך הודעה {messageCount,number} שלא נקראה, כולל {replySummary}.} two {יש לך {messageCount,number} הודעות שלא נקראו, כולל {replySummary}.} many {יש לך {messageCount,number} הודעות שלא נקראו, כולל {replySummary}.} other {יש לך {messageCount,number} הודעות שלא נקראו, כולל {replySummary}.}}"
+  },
+  "icu:UnreadReminders__notification--counts--messages": {
+    "messageformat": "{messageCount, plural, one {יש לך הודעה {messageCount,number} שלא נקראה.} two {יש לך {messageCount,number} הודעות שלא נקראו.} many {יש לך {messageCount,number} הודעות שלא נקראו.} other {יש לך {messageCount,number} הודעות שלא נקראו.}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--1": {
+    "messageformat": "{mentionCount, plural, one {אזכור שלך על ידי {person1}} two {{mentionCount,number} אזכורים שלך על ידי {person1}} many {{mentionCount,number} אזכורים שלך על ידי {person1}} other {{mentionCount,number} אזכורים שלך על ידי {person1}}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--2": {
+    "messageformat": "{mentionCount, plural, one {{mentionCount,number} אזכור שלך על ידי {person1} ועל ידי {person2}} two {{mentionCount,number} אזכורים שלך על ידי {person1} ועל ידי {person2}} many {{mentionCount,number} אזכורים שלך על ידי {person1} ועל ידי {person2}} other {{mentionCount,number} אזכורים שלך על ידי {person1} ועל ידי {person2}}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--many": {
+    "messageformat": "{mentionCount, plural, one {{mentionCount,number} אזכור שלך על ידי {person1} ואחרים} two {{mentionCount,number} אזכורים שלך על ידי {person1} ואחרים} many {{mentionCount,number} אזכורים שלך על ידי {person1} ואחרים} other {{mentionCount,number} אזכורים שלך על ידי {person1} ואחרים}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--1": {
+    "messageformat": "{replyCount, plural, one {תשובה מאת {person1}} two {{replyCount,number} תשובות מאת {person1}} many {{replyCount,number} תשובות מאת {person1}} other {{replyCount,number} תשובות מאת {person1}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--2": {
+    "messageformat": "{replyCount, plural, one {{replyCount,number} תשובה מאת {person1} ומאת {person2}} two {{replyCount,number} תשובות מאת {person1} ומאת {person2}} many {{replyCount,number} תשובות מאת {person1} ומאת {person2}} other {{replyCount,number} תשובות מאת {person1} ומאת {person2}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--many": {
+    "messageformat": "{replyCount, plural, one {{replyCount,number} תשובה מאת {person1} ואחרים} two {{replyCount,number} תשובות מאת {person1} ואחרים} many {{replyCount,number} תשובות מאת {person1} ואחרים} other {{replyCount,number} תשובות מאת {person1} ואחרים}}"
   },
   "icu:GroupLinkManagement--clipboard": {
     "messageformat": "קישור קבוצה הועתק."
@@ -5140,6 +5272,48 @@
   },
   "icu:GroupLinkManagement__CopyGroupLinkButtonLabel": {
     "messageformat": "העתקה של קישור signal.group ללוח"
+  },
+  "icu:GroupMembersSearchDialog__DialogTitle": {
+    "messageformat": "חיפוש חברים"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder": {
+    "messageformat": "חיפוש"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringByAdmins": {
+    "messageformat": "חיפוש מנהלים"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringBySystemContacts": {
+    "messageformat": "חיפוש אנשי קשר"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Label": {
+    "messageformat": "סינון"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__AllMembers": {
+    "messageformat": "כל חברי הקבוצה"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Admins": {
+    "messageformat": "מנהלנים"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__SystemContacts": {
+    "messageformat": "אנשי קשר"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithoutSearchQuery": {
+    "messageformat": "אין תוצאות"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithSearchQuery": {
+    "messageformat": "אין תוצאות עבור ״{searchQuery}״"
+  },
+  "icu:GroupMembersSearchDialog__MemberItem__Admin": {
+    "messageformat": "מנהלן"
+  },
+  "icu:GroupMembersSearchDialog__SearchResults__Title": {
+    "messageformat": "תוצאות חיפוש"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__AddMembers": {
+    "messageformat": "הוסף חברי קבוצה"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__InviteViaGroupLink": {
+    "messageformat": "הזמנה באמצעות קישור קבוצה"
   },
   "icu:PendingInvites--tab-requests": {
     "messageformat": "בקשות ({count,number})"
@@ -5426,6 +5600,9 @@
   },
   "icu:CaptchaDialog__second-paragraph": {
     "messageformat": "לאחר וידוא, אתה יכול להמשיך להתכתב. הודעות מושהות כלשהן יישלחו באופן אוטומטי."
+  },
+  "icu:CaptchaDialog__continue": {
+    "messageformat": "המשך"
   },
   "icu:CaptchaDialog--can-close__title": {
     "messageformat": "להמשיך בלי לוודא?"
@@ -5893,6 +6070,15 @@
   "icu:Preferences__message-audio-description": {
     "messageformat": "השמעת צליל התראה עבור הודעות שנשלחו והתקבלו בזמן שנמצאים בצ׳אט."
   },
+  "icu:Preferences__reaction-notifications-title": {
+    "messageformat": "התראות על תגובות"
+  },
+  "icu:Preferences__reaction-notifications-description": {
+    "messageformat": "התראה כשמשיבים להודעות שלך"
+  },
+  "icu:Preferences__button--account": {
+    "messageformat": "חשבון"
+  },
   "icu:Preferences__button--general": {
     "messageformat": "כללי"
   },
@@ -5962,6 +6148,45 @@
   "icu:Preferences--system": {
     "messageformat": "מערכת"
   },
+  "icu:Preferences--signal-login": {
+    "messageformat": "Signal Login"
+  },
+  "icu:Preferences--signal-login-description": {
+    "messageformat": "Signal Login שלך משמש לשחזור החשבון שלך. יש לתעד את המפתחות האלה במקום בטוח, במנהל סיסמאות אמין. <learnMoreLink>למידע נוסף</learnMoreLink>."
+  },
+  "icu:Preferences--signal-login-description--learn-more": {
+    "messageformat": "למידע נוסף"
+  },
+  "icu:Preferences__SignalAccount__label": {
+    "messageformat": "חשבון ושחזור"
+  },
+  "icu:Preferences__SignalAccount__description": {
+    "messageformat": "2 מפתחות"
+  },
+  "icu:Preferences__SignalAccountKeys__Title": {
+    "messageformat": "Signal Login שלך"
+  },
+  "icu:Preferences__SignalAccountKeys__Description": {
+    "messageformat": "חשוב לאחסן את זה במקום בטוח, מידע ההתחברות (login) שלך נדרש כדי לשחזר את החשבון והנתונים שלך. אף פעם אין לשתף את זה עם אף אחד אחר."
+  },
+  "icu:Preferences__SignalAccountKeys__AccountKey": {
+    "messageformat": "מפתח חשבון"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountID": {
+    "messageformat": "מזהה חשבון"
+  },
+  "icu:Preferences__SignalAccountKeys__RecoveryKey": {
+    "messageformat": "מפתח שחזור"
+  },
+  "icu:Preferences__SignalAccountKeys__Save": {
+    "messageformat": "שמור"
+  },
+  "icu:Preferences__Account__LinkedDevice__label": {
+    "messageformat": "זה מכשיר מקושר"
+  },
+  "icu:Preferences__Account__LinkedDevice__description": {
+    "messageformat": "כדי לנהל את הגדרות החשבון שלך, יש לפתוח את Signal במכשיר הראשי שלך."
+  },
   "icu:Preferences--zoom": {
     "messageformat": "רמת התקרבות"
   },
@@ -5992,8 +6217,116 @@
   "icu:Preferences--advanced": {
     "messageformat": "מתקדם"
   },
-  "icu:Preferences--notification-content": {
-    "messageformat": "תוכן התראה"
+  "icu:Preferences--change-signal-pin": {
+    "messageformat": "שנה את ה־PIN שלך"
+  },
+  "icu:Preferences--change-signal-pin-button": {
+    "messageformat": "שינוי"
+  },
+  "icu:Preferences--create-signal-pin": {
+    "messageformat": "צור PIN"
+  },
+  "icu:Preferences--create-signal-pin-button": {
+    "messageformat": "צור"
+  },
+  "icu:Preferences--signal-pin": {
+    "messageformat": "PIN של Signal"
+  },
+  "icu:Preferences--signal-pin__footer": {
+    "messageformat": "קודי PIN שומרים על המידע שמאוחסן ב–Signal מוצפן כך שרק לך תהיה גישה אליו. לא ניתן לשחזר את ה–PIN שלך. הפרופיל, ההגדרות ואנשי הקשר שלך ישוחזרו בעת התקנה מחדש של Signal. <learnMoreLink>למידע נוסף</learnMoreLink>"
+  },
+  "icu:Preferences--signal-pin-advanced-settings": {
+    "messageformat": "הגדרות PIN מתקדמות"
+  },
+  "icu:Preferences--disable-signal-pin": {
+    "messageformat": "השבת PIN"
+  },
+  "icu:Preferences--disable-signal-pin--button": {
+    "messageformat": "השבת"
+  },
+  "icu:Preferences--disable-signal-pin--footer": {
+    "messageformat": "אם תשבית את ה־PIN, תאבד את כל הנתונים כאשר תירשם מחדש אל Signal אלא אם תגבה ותשחזר באופן ידני. אינך יכול להפעיל נעילת הרשמה בזמן שה־PIN מושבת."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--title": {
+    "messageformat": "השבתת PIN נכשלה בגלל נעילת הרשמה"
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--body": {
+    "messageformat": "יש להשבית את נעילת ההרשמה לפני השבתת קוד ה–PIN שלך."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--ok": {
+    "messageformat": "אישור"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--title": {
+    "messageformat": "השבתת PIN נכשלה בגלל גיבויים"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--body": {
+    "messageformat": "יש להשבית את הגיבויים לפני השבתת קוד ה–PIN שלך."
+  },
+  "icu:Preferences--enable-signal-pin": {
+    "messageformat": "אפשר PIN"
+  },
+  "icu:Preferences--enable-signal-pin--button": {
+    "messageformat": "הפעלה"
+  },
+  "icu:Preferences--pin-reminders--header": {
+    "messageformat": "תזכורות PIN"
+  },
+  "icu:Preferences--pin-reminders--description": {
+    "messageformat": "תישאל לעיתים פחות תכופות עם הזמן"
+  },
+  "icu:Preferences--registration-lock__label": {
+    "messageformat": "נעילת הרשמה"
+  },
+  "icu:Preferences--registration-lock__footer": {
+    "messageformat": "דרוש את ה־PIN של Signal שלך כדי להירשם שוב אל Signal עם מספר הטלפון שלך."
+  },
+  "icu:Preferences__Chats__TextInputSection__Title": {
+    "messageformat": "קלט טקסט"
+  },
+  "icu:Preferences__Chats__ChatFoldersSection__Title": {
+    "messageformat": "תיקיות צ׳אטים"
+  },
+  "icu:Preferences__Notifications__Show__Label": {
+    "messageformat": "הראה"
+  },
+  "icu:Preferences__Notifications__SoundsSection__Title": {
+    "messageformat": "צלילים"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title": {
+    "messageformat": "הוספת תג"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title-v2": {
+    "messageformat": "תגי הודעות שלא נקראו"
+  },
+  "icu:Preferences__Notifications__Reset__title": {
+    "messageformat": "איפוס הגדרות ההתראות לברירת המחדל, כולל הגדרות מותאמות אישית עבור הצ׳אטים שלך."
+  },
+  "icu:Preferences__Notifications__Reset__button": {
+    "messageformat": "אפס"
+  },
+  "icu:Preferences__Notifications__Reset__modal--body": {
+    "messageformat": "לאפס את כל הגדרות ההתראות לברירת המחדל עבור כל הצ׳אטים?"
+  },
+  "icu:Preferences__Notifications__Reset__modal--confirm": {
+    "messageformat": "אפס"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Label": {
+    "messageformat": "ספירת גשרים"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Description": {
+    "messageformat": "לבחור האם מחוון ספירת ההודעות יציג את מספר ההודעות שלא נקראו או את מספר הצ׳אטים שלא נקראו"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadMessages": {
+    "messageformat": "הודעות שלא נקראו"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadChats": {
+    "messageformat": "צ׳אטים שלא נקראו"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats": {
+    "messageformat": "לכלול צ'אטים מושתקים בספירת תג האפליקציה"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats__description": {
+    "messageformat": "ספירת התג של תיקיית הצ׳אטים תמיד תציג צ׳אטים מושתקים"
   },
   "icu:PlaintextExport--PreferencesRow--Header": {
     "messageformat": "ייצוא היסטוריית צ׳אט"
@@ -6145,9 +6478,6 @@
   "icu:NotificationProfiles--setting": {
     "messageformat": "פרופילי התראות"
   },
-  "icu:NotificationProfiles--setup": {
-    "messageformat": "הגדרה"
-  },
   "icu:NotificationProfiles--title": {
     "messageformat": "פרופילי התראות"
   },
@@ -6159,9 +6489,6 @@
   },
   "icu:NotificationProfiles--manage-description": {
     "messageformat": "הוסף או ערוך פרופילי התראות"
-  },
-  "icu:NotificationProfiles--manage-profiles": {
-    "messageformat": "{profileCount, plural, one {פרופיל אחד} two {{profileCount,number} פרופילים} many {{profileCount,number} פרופילים} other {{profileCount,number} פרופילים}}"
   },
   "icu:NotificationProfiles--create": {
     "messageformat": "צור פרופיל"
@@ -6351,6 +6678,9 @@
   },
   "icu:Preferences--blocked-groups": {
     "messageformat": "קבוצות חסומות"
+  },
+  "icu:Preferences--blocked--blocked-on": {
+    "messageformat": "נחסמ/ה ב–{blockedAt}"
   },
   "icu:Preferences--signal-backups": {
     "messageformat": "גיבויים מאובטחים של Signal"
@@ -6559,9 +6889,6 @@
   "icu:Preferences__pnp__row--body": {
     "messageformat": "אפשר לבחור מי יוכל לראות את מספר הטלפון שלך ומי יוכל ליצור איתך קשר באמצעותו ב–Signal."
   },
-  "icu:Preferences__pnp__row--button": {
-    "messageformat": "שינוי…"
-  },
   "icu:Preferences__pnp__sharing--title": {
     "messageformat": "מי יכול לראות את המספר שלי"
   },
@@ -6610,14 +6937,11 @@
   "icu:Preferences--read-receipts": {
     "messageformat": "אישורי קריאה"
   },
-  "icu:Preferences--read-receipts--description": {
-    "messageformat": "אם האפשרות הזו מושבתת, לא יוצגו לך אישורי קריאה מאחרים."
-  },
   "icu:Preferences--typing-indicators": {
     "messageformat": "מחווני הקלדה"
   },
-  "icu:Preferences--typing-indicators--description": {
-    "messageformat": "אם האפשרות הזו מושבתת, לא יוצגו לך מחווני הקלדה מאחרים."
+  "icu:Preferences--messaging-help": {
+    "messageformat": "לראות ולשתף כשהודעות נקראות ומוקלדות. אם האפשרות הזו מושבתת, לא יוצגו לך אישורי קריאה ומחווני הקלדה מאחרים."
   },
   "icu:Preferences--updates": {
     "messageformat": "עדכונים"
@@ -6721,11 +7045,23 @@
   "icu:InstallScreenUpdateDialog--update-required__title": {
     "messageformat": "נדרש עדכון"
   },
+  "icu:InstallScreenUpdateDialog--checking-for-updates": {
+    "messageformat": "עדכונים בבדיקה"
+  },
+  "icu:InstallScreenUpdateDialog--updating-signal": {
+    "messageformat": "Signal בעדכון"
+  },
+  "icu:InstallScreenUpdateDialog--download-progress": {
+    "messageformat": "מורידים {currentBytes} מתוך {totalBytes} ({percentage,number,percent})…"
+  },
   "icu:InstallScreenUpdateDialog--update-required__body": {
-    "messageformat": "כדי להשלים את סנכרון ההודעות שלך, יש לעדכן את Signal לשולחן העבודה כעת."
+    "messageformat": "כדי להמשיך, יש לעדכן את Signal לשולחן העבודה."
   },
   "icu:InstallScreenUpdateDialog--update-required__action-update": {
     "messageformat": "עדכן"
+  },
+  "icu:InstallScreenUpdateDialog--update-required__action-update__mas": {
+    "messageformat": "מעבר אל App Store"
   },
   "icu:InstallScreenUpdateDialog--unsupported-os__title": {
     "messageformat": "נדרש עדכון"
@@ -6759,6 +7095,9 @@
   },
   "icu:StandaloneRegistration--PhoneNumber--waiting": {
     "messageformat": "יש לנסות שוב בעוד {duration}"
+  },
+  "icu:StandaloneRegistration--PhoneNumber--RegionCodeSelector--Label": {
+    "messageformat": "בחירת קוד מדינה"
   },
   "icu:StandaloneRegistration--PhoneNumber--placeholder": {
     "messageformat": "מספר טלפון"
@@ -6982,6 +7321,9 @@
   "icu:StandaloneRegistration--VerifyPIN--incorrect-pin--with-count": {
     "messageformat": "{triesRemaining, plural, one {PIN שגוי. ניסיון {triesRemaining,number} נותר.} two {PIN שגוי. {triesRemaining,number} ניסיונות נותרים.} many {PIN שגוי. {triesRemaining,number} ניסיונות נותרים.} other {PIN שגוי. {triesRemaining,number} ניסיונות נותרים.}}"
   },
+  "icu:StandaloneRegistration--VerifyPIN--just-count": {
+    "messageformat": "{triesRemaining, plural, one {ניסיון {triesRemaining,number} נותר.} two {{triesRemaining,number} ניסיונות נותרים.} many {{triesRemaining,number} ניסיונות נותרים.} other {{triesRemaining,number} ניסיונות נותרים.}}"
+  },
   "icu:StandaloneRegistration--VerifyPIN--NeedHelp--header": {
     "messageformat": "צריך עזרה?"
   },
@@ -7024,6 +7366,9 @@
   "icu:StandaloneRegistration--VerifyPIN--NoRemainingTries--learn-more": {
     "messageformat": "למד עוד על קודי PIN"
   },
+  "icu:StandaloneRegistration--VerifyPIN--open-menu": {
+    "messageformat": "פתיחת תפריט"
+  },
   "icu:StandaloneRegistration--VerifyPIN--menu--skip-pin": {
     "messageformat": "דילוג על PIN"
   },
@@ -7031,7 +7376,7 @@
     "messageformat": "לדלג על הכנסת PIN?"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--description": {
-    "messageformat": "אם שכחת את ה–PIN שלך, אפשר ליצור אחד חדש. ניתן להירשם ולהשתמש בחשבון שלך אבל אז יאבדו כמה הגדרות שמורות כמו נתוני הפרופיל שלך. למד עוד."
+    "messageformat": "אם שכחת את ה–PIN שלך, אפשר ליצור אחד חדש. ניתן להירשם ולהשתמש בחשבון שלך אבל אז יאבדו כמה הגדרות שמורות כמו נתוני הפרופיל שלך. <learnMore>למידע נוסף</learnMore>."
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--skip-button": {
     "messageformat": "דלג וצור PIN חדש"
@@ -7067,7 +7412,7 @@
     "messageformat": "אזהרה"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--description": {
-    "messageformat": "אם תשבית את ה־PIN, תאבד את כל הנתונים כאשר תירשם מחדש אל Signal אלא אם תעביר אותו ממכשיר iOS אחר. אינך יכול להפעיל נעילת הרשמה בזמן שה־PIN מושבת."
+    "messageformat": "השבתת ה–PIN תגרום לאובדן כל הנתונים שלך בעת רישום מחדש אל Signal. לא ניתן להפעיל נעילת הרשמה כאשר ה–PIN מושבת."
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--disable-button": {
     "messageformat": "השבת PIN"
@@ -7275,6 +7620,12 @@
   },
   "icu:MediaPermissionsModal__step-2": {
     "messageformat": "להפעיל את ״Signal״"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--microphone": {
+    "messageformat": "לתת ל–Signal גישה למיקרופון שלך"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--camera": {
+    "messageformat": "לתת ל–Signal גישה למצלמה שלך"
   },
   "icu:MediaPermissionsModal__open": {
     "messageformat": "מעבר להגדרות"
@@ -7816,11 +8167,17 @@
   "icu:ContextMenu--button": {
     "messageformat": "תפריט קונטקסט"
   },
+  "icu:EditUsernameModalBody__username-label": {
+    "messageformat": "שם משתמש"
+  },
   "icu:EditUsernameModalBody__username-placeholder": {
     "messageformat": "שם משתמש"
   },
   "icu:EditUsernameModalBody__username-helper": {
     "messageformat": "שמות משתמש תמיד מוצמדים לסט של מספרים."
+  },
+  "icu:EditUsernameModalBody__discriminator-label": {
+    "messageformat": "ספרות שם משתמש"
   },
   "icu:EditUsernameModalBody__learn-more": {
     "messageformat": "למידע נוסף"
@@ -7918,6 +8275,75 @@
   },
   "icu:UsernameMegaphone__dismiss": {
     "messageformat": "ביטול"
+  },
+  "icu:PinReminderMegaphone__title": {
+    "messageformat": "וודא את Signal PIN שלך"
+  },
+  "icu:PinReminderMegaphone__body": {
+    "messageformat": "נבקש ממך מדי פעם לוודא את ה־PIN שלך כך שתזכור אותו."
+  },
+  "icu:PinReminderMegaphone__verify": {
+    "messageformat": "אימות"
+  },
+  "icu:PinReminderMegaphone__not-now": {
+    "messageformat": "לא עכשיו"
+  },
+  "icu:PinReminderModal__title": {
+    "messageformat": "הכנס את Signal PIN שלך"
+  },
+  "icu:PinReminderModal__body": {
+    "messageformat": "כדי לעזור לך לשנן את ה־PIN שלך, נבקש ממך להכניס אותו מעת לעת. נבקש פחות עם הזמן."
+  },
+  "icu:PinReminderModal__pin-input-placeholder": {
+    "messageformat": "הכנס את ה־PIN שלך"
+  },
+  "icu:PinReminderModal__pin-input-error": {
+    "messageformat": "PIN שגוי נסה שוב"
+  },
+  "icu:PinReminderModal__forgot": {
+    "messageformat": "שכחתי PIN"
+  },
+  "icu:PinReminderModal__confirm": {
+    "messageformat": "אישור"
+  },
+  "icu:PinReminderCompletedToast": {
+    "messageformat": "PIN נכון. נזכיר לך שוב מאוחר יותר."
+  },
+  "icu:PinChangeModal__title--create": {
+    "messageformat": "שינוי ה–PIN שלך ב–Signal"
+  },
+  "icu:PinChangeModal__title--create--without-pin": {
+    "messageformat": "יצירת קוד PIN של Signal"
+  },
+  "icu:PinChangeModal__body--create": {
+    "messageformat": "אתה יכול לשנות את ה־PIN שלך כל עוד המכשיר רשום. <learnMoreLink>למידע נוסף</learnMoreLink>"
+  },
+  "icu:PinChangeModal__body--create--without-pin": {
+    "messageformat": "קודי PIN שומרים על המידע שמאוחסן ב–Signal מוצפן כך שרק לך תהיה גישה אליו. הפרופיל, ההגדרות ואנשי הקשר שלך ישוחזרו בעת התקנה מחדש. לא יהיה צורך ב–PIN שלך כדי לפתוח את האפליקציה. <learnMoreLink>למידע נוסף</learnMoreLink>"
+  },
+  "icu:PinChangeModal__title--confirm": {
+    "messageformat": "אשר את ה־PIN של Signal שלך"
+  },
+  "icu:PinChangeModal__body--confirm": {
+    "messageformat": "הכנס את ה־PIN שזה עתה יצרת."
+  },
+  "icu:PinChangeModal__pin-input-placeholder--create": {
+    "messageformat": "הזנת PIN חדש"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--confirm": {
+    "messageformat": "אשר PIN"
+  },
+  "icu:PinChangeModal__cancel": {
+    "messageformat": "ביטול"
+  },
+  "icu:PinChangeModal__continue": {
+    "messageformat": "המשך"
+  },
+  "icu:PinChangeModal__confirm": {
+    "messageformat": "אישור"
+  },
+  "icu:PinChangeCompletedToast": {
+    "messageformat": "נוצר PIN חדש."
   },
   "icu:UnsupportedOSWarningDialog__body": {
     "messageformat": "Signal לשולחן עבודה בקרוב תפסיק לתמוך בגרסת {OS} של המחשב שלך. כדי להמשיך להשתמש ב–Signal, צריך לעדכן את מערכת ההפעלה של המחשב שלך עד {expirationDate}. <learnMoreLink>למידע נוסף</learnMoreLink>"
@@ -8351,8 +8777,11 @@
   "icu:DonationReceipt__type-value--one-time": {
     "messageformat": "פעם אחת"
   },
-  "icu:DonationReceipt__footer-text": {
-    "messageformat": "תודה על התמיכה ב–Signal. התרומה שלך עוזרת להמשיך להניע את המשימה שלנו להגן על חופש הביטוי ולאפשר תקשורת גלובלית מאובטחת עבור מיליונים ברחבי העולם, באמצעות טכנולוגיית פרטיות בקוד פתוח. אם מקום המגורים שלך הוא ארה״ב, יש לשמור את הקבלה הזו לצורך רישומי המס שלך. Signal Technology Foundation היא עמותה ללא מטרות רווח פטורה ממס בארה״ב תחת סעיף 501c3 של קוד מס ההכנסה האמריקאי. מזהה המס הפדרלי שלנו הוא 82-4506840."
+  "icu:DonationReceipt__footer-text-v2": {
+    "messageformat": "תודה על התמיכה ב–Signal. התרומה שלך עוזרת להמשיך לקדם את המשימה שלנו להגן על חופש הביטוי ולאפשר תקשורת גלובלית מאובטחת עבור מיליונים ברחבי העולם, באמצעות טכנולוגיית פרטיות בקוד פתוח. אם מקום המגורים שלך הוא ארה״ב, יש לשמור את הקבלה הזו לצורך רישומי המס שלך. Signal Technology Foundation היא עמותה ללא מטרות רווח פטורה ממס בארה״ב תחת סעיף 501c3 של קוד מס ההכנסה האמריקאי. מזהה המס הפדרלי שלנו הוא 82-4506840. Signal לא סיפקה כל מוצר או שירות בתמורה לתרומה זו."
+  },
+  "icu:MessageCta__Donate": {
+    "messageformat": "ביצוע תרומה עכשיו"
   },
   "icu:Donations__OfflineTooltip": {
     "messageformat": "המכשיר שלך לא מחובר. יש להתחבר לאינטרנט כדי להשלים את התרומה."
@@ -8661,16 +9090,10 @@
     "messageformat": "התאמות קטנות, תיקוני באגים ושיפורי ביצועים. תודה על השימוש ב-Signal!",
     "ignoreUnused": true
   },
-  "icu:WhatsNew__8.18--0": {
-    "messageformat": "עכשיו אפשר ליצור סקרים גם בצ׳אטים אחד על אחד."
+  "icu:WhatsNew__8.30--0": {
+    "messageformat": "שיפורי ביצועים בשיחות וידאו."
   },
-  "icu:WhatsNew__8.19--0": {
-    "messageformat": "מנהלי קבוצות יכולים עכשיו לסיים צ׳אטים עם אפשרות ״סיום קבוצה״ החדשה בהגדרות הקבוצה. סיום קבוצה מונע מחברי הקבוצה לשלוח הודעות או להתחיל שיחות, וגם משבית הזמנות."
-  },
-  "icu:WhatsNew__8.20--0": {
-    "messageformat": "Introducing disappearing call events: Missed, outgoing, and received calls that occur after you install this update will now automatically disappear in any chat where disappearing messages are enabled."
-  },
-  "icu:WhatsNew__8.20--1": {
-    "messageformat": "Now you can reorder installed sticker packs so your new favorites don’t get stuck in the back of the line."
+  "icu:WhatsNew__8.30--1": {
+    "messageformat": "הוספנו גם קיצור דרך נוח לפתיחת הגדרות המערכת שלך ב–Windows במקרה שניסית להצטרף לשיחת וידאו ול–Signal אין הרשאת גישה למצלמה."
   }
 }

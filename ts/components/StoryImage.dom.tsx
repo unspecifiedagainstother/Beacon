@@ -90,8 +90,13 @@ export function StoryImage({
   }, [isPaused, onMediaPlaybackStart]);
 
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect
     setHasImgError(false);
-  }, [attachment?.url, attachment?.thumbnail?.url]);
+  }, [
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
+    attachment?.url,
+    attachment?.thumbnail?.url,
+  ]);
 
   if (!attachment) {
     return null;
@@ -123,11 +128,9 @@ export function StoryImage({
       />
     );
   } else if (!isThumbnail && isSupportedVideo) {
-    const shouldLoop = isGIF(attachment ? [attachment] : undefined);
+    const shouldLoop = isGIF(attachment);
 
     storyElement = (
-      // FIXME
-      // oxlint-disable-next-line jsx-a11y/control-has-associated-label
       <video
         autoPlay={!isPaused}
         className={getClassName('__image')}

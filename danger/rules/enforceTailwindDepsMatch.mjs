@@ -13,8 +13,8 @@ const pkgJson = JSON.parse(pkgContents);
 
 const lockPath = resolve(rootDir, 'pnpm-lock.yaml');
 const lockContents = readFileSync(lockPath, 'utf8');
-/** @type {any} */
-const lockYaml = YAML.load(lockContents);
+/** @type {any[]} */
+const lockYaml = YAML.loadAll(lockContents);
 
 const expectedVersion = pkgJson.devDependencies.tailwindcss;
 if (typeof expectedVersion !== 'string') {
@@ -47,20 +47,22 @@ for (const depType of ['dependencies', 'devDependencies']) {
   }
 }
 
-for (const depKey of Object.keys(lockYaml.packages)) {
-  const match = depKey.match(/^((?:@[^\/]+\/)?[^@]+)@(.+)$/);
-  if (match == null) {
-    throw new Error(`Could not parse "${depKey}"`);
-  }
+for (const document of lockYaml) {
+  for (const depKey of Object.keys(document.packages)) {
+    const match = depKey.match(/^((?:@[^\/]+\/)?[^@]+)@(.+)$/);
+    if (match == null) {
+      throw new Error(`Could not parse "${depKey}"`);
+    }
 
-  const [, depName, depSpec] = match;
+    const [, depName, depSpec] = match;
 
-  if (isTailwindPackage(depName) && depSpec !== expectedVersion) {
-    fail(
-      `**Tailwind package versions must all match**\n` +
-        `Expected to match tailwindcss@${expectedVersion}\n` +
-        `See ${depName}@${depSpec} in pnpm-lock.yaml#packages.`,
-      'pnpm-lock.yaml'
-    );
+    if (isTailwindPackage(depName) && depSpec !== expectedVersion) {
+      fail(
+        `**Tailwind package versions must all match**\n` +
+          `Expected to match tailwindcss@${expectedVersion}\n` +
+          `See ${depName}@${depSpec} in pnpm-lock.yaml#packages.`,
+        'pnpm-lock.yaml'
+      );
+    }
   }
 }

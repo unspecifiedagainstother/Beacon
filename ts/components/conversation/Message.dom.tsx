@@ -8,7 +8,6 @@ import type {
   RefObject,
   JSX,
   KeyboardEvent,
-  MutableRefObject,
   MouseEvent,
 } from 'react';
 import { forwardRef, useRef, PureComponent, createRef } from 'react';
@@ -22,7 +21,6 @@ import type { ReadonlyDeep } from 'type-fest';
 import type {
   ConversationType,
   ConversationTypeType,
-  InteractionModeType,
   PushPanelForConversationActionType,
   SaveAttachmentActionCreatorType,
   SaveAttachmentsActionCreatorType,
@@ -64,7 +62,6 @@ import type {
   AttachmentType,
 } from '../../types/Attachment.std.ts';
 import {
-  canDisplayImage,
   getGridDimensions,
   getImageDimensionsForTimeline,
   hasImage,
@@ -126,6 +123,8 @@ import type { ContactModalStateType } from '../../types/globalModals.std.ts';
 import { tw } from '../../axo/tw.dom.tsx';
 import { Emoji } from '../../axo/emoji.std.ts';
 import { AxoButton } from '../../axo/AxoButton.dom.tsx';
+import { TargetedMessageSource } from '../../state/ducks/conversationsEnums.std.ts';
+import { isReleaseNoteCtaId } from '../../types/releaseNotes.std.ts';
 
 const { drop, take, unescape } = lodash;
 
@@ -136,8 +135,6 @@ const EXPIRED_DELAY = 600;
 const GROUP_AVATAR_SIZE = AvatarSize.TWENTY_EIGHT;
 const STICKER_SIZE = 200;
 const GIF_SIZE = 300;
-// Note: this needs to match the animation time
-const TARGETED_TIMEOUT = 1200;
 // Beacon: how many earlier revisions of an edited message to show inline before
 // deferring the rest to the edit history modal.
 const MAX_INLINE_PAST_EDITS = 2;
@@ -246,8 +243,9 @@ export type PropsData = {
     deletedAt: number;
   };
   isSticker?: boolean;
-  isTargeted?: boolean;
-  isTargetedCounter?: number;
+  isTargeted: boolean;
+  isTargetedCounter: number | null;
+  isTargetedSource: TargetedMessageSource | null;
   isSelected: boolean;
   isSelectMode: boolean;
   isSignalConversation: boolean;
@@ -261,6 +259,8 @@ export type PropsData = {
   receivedAtMS?: number;
   status?: MessageStatusType;
   contact?: ReadonlyDeep<EmbeddedContactForUIType>;
+  callToActionId?: string;
+  callToActionText?: string;
   author: Pick<
     ConversationType,
     | 'avatarPlaceholderGradient'
@@ -341,11 +341,11 @@ export type PropsData = {
   isMessageRequestAccepted: boolean;
   bodyRanges?: HydratedBodyRangesType;
 
-  renderMenu?: () => JSX.Element | undefined;
+  renderMenu?: () => ReactNode;
   renderMessageContextMenu?: (
     renderer: AxoMenuBuilder.Renderer,
     children: ReactNode
-  ) => JSX.Element;
+  ) => ReactNode;
 
   item?: never;
   // test-only, to force GIF's reduced motion experience
@@ -359,9 +359,8 @@ export type PropsHousekeeping = {
   getPreferredBadge: PreferredBadgeSelectorType;
   i18n: LocalizerType;
   interactivity: MessageInteractivity;
-  interactionMode: InteractionModeType;
   platform: string;
-  renderAudioAttachment: (props: RenderAudioAttachmentProps) => JSX.Element;
+  renderAudioAttachment: (props: RenderAudioAttachmentProps) => ReactNode;
   shouldCollapseAbove: boolean;
   shouldCollapseBelow: boolean;
   shouldHideMetadata: boolean;
@@ -388,6 +387,7 @@ export type PropsActions = {
   endPoll: (messageId: string) => void;
   showContactModal: (payload: ContactModalStateType) => void;
   showSpoiler: (messageId: string, data: Record<number, boolean>) => void;
+  handleClickCtaButton: (ctaId: string) => void;
 
   cancelAttachmentDownload: (options: { messageId: string }) => void;
   kickOffAttachmentDownload: (options: { messageId: string }) => void;
@@ -408,7 +408,11 @@ export type PropsActions = {
     conversationId: string;
     sentAt: number;
   }) => void;
-  targetMessage?: (messageId: string, conversationId: string) => unknown;
+  targetMessage?: (
+    messageId: string,
+    conversationId: string,
+    targetedMessageSource: TargetedMessageSource
+  ) => unknown;
 
   showEditHistoryModal?: (id: string) => unknown;
   showAttachmentDownloadStillInProgressToast: (count: number) => unknown;
@@ -431,10 +435,9 @@ type State = {
 
   expiring: boolean;
   expired: boolean;
-  imageBroken: boolean;
 
-  isTargeted?: boolean;
-  prevTargetedCounter?: number;
+  flashing: boolean;
+  lastFlashedTargetedMessageCounter: number | null;
 
   reactionViewerRoot: HTMLDivElement | null;
   reactionViewerOutsideClickDestructor?: () => void;
@@ -634,29 +637,18 @@ const MessageReactions = forwardRef(function MessageReactions(
 
 // oxlint-disable-next-line react/prefer-function-component
 export class Message extends PureComponent<Props, State> {
-  public focusRef: RefObject<HTMLDivElement | null> = createRef();
+  readonly #focusRef = createRef<HTMLDivElement>();
+  readonly #audioButtonRef = createRef<HTMLButtonElement>();
+  readonly #reactionsContainerRef = createRef<HTMLDivElement>();
+  readonly #metadataRef = createRef<HTMLDivElement>();
 
-  public audioButtonRef: RefObject<HTMLButtonElement | null> = createRef();
+  #hasSelectedText = false;
+  #expirationCheckInterval: ReturnType<typeof setInterval> | null = null;
+  #giftBadgeInterval: ReturnType<typeof setInterval> | null = null;
+  #expiredTimeout: ReturnType<typeof setTimeout> | null = null;
+  #deleteForEveryoneTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  public reactionsContainerRef: RefObject<HTMLDivElement | null> = createRef();
-
-  readonly #hasSelectedTextRef: MutableRefObject<boolean> = {
-    current: false,
-  };
-
-  readonly #metadataRef: RefObject<HTMLDivElement | null> = createRef();
-
-  public expirationCheckInterval: NodeJS.Timeout | undefined;
-
-  public giftBadgeInterval: NodeJS.Timeout | undefined;
-
-  public expiredTimeout: NodeJS.Timeout | undefined;
-
-  public targetedTimeout: NodeJS.Timeout | undefined;
-
-  public deleteForEveryoneTimeout: NodeJS.Timeout | undefined;
-
-  public constructor(props: Props) {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
@@ -664,10 +656,9 @@ export class Message extends PureComponent<Props, State> {
 
       expiring: false,
       expired: false,
-      imageBroken: false,
 
-      isTargeted: props.isTargeted,
-      prevTargetedCounter: props.isTargetedCounter,
+      flashing: false,
+      lastFlashedTargetedMessageCounter: null,
 
       reactionViewerRoot: null,
 
@@ -679,73 +670,72 @@ export class Message extends PureComponent<Props, State> {
     };
   }
 
-  public static getDerivedStateFromProps(props: Props, state: State): State {
-    if (!props.isTargeted) {
-      return {
-        ...state,
-        isTargeted: false,
-        prevTargetedCounter: 0,
-      };
-    }
-
-    if (
-      props.isTargeted &&
-      props.isTargetedCounter !== state.prevTargetedCounter
-    ) {
-      return {
-        ...state,
-        isTargeted: props.isTargeted,
-        prevTargetedCounter: props.isTargetedCounter,
-      };
-    }
-
-    return state;
-  }
-
   #hasReactions(): boolean {
     const { reactions } = this.props;
     return Boolean(reactions && reactions.length);
   }
 
-  public handleFocus = (): void => {
-    const { interactionMode, isTargeted } = this.props;
+  readonly #handleFocus = (): void => {
+    const { isTargeted } = this.props;
 
-    if (interactionMode === 'keyboard' && !isTargeted) {
-      this.setTargeted();
+    if (!isTargeted) {
+      this.#setTargeted();
     }
   };
 
-  public handleImageError = (): void => {
-    const { id } = this.props;
-    log.info(`${id}: Image failed to load; failing over to placeholder`);
-    this.setState({
-      imageBroken: true,
-    });
+  readonly #handleAnimationEnd = (): void => {
+    this.setState({ flashing: false });
   };
 
-  public setTargeted = (): void => {
+  #setTargeted() {
     const { id, conversationId, targetMessage } = this.props;
 
     if (targetMessage) {
-      targetMessage(id, conversationId);
+      targetMessage(id, conversationId, TargetedMessageSource.Focus);
     }
-  };
+  }
 
-  public setFocus = (): void => {
-    const container = this.focusRef.current;
+  #setFocus() {
+    const container = this.#focusRef.current;
 
     if (container && !container.contains(document.activeElement)) {
-      container.focus();
+      const isFocusVisible =
+        document.activeElement?.matches(':focus-visible') ?? false;
+      container.focus({
+        focusVisible: isFocusVisible,
+      });
     }
-  };
 
-  public override componentDidMount(): void {
+    this.#maybeFlash();
+  }
+
+  #maybeFlash() {
+    const { isTargetedCounter, isTargetedSource } = this.props;
+    const { lastFlashedTargetedMessageCounter } = this.state;
+
+    if (
+      isTargetedCounter == null ||
+      isTargetedCounter === lastFlashedTargetedMessageCounter
+    ) {
+      return;
+    }
+
+    if (isTargetedSource !== TargetedMessageSource.NavigateToMessage) {
+      return;
+    }
+
+    this.setState({
+      flashing: true,
+      lastFlashedTargetedMessageCounter: isTargetedCounter,
+    });
+  }
+
+  override componentDidMount(): void {
     const { conversationId } = this.props;
     window.ConversationController?.onConvoMessageMount(conversationId);
 
-    this.startTargetedTimer();
     this.#startDeleteForEveryoneTimerIfApplicable();
-    this.startGiftBadgeInterval();
+    this.#startGiftBadgeInterval();
 
     if (this.#metadataRef.current) {
       this.#updateMetadataWidth(this.#metadataRef.current.offsetWidth);
@@ -753,7 +743,7 @@ export class Message extends PureComponent<Props, State> {
 
     const { isTargeted } = this.props;
     if (isTargeted) {
-      this.setFocus();
+      this.#setFocus();
     }
 
     const { expirationLength } = this.props;
@@ -761,10 +751,10 @@ export class Message extends PureComponent<Props, State> {
       const increment = getIncrement(expirationLength);
       const checkFrequency = Math.max(EXPIRATION_CHECK_MINIMUM, increment);
 
-      this.checkExpired();
+      this.#checkExpired();
 
-      this.expirationCheckInterval = setInterval(() => {
-        this.checkExpired();
+      this.#expirationCheckInterval = setInterval(() => {
+        this.#checkExpired();
       }, checkFrequency);
     }
 
@@ -776,30 +766,32 @@ export class Message extends PureComponent<Props, State> {
     document.addEventListener('selectionchange', this.#handleSelectionChange);
   }
 
-  public override componentWillUnmount(): void {
-    clearTimeoutIfNecessary(this.targetedTimeout);
-    clearTimeoutIfNecessary(this.expirationCheckInterval);
-    clearTimeoutIfNecessary(this.expiredTimeout);
-    clearTimeoutIfNecessary(this.deleteForEveryoneTimeout);
-    clearTimeoutIfNecessary(this.giftBadgeInterval);
-    this.toggleReactionViewer(true);
+  override componentWillUnmount(): void {
+    clearTimeoutIfNecessary(this.#expirationCheckInterval);
+    clearTimeoutIfNecessary(this.#expiredTimeout);
+    clearTimeoutIfNecessary(this.#deleteForEveryoneTimeout);
+    clearTimeoutIfNecessary(this.#giftBadgeInterval);
+    this.#toggleReactionViewer(true);
     document.removeEventListener(
       'selectionchange',
       this.#handleSelectionChange
     );
   }
 
-  public override componentDidUpdate(prevProps: Readonly<Props>): void {
+  override componentDidUpdate(prevProps: Readonly<Props>): void {
     const { isTargeted, status, timestamp } = this.props;
 
-    this.startTargetedTimer();
     this.#startDeleteForEveryoneTimerIfApplicable();
 
-    if (!prevProps.isTargeted && isTargeted) {
-      this.setFocus();
+    if (isTargeted) {
+      if (prevProps.isTargeted) {
+        this.#maybeFlash();
+      } else {
+        this.#setFocus();
+      }
     }
 
-    this.checkExpired();
+    this.#checkExpired();
 
     if (
       prevProps.status === 'sending' &&
@@ -839,8 +831,6 @@ export class Message extends PureComponent<Props, State> {
       text,
     }: Readonly<Props> = this.props
   ): MetadataPlacement {
-    const { imageBroken } = this.state;
-
     if (
       !expirationLength &&
       !expirationTimestamp &&
@@ -882,7 +872,7 @@ export class Message extends PureComponent<Props, State> {
       const isAttachmentNotAvailable =
         firstAttachment?.isPermanentlyUndownloadable;
 
-      if (this.isGenericAttachment(attachments, imageBroken)) {
+      if (this.#isGenericAttachment(attachments)) {
         return MetadataPlacement.RenderedElsewhere;
       }
 
@@ -908,36 +898,19 @@ export class Message extends PureComponent<Props, State> {
     return MetadataPlacement.InlineWithText;
   }
 
-  public startTargetedTimer(): void {
-    const { clearTargetedMessage, interactionMode } = this.props;
-    const { isTargeted } = this.state;
-
-    if (interactionMode === 'keyboard' || !isTargeted) {
-      return;
-    }
-
-    if (!this.targetedTimeout) {
-      this.targetedTimeout = setTimeout(() => {
-        this.targetedTimeout = undefined;
-        this.setState({ isTargeted: false });
-        clearTargetedMessage();
-      }, TARGETED_TIMEOUT);
-    }
-  }
-
-  public startGiftBadgeInterval(): void {
+  #startGiftBadgeInterval() {
     const { giftBadge } = this.props;
 
     if (!giftBadge) {
       return;
     }
 
-    this.giftBadgeInterval = setInterval(() => {
-      this.updateGiftBadgeCounter();
+    this.#giftBadgeInterval = setInterval(() => {
+      this.#updateGiftBadgeCounter();
     }, GIFT_BADGE_UPDATE_INTERVAL);
   }
 
-  public updateGiftBadgeCounter(): void {
+  #updateGiftBadgeCounter() {
     this.setState((state: State) => ({
       giftBadgeCounter: (state.giftBadgeCounter || 0) + 1,
     }));
@@ -948,31 +921,31 @@ export class Message extends PureComponent<Props, State> {
     return Math.max(timestamp - Date.now() + DAY, 0);
   }
 
-  #startDeleteForEveryoneTimerIfApplicable(): void {
+  #startDeleteForEveryoneTimerIfApplicable() {
     const { canDeleteForEveryone } = this.props;
     const { hasDeleteForEveryoneTimerExpired } = this.state;
     if (
       !canDeleteForEveryone ||
       hasDeleteForEveryoneTimerExpired ||
-      this.deleteForEveryoneTimeout
+      this.#deleteForEveryoneTimeout
     ) {
       return;
     }
 
-    this.deleteForEveryoneTimeout = setTimeout(() => {
+    this.#deleteForEveryoneTimeout = setTimeout(() => {
       this.setState({ hasDeleteForEveryoneTimerExpired: true });
-      delete this.deleteForEveryoneTimeout;
+      this.#deleteForEveryoneTimeout = null;
     }, this.#getTimeRemainingForDeleteForEveryone());
   }
 
-  public checkExpired(): void {
+  #checkExpired() {
     const now = Date.now();
     const { expirationTimestamp, expirationLength } = this.props;
 
     if (!expirationTimestamp || !expirationLength) {
       return;
     }
-    if (this.expiredTimeout) {
+    if (this.#expiredTimeout) {
       return;
     }
 
@@ -986,7 +959,7 @@ export class Message extends PureComponent<Props, State> {
           expired: true,
         });
       };
-      this.expiredTimeout = setTimeout(setExpired, EXPIRED_DELAY);
+      this.#expiredTimeout = setTimeout(setExpired, EXPIRED_DELAY);
     }
   }
 
@@ -1058,7 +1031,7 @@ export class Message extends PureComponent<Props, State> {
   readonly #handleSelectionChange = () => {
     const selection = document.getSelection();
     if (selection != null && !selection.isCollapsed) {
-      this.#hasSelectedTextRef.current = true;
+      this.#hasSelectedText = true;
     }
   };
 
@@ -1122,7 +1095,7 @@ export class Message extends PureComponent<Props, State> {
         isOutlineOnlyBubble={
           deletedForEveryone || (attachmentDroppedDueToSize && !text)
         }
-        isShowingImage={this.isShowingImage()}
+        isShowingImage={this.#isShowingImage()}
         isSticker={isStickerLike}
         isStickerReply={isStickerLike && Boolean(quote)}
         onWidthMeasured={isInline ? this.#updateMetadataWidth : undefined}
@@ -1166,7 +1139,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public renderAttachment(): JSX.Element | null {
+  #renderAttachment(): ReactNode {
     const {
       _forceTapToPlay,
       attachmentDroppedDueToSize,
@@ -1201,7 +1174,6 @@ export class Message extends PureComponent<Props, State> {
       theme,
       timestamp,
     } = this.props;
-    const { imageBroken } = this.state;
 
     const collapseMetadata =
       this.#getMetadataPlacement() === MetadataPlacement.NotRendered;
@@ -1216,18 +1188,13 @@ export class Message extends PureComponent<Props, State> {
     const withContentBelow = Boolean(text || attachmentDroppedDueToSize);
     const withContentAbove =
       !isStickerReply && (Boolean(quote) || this.#shouldRenderAuthor());
-    const displayImage = canDisplayImage(attachments);
 
     // attachmentDroppedDueToSize is handled in renderAttachmentTooBig
     const isAttachmentNotAvailable =
       firstAttachment.isPermanentlyUndownloadable &&
       !attachmentDroppedDueToSize;
 
-    if (
-      displayImage &&
-      !imageBroken &&
-      !(isSticker && isAttachmentNotAvailable)
-    ) {
+    if (!(isSticker && isAttachmentNotAvailable)) {
       const prefix = isSticker ? 'sticker' : 'attachment';
       const containerClassName = classNames(
         `module-message__${prefix}-container`,
@@ -1242,18 +1209,16 @@ export class Message extends PureComponent<Props, State> {
           : null
       );
 
-      if (isGIF(attachments)) {
+      if (isGIF(firstAttachment)) {
         return (
           <div className={containerClassName}>
             {/* oxlint-disable-next-line react/jsx-pascal-case */}
             <GIF
               attachment={firstAttachment}
               size={GIF_SIZE}
-              tabIndex={0}
               _forceTapToPlay={_forceTapToPlay}
               theme={theme}
               i18n={i18n}
-              onError={this.handleImageError}
               showVisualAttachment={() => {
                 showLightbox({
                   attachment: firstAttachment,
@@ -1278,8 +1243,6 @@ export class Message extends PureComponent<Props, State> {
 
       if (isSticker || isImage(attachments) || isVideo(attachments)) {
         const bottomOverlay = !isSticker && !collapseMetadata;
-        // We only want users to tab into this if there's more than one
-        const tabIndex = attachments.length > 1 ? 0 : -1;
 
         return (
           <div className={containerClassName}>
@@ -1292,11 +1255,9 @@ export class Message extends PureComponent<Props, State> {
               stickerSize={STICKER_SIZE}
               bottomOverlay={bottomOverlay}
               i18n={i18n}
-              onError={this.handleImageError}
               theme={theme}
               shouldCollapseAbove={shouldCollapseAbove}
               shouldCollapseBelow={shouldCollapseBelow}
-              tabIndex={tabIndex}
               showVisualAttachment={attachment => {
                 showLightbox({ attachment, messageId: id });
               }}
@@ -1316,13 +1277,13 @@ export class Message extends PureComponent<Props, State> {
     const isAttachmentAudio = isAudio(attachments);
 
     if (isAttachmentNotAvailable && (isAttachmentAudio || isSticker)) {
-      return this.renderSimpleAttachmentNotAvailable();
+      return this.#renderSimpleAttachmentNotAvailable();
     }
 
     if (isAttachmentAudio) {
       return renderAudioAttachment({
         i18n,
-        buttonRef: this.audioButtonRef,
+        buttonRef: this.#audioButtonRef,
         renderingContext,
         attachment: firstAttachment,
         collapseMetadata,
@@ -1381,7 +1342,7 @@ export class Message extends PureComponent<Props, State> {
           event.stopPropagation();
           event.preventDefault();
 
-          this.openGenericAttachment();
+          this.#openGenericAttachment();
         }}
         onKeyDown={(event: KeyboardEvent) => {
           if (event.key !== 'Enter' && event.key !== ' ') {
@@ -1391,7 +1352,7 @@ export class Message extends PureComponent<Props, State> {
           event.stopPropagation();
           event.preventDefault();
 
-          this.openGenericAttachment();
+          this.#openGenericAttachment();
         }}
         tabIndex={tabIndex}
         aria-label={
@@ -1475,7 +1436,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public renderSimpleAttachmentNotAvailable(): JSX.Element | null {
+  #renderSimpleAttachmentNotAvailable(): ReactNode {
     const {
       attachmentDroppedDueToSize,
       attachments,
@@ -1569,7 +1530,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public renderUndownloadableTextAttachment(): JSX.Element | null {
+  #renderUndownloadableTextAttachment(): ReactNode {
     const { i18n, textAttachment } = this.props;
     if (!textAttachment || !textAttachment.isPermanentlyUndownloadable) {
       return null;
@@ -1588,7 +1549,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public renderPreview(): JSX.Element | null {
+  #renderPreview(): ReactNode {
     const {
       attachments,
       conversationType,
@@ -1658,7 +1619,6 @@ export class Message extends PureComponent<Props, State> {
             direction={direction}
             shouldCollapseAbove={shouldCollapseAbove}
             withContentBelow
-            onError={this.handleImageError}
             i18n={i18n}
             theme={theme}
             showVisualAttachment={() => {
@@ -1701,7 +1661,6 @@ export class Message extends PureComponent<Props, State> {
                 url={first.image.url}
                 attachment={first.image}
                 blurHash={first.image.blurHash}
-                onError={this.handleImageError}
                 i18n={i18n}
                 showMediaNoLongerAvailableToast={
                   showMediaNoLongerAvailableToast
@@ -1805,7 +1764,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public renderAttachmentTooBig(): JSX.Element | null {
+  #renderAttachmentTooBig(): ReactNode {
     const {
       attachments,
       attachmentDroppedDueToSize,
@@ -1861,7 +1820,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public renderGiftBadge(): JSX.Element | null {
+  #renderGiftBadge(): ReactNode {
     const { conversationTitle, direction, getPreferredBadge, giftBadge, i18n } =
       this.props;
     const { showOutgoingGiftBadgeModal } = this.state;
@@ -2050,7 +2009,7 @@ export class Message extends PureComponent<Props, State> {
     throw missingCaseError(giftBadge.state);
   }
 
-  public renderPayment(): JSX.Element | null {
+  #renderPayment(): ReactNode {
     const {
       payment,
       direction,
@@ -2092,7 +2051,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public renderPoll(): JSX.Element | null {
+  #renderPoll(): ReactNode {
     const { poll, direction, i18n, id, endPoll, canEndPoll, canSendPollVote } =
       this.props;
     if (!poll) {
@@ -2116,7 +2075,7 @@ export class Message extends PureComponent<Props, State> {
     return this.props.doubleCheckMissingQuoteReference(this.props.id);
   };
 
-  public renderQuote(): JSX.Element | null {
+  #renderQuote(): ReactNode {
     const {
       conversationColor,
       conversationId,
@@ -2172,7 +2131,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public renderStoryReplyContext(): JSX.Element | null {
+  #renderStoryReplyContext(): ReactNode {
     const {
       conversationTitle,
       conversationColor,
@@ -2230,7 +2189,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public renderEmbeddedContact(): JSX.Element | null {
+  #renderEmbeddedContact(): ReactNode {
     const {
       cancelAttachmentDownload,
       contact,
@@ -2293,7 +2252,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public renderSendMessageButton(): JSX.Element | null {
+  #renderSendMessageButton(): ReactNode {
     const { contact, direction, shouldCollapseBelow, startConversation, i18n } =
       this.props;
     const noBottomLeftCurve = direction === 'incoming' && shouldCollapseBelow;
@@ -2380,7 +2339,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  #getMessageStatusContents(): JSX.Element | string | null {
+  #getMessageStatusContents(): ReactNode {
     const {
       author,
       conversationId,
@@ -2431,13 +2390,7 @@ export class Message extends PureComponent<Props, State> {
             id="icu:message--deletedForEveryone--incoming"
             i18n={i18n}
             components={{
-              name: (
-                <ContactName
-                  preferFirstName
-                  title={author.title}
-                  firstName={author.firstName}
-                />
-              ),
+              name: <ContactName title={author.title} />,
             }}
           />
         );
@@ -2576,7 +2529,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public renderText(): JSX.Element | null {
+  #renderText(): ReactNode {
     const {
       text,
       bodyRanges,
@@ -2677,7 +2630,11 @@ export class Message extends PureComponent<Props, State> {
   }
 
   #shouldShowActionButton(): boolean {
-    const { previews } = this.props;
+    const { callToActionId, isSignalConversation, previews } = this.props;
+
+    if (isReleaseNoteCtaId(callToActionId) && isSignalConversation) {
+      return true;
+    }
 
     if (previews?.length !== 1) {
       return false;
@@ -2690,11 +2647,35 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  #renderAction(): JSX.Element | null {
-    const { direction, activeCallConversationId, i18n, previews } = this.props;
+  #renderAction(): ReactNode {
+    const {
+      direction,
+      activeCallConversationId,
+      i18n,
+      previews,
+      callToActionId,
+      callToActionText,
+      isSignalConversation,
+      handleClickCtaButton,
+    } = this.props;
 
     if (!this.#shouldShowActionButton()) {
       return null;
+    }
+
+    if (isReleaseNoteCtaId(callToActionId) && isSignalConversation) {
+      return (
+        <div className={tw('mt-2 mb-1.5')}>
+          <AxoButton.Root
+            variant="message-outgoing-primary"
+            size="lg"
+            width="full"
+            onClick={() => handleClickCtaButton(callToActionId)}
+          >
+            {callToActionText ?? i18n('icu:MessageCta__Donate')}
+          </AxoButton.Root>
+        </div>
+      );
     }
 
     const firstPreview = previews[0];
@@ -2724,10 +2705,10 @@ export class Message extends PureComponent<Props, State> {
         </button>
       );
 
-      return inAnotherCall ? (
-        <InAnotherCallTooltip i18n={i18n}>{joinButton}</InAnotherCallTooltip>
-      ) : (
-        joinButton
+      return (
+        <InAnotherCallTooltip inAnotherCall={inAnotherCall} i18n={i18n}>
+          {joinButton}
+        </InAnotherCallTooltip>
       );
     }
 
@@ -2777,7 +2758,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public getWidth(): number | undefined {
+  #getWidth(): number | undefined {
     const { attachments, giftBadge, isSticker, isTapToView, previews } =
       this.props;
 
@@ -2790,7 +2771,7 @@ export class Message extends PureComponent<Props, State> {
     }
 
     if (attachments && attachments.length) {
-      if (isGIF(attachments)) {
+      if (isGIF(attachments[0])) {
         // Message container border
         return GIF_SIZE + 2;
       }
@@ -2825,18 +2806,15 @@ export class Message extends PureComponent<Props, State> {
     return undefined;
   }
 
-  public isShowingImage(): boolean {
+  #isShowingImage(): boolean {
     const { isTapToView, attachments, previews } = this.props;
-    const { imageBroken } = this.state;
 
-    if (imageBroken || isTapToView) {
+    if (isTapToView) {
       return false;
     }
 
     if (attachments && attachments.length) {
-      const displayImage = canDisplayImage(attachments);
-
-      return displayImage && (isImage(attachments) || isVideo(attachments));
+      return isImage(attachments) || isVideo(attachments);
     }
 
     if (previews && previews.length) {
@@ -2850,7 +2828,7 @@ export class Message extends PureComponent<Props, State> {
     return false;
   }
 
-  public isAttachmentPending(): boolean {
+  #isAttachmentPending(): boolean {
     const { attachments } = this.props;
 
     if (!attachments || attachments.length < 1) {
@@ -2863,7 +2841,7 @@ export class Message extends PureComponent<Props, State> {
     return Boolean(first.pending);
   }
 
-  public renderTapToViewIcon(): JSX.Element {
+  #renderTapToViewIcon(): ReactNode {
     const { direction, isTapToViewError, isTapToViewExpired, readStatus } =
       this.props;
     const isIncoming = direction === 'incoming';
@@ -2915,7 +2893,7 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  public renderTapToViewText(): { title: string; detail: string | undefined } {
+  #renderTapToViewText(): { title: string; detail: string | undefined } {
     const {
       attachments,
       direction,
@@ -2949,7 +2927,7 @@ export class Message extends PureComponent<Props, State> {
       detail = formatFileSize(firstAttachment.size);
     }
 
-    if (isVideo(attachments) || isGIF(attachments)) {
+    if (isVideo(attachments) || isGIF(firstAttachment)) {
       return {
         title: i18n('icu:Message--tap-to-view--video'),
         detail,
@@ -2961,7 +2939,7 @@ export class Message extends PureComponent<Props, State> {
     };
   }
 
-  public renderTapToView(): JSX.Element | null {
+  #renderTapToView(): ReactNode {
     const {
       attachments,
       attachmentDroppedDueToSize,
@@ -3002,10 +2980,10 @@ export class Message extends PureComponent<Props, State> {
       direction === 'incoming';
 
     if (isIncoming && !isViewed && (isError || isExpired)) {
-      return this.renderSimpleAttachmentNotAvailable();
+      return this.#renderSimpleAttachmentNotAvailable();
     }
 
-    const text = this.renderTapToViewText();
+    const text = this.#renderTapToViewText();
     let content: JSX.Element;
     if (text.title && text.detail) {
       content = (
@@ -3115,14 +3093,14 @@ export class Message extends PureComponent<Props, State> {
         )}
       >
         {isExpired || firstAttachment == null ? (
-          this.renderTapToViewIcon()
+          this.#renderTapToViewIcon()
         ) : (
           <AttachmentStatusIcon
             key={id}
             attachment={firstAttachment}
             isIncoming={isIncoming}
           >
-            {this.renderTapToViewIcon()}
+            {this.#renderTapToViewIcon()}
           </AttachmentStatusIcon>
         )}
         {content}
@@ -3148,11 +3126,11 @@ export class Message extends PureComponent<Props, State> {
       };
     };
 
-  public toggleReactionViewer = (onlyRemove = false): void => {
+  #toggleReactionViewer(onlyRemove = false) {
     this.setState(oldState => {
       const { reactionViewerRoot } = oldState;
       if (reactionViewerRoot) {
-        document.body.removeChild(reactionViewerRoot);
+        reactionViewerRoot.parentNode?.removeChild(reactionViewerRoot);
 
         oldState.reactionViewerOutsideClickDestructor?.();
 
@@ -3168,11 +3146,11 @@ export class Message extends PureComponent<Props, State> {
 
         const reactionViewerOutsideClickDestructor = handleOutsideClick(
           () => {
-            this.toggleReactionViewer(true);
+            this.#toggleReactionViewer(true);
             return true;
           },
           {
-            containerElements: [root, this.reactionsContainerRef],
+            containerElements: [root, this.#reactionsContainerRef],
             name: 'Message.reactionViewer',
           }
         );
@@ -3185,9 +3163,9 @@ export class Message extends PureComponent<Props, State> {
 
       return null;
     });
-  };
+  }
 
-  public renderReactions(outgoing: boolean): JSX.Element | null {
+  #renderReactions(outgoing: boolean): ReactNode {
     const { getPreferredBadge, reactions = [], i18n, theme } = this.props;
 
     if (!this.#hasReactions()) {
@@ -3204,35 +3182,35 @@ export class Message extends PureComponent<Props, State> {
         theme={theme}
         outgoing={outgoing}
         toggleReactionViewer={() => {
-          this.toggleReactionViewer();
+          this.#toggleReactionViewer();
         }}
         reactionViewerRoot={reactionViewerRoot}
         popperPreventOverflowModifier={this.#popperPreventOverflowModifier}
-        ref={this.reactionsContainerRef}
+        ref={this.#reactionsContainerRef}
       />
     );
   }
 
-  public renderContents(): JSX.Element | null {
+  #renderContents(): ReactNode {
     const { deletedForEveryone, giftBadge, isTapToView } = this.props;
 
     if (deletedForEveryone) {
       return (
         <>
-          {this.renderText()}
+          {this.#renderText()}
           {this.#renderMetadata()}
         </>
       );
     }
 
     if (giftBadge) {
-      return this.renderGiftBadge();
+      return this.#renderGiftBadge();
     }
 
     if (isTapToView) {
       return (
         <>
-          {this.renderTapToView()}
+          {this.#renderTapToView()}
           {this.#renderMetadata()}
         </>
       );
@@ -3240,24 +3218,24 @@ export class Message extends PureComponent<Props, State> {
 
     return (
       <>
-        {this.renderQuote()}
-        {this.renderStoryReplyContext()}
-        {this.renderAttachment()}
-        {this.renderPreview()}
-        {this.renderAttachmentTooBig()}
-        {this.renderPayment()}
-        {this.renderPoll()}
-        {this.renderEmbeddedContact()}
-        {this.renderText()}
-        {this.renderUndownloadableTextAttachment()}
+        {this.#renderQuote()}
+        {this.#renderStoryReplyContext()}
+        {this.#renderAttachment()}
+        {this.#renderPreview()}
+        {this.#renderAttachmentTooBig()}
+        {this.#renderPayment()}
+        {this.#renderPoll()}
+        {this.#renderEmbeddedContact()}
+        {this.#renderText()}
+        {this.#renderUndownloadableTextAttachment()}
         {this.#renderAction()}
         {this.#renderMetadata()}
-        {this.renderSendMessageButton()}
+        {this.#renderSendMessageButton()}
       </>
     );
   }
 
-  public handleOpen = (event: KeyboardEvent | MouseEvent): void => {
+  #handleOpen(event: KeyboardEvent | MouseEvent) {
     const {
       attachments,
       cancelAttachmentDownload,
@@ -3278,9 +3256,8 @@ export class Message extends PureComponent<Props, State> {
       showLightboxForViewOnceMedia,
       startConversation,
     } = this.props;
-    const { imageBroken } = this.state;
 
-    const isAttachmentPending = this.isAttachmentPending();
+    const isAttachmentPending = this.#isAttachmentPending();
 
     if (giftBadge && giftBadge.state === GiftBadgeStates.Unopened) {
       openGiftBadge(id);
@@ -3343,25 +3320,24 @@ export class Message extends PureComponent<Props, State> {
       return;
     }
 
-    if (this.isGenericAttachment(attachments, imageBroken)) {
-      this.openGenericAttachment();
+    if (this.#isGenericAttachment(attachments)) {
+      this.#openGenericAttachment();
       return;
     }
 
     if (
       isAudio(attachments) &&
-      this.audioButtonRef &&
-      this.audioButtonRef.current
+      this.#audioButtonRef &&
+      this.#audioButtonRef.current
     ) {
       event.preventDefault();
       event.stopPropagation();
 
-      this.audioButtonRef.current.click();
+      this.#audioButtonRef.current.click();
       return;
     }
 
     if (
-      !imageBroken &&
       attachments &&
       attachments.length > 0 &&
       !isAttachmentPending &&
@@ -3376,11 +3352,9 @@ export class Message extends PureComponent<Props, State> {
     }
 
     if (
-      !imageBroken &&
       attachments &&
       attachments.length > 0 &&
       !isAttachmentPending &&
-      canDisplayImage(attachments) &&
       ((isImage(attachments) && hasImage(attachments)) ||
         (isVideo(attachments) && hasVideoScreenshot(attachments)))
     ) {
@@ -3392,9 +3366,9 @@ export class Message extends PureComponent<Props, State> {
 
       showLightbox({ attachment, messageId: id });
     }
-  };
+  }
 
-  public openGenericAttachment = (event?: MouseEvent): void => {
+  #openGenericAttachment() {
     const {
       id,
       attachments,
@@ -3404,11 +3378,6 @@ export class Message extends PureComponent<Props, State> {
       attachmentDroppedDueToSize,
       cancelAttachmentDownload,
     } = this.props;
-
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
 
     const firstAttachment = attachments?.[0];
     if (!firstAttachment) {
@@ -3433,40 +3402,45 @@ export class Message extends PureComponent<Props, State> {
     } else {
       saveAttachment(firstAttachment, timestamp);
     }
-  };
+  }
 
-  public handleClick = (event: MouseEvent): void => {
+  readonly #handleClick = (event: MouseEvent): void => {
     // We don't want clicks on body text to result in the 'default action' for the message
     const { text } = this.props;
     if (text && text.length > 0) {
       return;
     }
 
-    this.handleOpen(event);
+    this.#handleOpen(event);
   };
 
-  public handleKeyDown = (event: KeyboardEvent): void => {
+  readonly #handleKeyDown = (event: KeyboardEvent) => {
     if (event.key !== 'Enter' && event.key !== ' ') {
       return;
     }
 
-    window.enterKeyboardMode();
-    this.handleOpen(event);
+    if (
+      event.target instanceof Element &&
+      !event.currentTarget.contains(event.target)
+    ) {
+      return;
+    }
+
+    this.#handleOpen(event);
   };
 
-  private isGenericAttachment(
-    attachments: ReadonlyArray<AttachmentForUIType> | undefined,
-    imageBroken: boolean
+  #isGenericAttachment(
+    attachments: ReadonlyArray<AttachmentForUIType> | undefined
   ) {
     return (
       attachments?.length &&
-      (!isImage(attachments) || !canDisplayImage(attachments) || imageBroken) &&
-      (!isVideo(attachments) || !canDisplayImage(attachments) || imageBroken) &&
+      !isImage(attachments) &&
+      !isVideo(attachments) &&
       !isAudio(attachments)
     );
   }
 
-  public renderContainer(): JSX.Element {
+  #renderContainer(): ReactNode {
     const {
       attachments,
       attachmentDroppedDueToSize,
@@ -3478,15 +3452,15 @@ export class Message extends PureComponent<Props, State> {
       id,
       isSelectMode,
       isSticker,
+      isTargeted,
       isTapToView,
       quote,
       renderMessageContextMenu,
       text,
       textDirection,
     } = this.props;
-    const { isTargeted, imageBroken } = this.state;
 
-    const width = this.getWidth();
+    const width = this.#getWidth();
     const isEmojiOnly = this.#canRenderStickerLikeEmoji();
     const isStickerLike =
       isEmojiOnly ||
@@ -3504,14 +3478,14 @@ export class Message extends PureComponent<Props, State> {
       (text || (!isVideo(attachments) && !isImage(attachments)));
     const isClickable =
       isTapToView ||
-      (this.isGenericAttachment(attachments, imageBroken) &&
+      (this.#isGenericAttachment(attachments) &&
         !text &&
         !attachments?.[0]?.isPermanentlyUndownloadable) ||
       contact;
 
     const containerClassnames = classNames(
       'module-message__container',
-      isGIF(attachments) && !isTapToView
+      isGIF(attachments?.[0]) && !isTapToView
         ? 'module-message__container--gif'
         : null,
       isTargeted ? 'module-message__container--targeted' : null,
@@ -3563,26 +3537,27 @@ export class Message extends PureComponent<Props, State> {
             id={`message-accessibility-contents:${id}`}
             style={containerStyles}
             role="row"
-            onClick={this.handleClick}
+            onClick={this.#handleClick}
             onDoubleClick={ev => {
               // Prevent double click from triggering the replyToMessage action
               ev.stopPropagation();
             }}
+            onAnimationEnd={this.#handleAnimationEnd}
             tabIndex={-1}
             inert={isSelectMode ? true : undefined}
           >
             {this.#renderAuthor()}
             <div dir={TextDirectionToDirAttribute[textDirection]}>
-              {this.renderContents()}
+              {this.#renderContents()}
             </div>
           </div>
         )}
-        {this.renderReactions(direction === 'outgoing')}
+        {this.#renderReactions(direction === 'outgoing')}
       </div>
     );
   }
 
-  renderAltAccessibilityTree(): JSX.Element {
+  #renderAltAccessibilityTree(): ReactNode {
     const { id, i18n, author } = this.props;
     return (
       <span className="module-message__alt-accessibility-tree">
@@ -3595,13 +3570,13 @@ export class Message extends PureComponent<Props, State> {
         </span>
 
         <span id={`message-accessibility-description:${id}`}>
-          {this.renderText()}
+          {this.#renderText()}
         </span>
       </span>
     );
   }
 
-  public override render(): JSX.Element | null {
+  override render(): ReactNode {
     const {
       id,
       attachments,
@@ -3612,6 +3587,7 @@ export class Message extends PureComponent<Props, State> {
       isSelected,
       isSelectMode,
       isSignalConversation,
+      isTargeted,
       platform,
       renderMenu,
       shouldCollapseAbove,
@@ -3622,13 +3598,13 @@ export class Message extends PureComponent<Props, State> {
       onWrapperKeyDown,
     } = this.props;
     const isMacOS = platform === 'darwin';
-    const { expired, expiring, isTargeted, imageBroken } = this.state;
+    const { expired, expiring, flashing } = this.state;
 
     if (expired) {
       return null;
     }
 
-    if (isSticker && (imageBroken || !attachments || !attachments.length)) {
+    if (isSticker && (!attachments || !attachments.length)) {
       return null;
     }
 
@@ -3658,7 +3634,7 @@ export class Message extends PureComponent<Props, State> {
     } else {
       wrapperProps = {
         onMouseDown: () => {
-          this.#hasSelectedTextRef.current = false;
+          this.#hasSelectedText = false;
         },
         // We use `onClickCapture` here and prevent default/stop propagation to
         // prevent other click handlers from firing.
@@ -3668,7 +3644,7 @@ export class Message extends PureComponent<Props, State> {
               return;
             }
 
-            if (this.#hasSelectedTextRef.current) {
+            if (this.#hasSelectedText) {
               return;
             }
 
@@ -3697,7 +3673,7 @@ export class Message extends PureComponent<Props, State> {
           }
         },
         onKeyDown: event => {
-          this.handleKeyDown(event);
+          this.#handleKeyDown(event);
           onWrapperKeyDown?.(event);
         },
       };
@@ -3721,7 +3697,7 @@ export class Message extends PureComponent<Props, State> {
               role="presentation"
               className="module-message__select-checkbox"
             />
-            {this.renderAltAccessibilityTree()}
+            {this.#renderAltAccessibilityTree()}
           </>
         )}
         <div
@@ -3732,19 +3708,20 @@ export class Message extends PureComponent<Props, State> {
             shouldCollapseAbove && 'module-message--collapsed-above',
             shouldCollapseBelow && 'module-message--collapsed-below',
             isTargeted ? 'module-message--targeted' : null,
-            expiring ? 'module-message--expired' : null
+            expiring ? 'module-message--expired' : null,
+            flashing ? 'module-message--flashing' : null
           )}
           data-testid={timestamp}
           tabIndex={0}
           // We need to have a role because screenreaders need to be able to focus here to
           //   read the message, but we can't be a button; that would break inner buttons.
           role="row"
-          onFocus={this.handleFocus}
-          ref={this.focusRef}
+          onFocus={this.#handleFocus}
+          ref={this.#focusRef}
         >
           {this.#renderError()}
           {this.#renderAvatar()}
-          {this.renderContainer()}
+          {this.#renderContainer()}
           {renderMenu?.()}
         </div>
       </div>

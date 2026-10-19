@@ -1,5 +1,6 @@
 // Copyright 2020 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
+// oxlint-disable max-classes-per-file
 
 /*
  * WebSocket-Resources
@@ -142,7 +143,6 @@ export type SendRequestOptions = Readonly<{
   headers?: ReadonlyArray<[string, string]>;
 }>;
 
-// oxlint-disable-next-line max-classes-per-file
 export class CloseEvent extends Event {
   public readonly code: number;
   public readonly reason: string;
@@ -230,12 +230,14 @@ export function connectAuthenticated({
   userLanguages,
   keepalive,
   onReceivedAlerts,
+  onServerTimestamp,
 }: {
   libsignalNet: Net.Net;
   name: string;
   credentials: WebAPICredentials;
   handler: (request: IncomingWebSocketRequest) => void;
   onReceivedAlerts: (alerts: Array<ServerAlert>) => void;
+  onServerTimestamp: (timestamp: number) => void;
   receiveStories: boolean;
   userLanguages: ReadonlyArray<string>;
   keepalive: KeepAliveOptionsType;
@@ -280,6 +282,9 @@ export function connectAuthenticated({
     },
     onReceivedAlerts(alerts: Array<string>): void {
       onReceivedAlerts(alerts.map(parseServerAlertsFromHeader).flat());
+    },
+    onServerTimestamp(timestamp: number): void {
+      onServerTimestamp(timestamp);
     },
   };
   return connect(

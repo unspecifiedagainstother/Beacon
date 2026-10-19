@@ -183,7 +183,7 @@ describe('pnp/merge', function (this: Mocha.Suite) {
       );
       {
         const state = await phone.expectStorageState('consistency check');
-        await phone.setStorageState(
+        const newState = await phone.setStorageState(
           state.mergeContact(pniContact, {
             identityState: Proto.ContactRecord.IdentityState.DEFAULT,
             whitelisted: true,
@@ -195,7 +195,7 @@ describe('pnp/merge', function (this: Mocha.Suite) {
         await phone.sendFetchStorage({
           timestamp: bootstrap.getTimestamp(),
         });
-        await app.waitForManifestVersion(state.version);
+        await app.waitForManifestVersion(newState.version);
       }
 
       debug('Verify final state');
@@ -301,7 +301,7 @@ describe('pnp/merge', function (this: Mocha.Suite) {
 
               identityKey: pniIdentityKey,
 
-              e164: pniContact.device.number,
+              e164: pniContact.device.checkedNumber,
               givenName: 'PNI Contact',
             },
             ServiceIdKind.PNI
@@ -318,7 +318,7 @@ describe('pnp/merge', function (this: Mocha.Suite) {
 
       debug('Wait for pni contact to appear');
       await leftPane
-        .locator(`[data-testid="${pniContact.device.pni}"]`)
+        .locator(`[data-testid="${pniContact.device.checkedPni}"]`)
         .waitFor();
 
       debug('Verify that the message is in the ACI conversation');
@@ -334,7 +334,7 @@ describe('pnp/merge', function (this: Mocha.Suite) {
 
       debug('Open PNI conversation');
       await leftPane
-        .locator(`[data-testid="${pniContact.device.pni}"]`)
+        .locator(`[data-testid="${pniContact.device.checkedPni}"]`)
         .click();
 
       debug('Verify absence of messages in the PNI conversation');
@@ -359,7 +359,7 @@ describe('pnp/merge', function (this: Mocha.Suite) {
         identityKey: pniContact.publicKey.serialize(),
         profileKey: pniContact.profileKey.serialize(),
       });
-      await phone.setStorageState(state);
+      state = await phone.setStorageState(state);
       await phone.sendFetchStorage({
         timestamp: bootstrap.getTimestamp(),
       });
@@ -396,8 +396,23 @@ describe('pnp/merge', function (this: Mocha.Suite) {
     {
       const newState = await phone.waitForStorageState({
         after: state,
+        // Unrelated uploads (e.g. from app startup) may land before the split,
+        // so wait for the split PNI contact to appear
+        predicate: storageState =>
+          storageState.hasRecord(({ record }) => {
+            const { aciBinary, pniBinary } = record.contact ?? {};
+            const expectedPni = pniContact.device.checkedPniRawUuid;
+            return (
+              !aciBinary?.length &&
+              pniBinary?.length === expectedPni.length &&
+              timingSafeEqual(pniBinary, expectedPni)
+            );
+          }),
       });
-      const { added, removed } = newState.diff(state);
+      const diff = newState.diff(state);
+      // only diff contacts to ignore other unrelated changes
+      const added = diff.added.filter(record => record.contact != null);
+      const removed = diff.removed.filter(record => record.contact != null);
       assert.strictEqual(added.length, 2, 'only two records must be added');
       assert.strictEqual(removed.length, 1, 'only one record must be removed');
 
@@ -418,11 +433,11 @@ describe('pnp/merge', function (this: Mocha.Suite) {
           assert.strictEqual(e164, '');
         } else if (
           pniBinary?.length &&
-          timingSafeEqual(pniBinary, pniContact.device.pniRawUuid)
+          timingSafeEqual(pniBinary, pniContact.device.checkedPniRawUuid)
         ) {
           pniContacts += 1;
           assert.strictEqual(aciBinary?.length, 0);
-          assert.strictEqual(e164, pniContact.device.number);
+          assert.strictEqual(e164, pniContact.device.checkedNumber);
         }
       }
       assert.strictEqual(aciContacts, 1);
@@ -431,7 +446,7 @@ describe('pnp/merge', function (this: Mocha.Suite) {
 
       assert.deepEqual(
         removed[0].contact.pniBinary,
-        pniContact.device.pniRawUuid
+        pniContact.device.checkedPniRawUuid
       );
       assert.deepEqual(
         removed[0].contact.aciBinary,
@@ -496,7 +511,7 @@ describe('pnp/merge', function (this: Mocha.Suite) {
       );
       state = state.pin(aciContact, ServiceIdKind.ACI);
 
-      await phone.setStorageState(state);
+      state = await phone.setStorageState(state);
       await phone.sendFetchStorage({
         timestamp: bootstrap.getTimestamp(),
       });
@@ -540,7 +555,7 @@ describe('pnp/merge', function (this: Mocha.Suite) {
       '.module-SearchInput__input.LeftPaneSearchInput__input'
     );
 
-    await typeIntoInput(searchBox, aciContact.device.number, '');
+    await typeIntoInput(searchBox, aciContact.device.checkedNumber, '');
 
     const firstSearchResult = window.locator(
       '.module-left-pane__no-search-results'
@@ -560,6 +575,7 @@ describe('pnp/merge', function (this: Mocha.Suite) {
       debug(`Send a ${key} sync message`);
       const timestamp = bootstrap.getTimestamp();
       const destinationServiceIdBinary = pniContact.device[`${key}Binary`];
+      assert(destinationServiceIdBinary != null, 'Contact must have ACI/PNI');
       const destination = key === 'pni' ? pniContact.device.number : undefined;
       const content: Proto.Content.Params = {
         content: {
@@ -613,7 +629,7 @@ describe('pnp/merge', function (this: Mocha.Suite) {
     );
     {
       const state = await phone.expectStorageState('consistency check');
-      await phone.setStorageState(
+      const newState = await phone.setStorageState(
         state.mergeContact(pniContact, {
           identityState: Proto.ContactRecord.IdentityState.DEFAULT,
           whitelisted: true,
@@ -625,7 +641,7 @@ describe('pnp/merge', function (this: Mocha.Suite) {
       await phone.sendFetchStorage({
         timestamp: bootstrap.getTimestamp(),
       });
-      await app.waitForManifestVersion(state.version);
+      await app.waitForManifestVersion(newState.version);
     }
 
     const window = await app.getWindow();

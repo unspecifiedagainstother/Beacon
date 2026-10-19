@@ -11,6 +11,9 @@
   "icu:AxoDialog.Close": {
     "messageformat": "Stäng"
   },
+  "icu:AxoPasswordField.Reveal": {
+    "messageformat": "Visa lösenord"
+  },
   "icu:AxoTextField.Clear": {
     "messageformat": "Rensa"
   },
@@ -61,6 +64,24 @@
   },
   "icu:Preferences__DonateTitle": {
     "messageformat": "Donera till Signal"
+  },
+  "icu:LinkedDevicesOnboardingDialog__description": {
+    "messageformat": "<bold>Länkade enheter</bold> låter dig komma åt ditt Signal-konto och dina meddelanden på ett säkert sätt på alla dina ytterligare enheter."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--1": {
+    "messageformat": "Du kan länka en dator, surfplatta eller ytterligare telefon."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--2": {
+    "messageformat": "Din primära enhet hanterar vad som är länkat, och du kan länka upp till 5 enheter."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3": {
+    "messageformat": "Kontoinställningar hanteras endast på din primära enhet, inklusive kontoinställningar och säkerhetskopior."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--1": {
+    "messageformat": "Kontoinställningar och säkerhetskopior kan endast hanteras på din primära enhet."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--2": {
+    "messageformat": "Kontoinställningar och Säker säkerhetskopiering kan endast hanteras på din primära enhet."
   },
   "icu:sentMediaQualityStandard": {
     "messageformat": "Standard"
@@ -317,11 +338,8 @@
   "icu:LeftPaneChatFolders__ItemLabel--All": {
     "messageformat": "Alla chattar"
   },
-  "icu:LeftPaneChatFolders__ItemUnreadBadge__MaxCount": {
-    "messageformat": "{maxCount,number}+"
-  },
   "icu:LeftPaneChatFolders__ItemUnreadBadge__AccessibleLabel": {
-    "messageformat": "{count, plural, one {{count,number} Unread Message} other {{count,number} Unread Messages}}"
+    "messageformat": "{count, plural, one {{count,number} oläst meddelande} other {{count,number} olästa meddelanden}}"
   },
   "icu:LeftPaneChatFolders__Item__ContextMenu__MarkAllRead": {
     "messageformat": "Markera alla som lästa"
@@ -364,9 +382,6 @@
   },
   "icu:NavTabs__ItemIconLabel--UnreadCount": {
     "messageformat": "{count,number} olästa"
-  },
-  "icu:NavTabs__ItemIconLabel--MarkedUnread": {
-    "messageformat": "Markerad som oläst"
   },
   "icu:NavTabs__ItemLabel--Chats": {
     "messageformat": "Chattar"
@@ -635,20 +650,23 @@
   "icu:SafetyNumberNotReady__learn-more": {
     "messageformat": "Läs mer"
   },
-  "icu:KeyTransparencyErrorDialog__Title": {
-    "messageformat": "Automatisk nyckelverifiering är för närvarande inte tillgänglig för din enhet. Skicka felsökningslogg?"
+  "icu:KeyTransparencyErrorDialog__Title-v2": {
+    "messageformat": "Automatisk nyckelverifiering är för närvarande inte tillgänglig för din enhet. Vill du skicka en rapport som hjälper oss att bli bättre?"
   },
-  "icu:KeyTransparencyErrorDialog__Description": {
-    "messageformat": "Felsökningsloggar hjälper oss att diagnostisera och åtgärda problemet och innehåller inte identifierande information."
+  "icu:KeyTransparencyErrorDialog__Description-v2": {
+    "messageformat": "Om du inkluderar dina felsökningsloggar hjälper det oss att diagnostisera och åtgärda problemet, och de innehåller ingen identifierande information. Det är valfritt att dela."
   },
-  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label": {
-    "messageformat": "Dela felsökningslogg"
+  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label-v2": {
+    "messageformat": "Inkludera felsökningslogg"
   },
   "icu:KeyTransparencyErrorDialog__ShareDebugLog__ViewButton": {
     "messageformat": "Visa"
   },
   "icu:KeyTransparencyErrorDialog__Submit": {
     "messageformat": "Skicka"
+  },
+  "icu:KeyTransparencyErrorDialog__Cancel": {
+    "messageformat": "Nej tack"
   },
   "icu:KeyTransparencyOnboardingDialog__Title": {
     "messageformat": "Signal kan nu automatiskt verifiera kryptering"
@@ -746,11 +764,11 @@
   "icu:maximumAttachments": {
     "messageformat": "Du kan inte lägga till fler bilagor till det här meddelandet."
   },
-  "icu:fileSizeWarning": {
-    "messageformat": "Tyvärr, filen du har valt överstiger maximalt tillåten filstorlek. {limit,number} {units}"
+  "icu:fileTooLargeWarning": {
+    "messageformat": "Det går inte att skicka den här filen eftersom den är för stor. Du kan skicka filer på upp till {limit,number}{units}."
   },
-  "icu:videoFileSizeWarning": {
-    "messageformat": "Tyvärr, den valda videofilen överskrider storleksgränsen för meddelanden. {limit,number} {units}"
+  "icu:videoFileTooLargeWarning": {
+    "messageformat": "Det går inte att skicka den här videofilen eftersom den är för stor. Du kan skicka videofiler på upp till {limit,number}{units}."
   },
   "icu:unableToLoadAttachment": {
     "messageformat": "Det gick inte att läsa in vald bilaga"
@@ -772,6 +790,9 @@
   },
   "icu:checkNetworkConnection": {
     "messageformat": "Kontrollera din nätverksanslutning."
+  },
+  "icu:clockSkewDetected": {
+    "messageformat": "Enhetens datum är felaktigt. Justera klockan och försök igen. Enhetens datum och tid är:"
   },
   "icu:submitDebugLog": {
     "messageformat": "Loggfil för felsökning"
@@ -994,6 +1015,9 @@
   },
   "icu:mute": {
     "messageformat": "Tysta"
+  },
+  "icu:muted": {
+    "messageformat": "Tystad"
   },
   "icu:cannotUpdateDetail-v2": {
     "messageformat": "Signal kunde inte uppdateras. <retryUpdateButton>Försök uppdatera igen</retryUpdateButton> eller besök {url} för att installera manuellt. <contactSupportLink>Kontakta sedan supporten</contactSupportLink> om detta problem"
@@ -1261,6 +1285,9 @@
   },
   "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync": {
     "messageformat": "Alla meddelanden i den här chatten kommer att tas bort från alla dina enheter."
+  },
+  "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync--still-member": {
+    "messageformat": "Alla meddelanden i den här chatten kommer att tas bort från alla dina enheter. Du kommer fortfarande att vara medlem i den här gruppen."
   },
   "icu:ConversationHeader__ContextMenu__LeaveGroupAction__title": {
     "messageformat": "Lämna grupp"
@@ -1610,9 +1637,6 @@
   "icu:Preferences__EmojiSkinToneDefaultSetting__Label": {
     "messageformat": "Emoji-hudton"
   },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__Title": {
-    "messageformat": "Chattmappar"
-  },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Title": {
     "messageformat": "Lägg till en chattmapp"
   },
@@ -1624,12 +1648,6 @@
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Description--WithChatFolders": {
     "messageformat": "{chatFoldersCount, plural, one {{chatFoldersCount,number} mapp} other {{chatFoldersCount,number} mappar}}"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button": {
-    "messageformat": "Ställ in"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button--WithChatFolders": {
-    "messageformat": "Hantera"
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__ChatFolderItem__ContextMenu__EditFolder": {
     "messageformat": "Redigera mapp"
@@ -2384,9 +2402,6 @@
   "icu:SafetyNumberModal__title": {
     "messageformat": "Verifiera säkerhetsnummer"
   },
-  "icu:safetyNumberChanged": {
-    "messageformat": "Säkerhetsnumret har ändrats"
-  },
   "icu:safetyNumberChanges": {
     "messageformat": "Säkerhetsnummerändringar"
   },
@@ -2826,16 +2841,16 @@
     "messageformat": "Ta bort"
   },
   "icu:stickers--StickerManagerPackDragHandle--Label": {
-    "messageformat": "Drag to reorder sticker pack"
+    "messageformat": "Dra för att ändra ordning på klistermärkespaket"
   },
   "icu:stickers--StickerManagerBlessedPacksList--Label": {
-    "messageformat": "Signal Artist Series sticker packs"
+    "messageformat": "Signal Artist Series-klistermärkespaket"
   },
   "icu:stickers--StickerManagerReceivedPacksList--Label": {
-    "messageformat": "Received sticker packs"
+    "messageformat": "Mottagna klistermärkespaket"
   },
   "icu:stickers--StickerManagerInstalledPacksList--Label": {
-    "messageformat": "Installed sticker packs"
+    "messageformat": "Installerade klistermärkespaket"
   },
   "icu:stickers--StickerPreview--Title": {
     "messageformat": "Klistermärkepaket"
@@ -3081,16 +3096,16 @@
     "messageformat": "Lägg till ett klistermärke"
   },
   "icu:FunPicker__Label--StickerReply": {
-    "messageformat": "Reply"
+    "messageformat": "Svara"
   },
   "icu:FunPicker__Label--SendStickerReply": {
-    "messageformat": "Send"
+    "messageformat": "Skicka"
   },
   "icu:FunPicker__Label--CancelStickerReply": {
-    "messageformat": "Cancel"
+    "messageformat": "Avbryt"
   },
   "icu:FunPicker__Label--Sticker": {
-    "messageformat": "Sticker"
+    "messageformat": "Klistermärke"
   },
   "icu:confirmation-dialog--Cancel": {
     "messageformat": "Avbryt"
@@ -3872,20 +3887,20 @@
   "icu:calling__preview--minimize": {
     "messageformat": "Minimera förhandsvisning"
   },
-  "icu:calling__change-view": {
-    "messageformat": "Ändra vy"
-  },
-  "icu:calling__view_mode--paginated": {
-    "messageformat": "Rutnätsvy"
-  },
-  "icu:calling__view_mode--overflow": {
-    "messageformat": "Sidofältsvy"
-  },
-  "icu:calling__view_mode--speaker": {
-    "messageformat": "Talarvy"
-  },
   "icu:calling__view_mode--updated": {
     "messageformat": "Vy uppdaterad"
+  },
+  "icu:calling__change-layout": {
+    "messageformat": "Ändra layout"
+  },
+  "icu:calling__layout--paginated": {
+    "messageformat": "Rutnät"
+  },
+  "icu:calling__layout--overflow": {
+    "messageformat": "Sidofält"
+  },
+  "icu:calling__layout--speaker": {
+    "messageformat": "Talare"
   },
   "icu:calling__SelectPresentingSourcesModal--title": {
     "messageformat": "Dela din skärm"
@@ -3950,23 +3965,47 @@
   "icu:notMuted": {
     "messageformat": "Inte tystad"
   },
-  "icu:muteHour": {
-    "messageformat": "Tysta i en timme"
-  },
-  "icu:muteEightHours": {
-    "messageformat": "Tysta i 8 timmar"
-  },
-  "icu:muteDay": {
-    "messageformat": "Tysta i en dag"
-  },
-  "icu:muteWeek": {
-    "messageformat": "Tysta i en vecka"
-  },
-  "icu:muteAlways": {
-    "messageformat": "Tysta för alltid"
-  },
   "icu:unmute": {
     "messageformat": "Avtysta"
+  },
+  "icu:MuteMenu__label": {
+    "messageformat": "Tysta denna chatt i …"
+  },
+  "icu:MuteMenu__hour": {
+    "messageformat": "1 timme"
+  },
+  "icu:MuteMenu__eightHours": {
+    "messageformat": "8 timmar"
+  },
+  "icu:MuteMenu__day": {
+    "messageformat": "1 dag"
+  },
+  "icu:MuteMenu__week": {
+    "messageformat": "1 vecka"
+  },
+  "icu:MuteMenu__until": {
+    "messageformat": "Tills …"
+  },
+  "icu:MuteMenu__always": {
+    "messageformat": "Alltid"
+  },
+  "icu:DatePicker__popupTitle": {
+    "messageformat": "Välj ett datum"
+  },
+  "icu:TimePicker__popupTitle": {
+    "messageformat": "Välj en tid"
+  },
+  "icu:MuteUntilDialog__title": {
+    "messageformat": "Tysta den här chatten tills …"
+  },
+  "icu:MuteUntilDialog__dateLabel": {
+    "messageformat": "Datum"
+  },
+  "icu:MuteUntilDialog__timeLabel": {
+    "messageformat": "Tid"
+  },
+  "icu:MuteUntilDialog__timeZoneNote": {
+    "messageformat": "Alla tider i {timeZone}"
   },
   "icu:muteExpirationLabelAlways": {
     "messageformat": "Tystad för alltid"
@@ -4874,9 +4913,6 @@
   "icu:showConversationDetails--direct": {
     "messageformat": "Chattinställningar"
   },
-  "icu:ConversationDetails__unmute--title": {
-    "messageformat": "Avtysta den här chatten"
-  },
   "icu:ConversationDetails--group-link": {
     "messageformat": "Grupplänk"
   },
@@ -5072,6 +5108,9 @@
   "icu:ConversationDetailsMembershipList--show-all": {
     "messageformat": "Se alla"
   },
+  "icu:ConversationDetailsMembershipList__Search__AccessibilityLabel": {
+    "messageformat": "Sök"
+  },
   "icu:ConversationDetailsGroups--title": {
     "messageformat": "{count, plural, one {{count,number} grupp gemensamt} other {{count,number} grupper gemensamt}}"
   },
@@ -5108,17 +5147,110 @@
   "icu:EditNicknameAndNoteModal__Note__Placeholder": {
     "messageformat": "Anteckning"
   },
-  "icu:ConversationNotificationsSettings__mentions__label": {
+  "icu:WhileMuted__title": {
+    "messageformat": "Vid tystad"
+  },
+  "icu:WhileMuted__description": {
+    "messageformat": "Välj vilka aviseringar som ska visas medan den här chatten är tystad."
+  },
+  "icu:WhileMuted__calls__title": {
+    "messageformat": "Samtal"
+  },
+  "icu:WhileMuted__calls__description": {
+    "messageformat": "Ring eller avisera när ett samtal startas medan den här chatten är tystad."
+  },
+  "icu:WhileMuted__mentions__title": {
     "messageformat": "Omnämnanden"
   },
-  "icu:ConversationNotificationsSettings__mentions__info": {
-    "messageformat": "Få aviseringar när du nämns i tystade chattar"
+  "icu:WhileMuted__mentions__description": {
+    "messageformat": "Avisera när du @nämns medan den här chatten är tystad."
   },
-  "icu:ConversationNotificationsSettings__mentions__select__always-notify": {
-    "messageformat": "Meddela alltid"
+  "icu:WhileMuted__replies__title": {
+    "messageformat": "Svar"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__dont-notify-for-mentions-if-muted": {
-    "messageformat": "Meddela inte om tystad"
+  "icu:WhileMuted__replies__description": {
+    "messageformat": "Avisera när någon svarar på ditt meddelande medan den här chatten är tystad."
+  },
+  "icu:WhileMuted__value--none": {
+    "messageformat": "Inga"
+  },
+  "icu:WhileMuted__value--calls": {
+    "messageformat": "Samtal"
+  },
+  "icu:WhileMuted__value--mentions": {
+    "messageformat": "Omnämnanden"
+  },
+  "icu:WhileMuted__value--replies": {
+    "messageformat": "Svar"
+  },
+  "icu:WhileMuted__value--calls-mentions": {
+    "messageformat": "Samtal, omnämnanden"
+  },
+  "icu:WhileMuted__value--calls-replies": {
+    "messageformat": "Samtal, svar"
+  },
+  "icu:WhileMuted__value--mentions-replies": {
+    "messageformat": "Omnämnanden, svar"
+  },
+  "icu:WhileMuted__value--calls-mentions-replies": {
+    "messageformat": "Samtal, omnämnanden, svar"
+  },
+  "icu:Preferences__WhileMuted__description": {
+    "messageformat": "Välj vilka aviseringar som ska visas för tystade chattar."
+  },
+  "icu:Preferences__WhileMuted__calls__description": {
+    "messageformat": "Ring eller avisera när ett samtal startas i tystade chattar."
+  },
+  "icu:Preferences__WhileMuted__mentions__description": {
+    "messageformat": "Avisera när du nämns i tystade chattar."
+  },
+  "icu:Preferences__WhileMuted__replies__description": {
+    "messageformat": "Avisera när någon svarar på ditt meddelande i tystade chattar."
+  },
+  "icu:UnreadReminders__title": {
+    "messageformat": "Påminnelser om olästa"
+  },
+  "icu:UnreadReminders__description": {
+    "messageformat": "Avisera ibland när det finns olästa meddelanden medan den här chatten är tystad."
+  },
+  "icu:Preferences__UnreadReminders__description": {
+    "messageformat": "Avisera ibland när det finns olästa meddelanden i tystade chattar."
+  },
+  "icu:UnreadReminders__notification--messages--1": {
+    "messageformat": "{messageCount, plural, one {Du har {messageCount,number} oläst meddelande från {person1}.} other {Du har {messageCount,number} olästa meddelanden från {person1}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--2": {
+    "messageformat": "{messageCount, plural, one {Du har {messageCount,number} oläst meddelande från {person1} och {person2}.} other {Du har {messageCount,number} olästa meddelanden från {person1} och {person2}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--many": {
+    "messageformat": "{messageCount, plural, one {Du har {messageCount,number} oläst meddelande från {person1}, {person2} och andra.} other {Du har {messageCount,number} olästa meddelanden från {person1}, {person2} och andra.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-mentions": {
+    "messageformat": "{messageCount, plural, one {Du har {messageCount,number} oläst meddelande, inklusive {mentionSummary}.} other {Du har {messageCount,number} olästa meddelanden, inklusive {mentionSummary}.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-replies": {
+    "messageformat": "{messageCount, plural, one {Du har {messageCount,number} oläst meddelande, inklusive {replySummary}.} other {Du har {messageCount,number} olästa meddelanden, inklusive {replySummary}.}}"
+  },
+  "icu:UnreadReminders__notification--counts--messages": {
+    "messageformat": "{messageCount, plural, one {Du har {messageCount,number} oläst meddelande.} other {Du har {messageCount,number} olästa meddelanden.}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--1": {
+    "messageformat": "{mentionCount, plural, one {ett omnämnande av dig från {person1}} other {{mentionCount,number} omnämnanden av dig från {person1}}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--2": {
+    "messageformat": "{mentionCount, plural, one {{mentionCount,number} omnämnanden av dig från {person1} och {person2}} other {{mentionCount,number} omnämnanden av dig från {person1} och {person2}}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--many": {
+    "messageformat": "{mentionCount, plural, one {{mentionCount,number} omnämnanden av dig från {person1} och annan} other {{mentionCount,number} omnämnanden av dig från {person1} och andra}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--1": {
+    "messageformat": "{replyCount, plural, one {ett svar från {person1}} other {{replyCount,number} svar från {person1}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--2": {
+    "messageformat": "{replyCount, plural, one {{replyCount,number} svar från {person1} och {person2}} other {{replyCount,number} svar från {person1} och {person2}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--many": {
+    "messageformat": "{replyCount, plural, one {{replyCount,number} svar från {person1} och annan} other {{replyCount,number} svar från {person1} och andra}}"
   },
   "icu:GroupLinkManagement--clipboard": {
     "messageformat": "Grupplänken kopierades."
@@ -5140,6 +5272,48 @@
   },
   "icu:GroupLinkManagement__CopyGroupLinkButtonLabel": {
     "messageformat": "Kopiera signal.group-länk till urklipp"
+  },
+  "icu:GroupMembersSearchDialog__DialogTitle": {
+    "messageformat": "Sök medlemmar"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder": {
+    "messageformat": "Sök"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringByAdmins": {
+    "messageformat": "Sök administratörer"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringBySystemContacts": {
+    "messageformat": "Sök kontakter"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Label": {
+    "messageformat": "Filter"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__AllMembers": {
+    "messageformat": "Alla medlemmar"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Admins": {
+    "messageformat": "Administratörer"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__SystemContacts": {
+    "messageformat": "Kontakter"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithoutSearchQuery": {
+    "messageformat": "Inga resultat"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithSearchQuery": {
+    "messageformat": "Inga resultat för ”{searchQuery}”"
+  },
+  "icu:GroupMembersSearchDialog__MemberItem__Admin": {
+    "messageformat": "Administratör"
+  },
+  "icu:GroupMembersSearchDialog__SearchResults__Title": {
+    "messageformat": "Sökresultat"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__AddMembers": {
+    "messageformat": "Lägg till medlemmar"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__InviteViaGroupLink": {
+    "messageformat": "Bjud in via grupplänk"
   },
   "icu:PendingInvites--tab-requests": {
     "messageformat": "Förfrågningar ({count,number})"
@@ -5426,6 +5600,9 @@
   },
   "icu:CaptchaDialog__second-paragraph": {
     "messageformat": "Efter verifiering kan du fortsätta skicka meddelanden. Alla pausade meddelanden skickas automatiskt."
+  },
+  "icu:CaptchaDialog__continue": {
+    "messageformat": "Fortsätt"
   },
   "icu:CaptchaDialog--can-close__title": {
     "messageformat": "Fortsätt utan att verifiera?"
@@ -5893,6 +6070,15 @@
   "icu:Preferences__message-audio-description": {
     "messageformat": "Hör ett aviseringsljud för skickade och mottagna meddelanden när du är i chatten."
   },
+  "icu:Preferences__reaction-notifications-title": {
+    "messageformat": "Aviseringar för reaktioner"
+  },
+  "icu:Preferences__reaction-notifications-description": {
+    "messageformat": "Avisera när någon reagerar på ditt meddelande"
+  },
+  "icu:Preferences__button--account": {
+    "messageformat": "Konto"
+  },
   "icu:Preferences__button--general": {
     "messageformat": "Allmänt"
   },
@@ -5962,6 +6148,45 @@
   "icu:Preferences--system": {
     "messageformat": "System"
   },
+  "icu:Preferences--signal-login": {
+    "messageformat": "Signal Login"
+  },
+  "icu:Preferences--signal-login-description": {
+    "messageformat": "Din Signal Login används för att återfå och återställa ditt konto. Förvara de här nycklarna säkert i en lösenordshanterare du litar på. <learnMoreLink>Läs mer</learnMoreLink>."
+  },
+  "icu:Preferences--signal-login-description--learn-more": {
+    "messageformat": "Läs mer"
+  },
+  "icu:Preferences__SignalAccount__label": {
+    "messageformat": "Konto och återställning"
+  },
+  "icu:Preferences__SignalAccount__description": {
+    "messageformat": "2 nycklar"
+  },
+  "icu:Preferences__SignalAccountKeys__Title": {
+    "messageformat": "Din Signal Login"
+  },
+  "icu:Preferences__SignalAccountKeys__Description": {
+    "messageformat": "Förvara detta på ett säkert ställe – dina inloggningsuppgifter krävs för att återställa ditt konto och dina data. Dela det aldrig med någon."
+  },
+  "icu:Preferences__SignalAccountKeys__AccountKey": {
+    "messageformat": "Kontonyckel"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountID": {
+    "messageformat": "Konto-ID"
+  },
+  "icu:Preferences__SignalAccountKeys__RecoveryKey": {
+    "messageformat": "Återställningsnyckel"
+  },
+  "icu:Preferences__SignalAccountKeys__Save": {
+    "messageformat": "Spara"
+  },
+  "icu:Preferences__Account__LinkedDevice__label": {
+    "messageformat": "Det här är en länkad enhet"
+  },
+  "icu:Preferences__Account__LinkedDevice__description": {
+    "messageformat": "Öppna Signal på din primära enhet för att hantera dina kontoinställningar."
+  },
   "icu:Preferences--zoom": {
     "messageformat": "Zoomnivå"
   },
@@ -5992,8 +6217,116 @@
   "icu:Preferences--advanced": {
     "messageformat": "Avancerat"
   },
-  "icu:Preferences--notification-content": {
-    "messageformat": "Aviseringsinnehåll"
+  "icu:Preferences--change-signal-pin": {
+    "messageformat": "Ändra din PIN-kod"
+  },
+  "icu:Preferences--change-signal-pin-button": {
+    "messageformat": "Ändra"
+  },
+  "icu:Preferences--create-signal-pin": {
+    "messageformat": "Skapa en PIN-kod"
+  },
+  "icu:Preferences--create-signal-pin-button": {
+    "messageformat": "Skapa"
+  },
+  "icu:Preferences--signal-pin": {
+    "messageformat": "Signal PIN-kod"
+  },
+  "icu:Preferences--signal-pin__footer": {
+    "messageformat": "Pinkoder håller information på Signal krypterad så att bara du kan komma åt den. Din pinkod kan inte återställas. Din profil, dina inställningar och dina kontakter återställs när du installerar om Signal. <learnMoreLink>Läs mer</learnMoreLink>"
+  },
+  "icu:Preferences--signal-pin-advanced-settings": {
+    "messageformat": "Avancerade PIN-kodsinställningar"
+  },
+  "icu:Preferences--disable-signal-pin": {
+    "messageformat": "Inaktivera PIN-koden"
+  },
+  "icu:Preferences--disable-signal-pin--button": {
+    "messageformat": "Inaktivera"
+  },
+  "icu:Preferences--disable-signal-pin--footer": {
+    "messageformat": "Om du inaktiverar PIN-koden kommer du att förlora alla data när du registrerar om Signal om du inte säkerhetskopierar och återställer manuellt. Du kan inte aktivera registreringslåset medan PIN-koden är inaktiverad."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--title": {
+    "messageformat": "Det gick inte att inaktivera pinkoden på grund av registreringslås"
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--body": {
+    "messageformat": "Du måste inaktivera registreringslåset innan du avaktiverar din pinkod."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--ok": {
+    "messageformat": "OK"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--title": {
+    "messageformat": "Det gick inte att inaktivera pinkoden på grund av säkerhetskopior"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--body": {
+    "messageformat": "Du måste inaktivera säkerhetskopior innan du inaktiverar din pinkod."
+  },
+  "icu:Preferences--enable-signal-pin": {
+    "messageformat": "Aktivera PIN-koden"
+  },
+  "icu:Preferences--enable-signal-pin--button": {
+    "messageformat": "Aktivera"
+  },
+  "icu:Preferences--pin-reminders--header": {
+    "messageformat": "PIN-kodspåminnelser"
+  },
+  "icu:Preferences--pin-reminders--description": {
+    "messageformat": "Du blir ombedd mindre ofta över tiden"
+  },
+  "icu:Preferences--registration-lock__label": {
+    "messageformat": "Registreringslås"
+  },
+  "icu:Preferences--registration-lock__footer": {
+    "messageformat": "Din Signal PIN-kod krävs för att omregistrera ditt telefonnummer hos Signal."
+  },
+  "icu:Preferences__Chats__TextInputSection__Title": {
+    "messageformat": "Textinmatning"
+  },
+  "icu:Preferences__Chats__ChatFoldersSection__Title": {
+    "messageformat": "Chattmappar"
+  },
+  "icu:Preferences__Notifications__Show__Label": {
+    "messageformat": "Visa"
+  },
+  "icu:Preferences__Notifications__SoundsSection__Title": {
+    "messageformat": "Ljud"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title": {
+    "messageformat": "Appmärke"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title-v2": {
+    "messageformat": "Olästa märken"
+  },
+  "icu:Preferences__Notifications__Reset__title": {
+    "messageformat": "Återställ aviseringsinställningarna till standard, inklusive anpassade inställningar för dina chattar."
+  },
+  "icu:Preferences__Notifications__Reset__button": {
+    "messageformat": "Återställ"
+  },
+  "icu:Preferences__Notifications__Reset__modal--body": {
+    "messageformat": "Återställ alla aviseringsinställningar till standard för alla chattar?"
+  },
+  "icu:Preferences__Notifications__Reset__modal--confirm": {
+    "messageformat": "Återställ"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Label": {
+    "messageformat": "Ikonräknare"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Description": {
+    "messageformat": "Välj om antal aviseringar visar antalet olästa meddelanden eller antalet olästa chattar"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadMessages": {
+    "messageformat": "Olästa meddelanden"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadChats": {
+    "messageformat": "Olästa chattar"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats": {
+    "messageformat": "Inkludera tystade chattar i appmärke"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats__description": {
+    "messageformat": "Märken för chattmappar kommer alltid inkludera tystade chattar"
   },
   "icu:PlaintextExport--PreferencesRow--Header": {
     "messageformat": "Exportera chatthistorik"
@@ -6145,9 +6478,6 @@
   "icu:NotificationProfiles--setting": {
     "messageformat": "Aviseringsprofiler"
   },
-  "icu:NotificationProfiles--setup": {
-    "messageformat": "Ställ in"
-  },
   "icu:NotificationProfiles--title": {
     "messageformat": "Aviseringsprofiler"
   },
@@ -6159,9 +6489,6 @@
   },
   "icu:NotificationProfiles--manage-description": {
     "messageformat": "Lägg till eller redigera aviseringsprofiler"
-  },
-  "icu:NotificationProfiles--manage-profiles": {
-    "messageformat": "{profileCount, plural, one {En profil} other {{profileCount,number} profiler}}"
   },
   "icu:NotificationProfiles--create": {
     "messageformat": "Skapa profil"
@@ -6351,6 +6678,9 @@
   },
   "icu:Preferences--blocked-groups": {
     "messageformat": "Blockerade grupper"
+  },
+  "icu:Preferences--blocked--blocked-on": {
+    "messageformat": "Blockerad {blockedAt}"
   },
   "icu:Preferences--signal-backups": {
     "messageformat": "Säkerhetskopiering av Signal"
@@ -6559,9 +6889,6 @@
   "icu:Preferences__pnp__row--body": {
     "messageformat": "Välj vem som kan se ditt telefonnummer och vem som kan använda det för att kontakta dig på Signal."
   },
-  "icu:Preferences__pnp__row--button": {
-    "messageformat": "Ändra …"
-  },
   "icu:Preferences__pnp__sharing--title": {
     "messageformat": "Vem kan se mitt nummer"
   },
@@ -6610,14 +6937,11 @@
   "icu:Preferences--read-receipts": {
     "messageformat": "Läskvitton"
   },
-  "icu:Preferences--read-receipts--description": {
-    "messageformat": "Om det är inaktiverat ser du inte läskvitton från andra."
-  },
   "icu:Preferences--typing-indicators": {
     "messageformat": "Skrivindikatorer"
   },
-  "icu:Preferences--typing-indicators--description": {
-    "messageformat": "Om det är inaktiverat ser du inte skrivindikatorer från andra."
+  "icu:Preferences--messaging-help": {
+    "messageformat": "Se och dela när meddelanden läses och skrivs. Om det är inaktiverat ser du inte läskvitton eller skrivindikatorer från andra."
   },
   "icu:Preferences--updates": {
     "messageformat": "Uppdateringar"
@@ -6721,11 +7045,23 @@
   "icu:InstallScreenUpdateDialog--update-required__title": {
     "messageformat": "Uppdatering krävs"
   },
+  "icu:InstallScreenUpdateDialog--checking-for-updates": {
+    "messageformat": "Söker efter uppdateringar"
+  },
+  "icu:InstallScreenUpdateDialog--updating-signal": {
+    "messageformat": "Uppdaterar Signal"
+  },
+  "icu:InstallScreenUpdateDialog--download-progress": {
+    "messageformat": "Laddar ned {currentBytes} av {totalBytes} ({percentage,number,percent}) …"
+  },
   "icu:InstallScreenUpdateDialog--update-required__body": {
-    "messageformat": "Uppdatera Signal Desktop nu för att slutföra synkroniseringen av dina meddelanden."
+    "messageformat": "Uppdatera Signal Desktop för att fortsätta."
   },
   "icu:InstallScreenUpdateDialog--update-required__action-update": {
     "messageformat": "Uppdatera"
+  },
+  "icu:InstallScreenUpdateDialog--update-required__action-update__mas": {
+    "messageformat": "Gå till App Store"
   },
   "icu:InstallScreenUpdateDialog--unsupported-os__title": {
     "messageformat": "Uppdatering krävs"
@@ -6759,6 +7095,9 @@
   },
   "icu:StandaloneRegistration--PhoneNumber--waiting": {
     "messageformat": "Försök igen om {duration}"
+  },
+  "icu:StandaloneRegistration--PhoneNumber--RegionCodeSelector--Label": {
+    "messageformat": "Välj regionkod"
   },
   "icu:StandaloneRegistration--PhoneNumber--placeholder": {
     "messageformat": "Telefonnummer"
@@ -6982,6 +7321,9 @@
   "icu:StandaloneRegistration--VerifyPIN--incorrect-pin--with-count": {
     "messageformat": "{triesRemaining, plural, one {Felaktig PIN-kod. {triesRemaining,number} försök kvar.} other {Felaktig PIN-kod. {triesRemaining,number} försök kvar.}}"
   },
+  "icu:StandaloneRegistration--VerifyPIN--just-count": {
+    "messageformat": "{triesRemaining, plural, one {{triesRemaining,number} försök kvar.} other {{triesRemaining,number} försök kvar.}}"
+  },
   "icu:StandaloneRegistration--VerifyPIN--NeedHelp--header": {
     "messageformat": "Behöver du hjälp?"
   },
@@ -7024,6 +7366,9 @@
   "icu:StandaloneRegistration--VerifyPIN--NoRemainingTries--learn-more": {
     "messageformat": "Läs mer om PIN-koder"
   },
+  "icu:StandaloneRegistration--VerifyPIN--open-menu": {
+    "messageformat": "Öppna menyn"
+  },
   "icu:StandaloneRegistration--VerifyPIN--menu--skip-pin": {
     "messageformat": "Hoppa över pinkod"
   },
@@ -7031,7 +7376,7 @@
     "messageformat": "Hoppa över PIN-kodsposten?"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--description": {
-    "messageformat": "Om du inte kommer ihåg din pinkod kan du skapa en ny. Du kan registrera och använda ditt konto men du kommer att förlora några sparade inställningar, som din profilinformation. Läs mer."
+    "messageformat": "Om du inte kommer ihåg din pinkod kan du skapa en ny. Du kan registrera och använda ditt konto men du kommer att förlora några sparade inställningar, som din profilinformation. <learnMore>Läs mer</learnMore>."
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--skip-button": {
     "messageformat": "Hoppa över och skapa ny PIN-kod"
@@ -7067,7 +7412,7 @@
     "messageformat": "Varning"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--description": {
-    "messageformat": "Om du inaktiverar PIN-koden kommer du att förlora alla data när du registrerar om Signal om du inte överför data från en annan iOS-enhet. Du kan inte slå på registreringslåset medan PIN-koden är inaktiverad."
+    "messageformat": "Om du inaktiverar pinkoden kommer du att förlora alla data när du registrerar om Signal. Du kan inte aktivera registreringslåset medan pinkoden är inaktiverad."
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--disable-button": {
     "messageformat": "Inaktivera PIN-koden"
@@ -7275,6 +7620,12 @@
   },
   "icu:MediaPermissionsModal__step-2": {
     "messageformat": "Slå på Signal"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--microphone": {
+    "messageformat": "Aktivera mikrofonåtkomst för Signal"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--camera": {
+    "messageformat": "Aktivera kameraåtkomst för Signal"
   },
   "icu:MediaPermissionsModal__open": {
     "messageformat": "Gå till inställningar"
@@ -7816,11 +8167,17 @@
   "icu:ContextMenu--button": {
     "messageformat": "Kontextmeny"
   },
+  "icu:EditUsernameModalBody__username-label": {
+    "messageformat": "Användarnamn"
+  },
   "icu:EditUsernameModalBody__username-placeholder": {
     "messageformat": "Användarnamn"
   },
   "icu:EditUsernameModalBody__username-helper": {
     "messageformat": "Användarnamn är alltid kopplade till en uppsättning siffror."
+  },
+  "icu:EditUsernameModalBody__discriminator-label": {
+    "messageformat": "Siffror i användarnamn"
   },
   "icu:EditUsernameModalBody__learn-more": {
     "messageformat": "Läs mer"
@@ -7918,6 +8275,75 @@
   },
   "icu:UsernameMegaphone__dismiss": {
     "messageformat": "Avfärda"
+  },
+  "icu:PinReminderMegaphone__title": {
+    "messageformat": "Verifiera din Signal PIN-kod"
+  },
+  "icu:PinReminderMegaphone__body": {
+    "messageformat": "Vi ber dig ibland att verifiera din PIN-kod så att du kommer ihåg den."
+  },
+  "icu:PinReminderMegaphone__verify": {
+    "messageformat": "Verifiera"
+  },
+  "icu:PinReminderMegaphone__not-now": {
+    "messageformat": "Inte nu"
+  },
+  "icu:PinReminderModal__title": {
+    "messageformat": "Ange din Signal PIN-kod"
+  },
+  "icu:PinReminderModal__body": {
+    "messageformat": "För att hjälpa dig att memorera din PIN-kod ber vi dig att skriva in den regelbundet. Vi frågar mindre med tiden."
+  },
+  "icu:PinReminderModal__pin-input-placeholder": {
+    "messageformat": "Ange din PIN-kod"
+  },
+  "icu:PinReminderModal__pin-input-error": {
+    "messageformat": "Felaktig pinkod. Försök igen"
+  },
+  "icu:PinReminderModal__forgot": {
+    "messageformat": "Glömt pinkod"
+  },
+  "icu:PinReminderModal__confirm": {
+    "messageformat": "Bekräfta"
+  },
+  "icu:PinReminderCompletedToast": {
+    "messageformat": "Pinkoden är korrekt. Vi påminner dig igen senare."
+  },
+  "icu:PinChangeModal__title--create": {
+    "messageformat": "Ändra din Signal-pinkod"
+  },
+  "icu:PinChangeModal__title--create--without-pin": {
+    "messageformat": "Skapa din Signal-pinkod"
+  },
+  "icu:PinChangeModal__body--create": {
+    "messageformat": "Du kan ändra din PIN-kod så länge denna enhet är registrerad. <learnMoreLink>Läs mer</learnMoreLink>"
+  },
+  "icu:PinChangeModal__body--create--without-pin": {
+    "messageformat": "Pinkoder håller information på Signal krypterad så att bara du kan komma åt den. Din profil, inställningar och kontakter återställs när du installerar om. Du behöver inte din pinkod för att öppna appen. <learnMoreLink>Läs mer</learnMoreLink>"
+  },
+  "icu:PinChangeModal__title--confirm": {
+    "messageformat": "Bekräfta din Signal PIN-kod"
+  },
+  "icu:PinChangeModal__body--confirm": {
+    "messageformat": "Ange PIN-koden du just skapat."
+  },
+  "icu:PinChangeModal__pin-input-placeholder--create": {
+    "messageformat": "Ange en ny pinkod"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--confirm": {
+    "messageformat": "Bekräfta PIN-kod"
+  },
+  "icu:PinChangeModal__cancel": {
+    "messageformat": "Avbryt"
+  },
+  "icu:PinChangeModal__continue": {
+    "messageformat": "Fortsätt"
+  },
+  "icu:PinChangeModal__confirm": {
+    "messageformat": "Bekräfta"
+  },
+  "icu:PinChangeCompletedToast": {
+    "messageformat": "Ny pinkod skapad."
   },
   "icu:UnsupportedOSWarningDialog__body": {
     "messageformat": "Snart stöder Signal Desktop inte längre din dators version av{OS}. Uppdatera datorns operativsystem senast den {expirationDate} för att fortsätta använda Signal. <learnMoreLink>Läs mer</learnMoreLink>"
@@ -8351,8 +8777,11 @@
   "icu:DonationReceipt__type-value--one-time": {
     "messageformat": "En gång"
   },
-  "icu:DonationReceipt__footer-text": {
-    "messageformat": "Tack för att du stöder Signal. Ditt bidrag hjälper till att främja uppdraget att skydda yttrandefriheten och möjliggöra säker global kommunikation för miljontals människor runt om i världen, genom öppen källkod för integritetsskydd. Spara detta kvitto för dina skatteuppgifter om du är bosatt i USA. Signal Technology Foundation är en skattebefriad ideell organisation i USA enligt avsnitt 501c3 i Internal Revenue Code. Vårt federala skatte-ID är 82-4506840."
+  "icu:DonationReceipt__footer-text-v2": {
+    "messageformat": "Tack för att du stöder Signal. Ditt bidrag hjälper till att främja uppdraget att skydda yttrandefriheten och möjliggöra säker global kommunikation för miljontals människor runt om i världen, genom öppen källkod för integritetsskydd. Spara detta kvitto för dina skatteuppgifter om du är bosatt i USA. Signal Technology Foundation är en skattebefriad ideell organisation i USA enligt avsnitt 501c3 i Internal Revenue Code. Vårt federala skatte-ID är 82-4506840. Signal har inte tillhandahållit några varor eller tjänster i utbyte mot detta bidrag."
+  },
+  "icu:MessageCta__Donate": {
+    "messageformat": "Donera nu"
   },
   "icu:Donations__OfflineTooltip": {
     "messageformat": "Du är offline. Vänligen anslut till internet för att slutföra en donation."
@@ -8661,16 +9090,10 @@
     "messageformat": "Små justeringer, buggfixar och prestandaförbättringar. Tack för att du använder Signal!",
     "ignoreUnused": true
   },
-  "icu:WhatsNew__8.18--0": {
-    "messageformat": "Omröstningar kan nu skapas även i individuella chattar."
+  "icu:WhatsNew__8.30--0": {
+    "messageformat": "Prestandaförbättringar för videosamtal."
   },
-  "icu:WhatsNew__8.19--0": {
-    "messageformat": "Gruppadministratörer kan nu avsluta chattar med det nya alternativet Avsluta grupp i gruppinställningarna. När en grupp avslutas kan gruppmedlemmarna inte längre skicka meddelanden eller starta samtal, och inbjudningar inaktiveras."
-  },
-  "icu:WhatsNew__8.20--0": {
-    "messageformat": "Introducing disappearing call events: Missed, outgoing, and received calls that occur after you install this update will now automatically disappear in any chat where disappearing messages are enabled."
-  },
-  "icu:WhatsNew__8.20--1": {
-    "messageformat": "Now you can reorder installed sticker packs so your new favorites don’t get stuck in the back of the line."
+  "icu:WhatsNew__8.30--1": {
+    "messageformat": "Vi har också lagt till en smidig genväg för att öppna systeminställningarna på Windows om du försöker gå med i ett videosamtal utan att Signal har behörighet att använda kameran."
   }
 }

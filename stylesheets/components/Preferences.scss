@@ -70,10 +70,8 @@
       background: var(--axo-color-fill-primary-pressed);
     }
 
-    &:has(.Preferences__profile-chip__button:focus) {
-      @include mixins.keyboard-mode {
-        @include mixins.axo-focus-ring;
-      }
+    &:has(.Preferences__profile-chip__button:focus-visible) {
+      @include mixins.axo-focus-ring;
     }
     &:has(.Preferences__profile-chip__button:hover):not(&--selected) {
       background: var(--axo-color-fill-primary);
@@ -86,8 +84,8 @@
         z-index: 1;
         inset: 0;
       }
-      &:focus {
-        outline: none;
+      &:focus-visible {
+        @include mixins.axo-focus-ring;
       }
     }
 
@@ -143,11 +141,8 @@
       &:active {
         background: var(--axo-color-fill-secondary);
       }
-      &:focus {
-        outline: none;
-        @include mixins.keyboard-mode {
-          @include mixins.axo-focus-ring;
-        }
+      &:focus-visible {
+        @include mixins.axo-focus-ring;
       }
     }
     &__qr-icon {
@@ -159,94 +154,6 @@
         '../images/icons/v3/qr_code/qr_code.svg',
         var(--axo-color-label-primary)
       );
-    }
-  }
-
-  &__button {
-    @include mixins.button-reset;
-    & {
-      @include mixins.font-body-1;
-      align-items: center;
-      display: flex;
-      width: 100%;
-      height: 40px;
-      padding-block: 14px;
-      padding-inline: 0;
-      border-radius: 10px;
-      margin-bottom: 4px;
-    }
-
-    &--selected {
-      background: var(--axo-color-fill-secondary);
-    }
-
-    &:not(&--selected) {
-      &:hover,
-      &:focus {
-        background: var(--axo-color-fill-primary);
-      }
-    }
-
-    &::before {
-      content: '';
-      display: block;
-      height: 20px;
-      margin-inline-start: 14px;
-      margin-inline-end: 12px;
-      width: 20px;
-    }
-
-    &--general {
-      @include preferences-icon('../images/icons/v3/settings/settings.svg');
-    }
-
-    &--appearance {
-      @include preferences-icon('../images/icons/v3/appearance/appearance.svg');
-    }
-
-    &--chats {
-      @include preferences-icon('../images/icons/v3/chat/chat.svg');
-    }
-
-    &--calls {
-      @include preferences-icon('../images/icons/v3/phone/phone.svg');
-    }
-
-    &--notifications {
-      @include preferences-icon('../images/icons/v3/bell/bell.svg');
-    }
-
-    &--privacy {
-      @include preferences-icon('../images/icons/v3/lock/lock.svg');
-    }
-
-    &--data-usage {
-      @include preferences-icon('../images/icons/v3/data/data.svg');
-    }
-
-    &--backups {
-      @include preferences-icon(
-        '../images/icons/v3/signal_backups/signal_backups.svg'
-      );
-    }
-
-    &--donations {
-      @include preferences-icon('../images/icons/v3/heart/heart.svg');
-    }
-
-    // Beacon: reuses Signal's own v3 `tune` (sliders) icon rather than shipping
-    // custom artwork, so the nav stays visually consistent — same 20x20 grid,
-    // stroke weight and masking behaviour as every other entry.
-    &--beacon {
-      @include preferences-icon('../images/icons/v3/tune/tune.svg');
-    }
-
-    &--beacon-modules {
-      @include preferences-icon('../images/icons/v3/grid/grid.svg');
-    }
-
-    &--internal {
-      @include preferences-icon('../images/icons/v3/internal/internal.svg');
     }
   }
 
@@ -461,11 +368,8 @@
       &:focus {
         background: var(--axo-color-fill-primary);
       }
-      &:focus {
-        outline: none;
-        @include mixins.keyboard-mode {
-          @include mixins.axo-focus-ring;
-        }
+      &:focus-visible {
+        @include mixins.axo-focus-ring;
       }
     }
   }
@@ -519,11 +423,8 @@
       @include mixins.position-absolute-center-y;
     }
 
-    &:focus {
-      outline: none;
-      @include mixins.keyboard-mode {
-        @include mixins.axo-focus-ring;
-      }
+    &:focus-visible {
+      @include mixins.axo-focus-ring;
     }
 
     &::before {
@@ -607,12 +508,10 @@
       background: var(--axo-color-fill-primary);
     }
   }
-  &:focus {
+  &:focus-visible {
     outline: none;
     .Preferences__LanguageModal__Item__Inner {
-      @include mixins.keyboard-mode {
-        @include mixins.axo-focus-ring;
-      }
+      @include mixins.axo-focus-ring;
     }
   }
 }
@@ -865,7 +764,6 @@
   background: variables.$color-gray-02;
   border-radius: 12px;
   border-width: 0;
-  outline: none;
   color: variables.$color-gray-90;
   font-family: 'MonoSpecial', variables.$monospace;
   font-size: 16px;
@@ -878,6 +776,10 @@
   &::placeholder {
     color: var(--axo-color-label-placeholder);
     text-transform: none;
+  }
+
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 }
 
@@ -1009,9 +911,9 @@
   }
 }
 
-.Preferences__ChatFolders__ChatSelection__Item:focus {
-  outline: none;
-  @include mixins.keyboard-mode {
+.Preferences__ChatFolders__ChatSelection__Item {
+  &:focus-visible {
+    outline: none;
     .Preferences__ChatFolders__ChatSelection__ItemContent {
       @include mixins.axo-focus-ring-inset;
     }
@@ -1109,11 +1011,9 @@
     color: var(--axo-color-label-destructive);
     border-radius: 1px;
   }
-  @include mixins.keyboard-mode {
-    outline: none;
-    &:focus {
-      @include mixins.axo-focus-ring;
-    }
+
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 }
 

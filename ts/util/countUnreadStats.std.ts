@@ -6,8 +6,17 @@ import { CurrentChatFolders } from '../types/CurrentChatFolders.std.ts';
 import { isConversationMuted } from './isConversationMuted.std.ts';
 
 import type { ConversationType } from '../state/ducks/conversations.preload.ts';
+import type { UnreadCountBadgeType } from '../types/StorageKeys.std.ts';
 import type { ChatFolderId } from '../types/ChatFolder.std.ts';
-import type { NotificationProfileType } from '../types/NotificationProfile.std.ts';
+import {
+  shouldNotify,
+  type NotificationProfileType,
+} from '../types/NotificationProfile.std.ts';
+import type { ReadonlyDeep } from 'type-fest';
+import {
+  getNotifyWhileMuted,
+  type NotifyWhileMuted,
+} from './notifyWhileMuted.std.ts';
 
 type MutableUnreadStats = {
   /**
@@ -18,6 +27,15 @@ type MutableUnreadStats = {
    * unread messages with mentions.
    */
   unreadCount: number;
+
+  /**
+   * Number of countable conversations in the set that have at least one
+   * unread message.
+   *
+   * Note: Chats that are only marked unread are counted in
+   * `readChatsMarkedUnreadCount` instead.
+   */
+  unreadChatsCount: number;
 
   /**
    * Total of `conversation.unreadMentionsCount`
@@ -42,6 +60,7 @@ export type UnreadStats = Readonly<MutableUnreadStats>;
 export function _createUnreadStats(): MutableUnreadStats {
   return {
     unreadCount: 0,
+    unreadChatsCount: 0,
     unreadMentionsCount: 0,
     readChatsMarkedUnreadCount: 0,
   };
@@ -124,10 +143,27 @@ export function _countConversation(
 
   if (hasUnreadCount) {
     mutable.unreadCount += unreadCount;
+    mutable.unreadChatsCount += 1;
     mutable.unreadMentionsCount += unreadMentionsCount;
   } else if (markedUnread) {
     mutable.readChatsMarkedUnreadCount += 1;
   }
+}
+
+/**
+ * The number to show anywhere we are aggregating unreads across chats. Chats that are
+ * marked-unread count as 1, for either badge count type.
+ */
+export function getUnreadCountForBadge(
+  unreadStats: UnreadStats,
+  unreadCountBadgeType: UnreadCountBadgeType
+): number {
+  const unreadCount =
+    unreadCountBadgeType === 'unread-chats'
+      ? unreadStats.unreadChatsCount
+      : unreadStats.unreadCount;
+
+  return unreadCount + unreadStats.readChatsMarkedUnreadCount;
 }
 
 export function isConversationUnread(
@@ -206,4 +242,48 @@ export function countAllChatFoldersUnreadStats(
   }
 
   return results;
+}
+
+export function getUnreadCallsCount({
+  unreadCountsByConversationId,
+  conversationLookup,
+  badgeCountMutedConversations,
+  globalNotifyWhileMuted,
+  activeProfile,
+}: {
+  unreadCountsByConversationId: Record<string, number>;
+  conversationLookup: ReadonlyDeep<Record<string, ConversationType>>;
+  badgeCountMutedConversations: boolean;
+  globalNotifyWhileMuted: NotifyWhileMuted;
+  activeProfile: NotificationProfileType | undefined;
+}): number {
+  let total = 0;
+  for (const [conversationId, unreadCount] of Object.entries(
+    unreadCountsByConversationId
+  )) {
+    const conversation = conversationLookup[conversationId];
+    if (!conversation) {
+      continue;
+    }
+
+    const canNotifyForCalls =
+      !isConversationMuted(conversation) ||
+      getNotifyWhileMuted(conversation, globalNotifyWhileMuted).calls;
+
+    const isAllowedByProfile = shouldNotify({
+      isCall: true,
+      isMentionOrReply: false,
+      conversationId,
+      activeProfile,
+    });
+
+    if (
+      badgeCountMutedConversations ||
+      (canNotifyForCalls && isAllowedByProfile)
+    ) {
+      total += unreadCount;
+    }
+  }
+
+  return total;
 }

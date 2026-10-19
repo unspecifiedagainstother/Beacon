@@ -9,13 +9,17 @@ import type {
 } from '../types/Attachment.std.ts';
 import * as Bytes from '../Bytes.std.ts';
 import { createLogger } from '../logging/log.std.ts';
-import { MIMETypeToString, supportsIncrementalMac } from '../types/MIME.std.ts';
+import {
+  MIMETypeToString,
+  supportsIncrementalMac,
+  isAudio,
+} from '../types/MIME.std.ts';
 import { getRandomBytes } from '../Crypto.node.ts';
 import { backupsService } from '../services/backups/index.preload.ts';
 import { tusUpload } from './uploads/tusProtocol.node.ts';
 import { defaultFileReader } from './uploads/uploads.node.ts';
 import {
-  type AttachmentUploadFormResponseType,
+  type AttachmentUploadFormType,
   getAttachmentUploadForm,
   createFetchForAttachmentUpload,
   putEncryptedAttachment,
@@ -96,7 +100,16 @@ export async function uploadAttachment(
     }));
   }
 
-  const { blurHash, caption, clientUuid, flags, height, width } = attachment;
+  const {
+    blurHash,
+    caption,
+    clientUuid,
+    flags,
+    height,
+    width,
+    audioWaveform,
+    duration,
+  } = attachment;
 
   let { fileName } = attachment;
   if (isImageAttachment(attachment) || isVideoAttachment(attachment)) {
@@ -127,12 +140,16 @@ export async function uploadAttachment(
     uploadTimestamp: BigInt(uploadTimestamp),
 
     contentType: MIMETypeToString(attachment.contentType),
-    fileName: fileName ?? null,
+    fileName: fileName || null,
     flags: flags ?? null,
     width: width ?? null,
     height: height ?? null,
-    caption: caption ?? null,
-    blurHash: blurHash ?? null,
+    caption: caption || null,
+    blurHash: blurHash || null,
+    audioWaveform: audioWaveform == null ? null : new Uint8Array(audioWaveform),
+    audioDurationSeconds: isAudio(attachment.contentType)
+      ? duration || null
+      : null,
 
     thumbnail: null,
   };
@@ -153,7 +170,7 @@ export async function encryptAndUploadAttachment({
   cdnNumber: number;
   encrypted: EncryptedAttachmentV2;
 }> {
-  let uploadForm: AttachmentUploadFormResponseType;
+  let uploadForm: AttachmentUploadFormType;
   let absoluteCiphertextPath: string | undefined;
 
   try {
@@ -173,7 +190,9 @@ export async function encryptAndUploadAttachment({
         });
         break;
       case 'backup':
-        uploadForm = await backupsService.api.getMediaUploadForm();
+        uploadForm = await backupsService.api.getMediaUploadForm(
+          encrypted.ciphertextSize
+        );
         break;
       default:
         throw missingCaseError(uploadType);
@@ -211,7 +230,7 @@ export async function uploadFile({
 }: {
   absoluteCiphertextPath: string;
   ciphertextFileSize: number;
-  uploadForm: AttachmentUploadFormResponseType;
+  uploadForm: AttachmentUploadFormType;
 }): Promise<void> {
   if (CDNS_SUPPORTING_TUS.has(uploadForm.cdn)) {
     const fetchFn = createFetchForAttachmentUpload(uploadForm);

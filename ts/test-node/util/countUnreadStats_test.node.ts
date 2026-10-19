@@ -3,6 +3,8 @@
 
 import assert from 'node:assert/strict';
 import { v4 as generateUuid } from 'uuid';
+import { MuteExpiration } from '@signalapp/types';
+
 import {
   _canCountConversation,
   _countConversation,
@@ -10,6 +12,7 @@ import {
   _shouldExcludeMuted,
   countAllChatFoldersUnreadStats,
   countAllConversationsUnreadStats,
+  getUnreadCountForBadge,
   isConversationUnread,
 } from '../../util/countUnreadStats.std.ts';
 import type {
@@ -17,17 +20,18 @@ import type {
   ConversationPropsForUnreadStats,
   UnreadStatsIncludeMuted,
 } from '../../util/countUnreadStats.std.ts';
+import type { UnreadCountBadgeType } from '../../types/StorageKeys.std.ts';
 import type { CurrentChatFolder } from '../../types/CurrentChatFolders.std.ts';
 import { CurrentChatFolders } from '../../types/CurrentChatFolders.std.ts';
 import type { ChatFolderId } from '../../types/ChatFolder.std.ts';
 import { CHAT_FOLDER_DEFAULTS } from '../../types/ChatFolder.std.ts';
 
 function getFutureMutedTimestamp() {
-  return Date.now() + 12345;
+  return MuteExpiration.fromNumber(Date.now() + 12345);
 }
 
 function getPastMutedTimestamp() {
-  return Date.now() - 1000;
+  return MuteExpiration.fromNumber(Date.now() - 1000);
 }
 
 type ChatProps = Partial<ConversationPropsForUnreadStats>;
@@ -51,6 +55,7 @@ function mockChat(props: ChatProps): ConversationPropsForUnreadStats {
 function mockStats(props: StatsProps): UnreadStats {
   return {
     unreadCount: 0,
+    unreadChatsCount: 0,
     unreadMentionsCount: 0,
     readChatsMarkedUnreadCount: 0,
     ...props,
@@ -139,22 +144,33 @@ describe('countUnreadStats', () => {
     it('should count unreadCount', () => {
       check({ unreadCount: undefined }, { unreadCount: 0 });
       check({ unreadCount: 0 }, { unreadCount: 0 });
-      check({ unreadCount: 1 }, { unreadCount: 1 });
-      check({ unreadCount: 42 }, { unreadCount: 42 });
+      check({ unreadCount: 1 }, { unreadCount: 1, unreadChatsCount: 1 });
+      check({ unreadCount: 42 }, { unreadCount: 42, unreadChatsCount: 1 });
     });
 
     it('should count unreadMentionsCount', () => {
       check({ unreadMentionsCount: undefined }, { unreadMentionsCount: 0 });
       check({ unreadMentionsCount: 0 }, { unreadMentionsCount: 0 });
-      check({ unreadMentionsCount: 1 }, { unreadMentionsCount: 1 });
-      check({ unreadMentionsCount: 42 }, { unreadMentionsCount: 42 });
+      check(
+        { unreadMentionsCount: 1 },
+        { unreadMentionsCount: 1, unreadChatsCount: 1 }
+      );
+      check(
+        { unreadMentionsCount: 42 },
+        { unreadMentionsCount: 42, unreadChatsCount: 1 }
+      );
     });
 
     it('should count readChatsMarkedUnreadCount', () => {
       const read = { readChatsMarkedUnreadCount: 1 };
-      const unread = { unreadCount: 42, readChatsMarkedUnreadCount: 0 };
+      const unread = {
+        unreadCount: 42,
+        unreadChatsCount: 1,
+        readChatsMarkedUnreadCount: 0,
+      };
       const mentions = {
         unreadMentionsCount: 42,
+        unreadChatsCount: 1,
         readChatsMarkedUnreadCount: 0,
       };
 
@@ -233,25 +249,29 @@ describe('countUnreadStats', () => {
 
       check([read], { unreadCount: 0 });
       check([read, read], { unreadCount: 0 });
-      check([read, unread], { unreadCount: 10 });
+      check([read, unread], { unreadCount: 10, unreadChatsCount: 1 });
 
-      check([unread], { unreadCount: 10 });
-      check([unread, unread], { unreadCount: 20 });
+      check([unread], { unreadCount: 10, unreadChatsCount: 1 });
+      check([unread, unread], { unreadCount: 20, unreadChatsCount: 2 });
 
-      check([mentions], { unreadMentionsCount: 10 });
-      check([mentions, mentions], { unreadMentionsCount: 20 });
+      check([mentions], { unreadMentionsCount: 10, unreadChatsCount: 1 });
+      check([mentions, mentions], {
+        unreadMentionsCount: 20,
+        unreadChatsCount: 2,
+      });
 
       check([markedUnread], { readChatsMarkedUnreadCount: 1 });
       check([markedUnread, markedUnread], { readChatsMarkedUnreadCount: 2 });
       check([unreadAndMarkedUnread], {
         unreadCount: 10,
+        unreadChatsCount: 1,
         readChatsMarkedUnreadCount: 0,
       });
     });
 
     it('should check if each conversation can be counted', () => {
-      const isCounted = { unreadCount: 20 };
-      const isNotCounted = { unreadCount: 10 };
+      const isCounted = { unreadCount: 20, unreadChatsCount: 2 };
+      const isNotCounted = { unreadCount: 10, unreadChatsCount: 1 };
 
       const unread = { unreadCount: 10 };
       const inactive = { ...unread, activeAt: 0 };
@@ -264,6 +284,42 @@ describe('countUnreadStats', () => {
       check([unread, muted], isNotCounted);
       check([unread, muted], isCounted, 'force-include');
       check([unread, left], isNotCounted);
+    });
+  });
+
+  describe('getUnreadCountForBadge', () => {
+    function check(
+      stats: StatsProps,
+      expected: Record<UnreadCountBadgeType, number>
+    ) {
+      const unreadStats = mockStats(stats);
+      assert.equal(
+        getUnreadCountForBadge(unreadStats, 'unread-messages'),
+        expected['unread-messages']
+      );
+      assert.equal(
+        getUnreadCountForBadge(unreadStats, 'unread-chats'),
+        expected['unread-chats']
+      );
+    }
+
+    it('should count unread messages or unread chats', () => {
+      check({}, { 'unread-messages': 0, 'unread-chats': 0 });
+      check(
+        { unreadCount: 20, unreadChatsCount: 2 },
+        { 'unread-messages': 20, 'unread-chats': 2 }
+      );
+    });
+
+    it('should always include chats that are only marked unread', () => {
+      check(
+        { readChatsMarkedUnreadCount: 3 },
+        { 'unread-messages': 3, 'unread-chats': 3 }
+      );
+      check(
+        { unreadCount: 20, unreadChatsCount: 2, readChatsMarkedUnreadCount: 3 },
+        { 'unread-messages': 23, 'unread-chats': 5 }
+      );
     });
   });
 
@@ -324,17 +380,20 @@ describe('countUnreadStats', () => {
       check(chats, [{ folder: empty, stats: null }]);
 
       check(chats, [
-        { folder: all, stats: { unreadCount: 77 } },
-        { folder: allGroups, stats: { unreadCount: 7 } },
-        { folder: allDirect, stats: { unreadCount: 70 } },
+        { folder: all, stats: { unreadCount: 77, unreadChatsCount: 4 } },
+        { folder: allGroups, stats: { unreadCount: 7, unreadChatsCount: 2 } },
+        { folder: allDirect, stats: { unreadCount: 70, unreadChatsCount: 2 } },
       ]);
 
       check(
         chats,
         [
-          { folder: all, stats: { unreadCount: 88 } },
-          { folder: allGroups, stats: { unreadCount: 8 } },
-          { folder: allDirect, stats: { unreadCount: 80 } },
+          { folder: all, stats: { unreadCount: 88, unreadChatsCount: 6 } },
+          { folder: allGroups, stats: { unreadCount: 8, unreadChatsCount: 3 } },
+          {
+            folder: allDirect,
+            stats: { unreadCount: 80, unreadChatsCount: 3 },
+          },
         ],
         'force-include'
       );

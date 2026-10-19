@@ -39,6 +39,7 @@ const {
   isString,
   omit,
   partition,
+  takeWhile,
 } = lodash;
 
 const logging = createLogger('Attachment');
@@ -232,19 +233,12 @@ export function isAudio(attachments?: ReadonlyArray<AttachmentType>): boolean {
   );
 }
 
-export function canDisplayImage(
-  attachments?: ReadonlyArray<AttachmentType>
-): boolean {
-  const { height, width } =
-    attachments && attachments[0] ? attachments[0] : { height: 0, width: 0 };
+export function areDimensionsDisplayable(attachment: AttachmentType): boolean {
+  const { height, width } = attachment;
 
-  return Boolean(
-    height &&
-    height > 0 &&
-    height <= MAX_DISPLAYABLE_IMAGE_HEIGHT &&
-    width &&
-    width > 0 &&
-    width <= MAX_DISPLAYABLE_IMAGE_WIDTH
+  return (
+    (!height || height <= MAX_DISPLAYABLE_IMAGE_HEIGHT) &&
+    (!width || width <= MAX_DISPLAYABLE_IMAGE_WIDTH)
   );
 }
 
@@ -325,12 +319,10 @@ export function isVideoAttachment(
   return isVideoTypeSupported(attachment.contentType);
 }
 
-export function isGIF(attachments?: ReadonlyArray<AttachmentType>): boolean {
-  if (!attachments || attachments.length !== 1) {
+export function isGIF(attachment?: AttachmentType): boolean {
+  if (!attachment) {
     return false;
   }
-
-  const [attachment] = attachments;
 
   const flag = SignalService.AttachmentPointer.Flags.GIF;
   const hasFlag =
@@ -897,6 +889,51 @@ export function partitionBodyAndNormalAttachments<
     bodyAttachment: existingBodyAttachment ?? bodyAttachments[0],
     attachments: normalAttachments,
   };
+}
+
+export function getMessageAttachmentClass(
+  attachments: ReadonlyArray<AttachmentType>
+): 'file' | 'visual-media' | 'gif' | 'audio' | 'voice' | 'unknown' {
+  const first = attachments[0];
+  if (!first) {
+    return 'unknown';
+  }
+  if (isVoiceMessage(first)) {
+    return 'voice';
+  }
+  if (isGIF(first)) {
+    return 'gif';
+  }
+  if (isAudio(attachments)) {
+    return 'audio';
+  }
+  if (isImageAttachment(first) || isVideoAttachment(first)) {
+    return 'visual-media';
+  }
+  return 'file';
+}
+
+export function getValidMessageAttachments(
+  attachments: ReadonlyArray<AttachmentType>
+): ReadonlyArray<AttachmentType> {
+  if (attachments.length <= 1) {
+    return attachments;
+  }
+  const [first] = attachments;
+  if (first == null) {
+    return [];
+  }
+
+  if (getMessageAttachmentClass(attachments) === 'visual-media') {
+    return takeWhile(
+      attachments,
+      attachment =>
+        isImageAttachment(attachment) || isVideoAttachment(attachment)
+    );
+  }
+
+  // For all non-visual-media attachments, we only show the first attachment
+  return [first];
 }
 
 const MESSAGE_ATTACHMENT_TYPES_NEEDING_THUMBNAILS =

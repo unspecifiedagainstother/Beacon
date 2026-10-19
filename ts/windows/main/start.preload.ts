@@ -6,11 +6,11 @@ import { contextBridge } from 'electron';
 import { createLogger } from '../../logging/log.std.ts';
 
 import '../context.preload.ts';
+import '../clipboard.preload.ts';
 
 // Connect websocket early
 import '../../textsecure/preconnect.preload.ts';
 
-import './phase0-devtools.node.ts';
 import './phase1-ipc.preload.ts';
 import '../preload.preload.ts';
 import './phase2-dependencies.preload.ts';
@@ -37,6 +37,7 @@ import { benchmarkConversationOpen } from '../../CI/benchmarkConversationOpen.pr
 import { itemStorage } from '../../textsecure/Storage.preload.ts';
 import { getSelectedConversationId } from '../../state/selectors/nav.std.ts';
 import * as Bytes from '../../Bytes.std.ts';
+import { maybeUpdateRegistrationLock } from '../../util/registrationLock.preload.ts';
 
 const log = createLogger('start');
 
@@ -66,6 +67,12 @@ if (
   const testKey = 'p10bLPYMs6SjewuhrdWUK2hoqR0Jc/+56GuA/+VBZRg=';
 
   const SignalDebug = {
+    async setupRegistrationLock() {
+      await maybeUpdateRegistrationLock(true);
+    },
+    async disableRegistrationLock() {
+      await maybeUpdateRegistrationLock(false);
+    },
     restoreFromSVR2: async (pin: string, expectedKey = testKey) => {
       const result = await restoreFromSVR2({ pin });
 
@@ -131,6 +138,12 @@ if (
     },
     setSfuUrl: async (url: string) => {
       await itemStorage.put('sfuUrl', url);
+    },
+    setGroupSvcMode: async (scalabilityMode: string) => {
+      await itemStorage.put('groupSvcMode', scalabilityMode);
+    },
+    setGroupSvcModeForScreenshare: async (scalabilityMode: string) => {
+      await itemStorage.put('groupSvcModeForScreenshare', scalabilityMode);
     },
     setIceServerOverride: (
       override: GetIceServersResultType | string | undefined

@@ -56,7 +56,7 @@ function isPlainAction(action: unknown): action is UnknownAction {
     typeof action === 'object' &&
     action != null &&
     'type' in action &&
-    typeof (action as { type: unknown }).type === 'string'
+    typeof action.type === 'string'
   );
 }
 
@@ -64,9 +64,7 @@ function lookupMessage(
   state: StateType,
   id: string
 ): ReadonlyMessageAttributesType | undefined {
-  return state.conversations?.messagesLookup?.[id] as
-    | ReadonlyMessageAttributesType
-    | undefined;
+  return state.conversations?.messagesLookup?.[id];
 }
 
 function emitDerivedHooks(
@@ -169,16 +167,14 @@ export const beaconMiddleware: Middleware = storeApi => next => rawAction => {
       continue;
     }
     try {
-      const result = entry.interceptor(
-        action as { type: string; payload?: unknown }
-      );
+      const result = entry.interceptor(action);
       // null cancels; undefined (forgotten return) passes unchanged.
       // oxlint-disable-next-line eqeqeq -- must not match undefined
       if (result === null) {
         return action; // cancelled — reducers never see it
       }
       if (result && typeof result.type === 'string') {
-        action = result as UnknownAction;
+        action = result;
       }
     } catch (error) {
       log.error(`action interceptor for ${entry.type} threw:`, error);

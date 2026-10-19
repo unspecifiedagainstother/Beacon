@@ -31,6 +31,8 @@ import type { LocalBackupExportMetadata } from './LocalExport.std.ts';
 import type { ServerAlertsType } from './ServerAlert.std.ts';
 import type { AssertSameMembers } from './Util.std.ts';
 import type { Emoji } from '../axo/emoji.std.ts';
+import type { PartialRegistrationType } from './StandaloneRegistration.std.ts';
+import type { RegistrationQueueJobState } from '../jobs/registrationJobQueue.preload.ts';
 
 export type AutoDownloadAttachmentType = {
   photos: boolean;
@@ -51,6 +53,8 @@ export type SentMediaQualitySettingType = 'standard' | 'high';
 
 export type NotificationSettingType = 'message' | 'name' | 'count' | 'off';
 
+export type UnreadCountBadgeType = 'unread-messages' | 'unread-chats';
+
 export type IdentityKeyMap = Record<
   ServiceIdString,
   {
@@ -58,6 +62,19 @@ export type IdentityKeyMap = Record<
     pubKey: Uint8Array<ArrayBuffer>;
   }
 >;
+
+export type BlockedGroup = {
+  blockedAt: number | undefined;
+  groupId: string;
+};
+export type BlockedServiceId = {
+  blockedAt: number | undefined;
+  serviceId: ServiceIdString;
+};
+export type BlockedNumber = {
+  blockedAt: number | undefined;
+  e164: string;
+};
 
 // Beacon: keys are generated from the feature registry, so adding a feature
 // does not require editing this file. See ts/beacon/features.std.ts.
@@ -68,10 +85,9 @@ export type StorageAccessType = BeaconStorageKeys & {
   'auto-download-attachment': AutoDownloadAttachmentType;
   autoConvertEmoji: boolean;
   'badge-count-muted-conversations': boolean;
-  'blocked-groups': ReadonlyArray<string>;
-  'blocked-uuids': ReadonlyArray<ServiceIdString>;
+  'blocked-groups': ReadonlyArray<BlockedGroup>;
+  'blocked-uuids': ReadonlyArray<BlockedServiceId>;
   'call-ringtone-notification': boolean;
-  'call-system-notification': boolean;
   lastCallQualitySurveyTime: number;
   lastCallQualityFailureSurveyTime: number;
   cqsTestMode: boolean;
@@ -79,12 +95,13 @@ export type StorageAccessType = BeaconStorageKeys & {
   'incoming-call-notification': boolean;
   'notification-draw-attention': boolean;
   'notification-setting': NotificationSettingType;
+  'reaction-notification': boolean;
   'read-receipt-setting': boolean;
   'sent-media-quality': SentMediaQualitySettingType;
   audioMessage: boolean;
   attachmentMigration_isComplete: boolean;
   attachmentMigration_lastProcessedIndex: number;
-  blocked: ReadonlyArray<string>;
+  blocked: ReadonlyArray<BlockedNumber>;
   defaultConversationColor: DefaultConversationColorType;
 
   customColors: CustomColorsItemType;
@@ -182,6 +199,7 @@ export type StorageAccessType = BeaconStorageKeys & {
   preferredReactionEmoji: ReadonlyArray<Emoji.Variant>;
   emojiSkinToneDefault: Emoji.SkinTone;
   unreadCount: number;
+  unreadCountBadgeType: UnreadCountBadgeType;
   'challenge:conversations': ReadonlyArray<RegisteredChallengeType>;
 
   deviceNameEncrypted: boolean;
@@ -203,6 +221,12 @@ export type StorageAccessType = BeaconStorageKeys & {
   backupsSubscriberOriginalTransactionId: string;
   displayBadgesOnProfile: boolean;
   keepMutedChatsArchived: boolean;
+  notifyForCallsIfMuted: boolean | undefined;
+  notifyForMentionsIfMuted: boolean | undefined;
+  notifyForRepliesIfMuted: boolean | undefined;
+  notifyWhenContactJoins: boolean | undefined;
+  showUnreadReminders: boolean | undefined;
+  unreadRemindersEnabledAt: number;
   usernameLastIntegrityCheck: number;
   usernameCorrupted: boolean;
   usernameLinkCorrupted: boolean;
@@ -230,6 +254,8 @@ export type StorageAccessType = BeaconStorageKeys & {
   releaseNotesNextFetchTime: number;
   releaseNotesVersionWatermark: string;
   releaseNotesPreviousManifestHash: string;
+  releaseNotesChatBlocked: boolean;
+  releaseNotesChatBlockedAt: number | undefined;
 
   // If present - we are downloading backup
   backupDownloadPath: string;
@@ -237,6 +263,9 @@ export type StorageAccessType = BeaconStorageKeys & {
   // If present together with backupDownloadPath - we are downloading
   // link-and-sync backup
   backupEphemeralKey: Uint8Array<ArrayBuffer>;
+
+  // Should be present when linked/registered without PNI/E164
+  authCredentialSalt: Uint8Array<ArrayBuffer>;
 
   // If present - we are resuming the download of known transfer archive
   backupTransitArchive: {
@@ -259,11 +288,15 @@ export type StorageAccessType = BeaconStorageKeys & {
   restoredBackupFirstAppVersion: string;
 
   // When Desktop is standalone, we use these. Otherwise, only used for backup.
-  svrPin: string;
+  svrPin: string | undefined;
+  isSvrPinStored: boolean;
+  pinReminders: boolean | undefined;
+  pinReminderLastCompleted: number | undefined;
+  pinReminderNextInterval: number | undefined;
+  registrationLock: boolean | undefined;
 
   // Stored solely for persistence during import/export sequence
   optimizeOnDeviceStorage: boolean;
-  pinReminders: boolean | undefined;
   screenLockTimeoutMinutes: number | undefined;
   'auto-download-attachment-primary':
     | undefined
@@ -278,6 +311,9 @@ export type StorageAccessType = BeaconStorageKeys & {
   allowSealedSenderFromAnyone: unknown;
 
   postRegistrationSyncsStatus: 'incomplete' | 'complete';
+  standaloneRegistrationPartialState: PartialRegistrationType | undefined;
+  registrationJobQueueState: RegistrationQueueJobState | undefined; // base64
+  temporaryRegistrationMasterKey: string | undefined;
 
   avatarsHaveBeenMigrated: boolean;
 
@@ -309,11 +345,15 @@ export type StorageAccessType = BeaconStorageKeys & {
 
   // Used for manually controlling calling settings
   dredDuration: number | undefined;
-  isDirectVp9Enabled: boolean | undefined;
+  enableVp9Encode: boolean | undefined;
+  enableVp9Decode: boolean | undefined;
   directMaxBitrate: number | undefined;
-  isGroupVp9Enabled: boolean | undefined;
   groupMaxBitrate: number | undefined;
+  isGroupSvcEnabled: boolean | undefined;
+  groupSvcMode: string | undefined;
+  groupSvcModeForScreenshare: string | undefined;
   sfuUrl: string | undefined;
+  callStatsIntervalSecs: number | undefined;
 
   // Deprecated
   'challenge:retry-message-ids': never;
@@ -334,6 +374,9 @@ export type StorageAccessType = BeaconStorageKeys & {
   callQualitySurveyCooldownDisabled: never;
   localDeleteWarningShown: never;
   backupKeyViewed: never;
+  isDirectVp9Enabled: never;
+  isGroupVp9Enabled: never;
+  'call-system-notification': never;
 };
 
 export const STORAGE_KEYS_TO_PRESERVE_AFTER_UNLINK = [
@@ -349,7 +392,6 @@ export const STORAGE_KEYS_TO_PRESERVE_AFTER_UNLINK = [
   // around them. Generated from the registry — no edit needed per feature.
   ...BEACON_FEATURE_KEYS,
   'call-ringtone-notification',
-  'call-system-notification',
   'customColors',
   'defaultConversationColor',
   'existingOnboardingStoryMessageIds',
@@ -366,11 +408,13 @@ export const STORAGE_KEYS_TO_PRESERVE_AFTER_UNLINK = [
   'preferred-video-input-device',
   'preferredLeftPaneWidth',
   'preferredReactionEmoji',
+  'reaction-notification',
   'sent-media-quality',
   'showStickerPickerHint',
   'showStickersIntroduction',
   'emojiSkinToneDefault',
   'textFormatting',
+  'unreadCountBadgeType',
   'zoomFactor',
 
   // Bookkeeping keys
@@ -404,6 +448,11 @@ export const STORAGE_KEYS_TO_PRESERVE_AFTER_UNLINK = [
   'universalExpireTimer',
   'displayBadgesOnProfile',
   'keepMutedChatsArchived',
+  'notifyForCallsIfMuted',
+  'notifyForMentionsIfMuted',
+  'notifyForRepliesIfMuted',
+  'notifyWhenContactJoins',
+  'showUnreadReminders',
   'hasSetMyStoriesPrivacy',
   'hasViewedOnboardingStory',
   'hasKeyTransparencyDisabled',
@@ -434,6 +483,8 @@ export const STORAGE_KEYS_TO_PRESERVE_WHEN_PRIMARY = [
   'blocked-uuids',
   'read-receipt-setting',
   'blocked',
+  'releaseNotesChatBlocked',
+  'releaseNotesChatBlockedAt',
   'device_name',
   'seenPinMessageDisappearingMessagesWarningCount',
   'usernameLastIntegrityCheck',
@@ -446,11 +497,17 @@ export const STORAGE_KEYS_TO_PRESERVE_WHEN_PRIMARY = [
   'sendEditWarningShown',
   'formattingWarningShown',
   'localDeleteWarningShown',
+  'masterKey',
+  'linkPreviews',
+  'typingIndicators',
+  'manifestRecordIkm',
+  'unidentifiedDeliveryIndicators',
 ] as const satisfies ReadonlyArray<keyof StorageAccessType>;
 
 const STORAGE_KEYS_TO_REMOVE_AFTER_UNLINK = [
   // Beacon: message-logger index — references this account's messages.
   'beaconMessageLog',
+  'unreadRemindersEnabledAt',
   'lastCallQualitySurveyTime',
   'lastCallQualityFailureSurveyTime',
   'cqsTestMode',
@@ -461,7 +518,6 @@ const STORAGE_KEYS_TO_REMOVE_AFTER_UNLINK = [
   'lastAttemptedToRefreshProfilesAt',
   'lastResortKeyUpdateTime',
   'lastResortKeyUpdateTimePNI',
-  'masterKey',
   'accountEntropyPoolLastRequestTime',
   'maxPreKeyId',
   'maxPreKeyIdPNI',
@@ -470,6 +526,7 @@ const STORAGE_KEYS_TO_REMOVE_AFTER_UNLINK = [
   'password',
   'regionCode',
   'registrationIdMap',
+  'registrationLock',
   'remoteBuildExpiration',
   'sessionResets',
   'signedKeyId',
@@ -480,15 +537,12 @@ const STORAGE_KEYS_TO_REMOVE_AFTER_UNLINK = [
   'synced_at',
   'userAgent',
   'useRingrtcAdm',
-  'linkPreviews',
   'retryPlaceholders',
   'donationPermits',
   'donationWorkflow',
   'chromiumRegistrationDone',
-  'typingIndicators',
   'storageFetchComplete',
   'manifestVersion',
-  'manifestRecordIkm',
   'storageCredentials',
   'storage-service-error-records',
   'storage-service-unknown-records',
@@ -496,7 +550,6 @@ const STORAGE_KEYS_TO_REMOVE_AFTER_UNLINK = [
   'remoteConfig',
   'remoteConfigHash',
   'serverTimeSkew',
-  'unidentifiedDeliveryIndicators',
   'groupCredentials',
   'callLinkAuthCredentials',
   'backupCombinedCredentials',
@@ -531,12 +584,16 @@ const STORAGE_KEYS_TO_REMOVE_AFTER_UNLINK = [
   'releaseNotesPreviousManifestHash',
   'backupDownloadPath',
   'backupEphemeralKey',
+  'authCredentialSalt',
   'backupTransitArchive',
   'backupTier',
   'cloudBackupStatus',
   'backupSubscriptionStatus',
   'isRestoredFromBackup',
   'postRegistrationSyncsStatus',
+  'standaloneRegistrationPartialState',
+  'registrationJobQueueState',
+  'temporaryRegistrationMasterKey',
   'avatarsHaveBeenMigrated',
   'lastDistinguishedTreeHead',
   'keyTransparencySelfHealth',
@@ -557,13 +614,23 @@ const STORAGE_KEYS_TO_REMOVE_AFTER_UNLINK = [
   'callQualitySurveyCooldownDisabled',
   'dredDuration',
   'directMaxBitrate',
-  'isDirectVp9Enabled',
+  'enableVp9Encode',
+  'enableVp9Decode',
+  'callStatsIntervalSecs',
   'groupMaxBitrate',
+  'isGroupSvcEnabled',
+  'groupSvcMode',
+  'groupSvcModeForScreenshare',
+  'isDirectVp9Enabled',
   'isGroupVp9Enabled',
   'sfuUrl',
   'svrPin',
+  'isSvrPinStored',
+  'pinReminderLastCompleted',
+  'pinReminderNextInterval',
   'backupKeyViewed',
   'payments',
+  'call-system-notification',
 ] as const satisfies ReadonlyArray<keyof StorageAccessType>;
 
 // Ensure every storage key is explicitly marked to be preserved or removed on unlink.
@@ -604,3 +671,17 @@ export type AssertStorageUnlinkKeysAreExhaustive = AssertTrue<
     keyof StorageAccessType
   >
 >;
+
+export const STORAGE_KEY_DEFAULTS = {
+  'audio-notification': false,
+  'badge-count-muted-conversations': false,
+  'notification-draw-attention': false,
+  'notification-setting': 'message',
+  'reaction-notification': true,
+  audioMessage: false,
+  notifyForCallsIfMuted: undefined,
+  notifyForMentionsIfMuted: undefined,
+  notifyForRepliesIfMuted: undefined,
+  showUnreadReminders: undefined,
+  unreadCountBadgeType: 'unread-messages',
+} as const satisfies Partial<StorageAccessType>;

@@ -1,6 +1,6 @@
 // Copyright 2025 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import type { FC, ReactNode } from 'react';
 import { Select } from 'radix-ui';
 import { AxoBaseMenu } from './_internal/AxoBaseMenu.dom.tsx';
@@ -158,8 +158,10 @@ export namespace AxoSelect {
     'group relative inline-flex items-center',
     'rounded-full text-start type-body-medium font-medium text-primary',
     'disabled:text-disabled',
-    'outline-none keyboard-mode:focus:axo-focus-ring',
-    'forced-colors:border'
+    'focus-visible:axo-focus-ring',
+    'forced-colors:border',
+    'forced-colors:text-[ButtonText]',
+    'disabled:forced-colors:text-[GrayText]'
   );
 
   const TriggerVariants = variants<TriggerVariant>('AxoSelect.TriggerVariant', {
@@ -224,6 +226,10 @@ export namespace AxoSelect {
 
   export type TriggerProps = Readonly<{
     /**
+     * HTML `id` used to associate a `<label htmlFor={id}>` with this button.
+     */
+    id?: string;
+    /**
      * Visual style of the button. Defaults to `default`.
      */
     variant?: TriggerVariant;
@@ -252,16 +258,23 @@ export namespace AxoSelect {
    * trigger.
    */
   export const Trigger: FC<TriggerProps> = memo(props => {
+    const { placeholder } = props;
     const variant = props.variant ?? 'default';
     const width = props.width ?? 'fit';
     const chevron = props.chevron ?? 'always';
+
+    const placeholderOrEmpty = useMemo(() => {
+      return placeholder === '' ? <>&nbsp;</> : placeholder;
+    }, [placeholder]);
+
     return (
       <Select.Trigger
+        id={props.id}
         className={tw(TriggerVariants.get(variant), TriggerWidths.get(width))}
       >
         <div className={TriggerChevronContentStyles.get(chevron)}>
           <AxoBaseMenu.ItemText>
-            <Select.Value placeholder={props.placeholder}>
+            <Select.Value placeholder={placeholderOrEmpty}>
               {props.children}
             </Select.Value>
           </AxoBaseMenu.ItemText>
@@ -392,7 +405,7 @@ export namespace AxoSelect {
      * Optional leading icon. If one item has an icon, prefer to give all items
      * an icon.
      */
-    symbol?: AxoSymbol.IconName;
+    symbol?: AxoSymbol.Name;
     /**
      * Should be an `ItemText`, optionally followed by an
      * `ExperimentalItemBadge`.

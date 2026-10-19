@@ -1,8 +1,10 @@
 // Copyright 2024 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
-
+// oxlint-disable max-classes-per-file
 import { existsSync } from 'node:fs';
 import { PassThrough } from 'node:stream';
+
+import { ErrorCode, LibSignalErrorBase } from '@signalapp/libsignal-client';
 
 import * as durations from '../util/durations/index.std.ts';
 import { createLogger } from '../logging/log.std.ts';
@@ -27,7 +29,7 @@ import {
 } from '../AttachmentCrypto.node.ts';
 import {
   getBackupMediaRootKey,
-  deriveBackupMediaKeyMaterial,
+  deriveBackupMediaEncryptionKey,
   deriveBackupThumbnailTransitKeyMaterial,
 } from '../services/backups/crypto.preload.ts';
 import {
@@ -40,11 +42,12 @@ import { isInCall as isInCallSelector } from '../state/selectors/calling.std.ts'
 import { encryptAndUploadAttachment } from '../util/uploadAttachment.preload.ts';
 import { getAttachmentCiphertextSize } from '../util/AttachmentCrypto.std.ts';
 import {
+  type MediaIdType,
   getMediaIdFromMediaName,
   getMediaNameForAttachmentThumbnail,
 } from '../services/backups/util/mediaId.preload.ts';
 import { fromBase64, toBase64 } from '../Bytes.std.ts';
-import { backupMediaBatch as doBackupMediaBatch } from '../textsecure/WebAPI.preload.ts';
+import { copyBackupMedia as doCopyBackupMedia } from '../textsecure/WebAPI.preload.ts';
 import type { AttachmentType } from '../types/Attachment.std.ts';
 import { canAttachmentHaveThumbnail } from '../util/Attachment.std.ts';
 import { mightStillBeOnTransitTier } from '../util/mightStillBeOnTransitTier.dom.ts';
@@ -179,13 +182,12 @@ function getJobIdForLogging(job: CoreAttachmentBackupJobType): string {
 /**
  * Backup-specific methods
  */
-// oxlint-disable-next-line max-classes-per-file
 class AttachmentPermanentlyMissingError extends Error {}
 class FileNotFoundOnTransitTierError extends Error {}
 
 type RunAttachmentBackupJobDependenciesType = {
   getAbsoluteAttachmentPath: typeof doGetAbsoluteAttachmentPath;
-  backupMediaBatch?: typeof doBackupMediaBatch;
+  copyBackupMedia?: typeof doCopyBackupMedia;
   backupsService: BackupsService;
   encryptAndUploadAttachment: typeof encryptAndUploadAttachment;
   decryptAttachmentV2ToSink: typeof decryptAttachmentV2ToSink;
@@ -200,7 +202,7 @@ export async function runAttachmentBackupJob(
   dependencies: RunAttachmentBackupJobDependenciesType = {
     getAbsoluteAttachmentPath: doGetAbsoluteAttachmentPath,
     backupsService,
-    backupMediaBatch: doBackupMediaBatch,
+    copyBackupMedia: doCopyBackupMedia,
     encryptAndUploadAttachment,
     decryptAttachmentV2ToSink,
   }
@@ -219,6 +221,16 @@ export async function runAttachmentBackupJob(
     if (error instanceof AttachmentPermanentlyMissingError) {
       log.error(`${logId}: Attachment unable to be found, giving up on job`);
       return { status: 'finished' };
+    }
+
+    if (
+      error instanceof LibSignalErrorBase &&
+      error.is(ErrorCode.RateLimitedError)
+    ) {
+      return {
+        status: 'rate-limited',
+        pauseDurationMs: error.retryAfterSecs * durations.SECOND,
+      };
     }
 
     if (
@@ -278,7 +290,7 @@ async function backupStandardAttachment(
     job.data;
 
   const mediaId = getMediaIdFromMediaName(job.mediaName);
-  const backupKeyMaterial = deriveBackupMediaKeyMaterial(
+  const encryptionKey = deriveBackupMediaEncryptionKey(
     getBackupMediaRootKey(),
     mediaId.bytes
   );
@@ -295,8 +307,8 @@ async function backupStandardAttachment(
           cdnKey: transitCdnKey,
           cdnNumber: transitCdnNumber,
           size,
-          mediaId: mediaId.string,
-          ...backupKeyMaterial,
+          mediaId,
+          encryptionKey,
           dependencies,
         });
         log.info(`${logId}: copied to backup tier successfully`);
@@ -345,8 +357,8 @@ async function backupStandardAttachment(
     cdnKey: uploadResult.cdnKey,
     cdnNumber: uploadResult.cdnNumber,
     size,
-    mediaId: mediaId.string,
-    ...backupKeyMaterial,
+    mediaId,
+    encryptionKey,
     dependencies,
   });
 }
@@ -360,7 +372,7 @@ async function backupThumbnailAttachment(
 
   const mediaId = getMediaIdFromMediaName(job.mediaName);
 
-  const backupKeyMaterial = deriveBackupMediaKeyMaterial(
+  const encryptionKey = deriveBackupMediaEncryptionKey(
     getBackupMediaRootKey(),
     mediaId.bytes
   );
@@ -436,9 +448,9 @@ async function backupThumbnailAttachment(
   await copyToBackupTier({
     cdnKey: uploadResult.cdnKey,
     cdnNumber: uploadResult.cdnNumber,
-    mediaId: mediaId.string,
+    mediaId,
     size: thumbnail.data.byteLength,
-    ...backupKeyMaterial,
+    encryptionKey,
     dependencies,
   });
 }
@@ -554,64 +566,59 @@ async function uploadThumbnailToTransitTier({
   }
 }
 
-export const FILE_NOT_FOUND_ON_TRANSIT_TIER_STATUS = 410;
-
 async function copyToBackupTier({
   cdnNumber,
   cdnKey,
   size,
   mediaId,
-  macKey,
-  aesKey,
+  encryptionKey,
   dependencies,
 }: {
   cdnNumber: number;
   cdnKey: string;
   size: number;
-  mediaId: string;
-  macKey: Uint8Array<ArrayBuffer>;
-  aesKey: Uint8Array<ArrayBuffer>;
+  mediaId: MediaIdType;
+  encryptionKey: Uint8Array<ArrayBuffer>;
   dependencies: {
-    backupMediaBatch?: typeof doBackupMediaBatch;
+    copyBackupMedia?: typeof doCopyBackupMedia;
     backupsService: BackupsService;
   };
 }): Promise<{ cdnNumberOnBackup: number }> {
   strictAssert(
-    dependencies.backupMediaBatch,
-    'backupMediaBatch must be intialized'
+    dependencies.copyBackupMedia,
+    'copyBackupMedia must be intialized'
   );
   const ciphertextSizeOnTransitTier = getAttachmentCiphertextSize({
     unpaddedPlaintextSize: size,
     mediaTier: MediaTier.STANDARD,
   });
 
-  const { responses } = await dependencies.backupMediaBatch({
-    headers: await dependencies.backupsService.credentials.getHeadersForToday(
-      BackupCredentialType.Media
-    ),
+  const backupAuth = await dependencies.backupsService.credentials.getForToday(
+    BackupCredentialType.Media
+  );
+
+  const outcomes = await dependencies.copyBackupMedia({
+    auth: backupAuth,
     items: [
       {
-        sourceAttachment: {
-          cdn: cdnNumber,
-          key: cdnKey,
-        },
+        sourceAttachmentCdn: cdnNumber,
+        sourceKey: cdnKey,
         objectLength: ciphertextSizeOnTransitTier,
-        mediaId,
-        hmacKey: macKey,
-        encryptionKey: aesKey,
+        mediaId: mediaId.bytes,
+        encryptionKey,
       },
     ],
   });
 
-  const response = responses[0];
-  strictAssert(response, 'Missing response');
-  if (!response.isSuccess) {
-    if (response.status === FILE_NOT_FOUND_ON_TRANSIT_TIER_STATUS) {
+  const outcome = outcomes[0];
+  strictAssert(outcome, 'Missing outcome');
+
+  const { result } = outcome;
+  if (typeof result !== 'object') {
+    if (result === 'sourceNotFound') {
       throw new FileNotFoundOnTransitTierError();
     }
-    throw new Error(
-      `copyToBackupTier failed: ${response.failureReason}, code: ${response.status}`
-    );
+    throw new Error(`copyToBackupTier failed: ${result}`);
   }
 
   // Update our local understanding of what's in the backup cdn
@@ -622,13 +629,13 @@ async function copyToBackupTier({
 
   await DataWriter.saveBackupCdnObjectMetadata([
     {
-      mediaId,
-      cdnNumber: response.cdn,
+      mediaId: mediaId.string,
+      cdnNumber: result.cdn,
       sizeOnBackupCdn: ciphertextSizeOnBackupTier,
     },
   ]);
 
   return {
-    cdnNumberOnBackup: response.cdn,
+    cdnNumberOnBackup: result.cdn,
   };
 }

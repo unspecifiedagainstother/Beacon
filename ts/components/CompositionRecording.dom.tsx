@@ -57,6 +57,7 @@ export function CompositionRecording({
     return () => hideToast(toast);
   }, [showToast, hideToast]);
 
+  // oxlint-disable-next-line react/purity
   const startTime = useRef(Date.now());
   const [duration, setDuration] = useState(0);
   const drift = useRef(0);
@@ -79,7 +80,11 @@ export function CompositionRecording({
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [duration, errorRecording]);
+  }, [
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
+    duration,
+    errorRecording,
+  ]);
 
   let confirmationDialog: JSX.Element | undefined;
   if (errorDialogAudioRecorderType === ErrorDialogAudioRecorderType.Timeout) {
@@ -131,7 +136,7 @@ export function CompositionRecording({
           return (
             <b
               key={index}
-              style={{ height: `${value * 100}%` }}
+              style={{ height: `${(value / 255) * 100}%` }}
               className={tw(
                 'rounded-sm bg-(--axo-color-label-placeholder) p-px'
               )}

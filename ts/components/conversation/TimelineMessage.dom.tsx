@@ -2,12 +2,18 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import classNames from 'classnames';
-import lodash from 'lodash';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useState,
+} from 'react';
 import type { ReactNode, ComponentProps, JSX, MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { Manager, Popper, Reference } from 'react-popper';
 import type { PreventOverflowModifier } from '@popperjs/core/lib/modifiers/preventOverflow.js';
+import { tinykeys } from 'tinykeys';
 import { isDownloaded } from '../../util/Attachment.std.ts';
 import type { LocalizerType } from '../../types/I18N.std.ts';
 import { handleOutsideClick } from '../../util/handleOutsideClick.dom.ts';
@@ -23,7 +29,7 @@ import type {
 } from './Message.dom.tsx';
 import type { PushPanelForConversationActionType } from '../../state/ducks/conversations.preload.ts';
 import { doesMessageBodyOverflow } from './MessageBodyReadMore.dom.tsx';
-import { useToggleReactionPicker } from '../../hooks/useKeyboardShortcuts.dom.tsx';
+import { useHasAnyOverlay } from '../../hooks/useKeyboardShortcuts.dom.tsx';
 import { PanelType } from '../../types/Panels.std.ts';
 import type {
   DeleteMessagesPropsType,
@@ -36,12 +42,9 @@ import { useGroupedAndOrderedReactions } from '../../util/groupAndOrderReactions
 import { isNotNil } from '../../util/isNotNil.std.ts';
 import type { AxoMenuBuilder } from '../../axo/AxoMenuBuilder.dom.tsx';
 import { AxoContextMenu } from '../../axo/AxoContextMenu.dom.tsx';
-import { useDocumentKeyDown } from '../../hooks/useDocumentKeyDown.dom.ts';
 import type { Emoji } from '../../axo/emoji.std.ts';
 
 const { useAxoContextMenuOutsideKeyboardTrigger } = AxoContextMenu;
-
-const { noop } = lodash;
 
 export type PropsData = {
   canDownload: boolean;
@@ -55,7 +58,7 @@ export type PropsData = {
   canReply: boolean;
   canPinMessage: boolean;
   selectedReaction?: Emoji.Variant;
-  isTargeted?: boolean;
+  isTargeted: boolean;
   isSignalConversation: boolean;
 } & Omit<MessagePropsData, 'renderingContext' | 'menu'>;
 
@@ -88,6 +91,7 @@ export type PropsActions = {
     messageId: string,
     isPinningDisappearingMessage: boolean
   ) => void;
+  handleClickCtaButton: (callToActionId: string) => void;
   handleDebugMessage: () => void;
 } & Omit<MessagePropsActions, 'onToggleSelect' | 'onReplyToMessage'>;
 
@@ -298,15 +302,25 @@ export function TimelineMessage(props: Props): JSX.Element {
     onPinnedMessageRemove(id);
   }, [onPinnedMessageRemove, id]);
 
-  const toggleReactionPickerKeyboard = useToggleReactionPicker(
-    handleReact || noop
-  );
+  const hasOverlay = useHasAnyOverlay();
 
-  useDocumentKeyDown(event => {
-    if (isTargeted) {
-      toggleReactionPickerKeyboard(event);
+  const onReactShortcut = useEffectEvent((event: KeyboardEvent) => {
+    if (hasOverlay) {
+      return;
     }
+    if (!isTargeted) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    handleReact();
   });
+
+  useEffect(() => {
+    return tinykeys(window, {
+      '$mod+Shift+E': onReactShortcut,
+    });
+  }, []);
 
   const groupedReactions = useGroupedAndOrderedReactions(
     props.reactions,
@@ -527,17 +541,15 @@ function MessageMenu({
                   : undefined;
 
                 return (
-                  // FIXME: Menus should be keyboard accessible
-                  // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus
-                  <div
+                  <button
                     ref={maybePopperRef}
+                    type="button"
                     onClick={(event: MouseEvent) => {
                       event.stopPropagation();
                       event.preventDefault();
 
                       onReact();
                     }}
-                    role="button"
                     className="module-message__buttons__react"
                     aria-label={i18n('icu:reactToMessage')}
                     onDoubleClick={ev => {
@@ -551,11 +563,9 @@ function MessageMenu({
           )}
 
           {onDownload && (
-            // FIXME: Menus should be keyboard accessible
-            // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus
-            <div
+            <button
+              type="button"
               onClick={onDownload}
-              role="button"
               aria-label={i18n('icu:downloadAttachment')}
               className={classNames(
                 'module-message__buttons__download',
@@ -569,16 +579,14 @@ function MessageMenu({
           )}
 
           {onReplyToMessage && (
-            // FIXME: Menus should be keyboard accessible
-            // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus
-            <div
+            <button
+              type="button"
               onClick={(event: MouseEvent) => {
                 event.stopPropagation();
                 event.preventDefault();
 
                 onReplyToMessage();
               }}
-              role="button"
               aria-label={i18n('icu:replyToMessage')}
               className={classNames(
                 'module-message__buttons__reply',

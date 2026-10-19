@@ -101,11 +101,8 @@
       );
     }
 
-    &:focus {
-      outline: none;
-      @include mixins.keyboard-mode {
-        @include mixins.axo-focus-ring;
-      }
+    &:focus-visible {
+      @include mixins.axo-focus-ring;
     }
 
     &__icon {
@@ -241,13 +238,11 @@
       );
     }
 
-    @include mixins.keyboard-mode {
-      &:focus {
-        background-color: light-dark(
-          variables.$color-gray-02,
-          variables.$color-gray-80
-        );
-      }
+    &:focus-visible {
+      background-color: light-dark(
+        variables.$color-gray-02,
+        variables.$color-gray-80
+      );
     }
 
     // Currently only one time donations are possible
@@ -437,11 +432,8 @@
     background: light-dark(variables.$color-gray-04, variables.$color-gray-80);
   }
 
-  &:focus {
-    outline: none;
-    @include mixins.keyboard-mode {
-      @include mixins.axo-focus-ring;
-    }
+  &:focus-visible {
+    @include mixins.axo-focus-ring;
   }
 
   display: flex;

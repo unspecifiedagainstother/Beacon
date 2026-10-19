@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { useEffect, useState, type JSX } from 'react';
-import lodash from 'lodash';
+import lodash, { omit } from 'lodash';
 
 import { createPortal } from 'react-dom';
 import type { AttachmentType } from '../types/Attachment.std.ts';
@@ -33,6 +33,7 @@ function usePortalElement(testid: string): HTMLDivElement | null {
     const div = document.createElement('div');
     div.dataset.testid = testid;
     document.body.appendChild(div);
+    // oxlint-disable-next-line react/set-state-in-effect
     setElement(div);
     return () => {
       document.body.removeChild(div);
@@ -178,7 +179,7 @@ export function StoryCreator({
             })
           );
           attachment = {
-            ...draft,
+            ...omit(draft, 'screenshotData'),
             screenshot: {
               contentType: draft.screenshotContentType,
               url,
@@ -210,6 +211,7 @@ export function StoryCreator({
   useEffect(() => {
     if (draftAttachment === undefined) {
       sendStoryModalOpenStateChanged(false);
+      // oxlint-disable-next-line react/set-state-in-effect
       setIsReadyToSend(false);
     } else {
       sendStoryModalOpenStateChanged(true);

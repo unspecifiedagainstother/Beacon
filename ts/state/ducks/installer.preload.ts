@@ -38,6 +38,7 @@ import {
 } from '../../util/isRelinkingToSameAccount.std.ts';
 import { cancelRegistration } from './standaloneInstaller.preload.ts';
 import type { CancelWorkflowActionType } from './standaloneInstaller.preload.ts';
+import { enableStorageService } from '../../services/storage.preload.ts';
 
 const log = createLogger('installer');
 
@@ -192,6 +193,7 @@ function startInstaller(): ThunkAction<
 
     window.IPC.addSetupMenuItems();
     dispatch(cancelRegistration());
+    enableStorageService('ducks/installer: startInstaller');
 
     dispatch({
       type: START_INSTALLER,
@@ -290,15 +292,15 @@ function startInstaller(): ThunkAction<
         if (
           !isCleanStart({
             existingAci: itemStorage.user.getAci(),
-            existingPni: itemStorage.user.getPni(),
-            existingNumber: itemStorage.user.getNumber(),
+            existingPni: itemStorage.user.getOptionalPni(),
+            existingNumber: itemStorage.user.getOptionalNumber(),
             registrationEverDone: Registration.everDone(),
           }) &&
           !isRelinkingToSameAccount({
             newAci: envelope.aci,
             newNumber: envelope.number,
             previousAci: itemStorage.user.getAci(),
-            previousNumber: itemStorage.user.getNumber(),
+            previousNumber: itemStorage.user.getOptionalNumber(),
           })
         ) {
           log.warn(

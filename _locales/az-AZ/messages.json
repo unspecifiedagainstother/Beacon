@@ -11,6 +11,9 @@
   "icu:AxoDialog.Close": {
     "messageformat": "Bağla"
   },
+  "icu:AxoPasswordField.Reveal": {
+    "messageformat": "Parolu göstər"
+  },
   "icu:AxoTextField.Clear": {
     "messageformat": "Təmizlə"
   },
@@ -61,6 +64,24 @@
   },
   "icu:Preferences__DonateTitle": {
     "messageformat": "Signal-a ianə verin"
+  },
+  "icu:LinkedDevicesOnboardingDialog__description": {
+    "messageformat": "<bold>Əlaqələndirilmiş cihazlar</bold> istənilən əlavə cihazınızdan Signal hesabınıza və mesajlara təhlükəsiz giriş imkanı verir."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--1": {
+    "messageformat": "Masaüstü kompüteri, planşeti və ya əlavə bir telefonu əlaqələndirə bilərsiniz."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--2": {
+    "messageformat": "Əsas cihazınız əlaqələndirilən cihazları idarə edir, 5 ədədə qədər cihazı əlaqələndirə bilərsiniz."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3": {
+    "messageformat": "Hesab parametrləri və ehtiyat nüsxələr daxil parametrlər yalnız əsas cihazınızdan idarə oluna bilər."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--1": {
+    "messageformat": "Hesab parametrləri və ehtiyat nüsxələr yalnız əsas cihazınızdan idarə oluna bilər."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--2": {
+    "messageformat": "Hesab parametrləri və Signal təhlükəsiz ehtiyat nüsxələri yalnız əsas cihazınızdan idarə oluna bilər."
   },
   "icu:sentMediaQualityStandard": {
     "messageformat": "Standard"
@@ -317,11 +338,8 @@
   "icu:LeftPaneChatFolders__ItemLabel--All": {
     "messageformat": "Bütün çatlar"
   },
-  "icu:LeftPaneChatFolders__ItemUnreadBadge__MaxCount": {
-    "messageformat": "{maxCount,number}+"
-  },
   "icu:LeftPaneChatFolders__ItemUnreadBadge__AccessibleLabel": {
-    "messageformat": "{count, plural, one {{count,number} Unread Message} other {{count,number} Unread Messages}}"
+    "messageformat": "{count, plural, one {{count,number} oxunmamış mesaj} other {{count,number} oxunmamış mesaj}}"
   },
   "icu:LeftPaneChatFolders__Item__ContextMenu__MarkAllRead": {
     "messageformat": "Hamısını oxundu olaraq işarələ"
@@ -364,9 +382,6 @@
   },
   "icu:NavTabs__ItemIconLabel--UnreadCount": {
     "messageformat": "{count,number} oxunmamış"
-  },
-  "icu:NavTabs__ItemIconLabel--MarkedUnread": {
-    "messageformat": "Oxunmamış kimi işarələndi"
   },
   "icu:NavTabs__ItemLabel--Chats": {
     "messageformat": "Çatlar"
@@ -635,20 +650,23 @@
   "icu:SafetyNumberNotReady__learn-more": {
     "messageformat": "Daha ətraflı"
   },
-  "icu:KeyTransparencyErrorDialog__Title": {
-    "messageformat": "Avtomatik şifrə yoxlama cihazınız üçün hazırda qeyri-aktivdir. Sazlama jurnalı göndərilsin?"
+  "icu:KeyTransparencyErrorDialog__Title-v2": {
+    "messageformat": "Avtomatik şifrə yoxlama cihazınız üçün hazırda qeyri-aktivdir. Təkmilləşdirməyə kömək üçün bizə bildiriş göndərilsin?"
   },
-  "icu:KeyTransparencyErrorDialog__Description": {
-    "messageformat": "Sazlama jurnalları bizə problemi təyin edib aradan qaldırmaqda kömək edir və kimlik məlumatlarını əhatə etmir."
+  "icu:KeyTransparencyErrorDialog__Description-v2": {
+    "messageformat": "Sazlama jurnallarını əlavə etmək bizə problemi təyin edib, aradan qaldırmaqda kömək edir və kimlik məlumatlarını əhatə etmir. Paylaşmaq seçiminizdən asılıdır."
   },
-  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label": {
-    "messageformat": "Sazlama jurnalını paylaşın"
+  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label-v2": {
+    "messageformat": "Sazlama jurnalını əlavə et"
   },
   "icu:KeyTransparencyErrorDialog__ShareDebugLog__ViewButton": {
     "messageformat": "Baxış"
   },
   "icu:KeyTransparencyErrorDialog__Submit": {
     "messageformat": "Təqdim et"
+  },
+  "icu:KeyTransparencyErrorDialog__Cancel": {
+    "messageformat": "Xeyr, təşəkkürlər"
   },
   "icu:KeyTransparencyOnboardingDialog__Title": {
     "messageformat": "Artıq Signal şifrələməni avtomatik yoxlaya bilir"
@@ -746,11 +764,11 @@
   "icu:maximumAttachments": {
     "messageformat": "Bu mesaja daha çox qoşma əlavə edə bilməzsiniz."
   },
-  "icu:fileSizeWarning": {
-    "messageformat": "Təəssüf ki, seçilmiş fayl, mesaj həcm məhdudiyyətlərini aşır. {limit,number} {units}"
+  "icu:fileTooLargeWarning": {
+    "messageformat": "Faylın həcmi çox böyük olduğu üçün göndərmək mümkün olmadı. {limit,number}{units} həcminə qədər olan faylları göndərə bilərsiniz."
   },
-  "icu:videoFileSizeWarning": {
-    "messageformat": "Təəssüf ki, seçilmiş video faylı mesaj həcminə qoyulmuş məhdudiyyətləri aşır. {limit,number}{units}"
+  "icu:videoFileTooLargeWarning": {
+    "messageformat": "Video faylının həcmi çox böyük olduğu üçün göndərmək mümkün olmadı. {limit,number}{units} həcminə qədər olan video fayllarını göndərə bilərsiniz."
   },
   "icu:unableToLoadAttachment": {
     "messageformat": "Seçilmiş qoşma yüklənilə bilmir."
@@ -772,6 +790,9 @@
   },
   "icu:checkNetworkConnection": {
     "messageformat": "İnternet bağlantınızı yoxlayın."
+  },
+  "icu:clockSkewDetected": {
+    "messageformat": "Cihazınızdakı tarix qeyri-dəqiqdir. Cihaz saatını tənzimləyib, yenidən cəhd edin. Cihazınızdakı tarix və vaxt:"
   },
   "icu:submitDebugLog": {
     "messageformat": "Sazlama jurnalı"
@@ -994,6 +1015,9 @@
   },
   "icu:mute": {
     "messageformat": "Səsi bağla"
+  },
+  "icu:muted": {
+    "messageformat": "Səssizdə"
   },
   "icu:cannotUpdateDetail-v2": {
     "messageformat": "Signal-ı yeniləmək mümkün olmadı. <retryUpdateButton>Təkrar yeniləməyə cəhd edin</retryUpdateButton> və ya əl ilə quraşdırmaq üçün {url} keçidinə daxil olun. Daha sonra isə bu problemlə bağlı <contactSupportLink>dəstək xidməti ilə əlaqə</contactSupportLink> saxlayın"
@@ -1261,6 +1285,9 @@
   },
   "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync": {
     "messageformat": "Bu çatdakı bütün mesajlar bütün cihazlarınızdan silinəcək."
+  },
+  "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync--still-member": {
+    "messageformat": "Bu çatdakı bütün mesajlar bütün cihazlarınızdan silinəcək. Siz hələ də bu qrupun üzvü olacaqsınız."
   },
   "icu:ConversationHeader__ContextMenu__LeaveGroupAction__title": {
     "messageformat": "Qrupu tərk et"
@@ -1610,9 +1637,6 @@
   "icu:Preferences__EmojiSkinToneDefaultSetting__Label": {
     "messageformat": "Emojinin dəri tonu"
   },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__Title": {
-    "messageformat": "Çat qovluqları"
-  },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Title": {
     "messageformat": "Bir çat qovluğu əlavə et"
   },
@@ -1624,12 +1648,6 @@
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Description--WithChatFolders": {
     "messageformat": "{chatFoldersCount, plural, one {{chatFoldersCount,number} qovluq} other {{chatFoldersCount,number} qovluq}}"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button": {
-    "messageformat": "Quraşdır"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button--WithChatFolders": {
-    "messageformat": "İdarə et"
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__ChatFolderItem__ContextMenu__EditFolder": {
     "messageformat": "Qovluğu redaktə et"
@@ -2384,9 +2402,6 @@
   "icu:SafetyNumberModal__title": {
     "messageformat": "Güvənlik nömrəsini təsdiqlə"
   },
-  "icu:safetyNumberChanged": {
-    "messageformat": "Güvənlik nömrəsi dəyişdirildi"
-  },
   "icu:safetyNumberChanges": {
     "messageformat": "Güvənlik Nömrəsi Dəyişiklikləri"
   },
@@ -2826,16 +2841,16 @@
     "messageformat": "Çıxart"
   },
   "icu:stickers--StickerManagerPackDragHandle--Label": {
-    "messageformat": "Drag to reorder sticker pack"
+    "messageformat": "Stiker paketinin yerini dəyişmək üçün tutub sürükləyin"
   },
   "icu:stickers--StickerManagerBlessedPacksList--Label": {
-    "messageformat": "Signal Artist Series sticker packs"
+    "messageformat": "\"Signal Artist\" seriyalı stiker paketləri"
   },
   "icu:stickers--StickerManagerReceivedPacksList--Label": {
-    "messageformat": "Received sticker packs"
+    "messageformat": "Qəbul edilən stiker paketləri"
   },
   "icu:stickers--StickerManagerInstalledPacksList--Label": {
-    "messageformat": "Installed sticker packs"
+    "messageformat": "Quraşdırılan stiker paketləri"
   },
   "icu:stickers--StickerPreview--Title": {
     "messageformat": "Stiker paketi"
@@ -3081,16 +3096,16 @@
     "messageformat": "Stiker əlavə et"
   },
   "icu:FunPicker__Label--StickerReply": {
-    "messageformat": "Reply"
+    "messageformat": "Cavabla"
   },
   "icu:FunPicker__Label--SendStickerReply": {
-    "messageformat": "Send"
+    "messageformat": "Göndər"
   },
   "icu:FunPicker__Label--CancelStickerReply": {
-    "messageformat": "Cancel"
+    "messageformat": "Ləğv et"
   },
   "icu:FunPicker__Label--Sticker": {
-    "messageformat": "Sticker"
+    "messageformat": "Stiker"
   },
   "icu:confirmation-dialog--Cancel": {
     "messageformat": "Ləğv et"
@@ -3872,20 +3887,20 @@
   "icu:calling__preview--minimize": {
     "messageformat": "Önbaxışı azaldın"
   },
-  "icu:calling__change-view": {
-    "messageformat": "Görünüşü dəyiş"
-  },
-  "icu:calling__view_mode--paginated": {
-    "messageformat": "Tor görünüşü"
-  },
-  "icu:calling__view_mode--overflow": {
-    "messageformat": "Yan panel görünüşü"
-  },
-  "icu:calling__view_mode--speaker": {
-    "messageformat": "Reproduktor görünüşü"
-  },
   "icu:calling__view_mode--updated": {
     "messageformat": "Görünüş yeniləndi"
+  },
+  "icu:calling__change-layout": {
+    "messageformat": "Tərtibat formasını dəyiş"
+  },
+  "icu:calling__layout--paginated": {
+    "messageformat": "Cədvəl"
+  },
+  "icu:calling__layout--overflow": {
+    "messageformat": "Yan panel"
+  },
+  "icu:calling__layout--speaker": {
+    "messageformat": "Danışan şəxs"
   },
   "icu:calling__SelectPresentingSourcesModal--title": {
     "messageformat": "Ekranınızı paylaşın"
@@ -3950,23 +3965,47 @@
   "icu:notMuted": {
     "messageformat": "Səssizdə deyil"
   },
-  "icu:muteHour": {
-    "messageformat": "Bir saatlıq səsini bağla"
-  },
-  "icu:muteEightHours": {
-    "messageformat": "Səkkiz saatlıq səsini bağla"
-  },
-  "icu:muteDay": {
-    "messageformat": "Bir günlük səsini bağla"
-  },
-  "icu:muteWeek": {
-    "messageformat": "Bir həftəlik səsini bağla"
-  },
-  "icu:muteAlways": {
-    "messageformat": "Həmişəlik səsini bağla"
-  },
   "icu:unmute": {
     "messageformat": "Səsi aç"
+  },
+  "icu:MuteMenu__label": {
+    "messageformat": "Bu çatın səsini bağla…"
+  },
+  "icu:MuteMenu__hour": {
+    "messageformat": "1 saat"
+  },
+  "icu:MuteMenu__eightHours": {
+    "messageformat": "8 saat"
+  },
+  "icu:MuteMenu__day": {
+    "messageformat": "1 gün"
+  },
+  "icu:MuteMenu__week": {
+    "messageformat": "1 həftə"
+  },
+  "icu:MuteMenu__until": {
+    "messageformat": "Bu vaxta qədər…"
+  },
+  "icu:MuteMenu__always": {
+    "messageformat": "Həmişə"
+  },
+  "icu:DatePicker__popupTitle": {
+    "messageformat": "Tarix seç"
+  },
+  "icu:TimePicker__popupTitle": {
+    "messageformat": "Vaxt seç"
+  },
+  "icu:MuteUntilDialog__title": {
+    "messageformat": "… qədər bu çatın səsini bağla"
+  },
+  "icu:MuteUntilDialog__dateLabel": {
+    "messageformat": "Tarixə görə"
+  },
+  "icu:MuteUntilDialog__timeLabel": {
+    "messageformat": "Vaxt"
+  },
+  "icu:MuteUntilDialog__timeZoneNote": {
+    "messageformat": "{timeZone} saat qurşağındakı bütün saatlar"
   },
   "icu:muteExpirationLabelAlways": {
     "messageformat": "Həmişəlik səsi bağlandı"
@@ -4874,9 +4913,6 @@
   "icu:showConversationDetails--direct": {
     "messageformat": "Çat parametrləri"
   },
-  "icu:ConversationDetails__unmute--title": {
-    "messageformat": "Bu çatın səsi açılsın?"
-  },
   "icu:ConversationDetails--group-link": {
     "messageformat": "Qrup bağlantısı"
   },
@@ -5072,6 +5108,9 @@
   "icu:ConversationDetailsMembershipList--show-all": {
     "messageformat": "Hamısına bax"
   },
+  "icu:ConversationDetailsMembershipList__Search__AccessibilityLabel": {
+    "messageformat": "Axtar"
+  },
   "icu:ConversationDetailsGroups--title": {
     "messageformat": "{count, plural, one {{count,number} ortaq qrupunuz var} other {{count,number} ortaq qrupunuz var}}"
   },
@@ -5108,17 +5147,110 @@
   "icu:EditNicknameAndNoteModal__Note__Placeholder": {
     "messageformat": "Qeyd"
   },
-  "icu:ConversationNotificationsSettings__mentions__label": {
+  "icu:WhileMuted__title": {
+    "messageformat": "Səsi bağlı ikən"
+  },
+  "icu:WhileMuted__description": {
+    "messageformat": "Bu çatın səsi bağlı ikən göstəriləcək bildirişləri seçin."
+  },
+  "icu:WhileMuted__calls__title": {
+    "messageformat": "Zənglər"
+  },
+  "icu:WhileMuted__calls__description": {
+    "messageformat": "Bu çatın səsi bağlı ikən zəng gəldikdə zəng səsi və ya bildiriş gəlsin."
+  },
+  "icu:WhileMuted__mentions__title": {
     "messageformat": "Ad çəkmələr"
   },
-  "icu:ConversationNotificationsSettings__mentions__info": {
-    "messageformat": "Səsi bağlanmış çatlarda adınız çəkildikdə bildirişlər alın"
+  "icu:WhileMuted__mentions__description": {
+    "messageformat": "Bu çatın səsi bağlı ikən @adım çəkiləndə bildiriş gəlsin."
   },
-  "icu:ConversationNotificationsSettings__mentions__select__always-notify": {
-    "messageformat": "Həmişə bildir"
+  "icu:WhileMuted__replies__title": {
+    "messageformat": "Cavab"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__dont-notify-for-mentions-if-muted": {
-    "messageformat": "Səsi bağlanıbsa bildiriş göndərmə"
+  "icu:WhileMuted__replies__description": {
+    "messageformat": "Çatın səsi bağlı ikən kimsə mesajıma cavab verdikdə mənə bildiriş göndər."
+  },
+  "icu:WhileMuted__value--none": {
+    "messageformat": "Heç biri"
+  },
+  "icu:WhileMuted__value--calls": {
+    "messageformat": "Zənglər"
+  },
+  "icu:WhileMuted__value--mentions": {
+    "messageformat": "Ad çəkmələr"
+  },
+  "icu:WhileMuted__value--replies": {
+    "messageformat": "Cavab"
+  },
+  "icu:WhileMuted__value--calls-mentions": {
+    "messageformat": "Zənglər, ad çəkilmələri"
+  },
+  "icu:WhileMuted__value--calls-replies": {
+    "messageformat": "Zənglər, cavablar"
+  },
+  "icu:WhileMuted__value--mentions-replies": {
+    "messageformat": "Ad çəkilmələri, cavablar"
+  },
+  "icu:WhileMuted__value--calls-mentions-replies": {
+    "messageformat": "Zənglər, ad çəkilmələri, cavablar"
+  },
+  "icu:Preferences__WhileMuted__description": {
+    "messageformat": "Səsi bağlı çatlarda göstəriləcək bildirişləri seçin."
+  },
+  "icu:Preferences__WhileMuted__calls__description": {
+    "messageformat": "Səsi bağlı çatlardan zəng gəldikdə zəng səsi və ya bildiriş göndər."
+  },
+  "icu:Preferences__WhileMuted__mentions__description": {
+    "messageformat": "Səsi bağlı çatlarda adım çəkiləndə bildiriş göndər."
+  },
+  "icu:Preferences__WhileMuted__replies__description": {
+    "messageformat": "Səsi bağlı çatlarda kimsə mesajlarıma cavab verdikdə bildiriş göndər."
+  },
+  "icu:UnreadReminders__title": {
+    "messageformat": "\"Oxunmamış mesaj\" xəbərdarlıqları"
+  },
+  "icu:UnreadReminders__description": {
+    "messageformat": "Bu çatın səsi bağlı ikən oxunmamış mesajlar olduqda vaxtaşırı bildiriş göndər."
+  },
+  "icu:Preferences__UnreadReminders__description": {
+    "messageformat": "Səsi bağlı çatlarda oxunmamış mesajlar olduqda vaxtaşırı bildiriş göndərilsin."
+  },
+  "icu:UnreadReminders__notification--messages--1": {
+    "messageformat": "{messageCount, plural, one {{person1} adlı şəxsdən {messageCount,number} oxunmamış mesajınız var.} other {{person1} adlı şəxsdən {messageCount,number} oxunmamış mesajınız var.}}"
+  },
+  "icu:UnreadReminders__notification--messages--2": {
+    "messageformat": "{messageCount, plural, one {{person1} və {person2} adlı şəxslərdən {messageCount,number} oxunmamış mesajınız var.} other {{person1} və {person2} adlı şəxslərdən {messageCount,number} oxunmamış mesajınız var.}}"
+  },
+  "icu:UnreadReminders__notification--messages--many": {
+    "messageformat": "{messageCount, plural, one {{person1}, {person2} və digər şəxslərdən {messageCount,number} oxunmamış mesajınız var.} other {{person1}, {person2} və digər şəxslərdən {messageCount,number} oxunmamış mesajınız var.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-mentions": {
+    "messageformat": "{messageCount, plural, one {{messageCount,number} oxunmamış mesajınız və {mentionSummary} var.} other {{messageCount,number} oxunmamış mesajınız və {mentionSummary} var.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-replies": {
+    "messageformat": "{messageCount, plural, one {{messageCount,number} oxunmamış mesajınız və {replySummary} var.} other {{messageCount,number} oxunmamış mesajınız və {replySummary} var.}}"
+  },
+  "icu:UnreadReminders__notification--counts--messages": {
+    "messageformat": "{messageCount, plural, one {{messageCount,number} oxunmamış mesajınız var.} other {{messageCount,number} oxunmamış mesajınız var.}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--1": {
+    "messageformat": "{mentionCount, plural, one {{person1} adlı şəxs bir dəfə adınızı çəkdi} other {{person1} adlı şəxs {mentionCount,number} dəfə adınızı çəkdi}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--2": {
+    "messageformat": "{mentionCount, plural, one {Adınız {mentionCount,number} dəfə {person1} və {person2} tərəfindən çəkildi} other {Adınız {mentionCount,number} dəfə {person1} və {person2} tərəfindən çəkildi}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--many": {
+    "messageformat": "{mentionCount, plural, one {Adınız {mentionCount,number} dəfə {person1} və başqaları tərəfindən çəkildi} other {Adınız {mentionCount,number} dəfə {person1} və başqaları tərəfindən çəkildi}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--1": {
+    "messageformat": "{replyCount, plural, one {{person1} adlı şəxsdən cavab} other {{person1} adlı şəxsdən {replyCount,number} cavab}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--2": {
+    "messageformat": "{replyCount, plural, one {{person1} və {person2} tərəfindən {replyCount,number} cavab} other {{person1} və {person2} tərəfindən {replyCount,number} cavab}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--many": {
+    "messageformat": "{replyCount, plural, one {{person1} və digərləri tərəfindən {replyCount,number} cavab} other {{person1} və digərləri tərəfindən {replyCount,number} cavab}}"
   },
   "icu:GroupLinkManagement--clipboard": {
     "messageformat": "Qrup bağlantısı kopyalandı."
@@ -5140,6 +5272,48 @@
   },
   "icu:GroupLinkManagement__CopyGroupLinkButtonLabel": {
     "messageformat": "signal.group keçidini klaviaturaya kopiyalayın"
+  },
+  "icu:GroupMembersSearchDialog__DialogTitle": {
+    "messageformat": "Üzvləri axtar"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder": {
+    "messageformat": "Axtar"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringByAdmins": {
+    "messageformat": "Adminləri axtar"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringBySystemContacts": {
+    "messageformat": "Kontaktları axtar"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Label": {
+    "messageformat": "Filtr"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__AllMembers": {
+    "messageformat": "Bütün üzvlər"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Admins": {
+    "messageformat": "Adminlər"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__SystemContacts": {
+    "messageformat": "Əlaqələr"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithoutSearchQuery": {
+    "messageformat": "Nəticə yoxdur"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithSearchQuery": {
+    "messageformat": "“{searchQuery}” üçün heç bir nəticə yoxdur"
+  },
+  "icu:GroupMembersSearchDialog__MemberItem__Admin": {
+    "messageformat": "Admin"
+  },
+  "icu:GroupMembersSearchDialog__SearchResults__Title": {
+    "messageformat": "Axtarış nəticələri"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__AddMembers": {
+    "messageformat": "Üzv əlavə et"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__InviteViaGroupLink": {
+    "messageformat": "Qrup keçidi vasitəsilə dəvət et"
   },
   "icu:PendingInvites--tab-requests": {
     "messageformat": "Tələb ({count,number})"
@@ -5426,6 +5600,9 @@
   },
   "icu:CaptchaDialog__second-paragraph": {
     "messageformat": "Təsdiqlədikdən sonra mesajlaşmağa davam edə bilərsiniz. Fasilə verilən mesajlar avtomatik olaraq göndəriləcək."
+  },
+  "icu:CaptchaDialog__continue": {
+    "messageformat": "Davam et"
   },
   "icu:CaptchaDialog--can-close__title": {
     "messageformat": "Təsdiqləmə olmadan davam edilsin?"
@@ -5893,6 +6070,15 @@
   "icu:Preferences__message-audio-description": {
     "messageformat": "Çatda ikən göndərilən və qəbul edilən mesajlar üçün bildiriş səsini eşidin."
   },
+  "icu:Preferences__reaction-notifications-title": {
+    "messageformat": "Reaksiya bildirişləri"
+  },
+  "icu:Preferences__reaction-notifications-description": {
+    "messageformat": "Mesajıma biri reaksiya verdiyi zaman bildiriş göndər"
+  },
+  "icu:Preferences__button--account": {
+    "messageformat": "Hesab"
+  },
   "icu:Preferences__button--general": {
     "messageformat": "Ümumi"
   },
@@ -5962,6 +6148,45 @@
   "icu:Preferences--system": {
     "messageformat": "Sistem"
   },
+  "icu:Preferences--signal-login": {
+    "messageformat": "Signal Login"
+  },
+  "icu:Preferences--signal-login-description": {
+    "messageformat": "Signal Login məlumatlarınız hesabınızı bərpa etmək və yenidən quraşdırmaq üçün istifadə olunur. Bu parolları etibar etdiyiniz bir parol menecerində təhlükəsiz şəkildə saxlayın. <learnMoreLink>Daha ətraflı</learnMoreLink>."
+  },
+  "icu:Preferences--signal-login-description--learn-more": {
+    "messageformat": "Daha ətraflı"
+  },
+  "icu:Preferences__SignalAccount__label": {
+    "messageformat": "Hesab və bərpaetmə"
+  },
+  "icu:Preferences__SignalAccount__description": {
+    "messageformat": "2 parol"
+  },
+  "icu:Preferences__SignalAccountKeys__Title": {
+    "messageformat": "Signal Login məlumatlarınız"
+  },
+  "icu:Preferences__SignalAccountKeys__Description": {
+    "messageformat": "Onu təhlükəsiz yerdə saxlayın, hesabınızı və verilənlərinizi bərpa etmək üçün login məlumatlarınız tələb olunur. Onu əsla başqası ilə paylaşmayın."
+  },
+  "icu:Preferences__SignalAccountKeys__AccountKey": {
+    "messageformat": "Hesab şifrəsi"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountID": {
+    "messageformat": "Hesab ID-si"
+  },
+  "icu:Preferences__SignalAccountKeys__RecoveryKey": {
+    "messageformat": "Bərpa şifrəsi"
+  },
+  "icu:Preferences__SignalAccountKeys__Save": {
+    "messageformat": "Saxla"
+  },
+  "icu:Preferences__Account__LinkedDevice__label": {
+    "messageformat": "Bu əlaqələndirilmiş cihazdır"
+  },
+  "icu:Preferences__Account__LinkedDevice__description": {
+    "messageformat": "Hesab parametrlərini idarə etmək üçün əsas cihazınızda Signal-ı açın."
+  },
   "icu:Preferences--zoom": {
     "messageformat": "Yaxınlaşdırma səviyyəsi"
   },
@@ -5992,8 +6217,116 @@
   "icu:Preferences--advanced": {
     "messageformat": "Qabaqcıl"
   },
-  "icu:Preferences--notification-content": {
-    "messageformat": "Bildiriş məzmunu"
+  "icu:Preferences--change-signal-pin": {
+    "messageformat": "PIN-i dəyişdirin"
+  },
+  "icu:Preferences--change-signal-pin-button": {
+    "messageformat": "Dəyiş"
+  },
+  "icu:Preferences--create-signal-pin": {
+    "messageformat": "Bir PIN yarat"
+  },
+  "icu:Preferences--create-signal-pin-button": {
+    "messageformat": "Yarat"
+  },
+  "icu:Preferences--signal-pin": {
+    "messageformat": "Signal PIN-i"
+  },
+  "icu:Preferences--signal-pin__footer": {
+    "messageformat": "PIN kodlar, Signal yaddaşındakı məlumatlarınızı şifrələnmiş şəkildə saxlayır ki, onlara yalnız siz daxil ola biləsiniz. PIN kodunuzu bərpa etmək mümkün deyil. Siz Signal-ı yenidən quraşdırdıqda profiliniz, parametrləriniz və kontaktlarınız bərpa olunacaq. <learnMoreLink>Daha ətraflı</learnMoreLink>"
+  },
+  "icu:Preferences--signal-pin-advanced-settings": {
+    "messageformat": "Qabaqcıl PIN tənzimləmələri"
+  },
+  "icu:Preferences--disable-signal-pin": {
+    "messageformat": "PIN-i sıradan çıxart"
+  },
+  "icu:Preferences--disable-signal-pin--button": {
+    "messageformat": "Qeyri-aktiv et"
+  },
+  "icu:Preferences--disable-signal-pin--footer": {
+    "messageformat": "Əgər PIN-i sıradan çıxartsanız, manual olaraq nüsxələmə və geri yükləmə etmədiyiniz müddətcə Signal-da yenidən qeydiyyatdan keçəndə bütün verilənlərinizi itirəcəksiniz. PIN sıradan çıxarılanda, Qeydiyyat Kilidini aça bilməzsiniz."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--title": {
+    "messageformat": "Qeydiyyat kilidinə görə PIN-i qeyri aktiv etmək mümkün olmadı"
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--body": {
+    "messageformat": "PIN kodu qeyri-aktiv etməzdən əvvəl qeydiyyat kilidini qeyri-aktiv etməlisiniz."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--ok": {
+    "messageformat": "Oldu"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--title": {
+    "messageformat": "Ehtiyat nüsxələrə görə PIN-i qeyri-aktiv etmək mümkün olmadı"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--body": {
+    "messageformat": "PIN-i qeyri-aktiv etməzdən əvvəl ehtiyat nüsxələri qeyri-aktiv etməlisiniz."
+  },
+  "icu:Preferences--enable-signal-pin": {
+    "messageformat": "PIN-i fəallaşdır"
+  },
+  "icu:Preferences--enable-signal-pin--button": {
+    "messageformat": "Aktivləşdir"
+  },
+  "icu:Preferences--pin-reminders--header": {
+    "messageformat": "PIN xatırladıcıları"
+  },
+  "icu:Preferences--pin-reminders--description": {
+    "messageformat": "Vaxt keçdikcə daha az soruşulacaq"
+  },
+  "icu:Preferences--registration-lock__label": {
+    "messageformat": "Qeydiyyat Kilidi"
+  },
+  "icu:Preferences--registration-lock__footer": {
+    "messageformat": "Telefon nömrənizi Signal-da yenidən qeydiyyatdan keçirmək üçün Signal PIN-inizi tələb edin."
+  },
+  "icu:Preferences__Chats__TextInputSection__Title": {
+    "messageformat": "Mətnin daxil edilməsi"
+  },
+  "icu:Preferences__Chats__ChatFoldersSection__Title": {
+    "messageformat": "Çat qovluqları"
+  },
+  "icu:Preferences__Notifications__Show__Label": {
+    "messageformat": "Göstər"
+  },
+  "icu:Preferences__Notifications__SoundsSection__Title": {
+    "messageformat": "Səslər"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title": {
+    "messageformat": "Tətbiq nişanı"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title-v2": {
+    "messageformat": "Oxunmamışları göstərən nişanlar"
+  },
+  "icu:Preferences__Notifications__Reset__title": {
+    "messageformat": "Çatların fərdi parametrləri daxil olmaqla, bildiriş parametrlərini ilkin vəziyyətinə sıfırla."
+  },
+  "icu:Preferences__Notifications__Reset__button": {
+    "messageformat": "Sıfırla"
+  },
+  "icu:Preferences__Notifications__Reset__modal--body": {
+    "messageformat": "Bütün çatlarda bütün bildiriş parametrləri ilkin vəziyyətinə sıfırlansın?"
+  },
+  "icu:Preferences__Notifications__Reset__modal--confirm": {
+    "messageformat": "Sıfırla"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Label": {
+    "messageformat": "Say nişanı"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Description": {
+    "messageformat": "Say nişanının oxunmamış mesajların, yoxsa oxunmamış çatların sayını göstərəcəyini seçin"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadMessages": {
+    "messageformat": "Oxunmamış mesajlar"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadChats": {
+    "messageformat": "Oxunmamış çatlar"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats": {
+    "messageformat": "Səsi bağlanmış çatları da tətbiq nişanına daxil edin"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats__description": {
+    "messageformat": "Çat qovluğunun nişanları hər zaman səsi bağlanmış çatları da əhatə edir"
   },
   "icu:PlaintextExport--PreferencesRow--Header": {
     "messageformat": "Çat tarixçəsini ixrac et"
@@ -6145,9 +6478,6 @@
   "icu:NotificationProfiles--setting": {
     "messageformat": "Bildiriş profilləri"
   },
-  "icu:NotificationProfiles--setup": {
-    "messageformat": "Quraşdır"
-  },
   "icu:NotificationProfiles--title": {
     "messageformat": "Bildiriş profilləri"
   },
@@ -6159,9 +6489,6 @@
   },
   "icu:NotificationProfiles--manage-description": {
     "messageformat": "Bildiriş profillərini əlavə edin və ya redaktə edin"
-  },
-  "icu:NotificationProfiles--manage-profiles": {
-    "messageformat": "{profileCount, plural, one {Bir profil} other {{profileCount,number} profil}}"
   },
   "icu:NotificationProfiles--create": {
     "messageformat": "Profil yarat"
@@ -6351,6 +6678,9 @@
   },
   "icu:Preferences--blocked-groups": {
     "messageformat": "Bloklanmış qruplar"
+  },
+  "icu:Preferences--blocked--blocked-on": {
+    "messageformat": "Bloklanma vaxtı: {blockedAt}"
   },
   "icu:Preferences--signal-backups": {
     "messageformat": "Signal-ın Təhlükəsiz Ehtiyat Nüsxələri"
@@ -6559,9 +6889,6 @@
   "icu:Preferences__pnp__row--body": {
     "messageformat": "Telefon nömrənizi görə biləcək və nömrəniz vasitəsilə Signal-da sizinlə əlaqə saxlaya biləcək şəxsləri seçin."
   },
-  "icu:Preferences__pnp__row--button": {
-    "messageformat": "Dəyiş…"
-  },
   "icu:Preferences__pnp__sharing--title": {
     "messageformat": "Nömrəmi kim görə bilər?"
   },
@@ -6610,14 +6937,11 @@
   "icu:Preferences--read-receipts": {
     "messageformat": "\"Oxundu\" bildirişi"
   },
-  "icu:Preferences--read-receipts--description": {
-    "messageformat": "Qeyri-aktiv edildikdə mesajların başqaları tərəfindən oxunması bildirişlərini görməyəcəksiniz."
-  },
   "icu:Preferences--typing-indicators": {
     "messageformat": "\"Yazır\" göstəricisi"
   },
-  "icu:Preferences--typing-indicators--description": {
-    "messageformat": "Qeyri-aktiv edildikdə başqaları ilə yazışarkən, onların yazma göstəricilərini görməyəcəksiniz."
+  "icu:Preferences--messaging-help": {
+    "messageformat": "Mesajlar oxunduğu və ya yazıldığı zaman baxın və paylaşın. Qeyri-aktiv edildikdə oxunma bildirişlərini və ya yazma göstəricilərini görə bilməyəcəksiniz."
   },
   "icu:Preferences--updates": {
     "messageformat": "Yeniləmələr"
@@ -6721,11 +7045,23 @@
   "icu:InstallScreenUpdateDialog--update-required__title": {
     "messageformat": "Yeniləmə tələb olunur"
   },
+  "icu:InstallScreenUpdateDialog--checking-for-updates": {
+    "messageformat": "Yeniləmələr yoxlanılır"
+  },
+  "icu:InstallScreenUpdateDialog--updating-signal": {
+    "messageformat": "Signal yenilənir"
+  },
+  "icu:InstallScreenUpdateDialog--download-progress": {
+    "messageformat": "{currentBytes} / {totalBytes} endirilir ({percentage,number,percent})..."
+  },
   "icu:InstallScreenUpdateDialog--update-required__body": {
-    "messageformat": "Mesajların sinxronlaşdırılmasını tamamlamaq üçün Signal Desktop-u indi yeniləyin."
+    "messageformat": "Davam etmək üçün Signal Desktop-u yeniləyin."
   },
   "icu:InstallScreenUpdateDialog--update-required__action-update": {
     "messageformat": "Yenilə"
+  },
+  "icu:InstallScreenUpdateDialog--update-required__action-update__mas": {
+    "messageformat": "App Store-a keçin"
   },
   "icu:InstallScreenUpdateDialog--unsupported-os__title": {
     "messageformat": "Yeniləmə tələb olunur"
@@ -6759,6 +7095,9 @@
   },
   "icu:StandaloneRegistration--PhoneNumber--waiting": {
     "messageformat": "{duration} ərzində yenidən cəhd edin"
+  },
+  "icu:StandaloneRegistration--PhoneNumber--RegionCodeSelector--Label": {
+    "messageformat": "Bölgə kodu seçin"
   },
   "icu:StandaloneRegistration--PhoneNumber--placeholder": {
     "messageformat": "Telefon nömrəsi"
@@ -6982,6 +7321,9 @@
   "icu:StandaloneRegistration--VerifyPIN--incorrect-pin--with-count": {
     "messageformat": "{triesRemaining, plural, one {Səhv PIN. {triesRemaining,number} cəhd qaldı.} other {Yanlış PIN. {triesRemaining,number} cəhd qaldı.}}"
   },
+  "icu:StandaloneRegistration--VerifyPIN--just-count": {
+    "messageformat": "{triesRemaining, plural, one {{triesRemaining,number} cəhd qaldı.} other {{triesRemaining,number} cəhd qaldı.}}"
+  },
   "icu:StandaloneRegistration--VerifyPIN--NeedHelp--header": {
     "messageformat": "Kömək lazımdır?"
   },
@@ -7024,6 +7366,9 @@
   "icu:StandaloneRegistration--VerifyPIN--NoRemainingTries--learn-more": {
     "messageformat": "PIN-lər haqqında daha ətraflı"
   },
+  "icu:StandaloneRegistration--VerifyPIN--open-menu": {
+    "messageformat": "Menyunu aç"
+  },
   "icu:StandaloneRegistration--VerifyPIN--menu--skip-pin": {
     "messageformat": "PIN kodu ötür"
   },
@@ -7031,7 +7376,7 @@
     "messageformat": "PIN girişi ötürülsün?"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--description": {
-    "messageformat": "PIN kodunuzu xatırlamırsınızsa, yenisini yarada bilərsiniz. Qeydiyyatdan keçə və hesabınızı istifadə edə bilərsiniz, ancaq profil məlumatlarınız kimi bəzi yadda saxlanılmış parametrləri itirəcəksiniz. Daha ətraflı."
+    "messageformat": "PIN kodunuzu xatırlamırsınızsa, yenisini yarada bilərsiniz. Qeydiyyatdan keçə və hesabınızı istifadə edə bilərsiniz, ancaq profil məlumatlarınız kimi bəzi yadda saxlanılmış parametrləri itirəcəksiniz. <learnMore>Daha ətraflı</learnMore>."
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--skip-button": {
     "messageformat": "Ötür və yeni PIN kod yarat"
@@ -7067,7 +7412,7 @@
     "messageformat": "Xəbərdarlıq"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--description": {
-    "messageformat": "PIN kodu qeyri-aktiv etsəniz, Signal-da təkrar qeydiyyatdan keçərkən, digər bir iOS cihazından köçürmədiyiniz təqdirdə bütün məlumatları itirəcəksiniz. PIN kod qeyri-aktiv edildikdə qeydiyyat kilidini yandıra bilməzsiniz."
+    "messageformat": "PIN kodu qeyri-aktiv etsəniz, Signal-da təkrar qeydiyyatdan keçərkən bütün məlumatlarınız silinmiş olacaq. PIN kod qeyri-aktiv edildikdə Qeydiyyat kilidini yandıra bilməzsiniz."
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--disable-button": {
     "messageformat": "PIN-i sıradan çıxart"
@@ -7275,6 +7620,12 @@
   },
   "icu:MediaPermissionsModal__step-2": {
     "messageformat": "\"Signal\"ı açın"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--microphone": {
+    "messageformat": "Signal üçün mikrofona giriş icazəsini aktivləşdirin"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--camera": {
+    "messageformat": "Signal üçün kameraya giriş icazəsini aktivləşdirin"
   },
   "icu:MediaPermissionsModal__open": {
     "messageformat": "Parametrlərə keçin"
@@ -7816,11 +8167,17 @@
   "icu:ContextMenu--button": {
     "messageformat": "Kontekst menyusu"
   },
+  "icu:EditUsernameModalBody__username-label": {
+    "messageformat": "İstifadəçi adı"
+  },
   "icu:EditUsernameModalBody__username-placeholder": {
     "messageformat": "İstifadəçi adı"
   },
   "icu:EditUsernameModalBody__username-helper": {
     "messageformat": "İstifadəçi adı hər zaman bir sıra nömrələrlə birgə verilir."
+  },
+  "icu:EditUsernameModalBody__discriminator-label": {
+    "messageformat": "İstifadəçi adında rəqəmlər"
   },
   "icu:EditUsernameModalBody__learn-more": {
     "messageformat": "Daha ətraflı"
@@ -7918,6 +8275,75 @@
   },
   "icu:UsernameMegaphone__dismiss": {
     "messageformat": "Rədd et"
+  },
+  "icu:PinReminderMegaphone__title": {
+    "messageformat": "Signal PIN-inizi təsdiqləyin"
+  },
+  "icu:PinReminderMegaphone__body": {
+    "messageformat": "PIN kodunuzu yadda saxlamağınıza kömək etmək üçün onu vaxtaşırı daxil etməyinizi xahiş edəcəyik."
+  },
+  "icu:PinReminderMegaphone__verify": {
+    "messageformat": "Yoxla"
+  },
+  "icu:PinReminderMegaphone__not-now": {
+    "messageformat": "İndi yox"
+  },
+  "icu:PinReminderModal__title": {
+    "messageformat": "Signal PIN-inizi daxil edin"
+  },
+  "icu:PinReminderModal__body": {
+    "messageformat": "PIN kodunuzu xatırlamağınıza kömək etmək üçün onu vaxtaşırı daxil etməyinizi xahiş edəcəyik. Zaman keçdikcə bunu daha az tez-tez tələb edəcəyik."
+  },
+  "icu:PinReminderModal__pin-input-placeholder": {
+    "messageformat": "PIN-inizi daxil edin"
+  },
+  "icu:PinReminderModal__pin-input-error": {
+    "messageformat": "Yanlış PIN. Yenidən sına"
+  },
+  "icu:PinReminderModal__forgot": {
+    "messageformat": "PIN-i unutdum"
+  },
+  "icu:PinReminderModal__confirm": {
+    "messageformat": "Təsdiqlə"
+  },
+  "icu:PinReminderCompletedToast": {
+    "messageformat": "PIN doğrudur. Daha sonra sizə təkrar xatırladacağıq."
+  },
+  "icu:PinChangeModal__title--create": {
+    "messageformat": "Signal PIN-ni dəyişin"
+  },
+  "icu:PinChangeModal__title--create--without-pin": {
+    "messageformat": "Signal PIN kodu yaradın"
+  },
+  "icu:PinChangeModal__body--create": {
+    "messageformat": "Bu cihaz qeydiyyatda olduğu müddətcə PIN-inizi dəyişdirə bilərsiniz. <learnMoreLink>Daha ətraflı</learnMoreLink>"
+  },
+  "icu:PinChangeModal__body--create--without-pin": {
+    "messageformat": "PIN kodlar, Signal yaddaşındakı məlumatlarınızı şifrələnmiş şəkildə saxlayır ki, onlara yalnız siz daxil ola biləsiniz. Profiliniz, parametrlər və kontaktlar yenidən quraşdırma zamanı bərpa olunur. Tətbiqi açmaq üçün PIN kodunuza ehtiyacınız olmayacaq. <learnMoreLink>Daha ətraflı</learnMoreLink>"
+  },
+  "icu:PinChangeModal__title--confirm": {
+    "messageformat": "Signal PIN-inizi təsdiqləyin"
+  },
+  "icu:PinChangeModal__body--confirm": {
+    "messageformat": "Yeni yaratdığınız PIN kodu daxil edin."
+  },
+  "icu:PinChangeModal__pin-input-placeholder--create": {
+    "messageformat": "Yeni PIN daxil edin"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--confirm": {
+    "messageformat": "PIN-i təsdiqləyin"
+  },
+  "icu:PinChangeModal__cancel": {
+    "messageformat": "Ləğv et"
+  },
+  "icu:PinChangeModal__continue": {
+    "messageformat": "Davam et"
+  },
+  "icu:PinChangeModal__confirm": {
+    "messageformat": "Təsdiqlə"
+  },
+  "icu:PinChangeCompletedToast": {
+    "messageformat": "Yeni PIN yaradıldı."
   },
   "icu:UnsupportedOSWarningDialog__body": {
     "messageformat": "Signal desktop tezliklə kompüterinizin {OS} versiyasını artıq dəstəkləməyəcək. Signal-dan istifadəyə davam etmək üçün kompüterinizin əməliyyat sistemini {expirationDate} tarixinə qədər yeniləyin. <learnMoreLink>Daha ətraflı</learnMoreLink>"
@@ -8351,8 +8777,11 @@
   "icu:DonationReceipt__type-value--one-time": {
     "messageformat": "Bir dəfə"
   },
-  "icu:DonationReceipt__footer-text": {
-    "messageformat": "Signal-ı dəstəklədiyiniz üçün təşəkkürlər. Töhfəniz, açıq mənbəli məxfilik texnologiyası vasitəsilə dünyadakı milyonlarla insan üçün azad ifadəni qoruyan və etibarlı qlobal ünsiyyəti təmin edən inkişaf missiyasını dəstəkləməyə kömək edir. Əgər Amerika Birləşmiş Ştatlarında yaşayırsınızsa, bu qəbzi vergi qeydlərinizin arasında saxlayın. Signal Texnologiya Fondu, Daxili Gəlir Məcəlləsinin 501c3 maddəsinə əsasən Amerika Birləşmiş Ştatlarında vergidən azad edilmiş qeyri-kommersiya təşkilatıdır. Federal Vergi Ödəyicisi Nömrəmiz: 82-4506840."
+  "icu:DonationReceipt__footer-text-v2": {
+    "messageformat": "Signal-ı dəstəklədiyiniz üçün təşəkkürlər. Töhfəniz, açıq mənbəli məxfilik texnologiyası vasitəsilə dünyadakı milyonlarla insan üçün azad ifadəni qoruyan və təhlükəsiz qlobal ünsiyyəti təmin edən inkişaf missiyasını dəstəkləməyə kömək edir. Əgər Amerika Birləşmiş Ştatlarında yaşayırsınızsa, bu qəbzi vergi qeydləriniz üçün saxlayın. \"Signal Technology Foundation\", Daxili Gəlir Məcəlləsinin 501c3 maddəsinə əsasən Amerika Birləşmiş Ştatlarında vergidən azad edilmiş qeyri-kommersiya təşkilatıdır. Federal VÖEN: 82-4506840. Signal bu töhfə qarşılığında heç bir mal və ya xidmət təmin etməyib."
+  },
+  "icu:MessageCta__Donate": {
+    "messageformat": "İndi ianə ver"
   },
   "icu:Donations__OfflineTooltip": {
     "messageformat": "Oflayn rejimdəsiniz. İanəni tamamlamaq üçün internetə qoşulun."
@@ -8661,16 +9090,10 @@
     "messageformat": "Kiçik spesifik tənzimləmələr, xəta düzəlişləri və məhsuldarlığın artırılması. Signal istifadə etdiyiniz üçün təşəkkürlər!",
     "ignoreUnused": true
   },
-  "icu:WhatsNew__8.18--0": {
-    "messageformat": "Səsvermə artıq fərdi çatlarda da yaradıla bilər. Tərəddüd edən dostunuza xüsusi seçimlər siyahısı təqdim edin və ya \"Məni bəyənirsən? B/X/Bəlkə\" sorğusu ilə bir səsvermə yaradaraq sevdiyiniz insana qısa mesaj ötürmə xatirəsini yenidən yad edin."
+  "icu:WhatsNew__8.30--0": {
+    "messageformat": "Qısa fəaliyyət təkmilləşdirmələri sayəsində video zənglər zamanı prosessorunuz özünü xoşbəxt hiss edəcək (hətta sizin üzünüz gülməsə də)."
   },
-  "icu:WhatsNew__8.19--0": {
-    "messageformat": "Artıq qrup adminləri qrup parametrlərində \"Qrupu sonlandır\" seçimi ilə çatları təbii şəkildə yekunlaşdıra bilər. Qrupu sonlandırdıqda qrup üzvləri mesajlaşa və ya zəng edə bilmir, dəvətlər qeyri-aktiv edilir. Artıq yeni qrupu birgə yaratmazdan əvvəl keçən ilki köhnə qrupu sonlandıra və hər kəsi doğru yolda saxlaya bilərsiniz."
-  },
-  "icu:WhatsNew__8.20--0": {
-    "messageformat": "Introducing disappearing call events: Missed, outgoing, and received calls that occur after you install this update will now automatically disappear in any chat where disappearing messages are enabled."
-  },
-  "icu:WhatsNew__8.20--1": {
-    "messageformat": "Now you can reorder installed sticker packs so your new favorites don’t get stuck in the back of the line."
+  "icu:WhatsNew__8.30--1": {
+    "messageformat": "Videozəngə qoşulmağa çalışdığınız zaman Signal-ın kameraya giriş icazəsi olmadıqda, Windows-da sistem parametrlərini açmaq üçün rahat qısayol da əlavə etdik. Artıq insanların sizi görə bilməsi üçün nə etməli olduğunuzu bilmək daha asandır."
   }
 }

@@ -3,30 +3,21 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSpring, animated } from '@react-spring/web';
-import type { MutableRefObject, JSX, ReactNode } from 'react';
+import type { JSX, ReactNode } from 'react';
 import { AvatarColors } from '../types/Colors.std.ts';
 import { AvatarEditor } from './AvatarEditor.dom.tsx';
 import { AvatarPreview } from './AvatarPreview.dom.tsx';
-import { Input } from './Input.dom.tsx';
-import { PanelRow } from './conversation/conversation-details/PanelRow.dom.tsx';
 import { UsernameEditState } from '../state/ducks/usernameEnums.std.ts';
 import { ToastType } from '../types/Toast.dom.tsx';
-import { assertDev } from '../util/assert.std.ts';
+import { strictAssert } from '../util/assert.std.ts';
 import { missingCaseError } from '../util/missingCaseError.std.ts';
-import { ContextMenu } from './ContextMenu.dom.tsx';
 import { UsernameLinkEditor } from './UsernameLinkEditor.dom.tsx';
-import {
-  ConversationDetailsIcon,
-  IconType,
-} from './conversation/conversation-details/ConversationDetailsIcon.dom.tsx';
 import { UserText } from './UserText.dom.tsx';
 import { Tooltip, TooltipPlacement } from './Tooltip.dom.tsx';
 import { offsetDistanceModifier } from '../util/popperUtil.std.ts';
 import { useReducedMotion } from '../hooks/useReducedMotion.dom.ts';
 import { FunStaticEmoji } from './fun/FunEmoji.dom.tsx';
 import { FunEmojiPicker } from './fun/FunEmojiPicker.dom.tsx';
-import { FunEmojiPickerButton } from './fun/FunButton.dom.tsx';
-import { PreferencesContent } from './Preferences.dom.tsx';
 import { ProfileEditorPage } from '../types/Nav.std.ts';
 
 import type { AvatarColorType } from '../types/Colors.std.ts';
@@ -50,9 +41,19 @@ import { useConfirmDiscard } from '../hooks/useConfirmDiscard.dom.tsx';
 import { AxoButton } from '../axo/AxoButton.dom.tsx';
 import { normalizeProfileName } from '../util/normalizeProfileName.std.ts';
 import { Emoji } from '../axo/emoji.std.ts';
-import { AxoTextField } from '../axo/AxoTextField.dom.tsx';
+import { AxoTextField } from '../axo/fields/AxoTextField.dom.tsx';
 import { tw } from '../axo/tw.dom.tsx';
 import { AxoConfirmDialog } from '../axo/AxoConfirmDialog.dom.tsx';
+import { AxoList } from '../axo/items/AxoList.dom.tsx';
+import { AxoItem } from '../axo/items/AxoItem.dom.tsx';
+import { AxoClickableItem } from '../axo/items/AxoClickableItem.dom.tsx';
+import { AriaClickable } from '../axo/AriaClickable.dom.tsx';
+import { AxoDropdownMenu } from '../axo/AxoDropdownMenu.dom.tsx';
+import { drop } from '../util/drop.std.ts';
+import { AxoSymbol } from '../axo/AxoSymbol.dom.tsx';
+import { AxoFieldList } from '../axo/items/AxoFieldList.dom.tsx';
+import { Pressable } from 'react-aria';
+import { AxoPanel } from '../axo/AxoPanel.dom.tsx';
 
 type ProfileEditorData = {
   firstName: string;
@@ -70,7 +71,6 @@ export type PropsDataType = {
   aboutEmoji?: Emoji.Variant;
   aboutText?: string;
   color?: AvatarColorType;
-  contentsRef: MutableRefObject<HTMLDivElement | null>;
   conversationId: string;
   emojiSkinToneDefault: Emoji.SkinTone | null;
   familyName?: string;
@@ -152,7 +152,6 @@ export function ProfileEditor({
   aboutText,
   color,
   conversationId,
-  contentsRef,
   deleteAvatarFromDisk,
   deleteUsername,
   familyName,
@@ -183,7 +182,6 @@ export function ProfileEditor({
   usernameLink,
   usernameLinkCorrupted,
 }: PropsType): JSX.Element {
-  const focusInputRef = useRef<HTMLInputElement | null>(null);
   const tryClose = useRef<(() => void) | null>(null);
   const [confirmDiscardModal, confirmDiscardIf] = useConfirmDiscard({
     i18n,
@@ -289,16 +287,6 @@ export function ProfileEditor({
     return [fullName.firstName, fullName.familyName].filter(Boolean).join(' ');
   };
 
-  useEffect(() => {
-    const focusNode = focusInputRef.current;
-    if (!focusNode) {
-      return;
-    }
-
-    focusNode.focus();
-    focusNode.setSelectionRange(focusNode.value.length, focusNode.value.length);
-  }, [editState]);
-
   // To make AvatarEditor re-render less often
   const handleAvatarLoaded = useCallback(
     (avatar: Uint8Array<ArrayBuffer>) => {
@@ -325,6 +313,7 @@ export function ProfileEditor({
 
     confirmDiscardIf(hasNameChanges || hasAboutChanges, onDiscard);
   }, [confirmDiscardIf, stagedProfile, fullName, fullBio, setStagedProfile]);
+  // oxlint-disable-next-line react/refs
   tryClose.current = onTryClose;
 
   let content: JSX.Element;
@@ -339,7 +328,7 @@ export function ProfileEditor({
         conversationTitle={getFullNameText()}
         deleteAvatarFromDisk={deleteAvatarFromDisk}
         i18n={i18n}
-        isDisplayedAsPanel={false}
+        isInsideDialog={false}
         onCancel={handleBack}
         onSave={handleAvatarChanged}
         userAvatarData={userAvatarData}
@@ -364,42 +353,50 @@ export function ProfileEditor({
 
     content = (
       <>
-        <div className={tw('flex flex-col gap-4')}>
-          <AxoTextField.Root>
-            <AxoTextField.Input
-              placeholder={i18n('icu:ProfileEditor--first-name')}
-              value={stagedProfile.firstName}
-              onValueChange={newFirstName => {
-                setStagedProfile(profileData => ({
-                  ...profileData,
-                  firstName: newFirstName,
-                }));
-              }}
-              maxGraphemes={26}
-              maxBytes={128}
-              autoFocus
-              showCount
-              showClear
-            />
-          </AxoTextField.Root>
+        <AxoList.Group>
+          <AxoFieldList.Root>
+            <AxoFieldList.Item>
+              <AxoTextField.Root
+                value={stagedProfile.firstName}
+                onValueChange={newFirstName => {
+                  setStagedProfile(profileData => ({
+                    ...profileData,
+                    firstName: newFirstName,
+                  }));
+                }}
+                maxGraphemes={26}
+                maxBytes={128}
+              >
+                <AxoTextField.Input
+                  placeholder={i18n('icu:ProfileEditor--first-name')}
+                  autoFocus
+                />
+                <AxoTextField.Count />
+                <AxoTextField.Clear />
+              </AxoTextField.Root>
+            </AxoFieldList.Item>
 
-          <AxoTextField.Root>
-            <AxoTextField.Input
-              placeholder={i18n('icu:ProfileEditor--last-name')}
-              value={stagedProfile.familyName ?? ''}
-              onValueChange={newFamilyName => {
-                setStagedProfile(profileData => ({
-                  ...profileData,
-                  familyName: newFamilyName,
-                }));
-              }}
-              maxGraphemes={26}
-              maxBytes={128}
-              showCount
-              showClear
-            />
-          </AxoTextField.Root>
-        </div>
+            <AxoFieldList.Item>
+              <AxoTextField.Root
+                value={stagedProfile.familyName ?? ''}
+                onValueChange={newFamilyName => {
+                  setStagedProfile(profileData => ({
+                    ...profileData,
+                    familyName: newFamilyName,
+                  }));
+                }}
+                maxGraphemes={26}
+                maxBytes={128}
+              >
+                <AxoTextField.Input
+                  placeholder={i18n('icu:ProfileEditor--last-name')}
+                />
+                <AxoTextField.Count />
+                <AxoTextField.Clear />
+              </AxoTextField.Root>
+            </AxoFieldList.Item>
+          </AxoFieldList.Root>
+        </AxoList.Group>
 
         <div className="ProfileEditor__button-footer">
           <AxoButton.Root
@@ -449,76 +446,104 @@ export function ProfileEditor({
 
     content = (
       <>
-        <Input
-          expandable
-          hasClearButton
-          i18n={i18n}
-          icon={
-            <div className="module-composition-area__button-cell">
-              <FunEmojiPicker
-                open={emojiPickerOpen}
-                onOpenChange={handleEmojiPickerOpenChange}
-                placement="bottom"
-                onSelectEmoji={handleSelectEmoji}
-                closeOnSelect
+        <AxoList.Group>
+          <AxoFieldList.Root>
+            <AxoFieldList.Item>
+              <AxoTextField.Root
+                maxGraphemes={140}
+                maxBytes={512}
+                value={stagedProfile.aboutText ?? ''}
+                onValueChange={value => {
+                  if (value) {
+                    setStagedProfile(profileData => ({
+                      ...profileData,
+                      aboutEmoji: stagedProfile.aboutEmoji,
+                      aboutText: value.replace(/(\r\n|\n|\r)/gm, ''),
+                    }));
+                  } else {
+                    setStagedProfile(profileData => ({
+                      ...profileData,
+                      aboutEmoji: undefined,
+                      aboutText: '',
+                    }));
+                  }
+                }}
               >
-                <FunEmojiPickerButton
-                  i18n={i18n}
-                  selectedEmoji={stagedAboutEmojiVariant}
+                <AxoTextField.Input
+                  autoFocus
+                  placeholder={i18n('icu:ProfileEditor--about-placeholder')}
                 />
-              </FunEmojiPicker>
-            </div>
-          }
-          maxLengthCount={140}
-          maxByteCount={512}
-          moduleClassName="ProfileEditor__about-input"
-          onChange={value => {
-            if (value) {
-              setStagedProfile(profileData => ({
-                ...profileData,
-                aboutEmoji: stagedProfile.aboutEmoji,
-                aboutText: value.replace(/(\r\n|\n|\r)/gm, ''),
-              }));
-            } else {
-              setStagedProfile(profileData => ({
-                ...profileData,
-                aboutEmoji: undefined,
-                aboutText: '',
-              }));
-            }
-          }}
-          ref={focusInputRef}
-          placeholder={i18n('icu:ProfileEditor--about-placeholder')}
-          value={stagedProfile.aboutText}
-          whenToShowRemainingCount={40}
-        />
+                <AxoTextField.Count />
+                <AxoTextField.Clear
+                  forceShow={stagedAboutEmojiVariant != null}
+                />
 
-        {defaultBios.map(defaultBio => {
-          const emojiVariant = Emoji.getVariant(
-            defaultBio.emojiParent,
-            emojiSkinToneDefault ?? Emoji.SkinTone.None
-          );
+                <FunEmojiPicker
+                  open={emojiPickerOpen}
+                  onOpenChange={handleEmojiPickerOpenChange}
+                  placement="bottom"
+                  onSelectEmoji={handleSelectEmoji}
+                  closeOnSelect
+                >
+                  <Pressable>
+                    <AxoTextField.CustomAction
+                      label={i18n('icu:FunButton__Label--EmojiPicker')}
+                      slot="leading"
+                    >
+                      {stagedAboutEmojiVariant == null ? (
+                        <AxoSymbol.Icon
+                          label={null}
+                          size={18}
+                          symbol="face-smiling"
+                        />
+                      ) : (
+                        <FunStaticEmoji
+                          role="presentation"
+                          size={18}
+                          emoji={stagedAboutEmojiVariant}
+                        />
+                      )}
+                    </AxoTextField.CustomAction>
+                  </Pressable>
+                </FunEmojiPicker>
+              </AxoTextField.Root>
+            </AxoFieldList.Item>
+          </AxoFieldList.Root>
 
-          return (
-            <PanelRow
-              className="ProfileEditor__row"
-              key={defaultBio.emojiParent}
-              icon={
-                <div className="ProfileEditor__icon--container">
-                  <BioEmoji emoji={emojiVariant} />
-                </div>
-              }
-              label={defaultBio.i18nLabel}
-              onClick={() => {
-                setStagedProfile(profileData => ({
-                  ...profileData,
-                  aboutEmoji: emojiVariant,
-                  aboutText: defaultBio.i18nLabel,
-                }));
-              }}
-            />
-          );
-        })}
+          <AxoList.Root>
+            <AxoList.Body>
+              <AxoItem.Group>
+                {defaultBios.map(defaultBio => {
+                  const emojiVariant = Emoji.getVariant(
+                    defaultBio.emojiParent,
+                    emojiSkinToneDefault ?? Emoji.SkinTone.None
+                  );
+
+                  return (
+                    <AxoItem.Root key={defaultBio.emojiParent}>
+                      <AxoItem.Leading>
+                        <BioEmoji emoji={emojiVariant} />
+                      </AxoItem.Leading>
+                      <AxoItem.Content>
+                        <AxoItem.Label>{defaultBio.i18nLabel}</AxoItem.Label>
+                        <AxoItem.HiddenTrigger
+                          label={defaultBio.i18nLabel}
+                          onClick={() => {
+                            setStagedProfile(profileData => ({
+                              ...profileData,
+                              aboutEmoji: emojiVariant,
+                              aboutText: defaultBio.i18nLabel,
+                            }));
+                          }}
+                        />
+                      </AxoItem.Content>
+                    </AxoItem.Root>
+                  );
+                })}
+              </AxoItem.Group>
+            </AxoList.Body>
+          </AxoList.Root>
+        </AxoList.Group>
 
         <div className="ProfileEditor__button-footer">
           <AxoButton.Root
@@ -570,86 +595,85 @@ export function ProfileEditor({
       />
     );
   } else if (editState === ProfileEditorPage.None) {
-    let actions: JSX.Element | undefined;
-    let alwaysShowActions = false;
+    let usernameAccessory: ReactNode | undefined;
 
     if (usernameEditState === UsernameEditState.Deleting) {
-      actions = (
-        <ConversationDetailsIcon
-          ariaLabel={i18n('icu:ProfileEditor--username--deleting-username')}
-          icon={IconType.spinner}
-          disabled
-          fakeButton
+      usernameAccessory = (
+        <AxoItem.IconAction
+          pending
+          variant="implied-secondary"
+          symbol="more"
+          label={i18n('icu:ProfileEditor--username--deleting-username')}
         />
       );
+    } else if (usernameCorrupted) {
+      usernameAccessory = (
+        <span className={tw('text-destructive')}>
+          <AxoSymbol.Icon
+            size={20}
+            symbol="error-circle"
+            label={i18n('icu:ProfileEditor__username__error-icon')}
+          />
+        </span>
+      );
     } else {
-      const menuOptions = [
-        {
-          group: 'copy',
-          icon: 'ProfileEditor__username-menu__copy-icon',
-          label: i18n('icu:ProfileEditor--username--copy'),
-          onClick: () => {
-            assertDev(
-              username !== undefined,
-              'Should not be visible without username'
-            );
-            void window.navigator.clipboard.writeText(username);
-            showToast({ toastType: ToastType.CopiedUsername });
-          },
-        },
-        {
-          // Different group to display a divider above it
-          group: 'delete',
+      usernameAccessory = (
+        <AriaClickable.DeadArea>
+          <AxoDropdownMenu.Root>
+            <AxoDropdownMenu.Trigger>
+              <AxoItem.IconAction
+                variant="implied-secondary"
+                symbol="more"
+                label={i18n('icu:ProfileEditor--username--context-menu')}
+              />
+            </AxoDropdownMenu.Trigger>
+            <AxoDropdownMenu.Content>
+              <AxoDropdownMenu.Item
+                symbol="copy"
+                onSelect={() => {
+                  strictAssert(username, 'Missing username');
+                  drop(window.navigator.clipboard.writeText(username));
+                  showToast({ toastType: ToastType.CopiedUsername });
+                }}
+              >
+                {i18n('icu:ProfileEditor--username--copy')}
+              </AxoDropdownMenu.Item>
 
-          icon: 'ProfileEditor__username-menu__trash-icon',
-          label: i18n('icu:ProfileEditor--username--delete'),
-          onClick: () => {
-            setUsernameEditState(UsernameEditState.ConfirmingDelete);
-          },
-        },
-      ];
-
-      if (usernameCorrupted) {
-        actions = (
-          <i
-            className="ProfileEditor__error-icon"
-            title={i18n('icu:ProfileEditor__username__error-icon')}
-          />
-        );
-        alwaysShowActions = true;
-      } else if (username) {
-        actions = (
-          <ContextMenu
-            i18n={i18n}
-            menuOptions={menuOptions}
-            popperOptions={{ placement: 'bottom', strategy: 'absolute' }}
-            moduleClassName="ProfileEditor__username-menu"
-            ariaLabel={i18n('icu:ProfileEditor--username--context-menu')}
-          />
-        );
-      }
+              <AxoDropdownMenu.Item
+                symbol="trash"
+                onSelect={() => {
+                  setUsernameEditState(UsernameEditState.ConfirmingDelete);
+                }}
+              >
+                {i18n('icu:ProfileEditor--username--delete')}
+              </AxoDropdownMenu.Item>
+            </AxoDropdownMenu.Content>
+          </AxoDropdownMenu.Root>
+        </AriaClickable.DeadArea>
+      );
     }
 
     let maybeUsernameLinkRow: JSX.Element | undefined;
     if (username && !usernameCorrupted) {
-      let linkActions: JSX.Element | undefined;
+      let usernameLinkAccessory: JSX.Element | undefined;
 
       if (usernameLinkCorrupted) {
-        linkActions = (
-          <i
-            className="ProfileEditor__error-icon"
-            title={i18n('icu:ProfileEditor__username-link__error-icon')}
-          />
+        usernameLinkAccessory = (
+          <span className={tw('text-destructive')}>
+            <AxoSymbol.Icon
+              size={20}
+              symbol="error-circle"
+              label={i18n('icu:ProfileEditor__username-link__error-icon')}
+            />
+          </span>
         );
       }
 
       maybeUsernameLinkRow = (
-        <PanelRow
-          className="ProfileEditor__row"
-          icon={
-            <i className="ProfileEditor__icon--container ProfileEditor__icon ProfileEditor__icon--username-link" />
-          }
+        <AxoClickableItem.Root
+          symbol="qrcode"
           label={i18n('icu:ProfileEditor__username-link')}
+          accessory={usernameLinkAccessory}
           onClick={() => {
             markCompletedUsernameLinkOnboarding();
 
@@ -660,8 +684,6 @@ export function ProfileEditor({
 
             setEditState(ProfileEditorPage.UsernameLink);
           }}
-          alwaysShowActions
-          actions={linkActions}
         />
       );
 
@@ -678,36 +700,37 @@ export function ProfileEditor({
     }
 
     const usernameRows = (
-      <>
-        <hr className="ProfileEditor__divider" />
-        <PanelRow
-          className="ProfileEditor__row"
-          icon={
-            <i className="ProfileEditor__icon--container ProfileEditor__icon ProfileEditor__icon--username" />
-          }
-          label={
-            (!usernameCorrupted && username) ||
-            i18n('icu:ProfileEditor--username')
-          }
-          onClick={() => {
-            if (usernameCorrupted) {
-              setIsResettingUsername(true);
-              return;
-            }
+      <AxoList.Root>
+        <AxoList.Body>
+          <AxoItem.Group>
+            <AxoClickableItem.Root
+              symbol="at"
+              label={
+                (!usernameCorrupted && username) ||
+                i18n('icu:ProfileEditor--username')
+              }
+              onClick={() => {
+                if (usernameCorrupted) {
+                  setIsResettingUsername(true);
+                  return;
+                }
 
-            openUsernameReservationModal();
-            setEditState(ProfileEditorPage.Username);
-          }}
-          alwaysShowActions={alwaysShowActions}
-          actions={actions}
-        />
-        {maybeUsernameLinkRow}
-        <div className="ProfileEditor__info">
-          {username
-            ? i18n('icu:ProfileEditor--info--pnp')
-            : i18n('icu:ProfileEditor--info--pnp--no-username')}
-        </div>
-      </>
+                openUsernameReservationModal();
+                setEditState(ProfileEditorPage.Username);
+              }}
+              accessory={usernameAccessory}
+            />
+            {maybeUsernameLinkRow}
+          </AxoItem.Group>
+        </AxoList.Body>
+        <AxoList.Footer>
+          <AxoList.FooterDescription>
+            {username
+              ? i18n('icu:ProfileEditor--info--pnp')
+              : i18n('icu:ProfileEditor--info--pnp--no-username')}
+          </AxoList.FooterDescription>
+        </AxoList.Footer>
+      </AxoList.Root>
     );
 
     content = (
@@ -738,57 +761,65 @@ export function ProfileEditor({
             {i18n('icu:ProfileEditor--edit-photo')}
           </AxoButton.Root>
         </div>
-        <PanelRow
-          className="ProfileEditor__row"
-          icon={
-            <i className="ProfileEditor__icon--container ProfileEditor__icon ProfileEditor__icon--name" />
-          }
-          label={<UserText text={getFullNameText()} />}
-          onClick={() => {
-            setEditState(ProfileEditorPage.ProfileName);
-          }}
-        />
-        <PanelRow
-          className="ProfileEditor__row"
-          icon={
-            fullBio.aboutEmoji && Emoji.isEmoji(fullBio.aboutEmoji) ? (
-              <div className="ProfileEditor__icon--container">
-                <BioEmoji
-                  emoji={Emoji.ignorePreferredSkinTone(fullBio.aboutEmoji)}
+
+        <AxoList.Group>
+          <AxoList.Root>
+            <AxoList.Body>
+              <AxoItem.Group>
+                <AxoClickableItem.Root
+                  symbol="person"
+                  label={<UserText text={getFullNameText()} />}
+                  onClick={() => {
+                    setEditState(ProfileEditorPage.ProfileName);
+                  }}
                 />
-              </div>
-            ) : (
-              <i className="ProfileEditor__icon--container ProfileEditor__icon ProfileEditor__icon--bio" />
-            )
-          }
-          label={
-            <UserText
-              text={fullBio.aboutText || i18n('icu:ProfileEditor--about')}
-            />
-          }
-          onClick={() => {
-            setEditState(ProfileEditorPage.Bio);
-          }}
-        />
-        <div className="ProfileEditor__info">
-          {i18n('icu:ProfileEditor--info--general')}
-        </div>
-        {usernameRows}
+
+                <AxoItem.Root>
+                  <AxoItem.Leading>
+                    {fullBio.aboutEmoji && Emoji.isEmoji(fullBio.aboutEmoji) ? (
+                      <BioEmoji
+                        emoji={Emoji.ignorePreferredSkinTone(
+                          fullBio.aboutEmoji
+                        )}
+                      />
+                    ) : (
+                      <AxoItem.Icon symbol="pencil" />
+                    )}
+                  </AxoItem.Leading>
+                  <AxoItem.Content>
+                    <AxoItem.Label>
+                      <UserText
+                        text={
+                          fullBio.aboutText || i18n('icu:ProfileEditor--about')
+                        }
+                      />
+                    </AxoItem.Label>
+                    <AxoItem.HiddenTrigger
+                      label={i18n('icu:ProfileEditor--about')}
+                      onClick={() => {
+                        setEditState(ProfileEditorPage.Bio);
+                      }}
+                    />
+                  </AxoItem.Content>
+                </AxoItem.Root>
+              </AxoItem.Group>
+            </AxoList.Body>
+            <AxoList.Footer>
+              <AxoList.FooterDescription>
+                {i18n('icu:ProfileEditor--info--general')}
+              </AxoList.FooterDescription>
+            </AxoList.Footer>
+          </AxoList.Root>
+
+          {usernameRows}
+        </AxoList.Group>
       </>
     );
   } else {
     throw missingCaseError(editState);
   }
 
-  const backButton =
-    editState !== ProfileEditorPage.None ? (
-      <button
-        aria-label={i18n('icu:goBack')}
-        className="Preferences__back-icon"
-        onClick={handleBack}
-        type="button"
-      />
-    ) : undefined;
+  const showBackButton = editState !== ProfileEditorPage.None;
 
   return (
     <>
@@ -853,12 +884,13 @@ export function ProfileEditor({
         </AxoConfirmDialog.Action>
       </AxoConfirmDialog.Root>
 
-      <PreferencesContent
-        backButton={backButton}
-        contents={<div className="ProfileEditor">{content}</div>}
-        contentsRef={contentsRef}
-        title={TITLES_BY_EDIT_STATE[editState]}
-      />
+      <AxoPanel.Root>
+        <AxoPanel.Header>
+          {showBackButton && <AxoPanel.Back onClick={handleBack} />}
+          <AxoPanel.Label>{TITLES_BY_EDIT_STATE[editState]}</AxoPanel.Label>
+        </AxoPanel.Header>
+        <AxoPanel.Content>{content}</AxoPanel.Content>
+      </AxoPanel.Root>
     </>
   );
 }

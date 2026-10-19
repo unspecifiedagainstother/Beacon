@@ -14,8 +14,8 @@ import { tw } from '../../../axo/tw.dom.tsx';
 import { AxoSymbol } from '../../../axo/AxoSymbol.dom.tsx';
 import { AxoButton } from '../../../axo/AxoButton.dom.tsx';
 import { AxoDialog } from '../../../axo/AxoDialog.dom.tsx';
-import { AxoRadioGroup } from '../../../axo/AxoRadioGroup.dom.tsx';
-import { AxoTextField } from '../../../axo/AxoTextField.dom.tsx';
+import { AxoRadioGroup } from '../../../axo/controls/AxoRadioGroup.dom.tsx';
+import { AxoTextField } from '../../../axo/fields/AxoTextField.dom.tsx';
 
 import type { LocalizerType } from '../../../types/I18N.std.ts';
 import type { ActionCreator } from '../../../state/types.std.ts';
@@ -96,7 +96,10 @@ export function ProfileEntryScreen({
           {i18n('icu:StandaloneRegistration--ProfileEntry--description')}
         </div>
         <div>
-          <a href="https://support.signal.org">
+          <a
+            className={tw('text-primary')}
+            href="https://support.signal.org/hc/articles/360007459591-Signal-Profiles-and-Message-Requests"
+          >
             {i18n('icu:StandaloneRegistration--ProfileEntry--learn-more')}
           </a>
         </div>
@@ -134,30 +137,34 @@ export function ProfileEntryScreen({
         {i18n('icu:StandaloneRegistration--ProfileEntry--add-photo')}
       </AxoButton.Root>
       <Spacer className={tw('h-7')} />
-      <InputContainer>
-        <AxoTextField.Root width="md" disabled={pending}>
+      <InputContainer className={tw('w-100')}>
+        <AxoTextField.Root
+          disabled={pending}
+          value={firstName}
+          onValueChange={onChangeFirstName}
+          maxGraphemes={30}
+          maxBytes={30}
+        >
           <AxoTextField.Input
             placeholder={i18n(
               'icu:StandaloneRegistration--ProfileEntry--first-name'
             )}
-            maxGraphemes={30}
-            maxBytes={30}
-            onValueChange={onChangeFirstName}
-            value={firstName}
           />
         </AxoTextField.Root>
       </InputContainer>
       <Spacer />
-      <InputContainer>
-        <AxoTextField.Root width="md" disabled={pending}>
+      <InputContainer className={tw('w-100')}>
+        <AxoTextField.Root
+          disabled={pending}
+          value={lastName}
+          onValueChange={onChangeLastName}
+          maxGraphemes={30}
+          maxBytes={30}
+        >
           <AxoTextField.Input
             placeholder={i18n(
               'icu:StandaloneRegistration--ProfileEntry--last-name'
             )}
-            maxGraphemes={30}
-            maxBytes={30}
-            onValueChange={onChangeLastName}
-            value={lastName}
           />
         </AxoTextField.Root>
       </InputContainer>
@@ -254,7 +261,7 @@ export function ProfileEntryScreen({
             conversationTitle={fullName}
             deleteAvatarFromDisk={deleteAvatarFromDisk}
             i18n={i18n}
-            isDisplayedAsPanel
+            isInsideDialog
             onCancel={() => {
               setIsEditingAvatar(false);
             }}
@@ -324,7 +331,6 @@ function PhoneNumberDiscoverabilityDialog({
             }}
           >
             <AxoRadioGroup.Item value={PhoneNumberDiscoverability.Discoverable}>
-              <AxoRadioGroup.Indicator />
               <AxoRadioGroup.Label>
                 <div className={tw('type-body-medium')}>
                   {i18n('icu:Preferences__pnp__discoverability__everyone')}
@@ -334,7 +340,6 @@ function PhoneNumberDiscoverabilityDialog({
             <AxoRadioGroup.Item
               value={PhoneNumberDiscoverability.NotDiscoverable}
             >
-              <AxoRadioGroup.Indicator />
               <AxoRadioGroup.Label>
                 <div className={tw('type-body-medium')}>
                   {i18n('icu:Preferences__pnp__discoverability__nobody')}

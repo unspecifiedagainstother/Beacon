@@ -11,11 +11,14 @@
   "icu:AxoDialog.Close": {
     "messageformat": "Funga"
   },
+  "icu:AxoPasswordField.Reveal": {
+    "messageformat": "Onyesha Nenosiri"
+  },
   "icu:AxoTextField.Clear": {
     "messageformat": "Futa"
   },
   "icu:AxoBadge.MaxOverflow": {
-    "messageformat": "{max,number}+"
+    "messageformat": "+{max,number}"
   },
   "icu:AddUserToAnotherGroupModal__title": {
     "messageformat": "Ongeza kwenye kikundi"
@@ -61,6 +64,24 @@
   },
   "icu:Preferences__DonateTitle": {
     "messageformat": "Changia Signal"
+  },
+  "icu:LinkedDevicesOnboardingDialog__description": {
+    "messageformat": "Kipengele cha <bold> Vifaa Vilivyounganishwa</bold> kinakuwezesha kufikia akaunti na jumbe zako za Signal kwa usalama kwenye vifaa vyako vingine vya ziada."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--1": {
+    "messageformat": "Unaweza unganisha kompyuta, tablet au simu ya ziada."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--2": {
+    "messageformat": "Kifaa chako cha msingi kinadhibiti zilizounganishwa, unaweza kuunganisha hadi vifaa 5."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3": {
+    "messageformat": "Baadhi ya mipangilio ya akaunti inadhibitiwa kwenye kifaa chako cha msingi pekee, ikiwa ni pamoja na mipangilio ya akaunti na nakala zilizohifadhiwa."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--1": {
+    "messageformat": "Mipangilio ya akaunti na nakala inaweza tu kudhibitiwa kwenye kifaa chako kikuu."
+  },
+  "icu:LinkedDevicesOnboardingDialog__bullet--3--2": {
+    "messageformat": "Mipangilio ya akaunti na Hifadhi Nakala Salama ya Signal inaweza tu kudhibitiwa kwenye kifaa chako cha msingi."
   },
   "icu:sentMediaQualityStandard": {
     "messageformat": "Kiwango"
@@ -317,11 +338,8 @@
   "icu:LeftPaneChatFolders__ItemLabel--All": {
     "messageformat": "Magumzo yote"
   },
-  "icu:LeftPaneChatFolders__ItemUnreadBadge__MaxCount": {
-    "messageformat": "+{maxCount,number}"
-  },
   "icu:LeftPaneChatFolders__ItemUnreadBadge__AccessibleLabel": {
-    "messageformat": "{count, plural, one {{count,number} Unread Message} other {{count,number} Unread Messages}}"
+    "messageformat": "{count, plural, one {{count,number} majumbe haijasomewa} other {{count,number} Jumbe hazijasomwa}}"
   },
   "icu:LeftPaneChatFolders__Item__ContextMenu__MarkAllRead": {
     "messageformat": "Alamisha zote zimesomwa"
@@ -364,9 +382,6 @@
   },
   "icu:NavTabs__ItemIconLabel--UnreadCount": {
     "messageformat": "{count,number} hazijasomwa"
-  },
-  "icu:NavTabs__ItemIconLabel--MarkedUnread": {
-    "messageformat": "Imetiwa alama haijasomwa"
   },
   "icu:NavTabs__ItemLabel--Chats": {
     "messageformat": "Gumzo"
@@ -635,20 +650,23 @@
   "icu:SafetyNumberNotReady__learn-more": {
     "messageformat": "Jifunze zaidi"
   },
-  "icu:KeyTransparencyErrorDialog__Title": {
-    "messageformat": "Uthibitishaji Kiotomatiki wa Funguo kwa sasa haupatikani kwenye kifaa chako. Ungependa kuwasilisha kumbukumbu za utatuzi?"
+  "icu:KeyTransparencyErrorDialog__Title-v2": {
+    "messageformat": "Uthibitishaji Kiotomatiki wa Funguo kwa sasa haupatikani kwenye kifaa chako. Ripoti ili utusaidie kuimarika?"
   },
-  "icu:KeyTransparencyErrorDialog__Description": {
-    "messageformat": "Kumbukumbu za utatuzi zinatusaidia kutambua na kurekebisha tatizo, na hazina maelezo ya utambulisho."
+  "icu:KeyTransparencyErrorDialog__Description-v2": {
+    "messageformat": "Kujumuisha faili yako ya marekebisho kunatusaidia kutambua na kurekebisha tatizo na haina taarifa za kutambulisha. Kushiriki na wengine ni kwa hiari yako."
   },
-  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label": {
-    "messageformat": "Shiriki faili la rekebisho"
+  "icu:KeyTransparencyErrorDialog__ShareDebugLog__Label-v2": {
+    "messageformat": "Jumuisha faili ya rekebisho"
   },
   "icu:KeyTransparencyErrorDialog__ShareDebugLog__ViewButton": {
     "messageformat": "Tazama"
   },
   "icu:KeyTransparencyErrorDialog__Submit": {
     "messageformat": "Tuma"
+  },
+  "icu:KeyTransparencyErrorDialog__Cancel": {
+    "messageformat": "Hapana nashukuru"
   },
   "icu:KeyTransparencyOnboardingDialog__Title": {
     "messageformat": "Sasa Signal inaweza kuthibitisha kiotomatiki usimbaji fiche"
@@ -746,11 +764,11 @@
   "icu:maximumAttachments": {
     "messageformat": "Hauwezi kuongeza viambatisho vingine zaidi kwenye ujumbe huu."
   },
-  "icu:fileSizeWarning": {
-    "messageformat": "Samahani, faili lililochaguliwa limepita vikwazo vya ukubwa wa ujumbe. {limit,number} {units}"
+  "icu:fileTooLargeWarning": {
+    "messageformat": "Imeshindwa kutuma faili hii kwa sababu ni kubwa mno. Unaweza kutuma faili hadi {limit,number}{units}."
   },
-  "icu:videoFileSizeWarning": {
-    "messageformat": "Samahani, faili ya video iliyochaguliwa imepita kikomo cha ukubwa wa ujumbe. {limit,number}{units}"
+  "icu:videoFileTooLargeWarning": {
+    "messageformat": "Huwezi kutuma faili hii ya video kwa sababu ni kubwa mno. Unaweza kutuma faili za video hadi {limit,number}{units}."
   },
   "icu:unableToLoadAttachment": {
     "messageformat": "Imeshindwa kupakia kiambatisho kilichochaguliwa."
@@ -772,6 +790,9 @@
   },
   "icu:checkNetworkConnection": {
     "messageformat": "Angalia muunganisho wako wa mtandao"
+  },
+  "icu:clockSkewDetected": {
+    "messageformat": "Tarehe ya kifaa chako si sahihi. Rekebisha saa yako kisha ujaribu tena. Tarehe na muda wa kifaa chako ni:"
   },
   "icu:submitDebugLog": {
     "messageformat": "Faili la rekebisho"
@@ -994,6 +1015,9 @@
   },
   "icu:mute": {
     "messageformat": "Nyamazisha"
+  },
+  "icu:muted": {
+    "messageformat": "Imenyamazishwa"
   },
   "icu:cannotUpdateDetail-v2": {
     "messageformat": "Signal imeshindwa kusasisha. <retryUpdateButton>Jaribu tena kusasisha</retryUpdateButton> au tembelea {url} ili kusanikisha mwenyewe. Halafu, <contactSupportLink>wasiliana na usaidizi</contactSupportLink> kuhusu tatizo hili"
@@ -1261,6 +1285,9 @@
   },
   "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync": {
     "messageformat": "Jumbe zote kwenye gumzo hili zitafutwa kwenye vifaa vyako vyote."
+  },
+  "icu:ConversationHeader__DeleteConversationConfirmation__description-with-sync--still-member": {
+    "messageformat": "Jumbe zote kwenye gumzo hili zitafutwa kwenye vifaa vyako vyote. Utaendelea kuwa mwanachama wa kikundi hiki."
   },
   "icu:ConversationHeader__ContextMenu__LeaveGroupAction__title": {
     "messageformat": "Ondoka kwenye kikundi"
@@ -1610,9 +1637,6 @@
   "icu:Preferences__EmojiSkinToneDefaultSetting__Label": {
     "messageformat": "Emoji ya rangi ya ngozi"
   },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__Title": {
-    "messageformat": "Folda la magumzo"
-  },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Title": {
     "messageformat": "Weka folda la gumzo"
   },
@@ -1624,12 +1648,6 @@
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Description--WithChatFolders": {
     "messageformat": "{chatFoldersCount, plural, one {Folda {chatFoldersCount,number}} other {Folda {chatFoldersCount,number}}}"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button": {
-    "messageformat": "Weka mipangilio"
-  },
-  "icu:Preferences__ChatsPage__ChatFoldersSection__AddChatFolderItem__Button--WithChatFolders": {
-    "messageformat": "Dhibiti"
   },
   "icu:Preferences__ChatsPage__ChatFoldersSection__ChatFolderItem__ContextMenu__EditFolder": {
     "messageformat": "Badili folda"
@@ -2384,9 +2402,6 @@
   "icu:SafetyNumberModal__title": {
     "messageformat": "Hakikisha Nambari ya Usalama"
   },
-  "icu:safetyNumberChanged": {
-    "messageformat": "Nambari ya Usalama imebadilika"
-  },
   "icu:safetyNumberChanges": {
     "messageformat": "Mabadiliko ya Nambari ya Usalama"
   },
@@ -2826,16 +2841,16 @@
     "messageformat": "Ondoa"
   },
   "icu:stickers--StickerManagerPackDragHandle--Label": {
-    "messageformat": "Drag to reorder sticker pack"
+    "messageformat": "Buruta kisha upange tena pakiti ya vibandiko"
   },
   "icu:stickers--StickerManagerBlessedPacksList--Label": {
-    "messageformat": "Signal Artist Series sticker packs"
+    "messageformat": "Pakiti za vibandiko za Mfululizo wa Wasanii wa Signal"
   },
   "icu:stickers--StickerManagerReceivedPacksList--Label": {
-    "messageformat": "Received sticker packs"
+    "messageformat": "Umepokea pakiti ya vibandiko"
   },
   "icu:stickers--StickerManagerInstalledPacksList--Label": {
-    "messageformat": "Installed sticker packs"
+    "messageformat": "Umeweka pakiti ya vibandiko"
   },
   "icu:stickers--StickerPreview--Title": {
     "messageformat": "Pakiti ya Vibandiko"
@@ -3081,16 +3096,16 @@
     "messageformat": "Ongeza kibandiko"
   },
   "icu:FunPicker__Label--StickerReply": {
-    "messageformat": "Reply"
+    "messageformat": "Jibu"
   },
   "icu:FunPicker__Label--SendStickerReply": {
-    "messageformat": "Send"
+    "messageformat": "Tuma"
   },
   "icu:FunPicker__Label--CancelStickerReply": {
-    "messageformat": "Cancel"
+    "messageformat": "Ghairi"
   },
   "icu:FunPicker__Label--Sticker": {
-    "messageformat": "Sticker"
+    "messageformat": "Kibandiko"
   },
   "icu:confirmation-dialog--Cancel": {
     "messageformat": "Ghairi"
@@ -3872,20 +3887,20 @@
   "icu:calling__preview--minimize": {
     "messageformat": "Punguza onyesho"
   },
-  "icu:calling__change-view": {
-    "messageformat": "Badili mtazamo"
-  },
-  "icu:calling__view_mode--paginated": {
-    "messageformat": "Mtazamo wa kigridi"
-  },
-  "icu:calling__view_mode--overflow": {
-    "messageformat": "Mtazamo wa pembeni"
-  },
-  "icu:calling__view_mode--speaker": {
-    "messageformat": "Mtazamo wa mzungumzaji"
-  },
   "icu:calling__view_mode--updated": {
     "messageformat": "Mtazamo umesasishwa"
+  },
+  "icu:calling__change-layout": {
+    "messageformat": "Badilisha muundo"
+  },
+  "icu:calling__layout--paginated": {
+    "messageformat": "Gridi"
+  },
+  "icu:calling__layout--overflow": {
+    "messageformat": "Utepe"
+  },
+  "icu:calling__layout--speaker": {
+    "messageformat": "Mzungumzaji"
   },
   "icu:calling__SelectPresentingSourcesModal--title": {
     "messageformat": "Shiriki skrini yako"
@@ -3950,23 +3965,47 @@
   "icu:notMuted": {
     "messageformat": "Haijanyamazishwa"
   },
-  "icu:muteHour": {
-    "messageformat": "Nyamazisha kwa lisaa limoja"
-  },
-  "icu:muteEightHours": {
-    "messageformat": "Nyamazisha kwa masaa manane"
-  },
-  "icu:muteDay": {
-    "messageformat": "Nyamazisha kwa siku moja"
-  },
-  "icu:muteWeek": {
-    "messageformat": "Nyamazisha kwa wiki moja"
-  },
-  "icu:muteAlways": {
-    "messageformat": "Nyamazisha wakati wote"
-  },
   "icu:unmute": {
     "messageformat": "Washa"
+  },
+  "icu:MuteMenu__label": {
+    "messageformat": "Zima sauti ya gumzo hili kwa…"
+  },
+  "icu:MuteMenu__hour": {
+    "messageformat": "Saa moja"
+  },
+  "icu:MuteMenu__eightHours": {
+    "messageformat": "Saa 8"
+  },
+  "icu:MuteMenu__day": {
+    "messageformat": "Siku moja"
+  },
+  "icu:MuteMenu__week": {
+    "messageformat": "Wiki moja"
+  },
+  "icu:MuteMenu__until": {
+    "messageformat": "Hadi…"
+  },
+  "icu:MuteMenu__always": {
+    "messageformat": "Kila mara"
+  },
+  "icu:DatePicker__popupTitle": {
+    "messageformat": "Chagua tarehe"
+  },
+  "icu:TimePicker__popupTitle": {
+    "messageformat": "Chagua muda"
+  },
+  "icu:MuteUntilDialog__title": {
+    "messageformat": "Zima sauti ya gumzo hili hadi…"
+  },
+  "icu:MuteUntilDialog__dateLabel": {
+    "messageformat": "Tarehe"
+  },
+  "icu:MuteUntilDialog__timeLabel": {
+    "messageformat": "Muda"
+  },
+  "icu:MuteUntilDialog__timeZoneNote": {
+    "messageformat": "Saa zote katika {timeZone}"
   },
   "icu:muteExpirationLabelAlways": {
     "messageformat": "Imenyamazishwa wakati wote"
@@ -4874,9 +4913,6 @@
   "icu:showConversationDetails--direct": {
     "messageformat": "Mipangilio ya Gumzo"
   },
-  "icu:ConversationDetails__unmute--title": {
-    "messageformat": "Washa gumzo hili?"
-  },
   "icu:ConversationDetails--group-link": {
     "messageformat": "Kiungo cha kikundi"
   },
@@ -5072,6 +5108,9 @@
   "icu:ConversationDetailsMembershipList--show-all": {
     "messageformat": "Tazama zote"
   },
+  "icu:ConversationDetailsMembershipList__Search__AccessibilityLabel": {
+    "messageformat": "Tafuta"
+  },
   "icu:ConversationDetailsGroups--title": {
     "messageformat": "{count, plural, one {Kuna vikundi {count,number}mnavyoshiriki pamoja} other {Kuna vikundi {count,number}mnavyoshiriki pamoja}}"
   },
@@ -5108,17 +5147,110 @@
   "icu:EditNicknameAndNoteModal__Note__Placeholder": {
     "messageformat": "Kidokezo"
   },
-  "icu:ConversationNotificationsSettings__mentions__label": {
+  "icu:WhileMuted__title": {
+    "messageformat": "Ikiwa imezimwa sauti"
+  },
+  "icu:WhileMuted__description": {
+    "messageformat": "Chagua arifa za kuonekana wakati gumzo hili limezimwa."
+  },
+  "icu:WhileMuted__calls__title": {
+    "messageformat": "Simu"
+  },
+  "icu:WhileMuted__calls__description": {
+    "messageformat": "Piga simu au toa arifa pale simu inapopigwa wakati gumzo hili limezimwa sauti."
+  },
+  "icu:WhileMuted__mentions__title": {
     "messageformat": "Kutajwa"
   },
-  "icu:ConversationNotificationsSettings__mentions__info": {
-    "messageformat": "Pokea arifa wakati unatajwa katika gumzo zilizonyamazishwa"
+  "icu:WhileMuted__mentions__description": {
+    "messageformat": "Toa taarifa unapotajwa wakati gumzo hili limezimwa."
   },
-  "icu:ConversationNotificationsSettings__mentions__select__always-notify": {
-    "messageformat": "Arifu kila wakati"
+  "icu:WhileMuted__replies__title": {
+    "messageformat": "Majibu"
   },
-  "icu:ConversationNotificationsSettings__mentions__select__dont-notify-for-mentions-if-muted": {
-    "messageformat": "Usiarifu ikiwa mazungumzo yamenyamazishwa"
+  "icu:WhileMuted__replies__description": {
+    "messageformat": "Toa taarifa mtu anapojibu jumbe zako wakati gumzo hili limezimwa."
+  },
+  "icu:WhileMuted__value--none": {
+    "messageformat": "Hakuna"
+  },
+  "icu:WhileMuted__value--calls": {
+    "messageformat": "Simu"
+  },
+  "icu:WhileMuted__value--mentions": {
+    "messageformat": "Kutajwa"
+  },
+  "icu:WhileMuted__value--replies": {
+    "messageformat": "Majibu"
+  },
+  "icu:WhileMuted__value--calls-mentions": {
+    "messageformat": "Simu, kutajwa"
+  },
+  "icu:WhileMuted__value--calls-replies": {
+    "messageformat": "Simu, majibu"
+  },
+  "icu:WhileMuted__value--mentions-replies": {
+    "messageformat": "Kutajwa, majibu"
+  },
+  "icu:WhileMuted__value--calls-mentions-replies": {
+    "messageformat": "Simu, kutajwa, majibu"
+  },
+  "icu:Preferences__WhileMuted__description": {
+    "messageformat": "Chagua arifa zionekane kwa magumzo yaliyozimwa."
+  },
+  "icu:Preferences__WhileMuted__calls__description": {
+    "messageformat": "Piga simu au toa arifa simu inapopigwa katika gumzo lililozimwa sauti."
+  },
+  "icu:Preferences__WhileMuted__mentions__description": {
+    "messageformat": "Toa taarifa unapotajwa kwenye gumzo lililozimwa."
+  },
+  "icu:Preferences__WhileMuted__replies__description": {
+    "messageformat": "Toa taarifa mtu anapojibu jumbe zako katika gumzo lililozimwa."
+  },
+  "icu:UnreadReminders__title": {
+    "messageformat": "Vikumbusho ambavyo havijasomwa"
+  },
+  "icu:UnreadReminders__description": {
+    "messageformat": "Mara moja moja toa arifa panapokuwa na jumbe ambazo hazijasomwa wakati gumzo hili limezimwa sauti."
+  },
+  "icu:Preferences__UnreadReminders__description": {
+    "messageformat": "Mara moja moja toa arifa panapokuwa na jumbe ambazo hazijasomwa katika magumzo yaliyozimwa sauti."
+  },
+  "icu:UnreadReminders__notification--messages--1": {
+    "messageformat": "{messageCount, plural, one {Una ujumbe {messageCount,number} ambao haujasomwa kutoka kwa {person1}.} other {Una jumbe {messageCount,number} ambazo hazijasomwa kutoka kwa {person1}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--2": {
+    "messageformat": "{messageCount, plural, one {Una ujumbe {messageCount,number} ambao haujasomwa kutoka kwa {person1} na {person2}.} other {Una jumbe {messageCount,number} ambazo hazijasomwa kutoka kwa {person1} na {person2}.}}"
+  },
+  "icu:UnreadReminders__notification--messages--many": {
+    "messageformat": "{messageCount, plural, one {Una ujumbe {messageCount,number} ambao haujasomwa kutoka kwa {person1}, {person2} na wengine.} other {Una jumbe {messageCount,number} ambazo hazijasomwa kutoka kwa {person1}, {person2} na wengine.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-mentions": {
+    "messageformat": "{messageCount, plural, one {Una ujumbe {messageCount,number} ambao haujasomwa, pamoja na {mentionSummary}.} other {Una jumbe {messageCount,number} ambazo hazijasomwa, pamoja na {mentionSummary}.}}"
+  },
+  "icu:UnreadReminders__notification--messages-including-replies": {
+    "messageformat": "{messageCount, plural, one {Una ujumbe {messageCount,number} ambao haujasomwa, pamoja na {replySummary}.} other {Una jumbe {messageCount,number} ambazo hazijasomwa, pamoja na {replySummary}.}}"
+  },
+  "icu:UnreadReminders__notification--counts--messages": {
+    "messageformat": "{messageCount, plural, one {Una ujumbe {messageCount,number} ambao haujasomwa.} other {Una jumbe {messageCount,number} ambazo hazijasomwa.}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--1": {
+    "messageformat": "{mentionCount, plural, one {umetajwa na {person1}} other {Umetajwa mara {mentionCount,number} na {person1}}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--2": {
+    "messageformat": "{mentionCount, plural, one {Umetajwa mara {mentionCount,number} na {person1} na {person2}} other {Umetajwa mara {mentionCount,number} na {person1} na {person2}}}"
+  },
+  "icu:UnreadReminders__notification__mentionSummary--many": {
+    "messageformat": "{mentionCount, plural, one {Umetajwa mara {mentionCount,number} na {person1} na wengine} other {Umetajwa mara {mentionCount,number} na {person1} na wengine}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--1": {
+    "messageformat": "{replyCount, plural, one {jibu kutoka kwa {person1}} other {Majibu {replyCount,number} kutoka kwa {person1}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--2": {
+    "messageformat": "{replyCount, plural, one {Majibu {replyCount,number} kutoka kwa {person1} na {person2}} other {Majibu {replyCount,number} kutoka kwa {person1} na {person2}}}"
+  },
+  "icu:UnreadReminders__notification__replySummary--many": {
+    "messageformat": "{replyCount, plural, one {Majibu {replyCount,number} kutoka kwa {person1} na wengine} other {Majibu {replyCount,number} kutoka kwa {person1} na wengine}}"
   },
   "icu:GroupLinkManagement--clipboard": {
     "messageformat": "Umenakili kiungo cha kikundi."
@@ -5140,6 +5272,48 @@
   },
   "icu:GroupLinkManagement__CopyGroupLinkButtonLabel": {
     "messageformat": "Nakili kiungo cha kikundi cha Signal. kwenye ubao wa kunakili"
+  },
+  "icu:GroupMembersSearchDialog__DialogTitle": {
+    "messageformat": "Tafuta wanakikundi"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder": {
+    "messageformat": "Tafuta"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringByAdmins": {
+    "messageformat": "Tafuta admins"
+  },
+  "icu:GroupMembersSearchDialog__SearchField__Placeholder--FilteringBySystemContacts": {
+    "messageformat": "Tafuta wawasiliani"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Label": {
+    "messageformat": "Chujio"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__AllMembers": {
+    "messageformat": "Wanachama wote"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__Admins": {
+    "messageformat": "Wasimamizi"
+  },
+  "icu:GroupMembersSearchDialog__FilterMenu__SystemContacts": {
+    "messageformat": "Wawasiliani"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithoutSearchQuery": {
+    "messageformat": "Hakuna matokeo"
+  },
+  "icu:GroupMembersSearchDialog__EmptyState__NoResults--WithSearchQuery": {
+    "messageformat": "Hakuna matokeo ya \"{searchQuery}\""
+  },
+  "icu:GroupMembersSearchDialog__MemberItem__Admin": {
+    "messageformat": "Msimamizi"
+  },
+  "icu:GroupMembersSearchDialog__SearchResults__Title": {
+    "messageformat": "Tafuta Matokeo"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__AddMembers": {
+    "messageformat": "Ongeza wanachama"
+  },
+  "icu:GroupMembersSearchDialog__BottomActions__InviteViaGroupLink": {
+    "messageformat": "Alikuwa kupitia kiungo cha kikundi"
   },
   "icu:PendingInvites--tab-requests": {
     "messageformat": "Maombi ({count,number})"
@@ -5426,6 +5600,9 @@
   },
   "icu:CaptchaDialog__second-paragraph": {
     "messageformat": "Baada ya kuthibitisha, unaweza kuendelea kutuma ujumbe. Ujumbe wowote uliositishwa utatumwa kiotomatiki."
+  },
+  "icu:CaptchaDialog__continue": {
+    "messageformat": "Endelea"
   },
   "icu:CaptchaDialog--can-close__title": {
     "messageformat": "Ungependa kuendelea bila kuthibitisha?"
@@ -5893,6 +6070,15 @@
   "icu:Preferences__message-audio-description": {
     "messageformat": "Sikia sauti ya kuarifu kutumwa na kupokewa kwa ujumbe unapokuwa kwenye gumzo."
   },
+  "icu:Preferences__reaction-notifications-title": {
+    "messageformat": "Arifa za majibu"
+  },
+  "icu:Preferences__reaction-notifications-description": {
+    "messageformat": "Toa arifa mtu akijibu ujumbe wako"
+  },
+  "icu:Preferences__button--account": {
+    "messageformat": "Akaunti"
+  },
   "icu:Preferences__button--general": {
     "messageformat": "Jumla"
   },
@@ -5962,6 +6148,45 @@
   "icu:Preferences--system": {
     "messageformat": "Mfumo"
   },
+  "icu:Preferences--signal-login": {
+    "messageformat": "Signal Login"
+  },
+  "icu:Preferences--signal-login-description": {
+    "messageformat": "Maelezo yako ya Signal Login yanatumika kurudisha na kurejesha akaunti yako. Hifadhi funguo hizi kwa njia salama katika kidhibiti cha manenosiri unachokiamini. <learnMoreLink>Pata maelezo zaidi</learnMoreLink>."
+  },
+  "icu:Preferences--signal-login-description--learn-more": {
+    "messageformat": "Jifunze zaidi"
+  },
+  "icu:Preferences__SignalAccount__label": {
+    "messageformat": "Akaunti na urejeshaji"
+  },
+  "icu:Preferences__SignalAccount__description": {
+    "messageformat": "Funguo 2"
+  },
+  "icu:Preferences__SignalAccountKeys__Title": {
+    "messageformat": "Signal Login Yako"
+  },
+  "icu:Preferences__SignalAccountKeys__Description": {
+    "messageformat": "Hifadhi maelezo haya mahali salama, maelezo yako ya kuingia katika akaunti yanahitajika ili kurejesha akaunti na data yako. Usimpatie mtu yeyote."
+  },
+  "icu:Preferences__SignalAccountKeys__AccountKey": {
+    "messageformat": "Ufunguo wa akaunti"
+  },
+  "icu:Preferences__SignalAccountKeys__AccountID": {
+    "messageformat": "ID ya Akaunti"
+  },
+  "icu:Preferences__SignalAccountKeys__RecoveryKey": {
+    "messageformat": "Ufunguo wa kurejesha akaunti"
+  },
+  "icu:Preferences__SignalAccountKeys__Save": {
+    "messageformat": "Hifadhi"
+  },
+  "icu:Preferences__Account__LinkedDevice__label": {
+    "messageformat": "Hiki ni kifaa kilichounganishwa"
+  },
+  "icu:Preferences__Account__LinkedDevice__description": {
+    "messageformat": "Ili udhibiti mipangilio ya akaunti yako, fungua Signal kwenye kifaa chako cha msingi."
+  },
   "icu:Preferences--zoom": {
     "messageformat": "Kiwango cha Kukuza"
   },
@@ -5992,8 +6217,116 @@
   "icu:Preferences--advanced": {
     "messageformat": "ya juu"
   },
-  "icu:Preferences--notification-content": {
-    "messageformat": "Arifa za maudhui"
+  "icu:Preferences--change-signal-pin": {
+    "messageformat": "Badilisha PINI yako"
+  },
+  "icu:Preferences--change-signal-pin-button": {
+    "messageformat": "Badili"
+  },
+  "icu:Preferences--create-signal-pin": {
+    "messageformat": "Unda Nenosiri"
+  },
+  "icu:Preferences--create-signal-pin-button": {
+    "messageformat": "Unda"
+  },
+  "icu:Preferences--signal-pin": {
+    "messageformat": "Nenosiri la Signal"
+  },
+  "icu:Preferences--signal-pin__footer": {
+    "messageformat": "PIN zinahifadhi maelezo kwenye Signal kwa kuyasimba kwa njia fiche ili wewe pekee ndio uyafikie. PIN yako haiwezi kurejeshwa. Wasifu, mipangilio na wawasiliani wako watarejeshwa ukisakinisha upya. <learnMoreLink>Pata maelezo zaidi</learnMoreLink>"
+  },
+  "icu:Preferences--signal-pin-advanced-settings": {
+    "messageformat": "Mipangilio ya PIN ya Hali ya Juu"
+  },
+  "icu:Preferences--disable-signal-pin": {
+    "messageformat": "Lemaza PIN"
+  },
+  "icu:Preferences--disable-signal-pin--button": {
+    "messageformat": "Lemaza"
+  },
+  "icu:Preferences--disable-signal-pin--footer": {
+    "messageformat": "Ukizima PIN, utapoteza data yote utakaposajili upya Signal isipokuwa ukihifadhi nakala yake na kuirejesha mwenyewe. Huwezi kuwasha Kufuli ya Usajili wakati PIN imezimwa."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--title": {
+    "messageformat": "Umeshindwa kuzima PIN kwa sababu ya lock ya usajili"
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--body": {
+    "messageformat": "Ni lazima uzime kipengele cha Lock ya Usajili kabla ya kuzima PIN yako."
+  },
+  "icu:DisableSignalPinErrorDialog--reg-lock--ok": {
+    "messageformat": "Sawa"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--title": {
+    "messageformat": "Umeshindwa kuzima PIN kwa sababu ya zoezi la kuhifadhi nakala"
+  },
+  "icu:DisableSignalPinErrorDialog--backups--body": {
+    "messageformat": "Ni lazima uzime zoezi la kuhifadhi nakala kabla ya kuzima PIN yako."
+  },
+  "icu:Preferences--enable-signal-pin": {
+    "messageformat": "Washa PIN"
+  },
+  "icu:Preferences--enable-signal-pin--button": {
+    "messageformat": "Washa"
+  },
+  "icu:Preferences--pin-reminders--header": {
+    "messageformat": "Vikumbusho vya PIN"
+  },
+  "icu:Preferences--pin-reminders--description": {
+    "messageformat": "Utaulizwa mara chache zaidi baada ya muda"
+  },
+  "icu:Preferences--registration-lock__label": {
+    "messageformat": "Lock ya usajili"
+  },
+  "icu:Preferences--registration-lock__footer": {
+    "messageformat": "Inahitaji PIN yako ya Signal ili usajili tena namba yako ya simu ukitumia Signal."
+  },
+  "icu:Preferences__Chats__TextInputSection__Title": {
+    "messageformat": "Uingizaji maandishi"
+  },
+  "icu:Preferences__Chats__ChatFoldersSection__Title": {
+    "messageformat": "Folda la magumzo"
+  },
+  "icu:Preferences__Notifications__Show__Label": {
+    "messageformat": "Onyesha"
+  },
+  "icu:Preferences__Notifications__SoundsSection__Title": {
+    "messageformat": "Sauti"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title": {
+    "messageformat": "Beji ya programu"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__Title-v2": {
+    "messageformat": "Beji ambayo hazisomwa"
+  },
+  "icu:Preferences__Notifications__Reset__title": {
+    "messageformat": "Weka upya mipangilio ya arifa iwe chaguomsingi, ikiwa ni pamoja na mipangilio maalum ya magumzo yako."
+  },
+  "icu:Preferences__Notifications__Reset__button": {
+    "messageformat": "Weka upya"
+  },
+  "icu:Preferences__Notifications__Reset__modal--body": {
+    "messageformat": "Ungependa kuweka upya mipangilio yote aria iwe chaguo kwa magumzo yote?"
+  },
+  "icu:Preferences__Notifications__Reset__modal--confirm": {
+    "messageformat": "Weka upya"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Label": {
+    "messageformat": "Idadi ya beji"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__Description": {
+    "messageformat": "Chagua kama idadi ya beji itaonyesha idadi ya jumbe au magumzo ambayo hayajasomwa"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadMessages": {
+    "messageformat": "Jumbe hazijasomwa"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__UnreadChats": {
+    "messageformat": "Magumzo hayajasomwa"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats": {
+    "messageformat": "Jumuisha magumzo yaliyozimwa sauti katika programu ya beji"
+  },
+  "icu:Preferences__Notifications__AppBadgeSection__BadgeCount__MutedChats__description": {
+    "messageformat": "Beji za folda za magumzo mara zote yatajumuisha magumzo yaliyozimwa sauti"
   },
   "icu:PlaintextExport--PreferencesRow--Header": {
     "messageformat": "Hamisha historia ya gumzo"
@@ -6145,9 +6478,6 @@
   "icu:NotificationProfiles--setting": {
     "messageformat": "Arifa za Wasifu"
   },
-  "icu:NotificationProfiles--setup": {
-    "messageformat": "Weka mipangilio"
-  },
   "icu:NotificationProfiles--title": {
     "messageformat": "Arifa za Wasifu"
   },
@@ -6159,9 +6489,6 @@
   },
   "icu:NotificationProfiles--manage-description": {
     "messageformat": "Ongeza au hariri wasifu wa arifa"
-  },
-  "icu:NotificationProfiles--manage-profiles": {
-    "messageformat": "{profileCount, plural, one {Wasifu mmoja} other {Wasifu {profileCount,number}}}"
   },
   "icu:NotificationProfiles--create": {
     "messageformat": "Tengeneza wasifu"
@@ -6351,6 +6678,9 @@
   },
   "icu:Preferences--blocked-groups": {
     "messageformat": "Vikundi Vilivyozuiliwa"
+  },
+  "icu:Preferences--blocked--blocked-on": {
+    "messageformat": "Ako blocked kwenye {blockedAt}"
   },
   "icu:Preferences--signal-backups": {
     "messageformat": "Hifadhi Nakala ya Signal iliyo Salama"
@@ -6559,9 +6889,6 @@
   "icu:Preferences__pnp__row--body": {
     "messageformat": "Chagua nani anayeweza kuona nambari yako ya simu na kuwasiliana nawe kwenye Signal."
   },
-  "icu:Preferences__pnp__row--button": {
-    "messageformat": "Badili…"
-  },
   "icu:Preferences__pnp__sharing--title": {
     "messageformat": "Nani anaweza kuona nambari yangu"
   },
@@ -6610,14 +6937,11 @@
   "icu:Preferences--read-receipts": {
     "messageformat": "Jumbe zilizosomwa"
   },
-  "icu:Preferences--read-receipts--description": {
-    "messageformat": "Ikizimwa, hutaona arifa kuwa wengine wamesoma risiti."
-  },
   "icu:Preferences--typing-indicators": {
     "messageformat": "Viashiria vya kucharaza"
   },
-  "icu:Preferences--typing-indicators--description": {
-    "messageformat": "Ikizimwa, hutaona viashiria vya kuandika kutoka kwa wengine."
+  "icu:Preferences--messaging-help": {
+    "messageformat": "Angalia na uruhusu ufikiaji wakati ujumbe unasomwa na kuchapwa. Kama imezimwa, hutaweza kuona arifa kuwa ujumbe umesomwa au viashiria vya kuandika kutoka kwa wengine."
   },
   "icu:Preferences--updates": {
     "messageformat": "Masasisho"
@@ -6721,11 +7045,23 @@
   "icu:InstallScreenUpdateDialog--update-required__title": {
     "messageformat": "Sasisho Linahitajika"
   },
+  "icu:InstallScreenUpdateDialog--checking-for-updates": {
+    "messageformat": "Inatafuta masasisho"
+  },
+  "icu:InstallScreenUpdateDialog--updating-signal": {
+    "messageformat": "Inasasisha Signal"
+  },
+  "icu:InstallScreenUpdateDialog--download-progress": {
+    "messageformat": "Inapakua {currentBytes} ya {totalBytes} ({percentage,number,percent})..."
+  },
   "icu:InstallScreenUpdateDialog--update-required__body": {
-    "messageformat": "Ili kukamilisha kusawazisha ujumbe wako, sasisha Signal Desktop sasa."
+    "messageformat": "Ili uendelee, sasisha Signal Desktop."
   },
   "icu:InstallScreenUpdateDialog--update-required__action-update": {
     "messageformat": "Sasisha"
+  },
+  "icu:InstallScreenUpdateDialog--update-required__action-update__mas": {
+    "messageformat": "Nenda kwenye App Store"
   },
   "icu:InstallScreenUpdateDialog--unsupported-os__title": {
     "messageformat": "Sasisho Linahitajika"
@@ -6759,6 +7095,9 @@
   },
   "icu:StandaloneRegistration--PhoneNumber--waiting": {
     "messageformat": "Tafadhali jaribu tena baada ya {duration}"
+  },
+  "icu:StandaloneRegistration--PhoneNumber--RegionCodeSelector--Label": {
+    "messageformat": "Chagua code ya eneo"
   },
   "icu:StandaloneRegistration--PhoneNumber--placeholder": {
     "messageformat": "Nambari ya simu"
@@ -6982,6 +7321,9 @@
   "icu:StandaloneRegistration--VerifyPIN--incorrect-pin--with-count": {
     "messageformat": "{triesRemaining, plural, one {PINI si sahihi. Jaribio {triesRemaining,number} limebaki.} other {Nenosiri sio sahihi. Majaribio {triesRemaining,number} yamesalia}}"
   },
+  "icu:StandaloneRegistration--VerifyPIN--just-count": {
+    "messageformat": "{triesRemaining, plural, one {Jaribio {triesRemaining,number} lililobakia.} other {Majaribio {triesRemaining,number} yamesalia}}"
+  },
   "icu:StandaloneRegistration--VerifyPIN--NeedHelp--header": {
     "messageformat": "Unahitaji usaidizi?"
   },
@@ -7024,6 +7366,9 @@
   "icu:StandaloneRegistration--VerifyPIN--NoRemainingTries--learn-more": {
     "messageformat": "Jifunze zaidi kuhusu PINI"
   },
+  "icu:StandaloneRegistration--VerifyPIN--open-menu": {
+    "messageformat": "Fungua menyu"
+  },
   "icu:StandaloneRegistration--VerifyPIN--menu--skip-pin": {
     "messageformat": "Ruka PIN"
   },
@@ -7031,7 +7376,7 @@
     "messageformat": "Ungependa kuruka kuweka PIN?"
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--description": {
-    "messageformat": "Ikiwa hukumbuki PIN yako, unaweza ukaunda mpya. Unaweza kusajili na kutumia akaunti yako lakini utapoteza baadhi ya mipangilio uliyohifadhi kama vile maelezo ya wasifu wako. Pata maelezo zaidi."
+    "messageformat": "Ikiwa hukumbuki PIN yako, unaweza ukaunda mpya. Unaweza kusajili na kutumia akaunti yako lakini utapoteza baadhi ya mipangilio uliyohifadhi kama vile maelezo ya wasifu wako. <learnMore>Pata maelezo zaidi</learnMore>."
   },
   "icu:StandaloneRegistration--VerifyPIN--SkipPIN--skip-button": {
     "messageformat": "Ruka na uunde PIN mpya"
@@ -7067,7 +7412,7 @@
     "messageformat": "Onyo"
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--description": {
-    "messageformat": "Ikiwa utazima PIN, utapoteza data yote wakati unasajili upya Signal isipokuwa uihamishe kutoka kwenye kifaa kingine cha iOS. Unaweza kuwasha kipengele cha Lock ya Usajili wakati PIN imezimwa."
+    "messageformat": "Ukilemaza PIN, utapoteza data yote ukisajili upya Signal. Huwezi kuwasha kipengele cha Lock ya Usajili wakati PIN imelemazwa."
   },
   "icu:StandaloneRegistration--CreatePIN--DisableWarning--disable-button": {
     "messageformat": "Lemaza PIN"
@@ -7275,6 +7620,12 @@
   },
   "icu:MediaPermissionsModal__step-2": {
     "messageformat": "Washa \"Signal\""
+  },
+  "icu:MediaPermissionsModal__step-2--windows--microphone": {
+    "messageformat": "Washa idhini ya kufikia maikrofoni kwa Signal"
+  },
+  "icu:MediaPermissionsModal__step-2--windows--camera": {
+    "messageformat": "Washa idhini ya kufikia kamera kwa Signal"
   },
   "icu:MediaPermissionsModal__open": {
     "messageformat": "Nenda kwenye mipangilio"
@@ -7816,11 +8167,17 @@
   "icu:ContextMenu--button": {
     "messageformat": "Menu ya Muktadha"
   },
+  "icu:EditUsernameModalBody__username-label": {
+    "messageformat": "Jina la mtumiaji"
+  },
   "icu:EditUsernameModalBody__username-placeholder": {
     "messageformat": "Jina la mtumiaji"
   },
   "icu:EditUsernameModalBody__username-helper": {
     "messageformat": "Majina ya watumiaji huwa yana seti ya tarakimu."
+  },
+  "icu:EditUsernameModalBody__discriminator-label": {
+    "messageformat": "Tarakimu za jina la mtumiaji"
   },
   "icu:EditUsernameModalBody__learn-more": {
     "messageformat": "Jifunze Zaidi"
@@ -7918,6 +8275,75 @@
   },
   "icu:UsernameMegaphone__dismiss": {
     "messageformat": "Tupilia mbali"
+  },
+  "icu:PinReminderMegaphone__title": {
+    "messageformat": "Thibitisha PINI yako ya Signal"
+  },
+  "icu:PinReminderMegaphone__body": {
+    "messageformat": "Mara kwa mara tutakuomba uthibitishe PIN yako ili uikumbuke."
+  },
+  "icu:PinReminderMegaphone__verify": {
+    "messageformat": "Thibitisha"
+  },
+  "icu:PinReminderMegaphone__not-now": {
+    "messageformat": "Sio sasa"
+  },
+  "icu:PinReminderModal__title": {
+    "messageformat": "Ingiza Nenosiri lako ya Signal"
+  },
+  "icu:PinReminderModal__body": {
+    "messageformat": "Ili kukusaidia kukumbuka PIN yako, tutakuomba uingize mara kwa mara. Na baada ya muda tutakuomba mara chache."
+  },
+  "icu:PinReminderModal__pin-input-placeholder": {
+    "messageformat": "Ingiza Nenosiri lako"
+  },
+  "icu:PinReminderModal__pin-input-error": {
+    "messageformat": "PIN sio sahihi. Jaribu tena"
+  },
+  "icu:PinReminderModal__forgot": {
+    "messageformat": "Umesahau PIN"
+  },
+  "icu:PinReminderModal__confirm": {
+    "messageformat": "Thibitisha"
+  },
+  "icu:PinReminderCompletedToast": {
+    "messageformat": "PIN ni sahihi. Tutakukumbusha tena baadae."
+  },
+  "icu:PinChangeModal__title--create": {
+    "messageformat": "Badilisha PIN yako ya Signal"
+  },
+  "icu:PinChangeModal__title--create--without-pin": {
+    "messageformat": "Unda PIN yako ya Signal"
+  },
+  "icu:PinChangeModal__body--create": {
+    "messageformat": "Unaweza kubadili PINI mradi tu kifaa hiki kimesajiliwa <learnMoreLink>Pata maelezo zaidi</learnMoreLink>"
+  },
+  "icu:PinChangeModal__body--create--without-pin": {
+    "messageformat": "PIN zinahifadhi maelezo kwenye Signal kwa kuyasimba kwa njia fiche ili wewe pekee ndio uyafikie. Wasifu, mipangilio na wawasiliani wako watarejeshwa ukisakinisha upya. Hutahitaji PIN yako ili ufungue programu. <learnMoreLink>Pata maelezo zaidi</learnMoreLink>"
+  },
+  "icu:PinChangeModal__title--confirm": {
+    "messageformat": "Thibitisha PINI yako ya Signal"
+  },
+  "icu:PinChangeModal__body--confirm": {
+    "messageformat": "Weka PIN uliyotoka kuunda."
+  },
+  "icu:PinChangeModal__pin-input-placeholder--create": {
+    "messageformat": "Weka PIN mpya"
+  },
+  "icu:PinChangeModal__pin-input-placeholder--confirm": {
+    "messageformat": "Thibitisha PIN"
+  },
+  "icu:PinChangeModal__cancel": {
+    "messageformat": "Ghairi"
+  },
+  "icu:PinChangeModal__continue": {
+    "messageformat": "Endelea"
+  },
+  "icu:PinChangeModal__confirm": {
+    "messageformat": "Thibitisha"
+  },
+  "icu:PinChangeCompletedToast": {
+    "messageformat": "PIN mpya uliyounda."
   },
   "icu:UnsupportedOSWarningDialog__body": {
     "messageformat": "Muda si mrefu Signal desktop haitaikubali tena toleo lako la {OS} mfumo wa uendeshaji wa kompyuta yako. Ili kuendelea kutumia Signal, sasisha mfumo wa uendeshaji wa kompyuta kabla ya {expirationDate}. <learnMoreLink>Jifunze zaidi</learnMoreLink>"
@@ -8351,8 +8777,11 @@
   "icu:DonationReceipt__type-value--one-time": {
     "messageformat": "Mara moja"
   },
-  "icu:DonationReceipt__footer-text": {
-    "messageformat": "Asante kwa kuiunga mkono Signal. Mchango wako husaidia kukuza dhamira ya kutengeneza teknolojia huria ya faragha ambayo hulinda uhuru wa kujieleza na kuwezesha mawasiliano salama ya kidunia kwa mamilioni ya watu duniani kote. Kama wewe ni mkazi wa Marekani, tafadhali hifadhi risiti hii kwa rekodi zako za kodi. Signal Technology Foundation ni shirika lisilo la kibiashara lisilotozwa kodi nchini Marekani chini ya kifungu cha 501c3 cha Kanuni ya Mapato ya Ndani. Kitambulisho chetu cha Ushuru wa Shirikisho ni 82-4506840."
+  "icu:DonationReceipt__footer-text-v2": {
+    "messageformat": "Asante kwa kuiunga mkono Signal. Mchango wako husaidia kuendelea dhamira ya kulinda uhuru wa kujieleza na kuwezesha mawasiliano salama ya kidunia kwa mamilioni ya watu duniani kote. Kama wewe ni mkazi wa Marekani, tafadhali hifadhi risiti hii kwa rekodi zako za kodi. Signal Technology Foundation ni shirika lisilo la kibiashara lisilotozwa kodi nchini Marekani chini ya kifungu cha 501c3 cha Kanuni ya Mapato ya Ndani. Kitambulisho chetu cha Ushuru wa Shirikisho ni 82-4506840. Signal haijatoa bidhaa wala huduma yoyote kwa kuzingatia mchango huu."
+  },
+  "icu:MessageCta__Donate": {
+    "messageformat": "Changia sasa"
   },
   "icu:Donations__OfflineTooltip": {
     "messageformat": "Haupo mtandaoni. Tafadhali jiunge na mtandao ili ukamilishe mchango."
@@ -8661,16 +9090,10 @@
     "messageformat": "Mabadiliko madogo, marekebisho ya bugs na uboreshaji wa utendaji. Asante kwa kutumia Signal!",
     "ignoreUnused": true
   },
-  "icu:WhatsNew__8.18--0": {
-    "messageformat": "Kura za maoni sasa zinaweza kuundwa kwenye magumzo binafsi pia. Wasilisha orodha iliyoratibiwa ya chaguo kwa rafiki yako anayekosa maamuzi au kumbuka tena furaha ya kumpatia kipenzi chako kiujumbe kwa kuunda kura ya maoni ya  “Unavutiwa nami? N/H/Labda “."
+  "icu:WhatsNew__8.30--0": {
+    "messageformat": "Kutokana na maboresha kadhaa ya utendaji, CPU yako itafanya kazi vizuri zaidi wakati wa simu za video (hata kama utakuwa hautabasamu)."
   },
-  "icu:WhatsNew__8.19--0": {
-    "messageformat": "Admins wa vikundi sasa wanaweza kuhitimisha magumzo kikawaida kwa kutumia chaguo la \"Funga Kikundi\" katika mipangilio ya kikundi. Kufunga kikundi huzuia wanakikundi kutuma jumbe au kupiga simu na pia inazima uwezo wa kualika. Sasa unaweza kuhakikisha kila mtu anabaki kwenye mazungumzo sahihi kwa kufunga kikundi cha ushonaji cha mwaka jana kabla ya kufungua kingine pamoja."
-  },
-  "icu:WhatsNew__8.20--0": {
-    "messageformat": "Introducing disappearing call events: Missed, outgoing, and received calls that occur after you install this update will now automatically disappear in any chat where disappearing messages are enabled."
-  },
-  "icu:WhatsNew__8.20--1": {
-    "messageformat": "Now you can reorder installed sticker packs so your new favorites don’t get stuck in the back of the line."
+  "icu:WhatsNew__8.30--1": {
+    "messageformat": "Pia tumeongeza njia ya mkato rahisi ili kufungua mipangilio yako ya mfumo kwenye Windows ikiwa utajaribu kujiunga kwenye simu ya video na Signal haina ruhusa ya kufikia kamera. Sasa ni rahisi kuona kile unachohitaji ili wengine wakuone."
   }
 }

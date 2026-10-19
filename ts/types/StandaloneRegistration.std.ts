@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { PhoneNumberDiscoverability } from '../util/phoneNumberDiscoverability.std.ts';
+import type { AvatarDataType } from './Avatar.std.ts';
 import type { VerificationTransport } from './VerificationTransport.std.ts';
 
 // Some example simple workflows:
@@ -25,6 +26,7 @@ export enum RegistrationStage {
   CREATE_PIN = 'CREATE_PIN',
   CREATE_PIN_CONFIRM = 'CREATE_PIN_CONFIRM',
   ACCOUNT_LOCKED = 'ACCOUNT_LOCKED',
+  UPDATE_REQUIRED = 'UPDATE_REQUIRED',
 }
 
 export const StageOrder: Record<RegistrationStage, number> = {
@@ -36,12 +38,15 @@ export const StageOrder: Record<RegistrationStage, number> = {
   [RegistrationStage.CREATE_PIN]: 5,
   [RegistrationStage.CREATE_PIN_CONFIRM]: 6,
   [RegistrationStage.ACCOUNT_LOCKED]: 7,
+  [RegistrationStage.UPDATE_REQUIRED]: 8,
 };
 
 // A few special-cases are always allowed:
 //   1. You can always return to the initial PHONE_NUMBER stage
-//   2. You can only start from the initial PHONE_NUMBER stage
+//   2. You can start from the initial PHONE_NUMBER stage, as well as these three
+//      for fixing partial registrations: PROFILE_ENTRY, VERIFY_PIN, CREATE_PIN
 //   3. You can always make an update to the existing stage
+//   4. You can always go to the UPDATE_REQUIRED stage
 export const ValidNextStages: Record<
   RegistrationStage,
   Set<RegistrationStage>
@@ -50,6 +55,7 @@ export const ValidNextStages: Record<
   [RegistrationStage.CAPTCHA]: new Set([RegistrationStage.VERIFICATION_CODE]),
   [RegistrationStage.VERIFICATION_CODE]: new Set([
     RegistrationStage.PROFILE_ENTRY,
+    RegistrationStage.ACCOUNT_LOCKED, // if 423 from account create contains no credentials
   ]),
   [RegistrationStage.PROFILE_ENTRY]: new Set([
     RegistrationStage.VERIFY_PIN,
@@ -66,6 +72,7 @@ export const ValidNextStages: Record<
     RegistrationStage.CREATE_PIN, // so we can go back
   ]),
   [RegistrationStage.ACCOUNT_LOCKED]: new Set([]),
+  [RegistrationStage.UPDATE_REQUIRED]: new Set([]),
 };
 
 // There's no 'complete' stage, just a check we do when we are done
@@ -80,6 +87,15 @@ export enum FatalErrorType {
   UNEXPECTED = 'UNEXPECTED',
   TIMEOUT = 'TIMEOUT',
   UPDATE_REQUIRED = 'UPDATE_REQUIRED',
+}
+
+// If the user's account is created, but they haven't finished registration fully, this
+// allows us to start them at the right place
+export enum PartialRegistrationType {
+  NEW_ACCOUNT__PROFILE = 'NEW_ACCOUNT__PROFILE', // start at PROFILE_ENTRY stage, with accountState = { created: true; hasPin: false; }
+  NEW_ACCOUNT__PIN = 'NEW_ACCOUNT__PIN', // start at CREATE_PIN stage
+  EXISTING__PROFILE = 'EXISTING__PROFILE', // start at PROFILE_ENTRY stage, with accountState = { created: true; hasPin: true; }
+  EXISTING__PIN = 'EXISTING__PIN', // start at VERIFY_PIN stage, with dataForReglockAccountCreate: undefined
 }
 
 export enum Direction {
@@ -256,13 +272,14 @@ export type LateStageAccountState =
       phoneNumber: string;
       verificationSessionId: string;
       svrCredentials: SVRCredentials;
+      avatars: ReadonlyArray<AvatarDataType> | undefined;
     };
 
 export type ProfileEntryStage = {
   // If we don't have information from a prior registration, the user sets up a profile
   // Prerequisites:
   //   - none; we could easily move this stage around
-  //   - if we already have profile information, this stage can be skipped
+  //   - if we already have profile information, this stage could be skipped; as is, we show it to allow confirmation
   // Behaviors:
   //   - we should save all of the draft avatars the user created but didn't use
   // Completion requirements:
@@ -286,6 +303,14 @@ export type ProfileEntryStage = {
   // After PROFILE_ENTRY:
   //  1. if accountState.created=true, can upload profile here since account is created
   //  2. if accountState.created=false or accountState.hasPin=true, go to VERIFY_PIN. Otherwise, CREATE_PIN.
+};
+
+export type DataForReglockAccountCreate = {
+  phoneNumber: string;
+  verificationSessionId: string;
+  svrCredentials: SVRCredentials;
+  profileData: ProfileData;
+  avatars: ReadonlyArray<AvatarDataType> | undefined;
 };
 
 export type VerifyPINStage = {
@@ -312,7 +337,7 @@ export type VerifyPINStage = {
     | {
         type: 'in-progress';
       }
-    | { type: 'failed'; error: 'nothing-in-svr' };
+    | { type: 'failed'; error: 'incorrect-pin' };
 
   // After VERIFY_PIN:
   //  - save PIN in local storage
@@ -363,13 +388,6 @@ export type CreatePINConfirmStage = {
   //  3. Go to COMPLETE
 };
 
-export type DataForReglockAccountCreate = {
-  phoneNumber: string;
-  verificationSessionId: string;
-  svrCredentials: SVRCredentials;
-  profileData: ProfileData;
-};
-
 export type AccountLockedStage = {
   // Server has told us that the phone number in question is locked (reglock and no more PIN tries)
   // Prerequisites:
@@ -377,6 +395,18 @@ export type AccountLockedStage = {
   // Behaviors:
   //   - user can try again with a different phone number
   stage: RegistrationStage.ACCOUNT_LOCKED;
+};
+
+export type UpdateRequiredStage = {
+  // Server has told us that we need to update Signal Desktop before we move forward.
+  // Prerequisites:
+  //   - a new version is available to download
+  //   - the user could potentially choose to do this even if not required
+  // Behaviors:
+  //   - allow user to download the new version and kick off the install
+  //   - show any errors that happen during the process
+  //   - restart the app to finish the installation
+  stage: RegistrationStage.UPDATE_REQUIRED;
 };
 
 export type RegistrationWorkflow =
@@ -387,4 +417,5 @@ export type RegistrationWorkflow =
   | VerifyPINStage
   | CreatePINStage
   | CreatePINConfirmStage
-  | AccountLockedStage;
+  | AccountLockedStage
+  | UpdateRequiredStage;

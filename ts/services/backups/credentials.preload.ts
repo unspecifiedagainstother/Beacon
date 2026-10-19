@@ -10,6 +10,7 @@ import {
   GenericServerPublicParams,
 } from '@signalapp/libsignal-client/zkgroup.js';
 import { type BackupKey } from '@signalapp/libsignal-client/dist/AccountKeys.js';
+import type { BackupAuth } from '@signalapp/libsignal-client/dist/net';
 import lodashFp from 'lodash/fp.js';
 
 import * as Bytes from '../../Bytes.std.ts';
@@ -26,8 +27,6 @@ import { missingCaseError } from '../../util/missingCaseError.std.ts';
 import {
   type BackupCdnReadCredentialType,
   type BackupCredentialWrapperType,
-  type BackupPresentationHeadersType,
-  type BackupSignedPresentationType,
   BackupCredentialType,
 } from '../../types/backups.node.ts';
 import { HTTPError } from '../../types/HTTPError.std.ts';
@@ -94,7 +93,7 @@ export class BackupCredentials {
 
   public async getForToday(
     credentialType: BackupCredentialType
-  ): Promise<BackupSignedPresentationType> {
+  ): Promise<BackupAuth> {
     const now = toDayMillis(Date.now());
 
     let signatureKey: PrivateKey;
@@ -134,36 +133,25 @@ export class BackupCredentials {
       Bytes.fromBase64(window.getBackupServerPublicParams())
     );
 
-    const presentation = cred.present(serverPublicParams).serialize();
-    const signature = signatureKey.sign(presentation);
-
-    const headers = {
-      'X-Signal-ZK-Auth': Bytes.toBase64(presentation),
-      'X-Signal-ZK-Auth-Signature': Bytes.toBase64(signature),
+    const backupAuth: BackupAuth = {
+      credential: cred,
+      serverKeys: serverPublicParams,
+      signingKey: signatureKey,
     };
 
-    const info = { headers, level: result.level };
     if (itemStorage.get(storageKey)) {
-      return info;
+      return backupAuth;
     }
 
     log.warn(`uploading signature key (${storageKey})`);
 
     await setBackupSignatureKey({
-      headers,
-      backupIdPublicKey: signatureKey.getPublicKey().serialize(),
+      auth: backupAuth,
     });
 
     await itemStorage.put(storageKey, true);
 
-    return info;
-  }
-
-  public async getHeadersForToday(
-    credentialType: BackupCredentialType
-  ): Promise<BackupPresentationHeadersType> {
-    const { headers } = await this.getForToday(credentialType);
-    return headers;
+    return backupAuth;
   }
 
   public async getCDNReadCredentials(
@@ -187,18 +175,17 @@ export class BackupCredentials {
       return cachedCredentials.credentials;
     }
 
-    const headers = await this.getHeadersForToday(credentialType);
+    const backupAuth = await this.getForToday(credentialType);
 
-    const retrievedAtMs = Date.now();
     const newCredentials = await getBackupCDNCredentials({
-      headers,
+      auth: backupAuth,
       cdnNumber,
     });
 
     cachedCredentialsForThisCredentialType[cdnNumber] = {
       credentials: newCredentials,
       cdnNumber,
-      retrievedAtMs,
+      retrievedAtMs: Date.now(),
     };
 
     return newCredentials;
@@ -400,7 +387,8 @@ export class BackupCredentials {
   public async getBackupLevel(
     credentialType: BackupCredentialType
   ): Promise<BackupLevel> {
-    return (await this.getForToday(credentialType)).level;
+    const backupAuth = await this.getForToday(credentialType);
+    return backupAuth.credential.getBackupLevel();
   }
 
   // Called when backup tier changes or when userChanged event

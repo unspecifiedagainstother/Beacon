@@ -27,17 +27,15 @@ button.ListTile {
   box-sizing: border-box;
   text-align: inherit;
 
-  &:focus {
+  &:focus-visible {
     outline: none;
-    @include mixins.keyboard-mode {
-      &::before {
-        content: '';
-        display: block;
-        position: absolute;
-        inset: 0;
-        border-radius: 12px;
-        @include mixins.axo-focus-ring-inset;
-      }
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      @include mixins.axo-focus-ring-inset;
     }
   }
 
@@ -111,10 +109,6 @@ button.ListTile {
 
       @include mixins.dark-theme {
         background-color: variables.$color-white-alpha-06;
-      }
-
-      & .ConversationDetails-panel-row__actions {
-        opacity: 1;
       }
     }
   }

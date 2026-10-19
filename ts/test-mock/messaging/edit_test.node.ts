@@ -24,6 +24,7 @@ import { typeIntoInput, waitForEnabledComposer } from '../helpers.node.ts';
 import type { MessageAttributesType } from '../../model-types.d.ts';
 import { sleep } from '../../util/sleep.std.ts';
 import { generateAci } from '../../test-helpers/serviceIdUtils.std.ts';
+import { expect } from 'playwright/test';
 
 export const debug = createDebug('mock:test:edit');
 
@@ -677,6 +678,13 @@ describe('editing', function (this: Mocha.Suite) {
       debug('sending edit message v2 desktop -> friend');
       await sendEditedMessage(page, originalMessageTimestamp, '2', '1');
 
+      debug("waiting for message on friend's device (original)");
+      const { editMessage: editMessageV2 } = await friend.waitForEditMessage();
+      assert.strictEqual(editMessageV2.dataMessage?.body, editMessageV2Text);
+      debug('v2 message', {
+        timestamp: toNumber(editMessageV2.dataMessage?.timestamp),
+      });
+
       {
         const readReceiptTimestamp = bootstrap.getTimestamp();
         debug('sending read receipt for original message friend -> desktop', {
@@ -703,7 +711,7 @@ describe('editing', function (this: Mocha.Suite) {
       }
 
       debug("testing message's send state (current(v2) and original (v1))");
-      {
+      await expect(async () => {
         const message = await getMessageFromApp(originalMessageTimestamp);
         strictAssert(message.editHistory, 'edit history exists');
         // oxlint-disable-next-line typescript/no-unused-vars
@@ -718,14 +726,7 @@ describe('editing', function (this: Mocha.Suite) {
           SendStatus.Read,
           'original message is marked read'
         );
-      }
-
-      debug("waiting for message on friend's device (original)");
-      const { editMessage: editMessageV2 } = await friend.waitForEditMessage();
-      assert.strictEqual(editMessageV2.dataMessage?.body, editMessageV2Text);
-      debug('v2 message', {
-        timestamp: toNumber(editMessageV2.dataMessage?.timestamp),
-      });
+      }).toPass();
 
       // Sending a v3 edited message targetting v2
       // v3 will be read after we receive v4
@@ -800,8 +801,8 @@ describe('editing', function (this: Mocha.Suite) {
       }
 
       debug("testing v4's send state");
-      {
-        debug('getting edited message from app (v4)');
+      // We allow retries here to wait for the read sync to be processed
+      await expect(async () => {
         const message = await getMessageFromApp(originalMessageTimestamp);
 
         strictAssert(
@@ -850,7 +851,7 @@ describe('editing', function (this: Mocha.Suite) {
           message.body,
           'body is same for v4 and main message'
         );
-      }
+      }).toPass();
     });
   });
 

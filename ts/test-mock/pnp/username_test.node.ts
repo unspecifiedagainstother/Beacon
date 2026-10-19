@@ -194,21 +194,25 @@ describe('pnp/username', function (this: Mocha.Suite) {
 
     const window = await app.getWindow();
 
-    debug('opening settings tab context menu');
-    await window.locator('[data-key="Settings"]').click();
+    debug('opening settings');
+    await window.getByRole('tab', { name: 'Settings' }).click();
 
     debug('opening username editor');
-    const profileEditor = window.locator('.ProfileEditor');
-    await profileEditor.getByRole('button', { name: 'Username' }).click();
+    const settings = window.getByRole('tabpanel', { name: 'Settings' });
+    await settings
+      .getByRole('button', { name: 'Username', exact: true })
+      .click();
 
     debug('entering new username');
-    const usernameField = profileEditor.locator('.Input__input');
+    const usernameField = settings.getByRole('textbox', {
+      name: 'Username',
+    });
     await typeIntoInput(usernameField, NICKNAME, '');
 
     debug('waiting for generated discriminator');
-    const discriminator = profileEditor.locator(
-      '.UsernameEditor__discriminator__input[value]'
-    );
+    const discriminator = settings.getByRole('textbox', {
+      name: 'Username digits',
+    });
     await discriminator.waitFor();
 
     const discriminatorValue = await discriminator.inputValue();
@@ -218,11 +222,11 @@ describe('pnp/username', function (this: Mocha.Suite) {
 
     debug('saving username');
     let state = await phone.expectStorageState('consistency check');
-    await profileEditor.getByRole('button', { name: 'Save' }).click();
+    await settings.getByRole('button', { name: 'Save' }).click();
 
     debug('checking the username is saved');
     {
-      await profileEditor.getByRole('button', { name: username }).waitFor();
+      await settings.getByRole('button', { name: username }).waitFor();
 
       const uuid = await server.lookupByUsername(username);
       assert.strictEqual(uuid, phone.device.aci);
@@ -265,10 +269,10 @@ describe('pnp/username', function (this: Mocha.Suite) {
     }
 
     debug('deleting username');
-    await profileEditor
-      .locator('button[aria-label="Copy or delete username"]')
+    await settings
+      .getByRole('button', { name: 'Copy or delete username' })
       .click();
-    await profileEditor.locator('button[aria-label="Delete"]').click();
+    await window.getByRole('menuitem', { name: 'Delete' }).click();
     await window
       .getByRole('alertdialog')
       .filter({
@@ -278,7 +282,9 @@ describe('pnp/username', function (this: Mocha.Suite) {
       })
       .getByRole('button', { name: 'Delete' })
       .click();
-    await profileEditor.getByRole('button', { name: 'Username' }).waitFor();
+    await settings
+      .getByRole('button', { name: 'Username', exact: true })
+      .waitFor();
 
     // Make sure we get a sync message
     await phone.waitForSyncMessage(entry => {
@@ -367,10 +373,9 @@ describe('pnp/username', function (this: Mocha.Suite) {
 
     const linkUrl = contactByEncryptedUsernameRoute
       .toWebUrl({
-        encryptedUsername: Buffer.concat([
-          entropy,
-          uuidToBytes(serverId),
-        ]).toString('base64url'),
+        encryptedUsername: Buffer.concat([entropy, serverId]).toString(
+          'base64url'
+        ),
       })
       .toString();
 

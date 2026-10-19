@@ -7,7 +7,7 @@ import type { JSX } from 'react';
 
 import { tw } from '../../../axo/tw.dom.tsx';
 import { AxoButton } from '../../../axo/AxoButton.dom.tsx';
-import { AxoTextField } from '../../../axo/AxoTextField.dom.tsx';
+import { AxoPasswordField } from '../../../axo/fields/AxoPasswordField.dom.tsx';
 import {
   Buttons,
   Container,
@@ -25,6 +25,7 @@ import {
   type goToCreatePINStage as doGoToCreatePINStage,
   type createPIN as doCreatePIN,
 } from '../../../state/ducks/standaloneInstaller.preload.ts';
+import { PIN_MAX_BYTES, PIN_MAX_GRAPHEMES } from './VerifyPIN.dom.tsx';
 
 export function CreatePINConfirmScreen({
   createPIN,
@@ -62,18 +63,23 @@ export function CreatePINConfirmScreen({
         {i18n('icu:StandaloneRegistration--CreatePIN--confirming--description')}
       </Description>
       <Spacer className={tw('h-8')} />
-      <InputContainer>
-        <AxoTextField.Root width="md" disabled={pending}>
-          <AxoTextField.Input
-            maxBytes={10}
-            maxGraphemes={10}
-            onValueChange={onChangePIN}
+      <InputContainer className={tw('w-81')}>
+        <AxoPasswordField.Root
+          disabled={pending}
+          maxBytes={PIN_MAX_BYTES}
+          maxGraphemes={PIN_MAX_GRAPHEMES}
+          onValueChange={onChangePIN}
+          value={pin}
+        >
+          <AxoPasswordField.Input
+            autoFocus
+            autoComplete="new-password"
             placeholder={i18n(
               'icu:StandaloneRegistration--CreatePIN--confirming--placeholder'
             )}
-            value={pin}
           />
-        </AxoTextField.Root>
+          <AxoPasswordField.Reveal />
+        </AxoPasswordField.Root>
       </InputContainer>
       <Spacer className={tw('h-8 grow')} />
       <Buttons>

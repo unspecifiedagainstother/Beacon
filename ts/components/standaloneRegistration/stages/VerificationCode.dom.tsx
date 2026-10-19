@@ -91,23 +91,28 @@ export function VerificationCodeScreen({
   >(undefined);
 
   const previousWorkflow = useRef<VerificationCodeStage | undefined>(undefined);
+  // oxlint-disable-next-line react/refs
   const previous = previousWorkflow.current;
   const current = workflow;
+  // oxlint-disable-next-line react/refs
   previousWorkflow.current = workflow;
 
   if (current !== previous) {
     const currentStatus = current.status;
     const previousStatus = previous?.status;
 
+    // oxlint-disable-next-line react/refs
     if (isErrorTypeNew(currentStatus, previousStatus, 'incorrect-code')) {
       setIncorrectCodeDialogOpen(true);
     }
+    // oxlint-disable-next-line react/refs
     if (isErrorTypeNew(currentStatus, previousStatus, 'invalid-code')) {
       setInvalidCodeDialogOpen(true);
     }
     if (
       isErrorTypeNew(
         currentStatus,
+        // oxlint-disable-next-line react/refs
         previousStatus,
         'cannot-send-code-temporary'
       )
@@ -117,6 +122,7 @@ export function VerificationCodeScreen({
     if (
       isErrorTypeNew(
         currentStatus,
+        // oxlint-disable-next-line react/refs
         previousStatus,
         'cannot-send-code-permanent'
       )
@@ -125,12 +131,14 @@ export function VerificationCodeScreen({
     }
     if (
       current.failedToSendSMS &&
+      // oxlint-disable-next-line react/refs
       current.failedToSendSMS !== previous?.failedToSendSMS
     ) {
       setVoiceCallNeededDialogOpen(true);
     }
     if (
       current.failedToCall &&
+      // oxlint-disable-next-line react/refs
       current.failedToCall !== previous?.failedToCall
     ) {
       setFailedToCallDialogOpen(true);
@@ -151,13 +159,17 @@ export function VerificationCodeScreen({
     timings || {};
   const updateCodeSubmitCountdown = useCallback(
     (newDuration: string | undefined) => {
-      if (!waitSubmitDuration && newDuration) {
+      if (
+        !waitSubmitDuration &&
+        newDuration &&
+        workflow.status.type !== 'failed' // we have error-specific dialogs
+      ) {
         setMustWaitDialogOpen(true);
       }
 
       setWaitSubmitDuration(newDuration);
     },
-    [waitSubmitDuration, setWaitSubmitDuration, setMustWaitDialogOpen]
+    [setMustWaitDialogOpen, setWaitSubmitDuration, waitSubmitDuration, workflow]
   );
   useCountdownDuration({
     timestamp: codeCanBeSubmittedAt,
@@ -217,14 +229,18 @@ export function VerificationCodeScreen({
         disabled={pending}
         onValueChange={onValueChange}
         className={tw('flex flex-nowrap gap-2')}
+        aria-label={i18n(
+          'icu:StandaloneRegistration--VerificationCode--header'
+        )}
       >
         {Array.from({ length: 6 }).map((_, i) => (
           <OneTimePasswordField.Input
+            key={`Field ${i.toString()}`}
             ref={i === 0 ? focusRef : undefined}
             className={classNames(
               tw(
                 'me-2.5 size-8 rounded-xl border-[0.5px] border-primary p-2.5 type-body-medium shadow-elevation-0',
-                'focus:outline-none keyboard-mode:focus:axo-focus-ring'
+                'focus-visible:axo-focus-ring'
               ),
               i === 2 ? tw('me-6') : undefined
             )}

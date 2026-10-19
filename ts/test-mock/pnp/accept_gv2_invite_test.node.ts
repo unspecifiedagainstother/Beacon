@@ -14,6 +14,7 @@ import {
 import { Bootstrap } from '../bootstrap.node.ts';
 import type { App } from '../bootstrap.node.ts';
 import { acceptConversation, expectSystemMessages } from '../helpers.node.ts';
+import { expect } from 'playwright/test';
 
 export const debug = createDebug('mock:test:gv2');
 
@@ -25,6 +26,12 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
   let group: Group;
   let unknownContact: PrimaryDevice;
   let unknownPniContact: PrimaryDevice;
+
+  before(function () {
+    if (Bootstrap.WITHOUT_E164) {
+      this.skip();
+    }
+  });
 
   beforeEach(async () => {
     bootstrap = new Bootstrap({
@@ -76,9 +83,9 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
     // Verify that created group has pending member
     assert.strictEqual(group.state?.members?.length, 3);
     assert(!group.getMemberByServiceId(desktop.aci));
-    assert(!group.getMemberByServiceId(desktop.pni));
+    assert(!group.getMemberByServiceId(desktop.checkedPni));
     assert(!group.getPendingMemberByServiceId(desktop.aci));
-    assert(group.getPendingMemberByServiceId(desktop.pni));
+    assert(group.getPendingMemberByServiceId(desktop.checkedPni));
 
     const window = await app.getWindow();
 
@@ -112,9 +119,9 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
     assert.strictEqual(group.revision, 2);
     assert.strictEqual(group.state?.members?.length, 4);
     assert(group.getMemberByServiceId(desktop.aci));
-    assert(!group.getMemberByServiceId(desktop.pni));
+    assert(!group.getMemberByServiceId(desktop.checkedPni));
     assert(!group.getPendingMemberByServiceId(desktop.aci));
-    assert(!group.getPendingMemberByServiceId(desktop.pni));
+    assert(!group.getPendingMemberByServiceId(desktop.checkedPni));
 
     debug('Checking that notifications are present');
     await window
@@ -133,7 +140,7 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
       serviceIdKind: ServiceIdKind.PNI,
     });
     assert(group.getMemberByServiceId(desktop.aci));
-    assert(group.getPendingMemberByServiceId(desktop.pni));
+    assert(group.getPendingMemberByServiceId(desktop.checkedPni));
 
     await window
       .locator(
@@ -143,7 +150,8 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
 
     debug('Verify that message request state is not visible');
     await conversationStack
-      .locator('.module-message-request-actions button >> "Accept"')
+      .getByTestId('message-request-actions')
+      .getByRole('button', { name: 'Accept' })
       .waitFor({ state: 'hidden' });
 
     await window.getByRole('button', { name: 'More Info' }).click();
@@ -152,19 +160,15 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
     debug(
       'Checking that we see all members of group, including (previously) unknown contact'
     );
-    await window
-      .locator('.ConversationDetails-panel-section__title >> "4 members"')
-      .waitFor();
+    await window.getByRole('region', { name: '4 members' }).waitFor();
 
     await window
-      .locator('.conversation-details-panel')
-      .getByText(unknownContact.profileName)
+      .getByRole('listitem', { name: unknownContact.profileName })
       .waitFor();
 
     debug('Leave the group through settings');
 
     await conversationStack
-      .locator('.conversation-details-panel')
       .getByRole('button', { name: 'Leave group' })
       .click();
 
@@ -182,9 +186,9 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
     assert.strictEqual(group.revision, 4);
     assert.strictEqual(group.state?.members?.length, 3);
     assert(!group.getMemberByServiceId(desktop.aci));
-    assert(!group.getMemberByServiceId(desktop.pni));
+    assert(!group.getMemberByServiceId(desktop.checkedPni));
     assert(!group.getPendingMemberByServiceId(desktop.aci));
-    assert(group.getPendingMemberByServiceId(desktop.pni));
+    assert(group.getPendingMemberByServiceId(desktop.checkedPni));
 
     debug('Waiting for notification');
     await window
@@ -201,7 +205,8 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
 
     debug('Declining');
     await conversationStack
-      .locator('.module-message-request-actions button >> "Block"')
+      .getByTestId('message-request-actions')
+      .getByRole('button', { name: 'Block' })
       .click();
 
     debug('waiting for confirmation modal');
@@ -214,9 +219,9 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
     assert.strictEqual(group.revision, 2);
     assert.strictEqual(group.state?.members?.length, 3);
     assert(!group.getMemberByServiceId(desktop.aci));
-    assert(!group.getMemberByServiceId(desktop.pni));
+    assert(!group.getMemberByServiceId(desktop.checkedPni));
     assert(!group.getPendingMemberByServiceId(desktop.aci));
-    assert(!group.getPendingMemberByServiceId(desktop.pni));
+    assert(!group.getPendingMemberByServiceId(desktop.checkedPni));
 
     // Verify that sync message was sent.
     const { syncMessage } = await phone.waitForSyncMessage(entry => {
@@ -282,9 +287,9 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
     assert.strictEqual(group.revision, 3);
     assert.strictEqual(group.state?.members?.length, 4);
     assert(group.getMemberByServiceId(desktop.aci));
-    assert(!group.getMemberByServiceId(desktop.pni));
+    assert(!group.getMemberByServiceId(desktop.checkedPni));
     assert(!group.getPendingMemberByServiceId(desktop.aci));
-    assert(group.getPendingMemberByServiceId(desktop.pni));
+    assert(group.getPendingMemberByServiceId(desktop.checkedPni));
 
     debug('Verifying invite list');
     await conversationStack
@@ -293,15 +298,10 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
     await conversationStack
       .getByRole('button', { name: 'Requests & Invites' })
       .click();
-    await conversationStack
-      .locator('.ConversationDetails__tabs__tab >> text=Invites (1)')
-      .click();
-    await conversationStack
-      .locator(
-        '.ConversationDetails-panel-row__root >> ' +
-          `text=/${first.profileName}.*Invited 1/i`
-      )
-      .waitFor();
+    await conversationStack.getByRole('tab', { name: 'Invites' }).click();
+    await expect(
+      conversationStack.getByRole('listitem', { name: first.profileName })
+    ).toContainText('Invited 1');
   });
 
   it('should decline ACI invite with extra PNI on the invite list', async () => {
@@ -321,7 +321,8 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
 
     debug('Declining');
     await conversationStack
-      .locator('.module-message-request-actions button >> "Block"')
+      .getByTestId('message-request-actions')
+      .getByRole('button', { name: 'Block' })
       .click();
 
     debug('waiting for confirmation modal');
@@ -334,9 +335,9 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
     assert.strictEqual(group.revision, 3);
     assert.strictEqual(group.state?.members?.length, 3);
     assert(!group.getMemberByServiceId(desktop.aci));
-    assert(!group.getMemberByServiceId(desktop.pni));
+    assert(!group.getMemberByServiceId(desktop.checkedPni));
     assert(!group.getPendingMemberByServiceId(desktop.aci));
-    assert(group.getPendingMemberByServiceId(desktop.pni));
+    assert(group.getPendingMemberByServiceId(desktop.checkedPni));
   });
 
   it('should display a single notification for remote PNI accept', async () => {
@@ -419,7 +420,7 @@ describe('pnp/accept gv2 invite', function (this: Mocha.Suite) {
 
     debug('Waiting for invite notification');
     const parsedE164 = parseAndFormatPhoneNumber(
-      unknownPniContact.device.number,
+      unknownPniContact.device.checkedNumber,
       '+1',
       PhoneNumberFormat.NATIONAL
     );

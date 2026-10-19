@@ -62,6 +62,7 @@ const MESSAGE_DEFAULT_PROPS = {
   isSelected: false,
   isSelectMode: false,
   isSMS: false,
+  handleClickCtaButton: shouldNeverBeCalled,
   onToggleSelect: shouldNeverBeCalled,
   onReplyToMessage: shouldNeverBeCalled,
   kickOffAttachmentDownload: shouldNeverBeCalled,
@@ -234,6 +235,7 @@ export function StoryViewsNRepliesModal({
   const onTryClose = useCallback(() => {
     confirmDiscardIf(emojiPickerOpen || messageBodyText.length > 0, onClose);
   }, [confirmDiscardIf, emojiPickerOpen, messageBodyText, onClose]);
+  // oxlint-disable-next-line react/refs
   tryClose.current = onTryClose;
 
   if (group && group.left) {
@@ -685,7 +687,6 @@ function ReplyOrReactionMessage({
         platform={platform}
         id={reply.id}
         interactivity={MessageInteractivity.Normal}
-        interactionMode="mouse"
         isSpoilerExpanded={isSpoilerExpanded}
         isSignalConversation={false}
         isVoiceMessagePlayed={false}
@@ -700,6 +701,9 @@ function ReplyOrReactionMessage({
         showContactModal={showContactModal}
         showSpoiler={showSpoiler}
         text={reply.body}
+        isTargeted={false}
+        isTargetedCounter={null}
+        isTargetedSource={null}
         textDirection={TextDirection.Default}
         timestamp={reply.timestamp}
       />

@@ -1,10 +1,9 @@
 // Copyright 2024 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { useState, useCallback, useEffect, type JSX } from 'react';
+import { useState, useEffect, type JSX } from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
-import { sleep } from '../../util/sleep.std.ts';
 import {
   InstallScreenBackupStep,
   InstallScreenBackupError,
@@ -15,46 +14,18 @@ import { InstallScreenBackupImportStep } from './InstallScreenBackupImportStep.d
 
 const { i18n } = window.SignalContext;
 
-const DEFAULT_UPDATES = {
+const updates = {
   dialogType: DialogType.None,
   didSnooze: false,
   isCheckingForUpdates: false,
   showEventsCount: 0,
-  downloadSize: 42 * 1024 * 1024,
 };
 
 export default {
-  title: 'Components/InstallScreenBackupImportStep',
+  title: 'Components/InstallScreen/InstallScreenBackupImportStep',
 } satisfies Meta<PropsType>;
 
 const Template: StoryFn<PropsType> = (args: PropsType) => {
-  const [updates, setUpdates] = useState(DEFAULT_UPDATES);
-  const forceUpdate = useCallback(async () => {
-    setUpdates(state => ({
-      ...state,
-      isCheckingForUpdates: true,
-    }));
-    await sleep(500);
-    setUpdates(state => ({
-      ...state,
-      isCheckingForUpdates: false,
-      dialogType: DialogType.Downloading,
-      downloadSize: 100,
-      downloadedSize: 0,
-      version: 'v7.7.7',
-    }));
-    await sleep(500);
-    setUpdates(state => ({
-      ...state,
-      downloadedSize: 50,
-    }));
-    await sleep(500);
-    setUpdates(state => ({
-      ...state,
-      downloadedSize: 100,
-    }));
-  }, [setUpdates]);
-
   return (
     <InstallScreenBackupImportStep
       {...args}
@@ -63,7 +34,7 @@ const Template: StoryFn<PropsType> = (args: PropsType) => {
       currentVersion="v6.0.0"
       OS="macOS"
       startUpdate={action('startUpdate')}
-      forceUpdate={forceUpdate}
+      forceCheck={action('forceCheck')}
       onCancel={action('onCancel')}
       onRetry={action('onRetry')}
     />
@@ -94,11 +65,11 @@ export function FullFlow(): JSX.Element {
   return (
     <InstallScreenBackupImportStep
       i18n={i18n}
-      updates={DEFAULT_UPDATES}
+      updates={updates}
       currentVersion="v6.0.0"
       OS="macOS"
       startUpdate={action('startUpdate')}
-      forceUpdate={action('forceUpdate')}
+      forceCheck={action('forceCheck')}
       onCancel={action('onCancel')}
       onRetry={action('onRetry')}
       currentBytes={currentBytes}

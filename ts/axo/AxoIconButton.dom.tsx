@@ -4,11 +4,11 @@ import type { FC, Ref, MouseEvent, FocusEvent } from 'react';
 import { memo, useCallback, useMemo } from 'react';
 import { AxoSymbol } from './AxoSymbol.dom.tsx';
 import { tw } from './tw.dom.tsx';
-import type { SpinnerVariant } from '../components/SpinnerV2.dom.tsx';
-import { SpinnerV2 } from '../components/SpinnerV2.dom.tsx';
 import { AxoTooltip } from './AxoTooltip.dom.tsx';
 import { useAxoIntl } from './_internal/AxoIntl.dom.tsx';
 import { variants } from './_internal/variants.dom.tsx';
+import { forwardExtraPropsForRadix } from './_internal/props.dom.tsx';
+import { AxoBaseSpinner } from './status/_AxoBaseSpinner.dom.tsx';
 
 /**
  * A circular icon-only button with an accessible label and built-in tooltip.
@@ -29,19 +29,26 @@ export namespace AxoIconButton {
 
   const baseStyles = tw(
     'relative rounded-full leading-none',
-    'not-forced-colors:outline-none keyboard-mode:focus:axo-focus-ring',
-    'forced-colors:border forced-colors:border-[ButtonBorder] forced-colors:bg-[ButtonFace] forced-colors:text-[ButtonText]',
+    'focus-visible:axo-focus-ring',
+    'forced-colors:border',
+    'forced-colors:border-[ButtonBorder]',
+    'forced-colors:focus:border-[Highlight]',
+    'forced-colors:bg-[ButtonFace]',
+    'forced-colors:text-[ButtonText]',
     'forced-colors:aria-disabled:text-[GrayText]',
-    'forced-colors:aria-pressed:bg-[SelectedItem] forced-colors:aria-pressed:text-[SelectedItemText]'
+    'forced-colors:aria-pressed:bg-[SelectedItem]',
+    'forced-colors:aria-pressed:text-[SelectedItemText]'
   );
 
   const pressedInvertedStyles = tw(
     'aria-pressed:bg-inverted aria-pressed:not-aria-disabled:active:bg-inverted-pressed',
+    'aria-pressed:not-aria-disabled:data-[axo-dropdownmenu-state=open]:bg-inverted-pressed',
     'aria-pressed:text-primary-inverted aria-pressed:aria-disabled:text-disabled-inverted'
   );
 
   const pressedPrimaryStyles = tw(
     'aria-pressed:bg-accent aria-pressed:not-aria-disabled:active:bg-accent-pressed',
+    'aria-pressed:not-aria-disabled:data-[axo-dropdownmenu-state=open]:bg-accent-pressed',
     'aria-pressed:text-primary-oncolor aria-pressed:aria-disabled:text-disabled-oncolor'
   );
 
@@ -206,11 +213,7 @@ export namespace AxoIconButton {
     /**
      * Icon to display inside the button.
      */
-    symbol: AxoSymbol.IconName;
-    /**
-     * Stroke weight override for the icon.
-     */
-    iconWeight?: AxoSymbol.Weight;
+    symbol: AxoSymbol.Name;
     /**
      * When `true`, shows a spinner and prevents interaction.
      */
@@ -266,12 +269,12 @@ export namespace AxoIconButton {
    */
   export const Root: FC<RootProps> = memo(props => {
     const {
+      ref,
       label,
       tooltip = true,
       variant,
       size,
       symbol,
-      iconWeight,
       pending,
       pressed,
       disabled,
@@ -306,7 +309,7 @@ export namespace AxoIconButton {
 
     const button = (
       <button
-        ref={props.ref}
+        ref={ref}
         type="button"
         aria-label={pending ? intl.get('AxoButton.Pending') : label}
         aria-pressed={pressed ?? undefined}
@@ -315,7 +318,7 @@ export namespace AxoIconButton {
         onMouseEnter={onMouseEnter}
         onFocus={onFocus}
         className={tw(baseStyles, Variants.get(variant), Sizes.get(size))}
-        {...rest}
+        {...forwardExtraPropsForRadix(rest)}
       >
         <span
           aria-hidden={pending ?? undefined}
@@ -328,7 +331,6 @@ export namespace AxoIconButton {
             size={IconSizes.get(size)}
             symbol={symbol}
             label={null}
-            weight={iconWeight}
           />
         </span>
         {pending && <Spinner buttonVariant={variant} buttonSize={size} />}
@@ -356,51 +358,50 @@ export namespace AxoIconButton {
    * --------------------------------------------------------------------------
    */
 
-  const SpinnerVariants = variants<Variant, SpinnerVariant>(
+  const SpinnerVariants = variants<Variant, AxoBaseSpinner.Variant>(
     'AxoIconButton.Variant',
     {
-      'strong-primary': 'axo-button-spinner-oncolor',
-      'strong-secondary': 'axo-button-spinner-secondary',
-      'strong-affirmative': 'axo-button-spinner-oncolor',
-      'strong-warning': 'axo-button-spinner-onbright',
-      'strong-destructive': 'axo-button-spinner-oncolor',
-      'subtle-primary': 'axo-button-spinner-primary',
-      'subtle-secondary': 'axo-button-spinner-secondary',
-      'subtle-affirmative': 'axo-button-spinner-affirmative',
-      'subtle-warning': 'axo-button-spinner-warning',
-      'subtle-destructive': 'axo-button-spinner-destructive',
-      'elevated-secondary': 'axo-button-spinner-secondary',
-      'material-subtle': 'axo-button-spinner-secondary',
-      'material-strong': 'axo-button-spinner-secondary',
-      'implied-secondary': 'axo-button-spinner-secondary',
+      'strong-primary': 'oncolor',
+      'strong-secondary': 'default',
+      'strong-affirmative': 'oncolor',
+      'strong-warning': 'oncolor',
+      'strong-destructive': 'oncolor',
+      'subtle-primary': 'default',
+      'subtle-secondary': 'default',
+      'subtle-affirmative': 'default',
+      'subtle-warning': 'default',
+      'subtle-destructive': 'default',
+      'elevated-secondary': 'default',
+      'material-subtle': 'default',
+      'material-strong': 'default',
+      'implied-secondary': 'default',
     }
   );
 
-  type SpinnerSizeConfig = { size: number; strokeWidth: number };
-
-  const SpinnerSizes = variants<Size, SpinnerSizeConfig>('AxoIconButton.Size', {
-    lg: { size: 20, strokeWidth: 2 },
-    md: { size: 20, strokeWidth: 2 },
-    sm: { size: 16, strokeWidth: 1.5 },
+  const SpinnerSizes = variants<Size, number>('AxoIconButton.Size', {
+    lg: 18,
+    md: 18,
+    sm: 16,
   });
 
   /** @internal */
   type SpinnerProps = Readonly<{
-    buttonVariant: Variant;
     buttonSize: Size;
+    buttonVariant: Variant;
   }>;
 
   /** @internal */
   const Spinner: FC<SpinnerProps> = memo(props => {
+    const size = SpinnerSizes.get(props.buttonSize);
     const variant = SpinnerVariants.get(props.buttonVariant);
-    const sizeConfig = SpinnerSizes.get(props.buttonSize);
     return (
       <span className={tw('absolute inset-0 flex items-center justify-center')}>
-        <SpinnerV2
-          size={sizeConfig.size}
-          strokeWidth={sizeConfig.strokeWidth}
+        <AxoBaseSpinner.Root
+          size={size}
+          weight="regular"
           variant={variant}
           value="indeterminate"
+          track={false}
         />
       </span>
     );

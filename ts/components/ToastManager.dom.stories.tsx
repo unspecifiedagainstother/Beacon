@@ -55,8 +55,6 @@ function getToast(toastType: ToastType): AnyToast {
       };
     case ToastType.CallQualitySurveySuccess:
       return { toastType: ToastType.CallQualitySurveySuccess };
-    case ToastType.CannotAddMemberLabel:
-      return { toastType: ToastType.CannotAddMemberLabel };
     case ToastType.CannotEditMessage:
       return { toastType: ToastType.CannotEditMessage };
     case ToastType.CannotForwardEmptyMessage:
@@ -216,6 +214,10 @@ function getToast(toastType: ToastType): AnyToast {
       };
     case ToastType.PinnedMessageNotFound:
       return { toastType: ToastType.PinnedMessageNotFound };
+    case ToastType.PinChangeCompleted:
+      return { toastType: ToastType.PinChangeCompleted };
+    case ToastType.PinReminderCompleted:
+      return { toastType: ToastType.PinReminderCompleted };
     case ToastType.PollNotFound:
       return { toastType: ToastType.PollNotFound };
     case ToastType.ReactionFailed:
@@ -314,6 +316,12 @@ function getMegaphone(megaphoneType: MegaphoneType): AnyActionableMegaphone {
       return {
         type: megaphoneType,
         onLearnMore: action('onLearnMore'),
+        onDismiss: action('onDismiss'),
+      };
+    case MegaphoneType.PinReminder:
+      return {
+        type: megaphoneType,
+        onShowModal: action('onShowModal'),
         onDismiss: action('onDismiss'),
       };
     case MegaphoneType.Remote:

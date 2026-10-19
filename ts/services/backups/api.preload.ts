@@ -5,22 +5,21 @@ import { type Readable } from 'node:stream';
 
 import {
   backupListMedia,
-  backupMediaBatch as doBackupMediaBatch,
   getBackupFileHeaders,
-  getBackupInfo,
   getBackupMediaUploadForm,
   getBackupStream,
   getBackupUploadForm,
   getEphemeralBackupStream,
+  getMediaBackupInfo,
+  getMessageBackupInfo,
   getSubscription,
   getTransferArchive as doGetTransferArchive,
   refreshBackup,
 } from '../../textsecure/WebAPI.preload.ts';
 import type {
-  AttachmentUploadFormResponseType,
-  GetBackupInfoResponseType,
-  BackupMediaItemType,
-  BackupMediaBatchResponseType,
+  AttachmentUploadFormType,
+  GetMediaBackupInfoResponseType,
+  GetMessageBackupInfoResponseType,
   BackupListMediaResponseType,
   TransferArchiveType,
   SubscriptionResponseType,
@@ -55,57 +54,69 @@ export type EphemeralDownloadOptionsType = Readonly<{
 
 export class BackupAPI {
   readonly #credentials: BackupCredentials;
-  readonly #cachedBackupInfo = new Map<
-    BackupCredentialType,
-    GetBackupInfoResponseType
-  >();
+  #cachedMessageBackupInfo: GetMessageBackupInfoResponseType | undefined;
+  #cachedMediaBackupInfo: GetMediaBackupInfoResponseType | undefined;
 
   constructor(credentials: BackupCredentials) {
     this.#credentials = credentials;
   }
 
   public async refresh(): Promise<void> {
-    const headers = await Promise.all(
+    await Promise.all(
       [BackupCredentialType.Messages, BackupCredentialType.Media].map(type =>
-        this.#credentials.getHeadersForToday(type)
+        this.#refreshType(type)
       )
     );
-    await Promise.all(headers.map(h => refreshBackup(h)));
   }
 
-  public async getInfo(
-    credentialType: BackupCredentialType
-  ): Promise<GetBackupInfoResponseType> {
-    const backupInfo = await getBackupInfo(
-      await this.#credentials.getHeadersForToday(credentialType)
+  async #refreshType(type: BackupCredentialType): Promise<void> {
+    const auth = await this.#credentials.getForToday(type);
+    return refreshBackup({ auth });
+  }
+
+  public async getMessageBackupInfo(): Promise<GetMessageBackupInfoResponseType> {
+    const backupAuth = await this.#credentials.getForToday(
+      BackupCredentialType.Messages
     );
-    this.#cachedBackupInfo.set(credentialType, backupInfo);
+    const backupInfo = await getMessageBackupInfo({ auth: backupAuth });
+    this.#cachedMessageBackupInfo = backupInfo;
     return backupInfo;
   }
 
-  async #getCachedInfo(
-    credentialType: BackupCredentialType
-  ): Promise<GetBackupInfoResponseType> {
-    const cached = this.#cachedBackupInfo.get(credentialType);
-    if (cached) {
-      return cached;
-    }
+  public async getMediaBackupInfo(): Promise<GetMediaBackupInfoResponseType> {
+    const backupAuth = await this.#credentials.getForToday(
+      BackupCredentialType.Media
+    );
+    const backupInfo = await getMediaBackupInfo({ auth: backupAuth });
+    this.#cachedMediaBackupInfo = backupInfo;
+    return backupInfo;
+  }
 
-    return this.getInfo(credentialType);
+  async #getCachedMessageBackupInfo(): Promise<GetMessageBackupInfoResponseType> {
+    return this.#cachedMessageBackupInfo ?? this.getMessageBackupInfo();
+  }
+
+  async #getCachedMediaBackupInfo(): Promise<GetMediaBackupInfoResponseType> {
+    return this.#cachedMediaBackupInfo ?? this.getMediaBackupInfo();
   }
 
   public async getMediaDir(): Promise<string> {
-    return (await this.#getCachedInfo(BackupCredentialType.Media)).mediaDir;
+    return (await this.#getCachedMediaBackupInfo()).mediaDir;
   }
 
   public async getBackupDir(): Promise<string> {
-    return (await this.#getCachedInfo(BackupCredentialType.Media))?.backupDir;
+    return (await this.#getCachedMediaBackupInfo()).backupDir;
   }
 
   public async upload(filePath: string, fileSize: number): Promise<void> {
-    const form = await getBackupUploadForm(
-      await this.#credentials.getHeadersForToday(BackupCredentialType.Messages)
+    const backupAuth = await this.#credentials.getForToday(
+      BackupCredentialType.Messages
     );
+
+    const form = await getBackupUploadForm({
+      auth: backupAuth,
+      uploadSize: fileSize,
+    });
 
     await uploadFile({
       absoluteCiphertextPath: filePath,
@@ -119,9 +130,7 @@ export class BackupAPI {
     onProgress,
     abortSignal,
   }: DownloadOptionsType): Promise<Readable> {
-    const { cdn, backupDir, backupName } = await this.getInfo(
-      BackupCredentialType.Messages
-    );
+    const { cdn, backupDir, backupName } = await this.getMessageBackupInfo();
     const { headers } = await this.#credentials.getCDNReadCredentials(
       cdn,
       BackupCredentialType.Messages
@@ -142,9 +151,8 @@ export class BackupAPI {
     | { backupExists: false }
     | { backupExists: true; size: number; createdAt: Date }
   > {
-    const { cdn, backupDir, backupName } = await this.#getCachedInfo(
-      BackupCredentialType.Messages
-    );
+    const { cdn, backupDir, backupName } =
+      await this.#getCachedMessageBackupInfo();
     const { headers } = await this.#credentials.getCDNReadCredentials(
       cdn,
       BackupCredentialType.Messages
@@ -191,21 +199,14 @@ export class BackupAPI {
     });
   }
 
-  public async getMediaUploadForm(): Promise<AttachmentUploadFormResponseType> {
-    return getBackupMediaUploadForm(
-      await this.#credentials.getHeadersForToday(BackupCredentialType.Media)
+  public async getMediaUploadForm(
+    uploadSize: number
+  ): Promise<AttachmentUploadFormType> {
+    const backupAuth = await this.#credentials.getForToday(
+      BackupCredentialType.Media
     );
-  }
 
-  public async backupMediaBatch(
-    items: ReadonlyArray<BackupMediaItemType>
-  ): Promise<BackupMediaBatchResponseType> {
-    return doBackupMediaBatch({
-      headers: await this.#credentials.getHeadersForToday(
-        BackupCredentialType.Media
-      ),
-      items,
-    });
+    return getBackupMediaUploadForm({ auth: backupAuth, uploadSize });
   }
 
   public async listMedia({
@@ -215,13 +216,11 @@ export class BackupAPI {
     cursor?: string;
     limit: number;
   }): Promise<BackupListMediaResponseType> {
-    return backupListMedia({
-      headers: await this.#credentials.getHeadersForToday(
-        BackupCredentialType.Media
-      ),
-      cursor,
-      limit,
-    });
+    const backupAuth = await this.#credentials.getForToday(
+      BackupCredentialType.Media
+    );
+
+    return backupListMedia({ auth: backupAuth, cursor, limit });
   }
 
   public async getSubscriptionInfo(): Promise<BackupsSubscriptionType> {
@@ -282,6 +281,7 @@ export class BackupAPI {
   }
 
   public clearCache(): void {
-    this.#cachedBackupInfo.clear();
+    this.#cachedMessageBackupInfo = undefined;
+    this.#cachedMediaBackupInfo = undefined;
   }
 }

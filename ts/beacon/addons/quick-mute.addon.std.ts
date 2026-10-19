@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { AddonManifest } from '../core/types.dom.ts';
+import { MuteExpiration } from '@signalapp/types';
 import { getSelectedConversationId } from '../../state/selectors/nav.std.ts';
-
-const MUTE_DURATION_MS = 365 * 24 * 60 * 60 * 1000; // ~1 year
+import { isConversationMuted } from '../../util/isConversationMuted.std.ts';
 
 /**
  * Quick Mute — mod+m toggles mute via the real action.
@@ -27,11 +27,11 @@ export default {
 
       const conversation =
         state.conversations.conversationLookup[conversationId];
-      const isMuted = (conversation?.muteExpiresAt ?? 0) > Date.now();
+      const isMuted = conversation ? isConversationMuted(conversation) : false;
 
-      ctx.signal.reduxActions.conversations.setMuteDuration(
+      ctx.signal.reduxActions.conversations.setMuteExpiration(
         conversationId,
-        isMuted ? 0 : MUTE_DURATION_MS
+        isMuted ? MuteExpiration.UNMUTED : MuteExpiration.ALWAYS
       );
       ctx.ui.showNotification(isMuted ? 'Unmuted' : 'Muted', 'success');
     });

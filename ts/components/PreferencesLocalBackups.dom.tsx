@@ -12,6 +12,7 @@ import {
   SettingsRow,
 } from './PreferencesUtil.dom.tsx';
 import { SIGNAL_BACKUPS_LEARN_MORE_URL } from './PreferencesBackups.dom.tsx';
+import { OSAuthErrorDialog } from './preferences/OSAuthErrorDialog.dom.tsx';
 import { I18n } from './I18n.dom.tsx';
 import type { SettingsLocation } from '../types/Nav.std.ts';
 import { SettingsPage } from '../types/Nav.std.ts';
@@ -158,6 +159,7 @@ export function PreferencesLocalBackups({
         toLogFormat(e)
       );
       setAuthError('error');
+      // oxlint-disable-next-line react/todo
     } finally {
       setIsAuthPending(false);
     }
@@ -348,32 +350,11 @@ export function PreferencesLocalBackups({
         />
       ) : null}
 
-      {authError ? (
-        <AxoAlertDialog.Root
-          open
-          onOpenChange={open => {
-            if (!open) {
-              setAuthError(undefined);
-            }
-          }}
-        >
-          <AxoAlertDialog.Content escape="cancel-is-noop">
-            <AxoAlertDialog.Title screenReaderOnly>
-              {i18n('icu:Toast--error')}
-            </AxoAlertDialog.Title>
-            <AxoAlertDialog.Body>
-              <AxoAlertDialog.Description>
-                {i18n(
-                  'icu:Preferences__local-backups-auth-error--unauthorized'
-                )}
-              </AxoAlertDialog.Description>
-            </AxoAlertDialog.Body>
-            <AxoAlertDialog.Footer>
-              <AxoAlertDialog.Cancel>{i18n('icu:ok')}</AxoAlertDialog.Cancel>
-            </AxoAlertDialog.Footer>
-          </AxoAlertDialog.Content>
-        </AxoAlertDialog.Root>
-      ) : null}
+      <OSAuthErrorDialog
+        i18n={i18n}
+        open={authError != null}
+        onOpenChange={newOpen => setAuthError(newOpen ? 'error' : undefined)}
+      />
 
       {isShowingBackupKeyChangedModal ? (
         <AxoAlertDialog.Root
@@ -456,6 +437,7 @@ function DisableLocalBackupsDialog({
         toLogFormat(e)
       );
       onError(e);
+      // oxlint-disable-next-line react/todo
     } finally {
       setIsPending(false);
     }
@@ -490,7 +472,7 @@ function DisableLocalBackupsDialog({
               {i18n('icu:Preferences__local-backups-turn-off')}
             </AxoDialog.Title>
           </AxoDialog.Header>
-          <AxoDialog.Body padding="normal">
+          <AxoDialog.Body>
             <AxoDialog.Description>
               <div className={tw('mb-2 text-secondary')}>
                 {i18n('icu:Preferences__local-backups-turn-off-confirmation')}
@@ -865,7 +847,7 @@ function LocalBackupSetupIcon(props: { symbol: 'key' | 'lock' }): JSX.Element {
     <div
       className={tw(
         // eslint-disable-next-line better-tailwindcss/no-restricted-classes
-        'inline-flex size-16 items-center justify-center rounded-full bg-[#D2DFFB] text-[#3B45FD]'
+        'inline-flex size-16 items-center justify-center rounded-full bg-[#D2DFFB] text-(--axo-color-brand-primary)'
       )}
     >
       <AxoSymbol.Icon symbol={props.symbol} size={36} label={null} />

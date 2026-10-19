@@ -104,6 +104,7 @@ export function AvatarPreview({
   // Ensures that when avatarValue changes we generate new URLs
   useEffect(() => {
     if (avatarValue) {
+      // oxlint-disable-next-line react/set-state-in-effect
       setAvatarPreview(avatarValue);
     } else {
       setAvatarPreview(undefined);
@@ -115,6 +116,7 @@ export function AvatarPreview({
 
   useEffect(() => {
     if (!avatarPreview) {
+      // oxlint-disable-next-line react/set-state-in-effect
       setObjectUrl(undefined);
       return noop;
     }
@@ -168,6 +170,7 @@ export function AvatarPreview({
 
   if (imageStatus === ImageStatus.Nothing) {
     let content: JSX.Element | string | undefined;
+    const initials = getInitials(conversationTitle);
     if (isGroup) {
       content = (
         <div
@@ -180,8 +183,14 @@ export function AvatarPreview({
           className={`BetterAvatarBubble--${avatarColor}--icon AvatarPreview__note_to_self`}
         />
       );
+    } else if (initials) {
+      content = initials;
     } else {
-      content = getInitials(conversationTitle);
+      content = (
+        <div
+          className={`BetterAvatarBubble--${avatarColor}--icon AvatarPreview__contact`}
+        />
+      );
     }
 
     return (

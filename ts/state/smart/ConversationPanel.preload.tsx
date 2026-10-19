@@ -22,6 +22,7 @@ import { SmartChatColorPicker } from './ChatColorPicker.preload.tsx';
 import { SmartContactDetail } from './ContactDetail.preload.tsx';
 import { SmartConversationDetails } from './ConversationDetails.preload.tsx';
 import { SmartConversationNotificationsSettings } from './ConversationNotificationsSettings.preload.tsx';
+import { SmartWhileMutedSettings } from './WhileMutedSettings.preload.tsx';
 import { SmartGV1Members } from './GV1Members.preload.tsx';
 import { SmartGroupLinkManagement } from './GroupLinkManagement.preload.tsx';
 import { SmartGroupV2Permissions } from './GroupV2Permissions.preload.tsx';
@@ -128,8 +129,12 @@ export const ConversationPanel = memo(function ConversationPanel({
   }, [wasAnimated]);
 
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect
     setLastPanelDoneAnimating(null);
-  }, [panelInformation?.prevPanel]);
+  }, [
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
+    panelInformation?.prevPanel,
+  ]);
 
   const onAnimationDone = useCallback(
     (panel: PanelArgsType | null) => {
@@ -201,6 +206,7 @@ export const ConversationPanel = memo(function ConversationPanel({
     isRTL,
     onAnimationDone,
     panelAnimationStarted,
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
     panelInformation?.currPanel,
     panelInformation?.direction,
     panelInformation?.prevPanel,
@@ -451,6 +457,10 @@ function PanelElement({
     );
   }
 
+  if (panel.type === PanelType.WhileMuted) {
+    return <SmartWhileMutedSettings conversationId={conversationId} />;
+  }
+
   log.warn(toLogFormat(missingCaseError(panel.type)));
   return null;
 }
@@ -468,6 +478,7 @@ function getPanelKey(panel: PanelArgsType): string {
     case PanelType.NotificationSettings:
     case PanelType.PinnedMessages:
     case PanelType.StickerManager:
+    case PanelType.WhileMuted:
       return panel.type;
     case PanelType.MessageDetails:
     case PanelType.ContactDetails:

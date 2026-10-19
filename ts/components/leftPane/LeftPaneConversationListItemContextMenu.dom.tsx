@@ -2,13 +2,16 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import type { FC, ReactNode, JSX } from 'react';
 import { memo, useCallback, useMemo, useState } from 'react';
+import { MuteExpiration } from '@signalapp/types';
+
 import { AxoContextMenu } from '../../axo/AxoContextMenu.dom.tsx';
 import type { LocalizerType } from '../../types/I18N.std.ts';
 import type { ConversationType } from '../../state/ducks/conversations.preload.ts';
 import { isConversationUnread } from '../../util/isConversationUnread.std.ts';
 import { drop } from '../../util/drop.std.ts';
 import { DeleteMessagesConfirmationDialog } from '../DeleteMessagesConfirmationDialog.dom.tsx';
-import { getMuteOptions } from '../../util/getMuteOptions.std.ts';
+import { MuteNotificationsSubMenu } from '../MuteNotificationsMenu.dom.tsx';
+import { getConversationMuteMenu } from '../../util/getMuteOptions.std.ts';
 import {
   CHAT_FOLDER_DEFAULTS,
   ChatFolderType,
@@ -42,7 +45,7 @@ export type LeftPaneConversationListItemContextMenuProps = Readonly<{
   onMarkRead: (conversationId: string) => void;
   onPin: (conversationId: string) => void;
   onUnpin: (conversationId: string) => void;
-  onUpdateMute: (conversationId: string, muteExpiresAt: number) => void;
+  onUpdateMute: (conversationId: string, muteExpiresAt: MuteExpiration) => void;
   onArchive: (conversationId: string) => void;
   onUnarchive: (conversationId: string) => void;
   onDelete: (conversationId: string) => void;
@@ -79,11 +82,15 @@ export const LeftPaneConversationListItemContextMenu: FC<LeftPaneConversationLis
       );
     }, [selectedChatFolder]);
 
-    const muteOptions = useMemo(() => {
-      return getMuteOptions(muteExpiresAt, i18n, {
+    const muteMenu = useMemo(() => {
+      return getConversationMuteMenu(muteExpiresAt, i18n, {
         canOnlyBeMutedAlways: canConversationOnlyBeMutedAlways(conversation),
       });
     }, [muteExpiresAt, i18n, conversation]);
+
+    const isMuted = useMemo(() => {
+      return isConversationMuted(conversation);
+    }, [conversation]);
 
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] =
       useState(false);
@@ -117,11 +124,15 @@ export const LeftPaneConversationListItemContextMenu: FC<LeftPaneConversationLis
     }, [onUnpin, conversationId]);
 
     const handleUpdateMute = useCallback(
-      (value: number) => {
-        onUpdateMute(conversationId, value);
+      (expiration: MuteExpiration) => {
+        onUpdateMute(conversationId, expiration);
       },
       [onUpdateMute, conversationId]
     );
+
+    const handleUnmute = useCallback(() => {
+      onUpdateMute(conversationId, MuteExpiration.UNMUTED);
+    }, [onUpdateMute, conversationId]);
 
     const handleArchive = useCallback(() => {
       onArchive(conversationId);
@@ -181,25 +192,20 @@ export const LeftPaneConversationListItemContextMenu: FC<LeftPaneConversationLis
                 {i18n('icu:unpinConversation')}
               </AxoContextMenu.Item>
             )}
-            <AxoContextMenu.Sub>
-              <AxoContextMenu.SubTrigger symbol="bell-slash">
-                {i18n('icu:muteNotificationsTitle')}
-              </AxoContextMenu.SubTrigger>
-              <AxoContextMenu.SubContent>
-                {muteOptions.map(muteOption => {
-                  return (
-                    <ContextMenuMuteNotificationsItem
-                      key={muteOption.value}
-                      value={muteOption.value}
-                      disabled={muteOption.disabled}
-                      onSelect={handleUpdateMute}
-                    >
-                      {muteOption.name}
-                    </ContextMenuMuteNotificationsItem>
-                  );
-                })}
-              </AxoContextMenu.SubContent>
-            </AxoContextMenu.Sub>
+            {isMuted ? (
+              <AxoContextMenu.Item symbol="bell" onSelect={handleUnmute}>
+                {i18n('icu:unmute')}
+              </AxoContextMenu.Item>
+            ) : (
+              <MuteNotificationsSubMenu
+                i18n={i18n}
+                renderer="AxoContextMenu"
+                title={i18n('icu:muteNotificationsTitle')}
+                options={muteMenu.options}
+                label={muteMenu.label}
+                onMuteExpiration={handleUpdateMute}
+              />
+            )}
             {!props.isActivelySearching &&
               isSelectedChatFolderAllChats &&
               props.currentChatFolders.hasAnyCurrentCustomChatFolders && (
@@ -293,28 +299,16 @@ export const LeftPaneConversationListItemContextMenu: FC<LeftPaneConversationLis
             i18n={i18n}
             onDestroyMessages={handleDelete}
             onClose={handleCloseConfirmDeleteDialog}
+            areWeMember={
+              conversation.type === 'group' &&
+              !conversation.left &&
+              !conversation.terminated
+            }
           />
         )}
       </>
     );
   });
-
-function ContextMenuMuteNotificationsItem(props: {
-  disabled?: boolean;
-  value: number;
-  onSelect: (value: number) => void;
-  children: ReactNode;
-}): JSX.Element {
-  const { value, onSelect } = props;
-  const handleSelect = useCallback(() => {
-    onSelect(value);
-  }, [onSelect, value]);
-  return (
-    <AxoContextMenu.Item disabled={props.disabled} onSelect={handleSelect}>
-      {props.children}
-    </AxoContextMenu.Item>
-  );
-}
 
 function ContextMenuCopyTextItem(props: {
   value: string;

@@ -126,8 +126,7 @@ const createProps = (
     deleteAvatarFromDisk: action('deleteAvatarFromDisk'),
     replaceAvatar: action('replaceAvatar'),
     saveAvatarToDisk: action('saveAvatarToDisk'),
-    setMuteDuration: action('setMuteDuration'),
-    showToast: action('showToast'),
+    setMuteExpiration: action('setMuteExpiration'),
     userAvatarData: [],
     reportSpam: action('reportSpam'),
     terminateGroup: action('terminateGroup'),
@@ -188,6 +187,18 @@ export function MemberLabelsCannotBeAdded(): JSX.Element {
   const props = createProps();
 
   return <ConversationDetails {...props} canAddLabel={false} />;
+}
+
+export function MemberLabelsNotAMember(): JSX.Element {
+  const props = createProps();
+
+  return (
+    <ConversationDetails
+      {...props}
+      canAddLabel={false}
+      memberships={props.memberships.filter(({ member }) => !member.isMe)}
+    />
+  );
 }
 
 export function SystemContact(): JSX.Element {

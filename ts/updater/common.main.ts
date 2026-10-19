@@ -114,15 +114,16 @@ type DownloadUpdateResultType = Readonly<{
 }>;
 
 export type UpdaterOptionsType = Readonly<{
-  canRunSilently: () => boolean;
+  canRunSilently: () => Promise<boolean>;
   getMainWindow: () => BrowserWindow | undefined;
   logger: LoggerType;
   sql: MainSQL;
 }>;
 
-enum CheckType {
+export enum CheckType {
   Normal = 'Normal',
   AllowSameVersion = 'AllowSameVersion',
+  ForceCheck = 'ForceCheck',
   ForceDownload = 'ForceDownload',
 }
 
@@ -153,7 +154,7 @@ export abstract class Updater {
   #activeDownload: Promise<boolean> | undefined;
   #markedCannotUpdate = false;
   #restarting = false;
-  readonly #canRunSilently: () => boolean;
+  readonly #canRunSilently: () => Promise<boolean>;
   #autoRetryAttempts = 0;
   #autoRetryAfter: number | undefined;
 
@@ -184,7 +185,7 @@ export abstract class Updater {
       50
     );
 
-    ipcMain.handle('updater/force-update', () => this.force());
+    ipcMain.handle('updater/force-check', () => this.forceCheck());
   }
 
   //
@@ -194,6 +195,11 @@ export abstract class Updater {
   public async force(): Promise<void> {
     this.#markedCannotUpdate = false;
     return this.#checkForUpdatesMaybeInstall(CheckType.ForceDownload);
+  }
+
+  public async forceCheck(): Promise<void> {
+    this.#markedCannotUpdate = false;
+    await this.#checkForUpdatesMaybeInstall(CheckType.ForceCheck);
   }
 
   // If the updater was about to restart the app but the user canceled it, show dialog
@@ -228,7 +234,8 @@ export abstract class Updater {
 
   protected abstract installUpdate(
     updateFilePath: string,
-    isSilent: boolean
+    isSilent: boolean,
+    checkType: CheckType
   ): Promise<() => Promise<void>>;
 
   // For Mac App Store
@@ -245,11 +252,15 @@ export abstract class Updater {
     ipcMain.handleOnce('start-update', performUpdateCallback);
   }
 
-  protected checkSystemRequirements(vendor: JSONVendorSchema): boolean {
+  protected checkSystemRequirements(
+    vendor: JSONVendorSchema,
+    checkType: CheckType
+  ): boolean {
     if (vendor.requireManualUpdate === 'true') {
       this.logger.warn('checkSystemRequirements: manual update required');
       this.markCannotUpdate(
         new Error('yaml file has requireManualUpdate flag'),
+        checkType,
         DialogType.Cannot_Update_Require_Manual
       );
       return false;
@@ -262,6 +273,7 @@ export abstract class Updater {
       );
       this.markCannotUpdate(
         new Error('yaml file has unsatisfied minOSVersion value'),
+        checkType,
         DialogType.UnsupportedOS
       );
       return false;
@@ -272,6 +284,7 @@ export abstract class Updater {
 
   protected markCannotUpdate(
     error: Error,
+    checkType: CheckType,
     dialogType = DialogType.Cannot_Update
   ): void {
     if (this.#markedCannotUpdate) {
@@ -296,7 +309,7 @@ export abstract class Updater {
       this.logger.info('markCannotUpdate: retrying after user action');
 
       this.#markedCannotUpdate = false;
-      await this.#checkForUpdatesMaybeInstall(CheckType.Normal);
+      await this.#checkForUpdatesMaybeInstall(checkType);
     });
   }
 
@@ -350,14 +363,19 @@ export abstract class Updater {
 
   async #downloadAndInstall(
     updateInfo: UpdateInformationType,
-    mode: DownloadMode
+    mode: DownloadMode,
+    checkType: CheckType
   ): Promise<boolean> {
     if (this.#activeDownload) {
       return this.#activeDownload;
     }
 
     try {
-      this.#activeDownload = this.#doDownloadAndInstall(updateInfo, mode);
+      this.#activeDownload = this.#doDownloadAndInstall(
+        updateInfo,
+        mode,
+        checkType
+      );
 
       return await this.#activeDownload;
     } finally {
@@ -367,7 +385,8 @@ export abstract class Updater {
 
   async #doDownloadAndInstall(
     updateInfo: UpdateInformationType,
-    mode: DownloadMode
+    mode: DownloadMode,
+    checkType: CheckType
   ): Promise<boolean> {
     const { logger } = this;
 
@@ -437,9 +456,13 @@ export abstract class Updater {
 
       const isSilent =
         updateInfo.vendor?.requireUserConfirmation !== 'true' &&
-        this.#canRunSilently();
+        (await this.#canRunSilently());
 
-      const handler = await this.installUpdate(updateFilePath, isSilent);
+      const handler = await this.installUpdate(
+        updateFilePath,
+        isSilent,
+        checkType
+      );
       if (isSilent || mode === DownloadMode.ForceUpdate) {
         await handler();
       } else {
@@ -471,15 +494,16 @@ export abstract class Updater {
       logger.error(
         `downloadAndInstall: fatal error ${Errors.toLogFormat(error)}`
       );
-      this.markCannotUpdate(error);
+      this.markCannotUpdate(error, checkType);
       throw error;
     }
   }
 
   async #checkForUpdatesMaybeInstall(checkType: CheckType): Promise<void> {
+    const logId = `checkForUpdatesMaybeInstall/${checkType}`;
     const { logger } = this;
 
-    logger.info('checkForUpdatesMaybeInstall: checking for update...');
+    logger.info(`${logId}: checking for update...`);
     const updateInfo = await this.#checkForUpdates(checkType);
     if (!updateInfo) {
       return;
@@ -488,11 +512,15 @@ export abstract class Updater {
     const { version: newVersion } = updateInfo;
 
     if (checkType === CheckType.ForceDownload) {
-      await this.#downloadAndInstall(updateInfo, DownloadMode.ForceUpdate);
+      await this.#downloadAndInstall(
+        updateInfo,
+        DownloadMode.ForceUpdate,
+        checkType
+      );
       return;
     }
 
-    if (checkType === CheckType.Normal) {
+    if (checkType === CheckType.Normal || checkType === CheckType.ForceCheck) {
       // Verify that the downloaded version is greater than downloaded
       if (this.version && !gt(newVersion, this.version)) {
         return;
@@ -507,8 +535,12 @@ export abstract class Updater {
     }
 
     const autoDownloadUpdates = await this.#getAutoDownloadUpdateSetting();
-    if (autoDownloadUpdates) {
-      await this.#downloadAndInstall(updateInfo, DownloadMode.Automatic);
+    if (autoDownloadUpdates && checkType !== CheckType.ForceCheck) {
+      await this.#downloadAndInstall(
+        updateInfo,
+        DownloadMode.Automatic,
+        checkType
+      );
       return;
     }
 
@@ -517,20 +549,25 @@ export abstract class Updater {
       mode = DownloadMode.DifferentialOnly;
     }
 
-    await this.#offerUpdate(updateInfo, mode, 0);
+    await this.#offerUpdate(updateInfo, mode, 0, checkType);
   }
 
   async #offerUpdate(
     updateInfo: UpdateInformationType,
     mode: DownloadMode,
-    attempt: number
+    attempt: number,
+    checkType: CheckType
   ): Promise<void> {
     const { logger } = this;
 
     this.setUpdateListener(async () => {
       logger.info('offerUpdate: have not downloaded update, going to download');
 
-      const didDownload = await this.#downloadAndInstall(updateInfo, mode);
+      const didDownload = await this.#downloadAndInstall(
+        updateInfo,
+        mode,
+        checkType
+      );
       if (!didDownload && mode === DownloadMode.DifferentialOnly) {
         this.logger.warn(
           'offerUpdate: Failed to download differential update, offering full'
@@ -539,7 +576,8 @@ export abstract class Updater {
         return this.#offerUpdate(
           updateInfo,
           DownloadMode.FullOnly,
-          attempt + 1
+          attempt + 1,
+          checkType
         );
       }
 
@@ -578,10 +616,14 @@ export abstract class Updater {
   async #checkForUpdates(
     checkType: CheckType
   ): Promise<UpdateInformationType | undefined> {
+    const logId = `checkForUpdates/${checkType}`;
     if (isNotUpdatable(packageJson.version)) {
       this.logger.info(
-        'checkForUpdates: not checking for updates, this is not an updatable build'
+        `${logId}: not checking for updates, this is not an updatable build`
       );
+      if (checkType === CheckType.ForceCheck) {
+        throw new Error(`${logId}: Not an updatabale build!`);
+      }
       return;
     }
 
@@ -589,31 +631,38 @@ export abstract class Updater {
     const parsedYaml = parseYaml(yaml);
 
     const { vendor } = parsedYaml;
-    if (vendor && !this.checkSystemRequirements(vendor)) {
+    if (vendor && !this.checkSystemRequirements(vendor, checkType)) {
       return;
     }
 
     const version = getVersion(parsedYaml);
 
     if (!version) {
-      this.logger.warn(
-        'checkForUpdates: no version extracted from downloaded yaml'
-      );
-
-      return;
-    }
-
-    if (checkType === CheckType.Normal && !isVersionNewer(version)) {
-      this.logger.info(
-        `checkForUpdates: ${version} is not newer than ${packageJson.version}; ` +
-          'no new update available'
-      );
+      this.logger.warn(`${logId}: no version extracted from downloaded yaml`);
+      if (checkType === CheckType.ForceCheck) {
+        throw new Error(`${logId}: No version extracted!`);
+      }
 
       return;
     }
 
     if (
-      checkType === CheckType.Normal &&
+      (checkType === CheckType.Normal || checkType === CheckType.ForceCheck) &&
+      !isVersionNewer(version)
+    ) {
+      this.logger.info(
+        `${logId}: ${version} is not newer than ${packageJson.version}; ` +
+          'no new update available'
+      );
+      if (checkType === CheckType.ForceCheck) {
+        throw new Error(`${logId}: No newer version available!`);
+      }
+
+      return;
+    }
+
+    if (
+      (checkType === CheckType.Normal || checkType === CheckType.ForceCheck) &&
       this.handleUpdateFromThirdParty(version)
     ) {
       return;
@@ -639,10 +688,7 @@ export abstract class Updater {
       }
     }
 
-    this.logger.info(
-      `checkForUpdates: found newer version ${version} ` +
-        `checkType=${checkType}`
-    );
+    this.logger.info(`${logId}: found newer version ${version}`);
 
     const fileName = getUpdateFileName(
       parsedYaml,
@@ -659,9 +705,7 @@ export abstract class Updater {
 
     let differentialData: DifferentialDownloadDataType | undefined;
     if (latestInstaller) {
-      this.logger.info(
-        `checkForUpdates: Found local installer ${latestInstaller}`
-      );
+      this.logger.info(`${logId}: Found local installer ${latestInstaller}`);
 
       const diffOptions = {
         oldFile: latestInstaller,
@@ -673,7 +717,7 @@ export abstract class Updater {
         this.cachedDifferentialData &&
         isValidDifferentialData(this.cachedDifferentialData, diffOptions)
       ) {
-        this.logger.info('checkForUpdates: using cached differential data');
+        this.logger.info(`${logId}: using cached differential data`);
 
         differentialData = this.cachedDifferentialData;
       } else {
@@ -683,12 +727,12 @@ export abstract class Updater {
           this.cachedDifferentialData = differentialData;
 
           this.logger.info(
-            'checkForUpdates: differential download size',
+            `${logId}: differential download size`,
             differentialData.downloadSize
           );
         } catch (error) {
           this.logger.error(
-            'checkForUpdates: Failed to prepare differential update',
+            `${logId}: Failed to prepare differential update`,
             Errors.toLogFormat(error)
           );
           this.cachedDifferentialData = undefined;

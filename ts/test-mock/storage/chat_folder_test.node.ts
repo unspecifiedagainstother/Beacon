@@ -28,8 +28,8 @@ async function openChatFolderSettings(window: Page) {
     .getByRole('navigation')
     .getByRole('button', { name: 'Chats' });
   const openChatFoldersSettingsBtn = window
-    .getByRole('group', { name: 'Chat folders' })
-    .getByRole('button', { name: 'Set up' });
+    .getByRole('region', { name: 'Chat folders' })
+    .getByRole('button', { name: /^Add a chat folder$|^Add or edit folders$/ });
 
   await openSettingsBtn.click();
   await openChatsSettingsBtn.click();
@@ -159,7 +159,7 @@ describe('storage service/chat folders', function (this: Mocha.Suite) {
         },
       });
 
-      await phone.setStorageState(state);
+      state = await phone.setStorageState(state);
       await phone.sendFetchStorage({ timestamp: bootstrap.getTimestamp() });
       await app.waitForManifestVersion(state.version);
 
@@ -184,7 +184,7 @@ describe('storage service/chat folders', function (this: Mocha.Suite) {
         }
       );
 
-      await phone.setStorageState(state);
+      state = await phone.setStorageState(state);
       await phone.sendFetchStorage({ timestamp: bootstrap.getTimestamp() });
       await app.waitForManifestVersion(state.version);
 
@@ -211,7 +211,7 @@ describe('storage service/chat folders', function (this: Mocha.Suite) {
         }
       );
 
-      await phone.setStorageState(state);
+      state = await phone.setStorageState(state);
       await phone.sendFetchStorage({ timestamp: bootstrap.getTimestamp() });
       await app.waitForManifestVersion(state.version);
 
