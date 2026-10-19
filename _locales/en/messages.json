@@ -83,6 +83,50 @@
     "messageformat": "Enable {name}",
     "description": "Accessible label for the switch that enables or disables an addon"
   },
+  "icu:Beacon__settings-privacy": {
+    "messageformat": "Privacy",
+    "description": "Section heading on the Beacon settings page"
+  },
+  "icu:Beacon__settings-window": {
+    "messageformat": "Window",
+    "description": "Section heading on the Beacon settings page"
+  },
+  "icu:Beacon__settings-window-footer": {
+    "messageformat": "Titlebar changes take effect after restarting Beacon.",
+    "description": "Footer under the Window section of Beacon settings"
+  },
+  "icu:Beacon__settings-customize": {
+    "messageformat": "Customize",
+    "description": "Section heading on the Beacon settings page"
+  },
+  "icu:Beacon__settings-accent": {
+    "messageformat": "Accent color",
+    "description": "Row on the Beacon settings page linking to the chat color setting"
+  },
+  "icu:Beacon__settings-accent-description": {
+    "messageformat": "Follows your chat color",
+    "description": "Description of the Accent color row"
+  },
+  "icu:Beacon__settings-accent-footer": {
+    "messageformat": "Switches, buttons and highlights use your chat color from Appearance.",
+    "description": "Footer under the Customize section of Beacon settings"
+  },
+  "icu:Beacon__css-editor-live-preview": {
+    "messageformat": "Live preview",
+    "description": "Toggle in the custom CSS editor that applies changes while typing"
+  },
+  "icu:Beacon__css-editor-invalid": {
+    "messageformat": "Could not parse CSS",
+    "description": "Status in the custom CSS editor when the CSS cannot be parsed"
+  },
+  "icu:Beacon__css-editor-rules": {
+    "messageformat": "{count, plural, one {# rule} other {# rules}}",
+    "description": "Number of CSS rules in the custom CSS editor"
+  },
+  "icu:Beacon__css-editor-empty": {
+    "messageformat": "No custom styles",
+    "description": "Shown when no custom CSS is saved"
+  },
   "icu:Beacon__modules-title": {
     "messageformat": "Modules",
     "description": "Title of the Beacon modules settings page"
@@ -11235,7 +11279,7 @@
     "description": "Description in the CSS editor modal"
   },
   "icu:Beacon__css-editor-placeholder": {
-    "messageformat": "/* Enter CSS here */ .selector color: red;",
+    "messageformat": "/* Example */\n.module-message__text '{'\n  font-size: 15px;\n'}'",
     "description": "Placeholder text in the CSS editor textarea"
   },
   "icu:Beacon__css-editor-save": {
