@@ -21,6 +21,7 @@ import { addBeaconFilter, applyBeaconFilter } from './filters.std.ts';
 import { createPatcher } from './patcher.std.ts';
 import { createElement, createModal } from './ui.dom.ts';
 import { createLogger } from '../../logging/log.std.ts';
+import { BEACON_FEATURES } from '../features.std.ts';
 
 const log = createLogger('beacon/runtime');
 
@@ -66,6 +67,7 @@ export function initializeBeaconRuntime(store: Store<StateType>): void {
 
   try {
     purgeLegacyPlaintext();
+    syncBlurPII(store);
     attachHookBus(hookBus);
     registerBuiltinCommands();
 
@@ -93,6 +95,26 @@ export function initializeBeaconRuntime(store: Store<StateType>): void {
       log.error('addon loader initialization error:', error);
     }
   })();
+}
+
+/**
+ * Blur PII applies app-wide (Settings, contact details, modals), so the class
+ * goes on <body> rather than on any one component, and follows the setting
+ * live. Elements opt in with the `Beacon-pii` class.
+ */
+function syncBlurPII(store: Store<StateType>): void {
+  const fallback =
+    BEACON_FEATURES.find(f => f.key === 'beaconBlurPII')?.defaultValue ?? true;
+  let current: boolean | undefined;
+  const apply = () => {
+    const next = store.getState().items.beaconBlurPII ?? fallback;
+    if (next !== current) {
+      current = next;
+      document.body.classList.toggle('Beacon--blur-pii', next);
+    }
+  };
+  apply();
+  store.subscribe(apply);
 }
 
 /**

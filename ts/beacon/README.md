@@ -92,6 +92,11 @@ upstream-added markup is covered automatically.
 
 ## Gotchas learned the hard way
 
+- **Mark PII with `Beacon-pii`, not upstream class names.** Blur PII used to
+  target `.Preferences__flow-value`; upstream moved those rows to
+  `AxoTextItem` and the blur silently stopped matching. Wrap the value in
+  `<span className="Beacon-pii">`; the runtime puts `Beacon--blur-pii` on
+  `<body>` from the setting.
 - **Never put a `transition` on a privacy filter.** `transition: filter`
   animates from clear to blurred on mount, so the value is legible for the
   duration of the animation. See the Blur PII rules in `_beacon-theme.scss`.
