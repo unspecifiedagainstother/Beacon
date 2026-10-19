@@ -466,17 +466,30 @@ function openLogViewer(
         }
         lines.forEach((line, idx) => {
           const isLast = idx === lines.length - 1;
-          body.append(
-            el(
-              'div',
-              classNames(
-                'BeaconLog__line',
-                !isLast && 'BeaconLog__line--old',
-                isLast && tab === 'deleted' && 'BeaconLog__line--deleted'
-              ),
-              line
+          let label: string;
+          if (isLast) {
+            label = tab === 'deleted' ? 'Deleted' : 'Current';
+          } else {
+            label = idx === 0 ? 'Original' : `Edit ${idx}`;
+          }
+          const lineEl = el(
+            'div',
+            classNames(
+              'BeaconLog__line',
+              !isLast && 'BeaconLog__line--old',
+              isLast && tab === 'deleted' && 'BeaconLog__line--deleted'
             )
           );
+          lineEl.append(
+            el('span', 'BeaconLog__line-label', label),
+            // Collapse runs of blank lines so long messages stay compact.
+            el(
+              'span',
+              'BeaconLog__line-text',
+              line.trim().replace(/\n{3,}/g, '\n\n')
+            )
+          );
+          body.append(lineEl);
         });
 
         const jump = ctx.ui.createElement({

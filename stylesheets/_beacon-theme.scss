@@ -53,6 +53,30 @@
   //   --beacon-elevation-border: none;
   --beacon-elevation-shadow: none;
   --beacon-elevation-border: 1px solid #2f2f2f;
+
+  // -- Accent
+  // Overwritten at runtime from the default chat color (core/accent.std.ts).
+  --beacon-accent: #2c6bed;
+  --beacon-accent-pressed: #2459c6;
+  --beacon-accent-tint: rgb(44 107 237 / 0.16);
+  --beacon-accent-text: #6191f3;
+
+  // -- Window
+  // The main window chrome color: titlebar, Beacon dialogs.
+  --beacon-window-bg: #1f1f1f;
+
+  // -- Code editor syntax colors (dark)
+  --beacon-code-bg: #161616;
+  --beacon-code-comment: #7d8590;
+  --beacon-code-string: #a5d6a7;
+  --beacon-code-at-rule: #c792ea;
+  --beacon-code-selector: var(--beacon-accent-text);
+  --beacon-code-property: #80cbc4;
+  --beacon-code-value: #e6e6e6;
+  --beacon-code-number: #f7a76c;
+  --beacon-code-color: #f48fb1;
+  --beacon-code-important: #ff6b6b;
+  --beacon-code-punctuation: #8b8b8b;
 }
 
 // Beacon: PII blur in Settings.
@@ -128,6 +152,35 @@
 // so `:root:not(.dark-theme)` would always match. Target .light-theme directly.
 .light-theme {
   --beacon-elevation-border: 1px solid #d8d8d8;
+  --beacon-window-bg: #f5f5f5;
+
+  --beacon-code-bg: #fbfbfb;
+  --beacon-code-comment: #6e7781;
+  --beacon-code-string: #116329;
+  --beacon-code-at-rule: #8250df;
+  --beacon-code-property: #0a6e78;
+  --beacon-code-value: #1f2328;
+  --beacon-code-number: #b35900;
+  --beacon-code-color: #bf3989;
+  --beacon-code-important: #cf222e;
+  --beacon-code-punctuation: #6e7781;
+}
+
+// Beacon: settings pages centre their content with flex spacers that
+// collapse to nothing whenever an item's text is long (e.g. Account), so the
+// content ran edge to edge on some pages only. Guarantee a gutter.
+.Preferences .Preferences__settings-pane-spacer {
+  flex: 1 0 24px;
+}
+
+// Beacon: selected nav entries use the accent instead of plain gray.
+.Preferences button[aria-current='page'] {
+  background: var(--beacon-accent-tint);
+}
+
+// Beacon: blur whatever sits behind upstream dialogs too.
+.module-modal-host__overlay {
+  backdrop-filter: blur(8px);
 }
 
 .dark-theme {
@@ -137,68 +190,6 @@
   --beacon-past-edit-opacity: 0.65;
 
   --beacon-deleted-text: #ff6b6b;
-}
-
-// Beacon: CSS editor modal styling. Large modal for editing the whole app.
-.BeaconCSSEditor__modal {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 20px;
-  // Let the Modal component handle sizing; just fill what's available
-  min-height: min(600px, 70vh);
-  height: 100%;
-}
-
-.BeaconCSSEditor__description {
-  font-size: 0.9375rem;
-  opacity: 0.8;
-  line-height: 1.5;
-  margin: 0;
-}
-
-.BeaconCSSEditor__textarea {
-  font-family: monospace;
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  flex: 1;
-  padding: 12px;
-  background: var(--axo-color-surface-primary, #000);
-  color: var(--axo-color-label-primary, #fff);
-  border: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
-  border-radius: 6px;
-  resize: none;
-  overflow: auto;
-}
-
-.BeaconCSSEditor__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  border-top: 1px solid var(--beacon-elevation-border, 1px solid #2f2f2f);
-  padding-top: 12px;
-}
-
-.BeaconCSSEditor__size-hint {
-  font-size: 0.8125rem;
-  opacity: 0.6;
-}
-
-.BeaconCSSEditor__actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.BeaconCSSEditor__button {
-  margin-top: 12px;
-}
-
-.Beacon__settings-divider {
-  height: 1px;
-  background: var(--axo-color-border-primary);
-  margin-block: 8px;
 }
 
 // ===========================================================================
@@ -237,12 +228,18 @@
   }
 
   &--primary {
-    color: var(--axo-color-label-primary-oncolor);
-    background: var(--axo-color-fill-primary);
+    color: #fff;
+    background: var(--beacon-accent);
 
     &:hover {
-      background: var(--axo-color-fill-primary-pressed);
+      background: var(--beacon-accent-pressed);
     }
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+    pointer-events: none;
   }
 
   &--destructive {
@@ -278,7 +275,7 @@
   }
 
   &:focus {
-    outline: 2px solid var(--axo-color-border-focused-outer);
+    outline: 2px solid var(--beacon-accent);
     outline-offset: -1px;
   }
 
@@ -323,8 +320,8 @@
   }
 
   &--active {
-    color: var(--axo-color-label-primary);
-    background: var(--axo-color-surface-primary);
+    color: #fff;
+    background: var(--beacon-accent);
     box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
   }
 }
@@ -344,7 +341,8 @@
 
   &--command {
     font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-    color: var(--axo-color-label-accent);
+    color: var(--beacon-accent-text);
+    background: var(--beacon-accent-tint);
   }
 
   &--kbd {
@@ -399,24 +397,32 @@
 
 .BeaconModules__grid {
   display: grid;
-  // One column until a card can be comfortably wide; never squeeze two.
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
-  gap: 10px;
-  align-items: start;
+  // Two columns once each card gets 280px; one column below that.
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 12px;
+  // Cards in a row share a height so the grid reads as rows, not a ragged
+  // stack; the footer is pinned to the bottom of each card.
+  align-items: stretch;
 }
 
 .BeaconModules__card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
-  padding: 14px;
+  padding: 16px;
   border: 1px solid var(--axo-color-border-primary);
-  border-radius: 12px;
+  border-radius: 14px;
   background: var(--axo-color-surface-secondary);
+  transition: border-color 120ms ease-out;
 
   &--enabled {
-    border-color: color-mix(in srgb, var(--beacon-brand) 45%, transparent);
+    border-color: color-mix(in srgb, var(--beacon-accent) 50%, transparent);
+    background: color-mix(
+      in srgb,
+      var(--beacon-accent) 5%,
+      var(--axo-color-surface-secondary)
+    );
   }
 
   &--expanded {
@@ -430,16 +436,34 @@
 
 .BeaconModules__card-head {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
   gap: 12px;
+}
+
+.BeaconModules__card-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--axo-color-label-secondary);
+  background: var(--axo-color-fill-secondary);
+
+  .BeaconModules__card--enabled & {
+    color: var(--beacon-accent-text);
+    background: var(--beacon-accent-tint);
+  }
 }
 
 .BeaconModules__card-title {
   display: flex;
+  flex: 1;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 2px 6px;
   min-width: 0;
 }
 
@@ -456,11 +480,11 @@
 
 .BeaconModules__card-switch {
   flex-shrink: 0;
-  padding-top: 2px;
 }
 
 .BeaconModules__card-description {
   margin: 0;
+  padding-inline-start: 46px;
   font-size: 0.8125rem;
   line-height: 1.4;
   color: var(--axo-color-label-secondary);
@@ -479,6 +503,10 @@
   );
 }
 
+.BeaconModules__card-extras {
+  padding-inline-start: 46px;
+}
+
 .BeaconModules__card-extras,
 .BeaconModules__card-tags {
   display: flex;
@@ -493,6 +521,7 @@
   justify-content: space-between;
   gap: 8px;
   margin-top: auto;
+  padding-top: 2px;
 }
 
 .BeaconModules__card-settings {
@@ -613,7 +642,15 @@
 .BeaconModal__overlay {
   position: absolute;
   inset: 0;
-  background: rgb(0 0 0 / 0.55);
+  background: rgb(0 0 0 / 0.4);
+  backdrop-filter: blur(10px) saturate(120%);
+  animation: beacon-fade-in 140ms ease-out;
+}
+
+@keyframes beacon-fade-in {
+  from {
+    opacity: 0;
+  }
 }
 
 .BeaconModal__content {
@@ -622,32 +659,52 @@
   flex-direction: column;
   width: min(480px, calc(100vw - 32px));
   max-height: min(85vh, 720px);
-  border: var(--beacon-elevation-border);
-  border-radius: 14px;
+  border: 1px solid var(--axo-color-border-primary);
+  border-radius: 16px;
   color: var(--axo-color-label-primary);
-  background: var(--axo-color-material-dialog);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 16px 48px rgb(0 0 0 / 0.3);
-  animation: beacon-pop-in 140ms ease-out;
+  background: var(--beacon-window-bg);
+  box-shadow:
+    0 24px 64px rgb(0 0 0 / 0.35),
+    0 2px 8px rgb(0 0 0 / 0.2);
+  animation: beacon-pop-in 160ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
 
   &--wide {
     width: min(720px, calc(100vw - 32px));
+  }
+
+  &--editor {
+    width: min(920px, calc(100vw - 32px));
+    height: min(760px, calc(100vh - 64px));
+    max-height: none;
   }
 }
 
 .BeaconModal__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding-block: 14px 10px;
-  padding-inline: 18px;
+  padding-block: 18px 12px;
+  padding-inline: 20px;
+}
+
+.BeaconModal__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .BeaconModal__title {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.0625rem;
   font-weight: 600;
+}
+
+.BeaconModal__subtitle {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--axo-color-label-secondary);
 }
 
 .BeaconModal__close {
@@ -682,8 +739,8 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding-block: 0 16px;
-  padding-inline: 18px;
+  padding-block: 0 18px;
+  padding-inline: 20px;
   font-size: 0.875rem;
   white-space: pre-wrap;
 }
@@ -691,11 +748,23 @@
 .BeaconModal__actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  padding-block: 10px 14px;
-  padding-inline: 18px;
+  padding-block: 12px 16px;
+  padding-inline: 20px;
   border-top: 1px solid var(--axo-color-border-primary);
+
+  &--spread {
+    justify-content: space-between;
+  }
+}
+
+.BeaconModal__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-inline-start: auto;
 }
 
 @keyframes beacon-pop-in {
@@ -728,9 +797,8 @@
   border-radius: 10px;
   font-size: 0.8125rem;
   color: var(--axo-color-label-primary);
-  background: var(--axo-color-material-dialog);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+  background: var(--beacon-window-bg);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
   pointer-events: auto;
   cursor: pointer;
   white-space: pre-wrap;
@@ -752,7 +820,7 @@
   }
 
   &--info {
-    border-inline-start-color: var(--beacon-brand);
+    border-inline-start-color: var(--beacon-accent);
   }
 
   &--leaving {
@@ -863,8 +931,20 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  padding-block: 2px 6px;
-  background: inherit;
+  padding-block: 2px 8px;
+  background: var(--beacon-window-bg);
+}
+
+.BeaconLog__line-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--axo-color-label-secondary);
+}
+
+.BeaconLog__line-text {
+  white-space: pre-wrap;
 }
 
 .BeaconLog__search {
@@ -879,9 +959,9 @@
 }
 
 .BeaconLog__item {
-  padding-block: 8px 10px;
-  padding-inline: 12px;
-  border-radius: 10px;
+  padding-block: 10px 12px;
+  padding-inline: 14px;
+  border-radius: 12px;
   border-inline-start: 3px solid var(--axo-color-border-primary);
   background: var(--axo-color-fill-secondary);
 
@@ -890,7 +970,7 @@
   }
 
   &--edited {
-    border-inline-start-color: var(--beacon-brand);
+    border-inline-start-color: var(--beacon-accent);
   }
 }
 
@@ -931,20 +1011,24 @@
 .BeaconLog__item-body {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
   font-size: 0.875rem;
   overflow-wrap: anywhere;
-  white-space: pre-wrap;
 }
 
 .BeaconLog__line {
-  &--old {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  align-items: baseline;
+  gap: 10px;
+
+  &--old .BeaconLog__line-text {
     color: var(--axo-color-label-secondary);
     text-decoration: line-through;
     text-decoration-color: color-mix(in srgb, currentColor 50%, transparent);
   }
 
-  &--deleted {
+  &--deleted .BeaconLog__line-text {
     color: var(--beacon-deleted-text);
   }
 
@@ -1074,5 +1158,157 @@
 
   .BeaconList__code {
     flex-basis: 100%;
+  }
+}
+
+// -- Code editor (custom CSS) -------------------------------------------------
+//
+// A <pre> highlight layer under a transparent <textarea>. Both layers must use
+// identical font metrics, padding and wrapping or the caret drifts from the
+// coloured text.
+
+.BeaconCode {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  margin-inline: 20px;
+  border: 1px solid var(--axo-color-border-primary);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--beacon-code-bg);
+
+  &:focus-within {
+    border-color: var(--beacon-accent);
+    box-shadow: 0 0 0 3px var(--beacon-accent-tint);
+  }
+}
+
+.BeaconCode__gutter {
+  flex-shrink: 0;
+  min-width: 44px;
+  padding-block: 12px;
+  padding-inline: 10px 8px;
+  overflow: hidden;
+  text-align: end;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--beacon-code-punctuation);
+  border-inline-end: 1px solid var(--axo-color-border-primary);
+  user-select: none;
+}
+
+.BeaconCode__editor {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.BeaconCode__highlight,
+.BeaconCode__input {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 12px;
+  border: none;
+  overflow: auto;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 20px;
+  tab-size: 2;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.BeaconCode__highlight {
+  color: var(--beacon-code-value);
+  pointer-events: none;
+  // Scroll position is mirrored from the textarea; its own bars stay hidden.
+  scrollbar-width: none;
+}
+
+.BeaconCode__input {
+  resize: none;
+  outline: none;
+  color: transparent;
+  background: transparent;
+  caret-color: var(--axo-color-label-primary);
+
+  &::placeholder {
+    color: var(--beacon-code-comment);
+  }
+
+  &::selection {
+    color: transparent;
+    background: color-mix(in srgb, var(--beacon-accent) 35%, transparent);
+  }
+}
+
+.BeaconCode__tok {
+  &--comment {
+    color: var(--beacon-code-comment);
+    font-style: italic;
+  }
+
+  &--string {
+    color: var(--beacon-code-string);
+  }
+
+  &--at-rule {
+    color: var(--beacon-code-at-rule);
+  }
+
+  &--selector {
+    color: var(--beacon-code-selector);
+  }
+
+  &--property {
+    color: var(--beacon-code-property);
+  }
+
+  &--value {
+    color: var(--beacon-code-value);
+  }
+
+  &--number {
+    color: var(--beacon-code-number);
+  }
+
+  &--color {
+    color: var(--beacon-code-color);
+  }
+
+  &--important {
+    color: var(--beacon-code-important);
+    font-weight: 600;
+  }
+
+  &--punctuation {
+    color: var(--beacon-code-punctuation);
+  }
+}
+
+.BeaconCode__status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.8125rem;
+  color: var(--axo-color-label-secondary);
+}
+
+.BeaconCode__preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.BeaconCode__count {
+  font-variant-numeric: tabular-nums;
+
+  &--error {
+    color: var(--axo-color-label-destructive);
   }
 }

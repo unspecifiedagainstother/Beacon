@@ -15,6 +15,8 @@ import {
   createDeletedSnapshot,
   describeSnapshot,
 } from '../../beacon/core/message-snapshot.std.ts';
+import { tokenizeCss } from '../../beacon/util/cssHighlight.std.ts';
+import { getAccentHex } from '../../beacon/core/accent.std.ts';
 import {
   cleanUrlsInText,
   DEFAULT_TRACKING_PARAMS,
@@ -213,6 +215,51 @@ describe('Beacon core', () => {
     it('leaves clean URLs byte-for-byte untouched', () => {
       const text = 'https://example.com/path?q=a%20b';
       assert.strictEqual(cleanUrlsInText(text, matchers), text);
+    });
+  });
+
+  describe('tokenizeCss', () => {
+    const source = `/* hi */
+@media (max-width: 600px) {
+  .a:hover, #b > p { color: #fff !important; margin: 4px 0; }
+}
+.c { content: "x;y"; }`;
+
+    it('round-trips the source exactly', () => {
+      assert.strictEqual(
+        tokenizeCss(source)
+          .map(t => t.text)
+          .join(''),
+        source
+      );
+    });
+
+    it('classifies selectors, properties and values', () => {
+      const kinds = (text: string) =>
+        tokenizeCss(source)
+          .filter(t => t.text.trim() === text)
+          .map(t => t.kind);
+      assert.include(kinds('/* hi */'), 'comment');
+      assert.include(kinds('@media'), 'at-rule');
+      assert.include(kinds('.c'), 'selector');
+      assert.include(kinds('color'), 'property');
+      assert.include(kinds('#fff'), 'color');
+      assert.include(kinds('!important'), 'important');
+      assert.include(kinds('"x;y"'), 'string');
+    });
+  });
+
+  describe('accent', () => {
+    it('maps chat colors and falls back to ultramarine', () => {
+      assert.strictEqual(getAccentHex({ color: 'crimson' }), '#cf163e');
+      assert.strictEqual(getAccentHex(undefined), '#2c6bed');
+      assert.match(
+        getAccentHex({
+          color: 'custom',
+          customColorData: { value: { start: { hue: 120, saturation: 1 } } },
+        }),
+        /^#[0-9a-f]{6}$/
+      );
     });
   });
 });
