@@ -109,22 +109,16 @@
   flex-shrink: 0;
 }
 
-// Note: `.Preferences__half-flow` on its own is NOT blurred — it wraps both the
-// label ("Phone number") and the value, so blurring it would obscure the label
-// too. Only the value-side variants are targeted.
-.Beacon--blur-pii {
-  // Profile chip at the top of the settings sidebar
-  .Preferences__profile-chip__number,
-  .Preferences__profile-chip__username,
-  // Value column of flow rows — currently phone number and device name
-  .Preferences__flow-value,
-  .Preferences__half-flow--align-right {
-    filter: blur(var(--beacon-pii-blur-radius, 6px));
-    user-select: none;
-    // Blur is a visual guard only — the text stays in the accessibility tree so
-    // screen reader users can still hear their own number.
-    pointer-events: none;
-  }
+// Applied app-wide: the runtime toggles `Beacon--blur-pii` on <body> from the
+// setting, and PII values opt in with `Beacon-pii` (phone number, username,
+// device name in Settings; phone number in contact details). Mark the value
+// only, never its label.
+.Beacon--blur-pii .Beacon-pii {
+  filter: blur(var(--beacon-pii-blur-radius, 6px));
+  user-select: none;
+  // Blur is a visual guard only — the text stays in the accessibility tree so
+  // screen reader users can still hear their own number.
+  pointer-events: none;
 }
 
 // Light theme keeps a visible edge too, but lighter — a #2f2f2f border on a

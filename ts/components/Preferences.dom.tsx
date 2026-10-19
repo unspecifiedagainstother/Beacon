@@ -1032,12 +1032,12 @@ export function Preferences({
           {phoneNumber && (
             <AxoTextItem.Root
               label={i18n('icu:Preferences--phone-number')}
-              value={phoneNumber}
+              value={<span className="Beacon-pii">{phoneNumber}</span>}
             />
           )}
           <AxoTextItem.Root
             label={i18n('icu:Preferences--device-name')}
-            value={deviceName}
+            value={<span className="Beacon-pii">{deviceName}</span>}
           />
         </List>
         {weArePrimaryDevice && (
@@ -2871,10 +2871,7 @@ export function Preferences({
   return (
     <>
       <div
-        className={classNames(
-          'Preferences',
-          beaconSettings.beaconBlurPII && 'Beacon--blur-pii'
-        )}
+        className="Preferences"
       >
         <NavSidebar
           title={i18n('icu:Preferences--header')}
@@ -2924,13 +2921,9 @@ export function Preferences({
                   <div className="Preferences__profile-chip__name">
                     {me.title}
                   </div>
-                  {me.phoneNumber && (
-                    <div className="Preferences__profile-chip__number">
-                      {me.phoneNumber}
-                    </div>
-                  )}
+                  {/* Beacon: phone number deliberately not shown here. */}
                   {me.username && (
-                    <div className="Preferences__profile-chip__username">
+                    <div className="Preferences__profile-chip__username Beacon-pii">
                       {me.username}
                     </div>
                   )}

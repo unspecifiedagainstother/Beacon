@@ -11288,10 +11288,10 @@
   },
   "icu:Preferences__blur-pii": {
     "messageformat": "Blur PII",
-    "description": "Setting to blur personally identifying information in Settings"
+    "description": "Setting to blur personally identifying information across the app"
   },
   "icu:Preferences__blur-pii--description": {
-    "messageformat": "Hide phone numbers and other identifying details until you hover over them. Useful when screen sharing.",
+    "messageformat": "Blur phone numbers, your username and device name wherever Beacon shows them. Useful when screen sharing.",
     "description": "Explanation of the Blur PII setting"
   },
   "icu:Beacon__PastEdit__label": {

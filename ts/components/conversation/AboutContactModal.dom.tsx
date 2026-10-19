@@ -331,7 +331,11 @@ export function AboutContactModal({
                   {!isMe && contact.phoneNumber && (
                     <AxoTextItem.Root
                       symbol="phone"
-                      label={<UserText text={contact.phoneNumber} />}
+                      label={
+                        <span className="Beacon-pii">
+                          <UserText text={contact.phoneNumber} />
+                        </span>
+                      }
                     />
                   )}
 
