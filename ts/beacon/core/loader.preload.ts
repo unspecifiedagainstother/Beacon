@@ -30,6 +30,13 @@ import notificationFilter from '../addons/notification-filter.addon.std.ts';
 import quickMute from '../addons/quick-mute.addon.std.ts';
 import focusMode from '../addons/focus-mode.addon.std.ts';
 import statsDashboard from '../addons/stats-dashboard.addon.std.ts';
+import readAll from '../addons/read-all.addon.preload.ts';
+import textReplace from '../addons/text-replace.addon.preload.ts';
+import blurMedia from '../addons/blur-media.addon.std.ts';
+import privacyScreen from '../addons/privacy-screen.addon.dom.ts';
+import compactMode from '../addons/compact-mode.addon.std.ts';
+import snippets from '../addons/snippets.addon.std.ts';
+import textFaces from '../addons/text-faces.addon.std.ts';
 
 const log = createLogger('beacon/loader');
 
@@ -260,6 +267,13 @@ const BUILTIN_MANIFESTS: ReadonlyArray<AddonManifest> = [
   quickMute,
   focusMode,
   statsDashboard,
+  readAll,
+  textReplace,
+  blurMedia,
+  privacyScreen,
+  compactMode,
+  snippets,
+  textFaces,
 ];
 
 function builtinManifests(): Array<AddonManifest> {

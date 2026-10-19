@@ -16,6 +16,10 @@ import {
   describeSnapshot,
 } from '../../beacon/core/message-snapshot.std.ts';
 import { tokenizeCss } from '../../beacon/util/cssHighlight.std.ts';
+import {
+  applyReplaceRules,
+  parseReplaceRules,
+} from '../../beacon/util/textReplace.std.ts';
 import { getAccentHex } from '../../beacon/core/accent.std.ts';
 import {
   defineIcon,
@@ -283,6 +287,27 @@ describe('Beacon core', () => {
       assert.isUndefined(iconToCssUrl('data:text/html,<b>x</b>'));
       assert.isUndefined(iconToCssUrl('<div>not svg</div>'));
       assert.isUndefined(iconToCssUrl(undefined));
+    });
+  });
+
+  describe('textReplace', () => {
+    it('applies literal and regex rules, skips comments, reports errors', () => {
+      const { rules, errors } = parseReplaceRules(
+        [
+          '# comment',
+          'idk => I don’t know',
+          '/\\b(\\d+)c\\b/ => $1°C',
+          'a$b => literal $1',
+          'no separator here',
+          '/(/ => broken',
+        ].join('\n')
+      );
+      assert.lengthOf(rules, 3);
+      assert.lengthOf(errors, 2);
+      assert.strictEqual(
+        applyReplaceRules('idk, it is 20c and a$b', rules),
+        'I don’t know, it is 20°C and literal $1'
+      );
     });
   });
 });

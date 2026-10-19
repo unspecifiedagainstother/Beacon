@@ -56,3 +56,54 @@ export const ICON_STATS_DASHBOARD = defineIcon([
   'M16 20v-7',
   'M22 20H2',
 ]);
+
+export const ICON_READ_ALL = defineIcon([
+  // Double check mark.
+  'M2 12.5l4.5 4.5L15 8.5',
+  'M10.5 15.5L12 17l9-9',
+]);
+
+export const ICON_BLUR_MEDIA = defineIcon([
+  // Picture frame with a mountain, plus blur dots.
+  'M4 4h16v16H4z',
+  'M4 16l5-5 4 4 2-2 5 5',
+  'M15.5 8.5h.01',
+]);
+
+export const ICON_PRIVACY_SCREEN = defineIcon([
+  // Monitor with a closed eye.
+  'M3 4h18v12H3z',
+  'M8 20h8',
+  'M12 16v4',
+  'M8 9.5c2.5 2.5 5.5 2.5 8 0',
+]);
+
+export const ICON_COMPACT_MODE = defineIcon([
+  // Stacked dense rows.
+  'M4 6h16',
+  'M4 10h16',
+  'M4 14h16',
+  'M4 18h16',
+]);
+
+export const ICON_TEXT_REPLACE = defineIcon([
+  // Two arrows swapping.
+  'M4 7h13l-3-3',
+  'M20 17H7l3 3',
+]);
+
+export const ICON_SNIPPETS = defineIcon([
+  // Clipboard with lines.
+  'M8 4H6v17h12V4h-2',
+  'M8 2h8v4H8z',
+  'M9 11h6',
+  'M9 15h4',
+]);
+
+export const ICON_TEXT_FACES = defineIcon([
+  // Smiley.
+  'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18z',
+  'M8.5 14.5a4.5 4.5 0 0 0 7 0',
+  'M9 9.5h.01',
+  'M15 9.5h.01',
+]);
