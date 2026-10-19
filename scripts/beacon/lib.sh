@@ -65,14 +65,12 @@ beacon_setup_node() {
     export PATH="$shim_dir:$PATH"
   fi
   export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-  # The workspace sets verifyDepsBeforeRun: prompt. In a real terminal that
-  # prompt can sit behind redirected output and hang forever; reconcile
-  # automatically instead, for this script and every nested `pnpm run`.
-  export pnpm_config_verify_deps_before_run=install
-  export npm_config_verify_deps_before_run=install
-  # ...and never stop to ask before re-creating node_modules.
-  export pnpm_config_confirm_modules_purge=false
-  export npm_config_confirm_modules_purge=false
+  # The workspace sets verifyDepsBeforeRun: prompt. Its prompt can sit behind
+  # redirected output and hang, and letting it auto-install re-resolves and
+  # rewrites the lockfile. Turn it off; beacon_ensure_deps installs from the
+  # frozen lockfile whenever package.json or the lockfile changed.
+  export pnpm_config_verify_deps_before_run=false
+  export npm_config_verify_deps_before_run=false
 }
 
 # Run a package.json script with pnpm. Not Bun: Bun rewrites `pnpm run` inside
@@ -90,15 +88,25 @@ beacon_run() {
 # node_modules can end up stripped (no .bin) or out of sync with the lockfile;
 # either way the app won't build or start.
 beacon_ensure_deps() {
+  local stamp=node_modules/.modules.yaml
+  local reason=""
   if [ ! -x node_modules/.bin/electron ] || [ ! -x node_modules/.bin/rolldown ]; then
-    beacon_log "dependencies missing, running pnpm install (first run is slow)..."
-    pnpm install --config.confirm-modules-purge=false --frozen-lockfile
+    reason="dependencies missing"
+  elif [ pnpm-lock.yaml -nt "$stamp" ] || [ package.json -nt "$stamp" ] ||
+    [ pnpm-workspace.yaml -nt "$stamp" ]; then
+    reason="lockfile or package.json changed"
+  fi
+  if [ -n "$reason" ]; then
+    beacon_log "$reason, installing from the lockfile..."
+    # --frozen-lockfile: never re-resolve or rewrite pnpm-lock.yaml.
+    pnpm install --frozen-lockfile --config.confirm-modules-purge=false
+    touch "$stamp"
   fi
   # An install from a different environment (e.g. a host pnpm) can leave the
   # native bindings for the wrong platform/libc. Load them to be sure.
   if ! beacon_native_ok; then
     beacon_log "native bindings missing or wrong platform, reinstalling..."
-    pnpm install --config.confirm-modules-purge=false --force --frozen-lockfile
+    pnpm install --frozen-lockfile --force --config.confirm-modules-purge=false
     beacon_native_ok || beacon_die "native bindings still fail to load — see output above"
   fi
 }

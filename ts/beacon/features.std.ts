@@ -46,7 +46,9 @@ export const BEACON_FEATURES = [
     key: 'beaconBlurPII',
     labelKey: 'icu:Preferences__blur-pii',
     descriptionKey: 'icu:Preferences__blur-pii--description',
-    defaultValue: false,
+    // On by default, deliberately: an exception to the rule below. A phone
+    // number leaking during a screen share cannot be taken back.
+    defaultValue: true,
   },
 ] as const satisfies ReadonlyArray<BeaconFeature>;
 
