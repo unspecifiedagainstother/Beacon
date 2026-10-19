@@ -4,34 +4,50 @@
 /**
  * Imperative UI helpers shared by the addon context and the command system.
  * Class names match stylesheets/_beacon-theme.scss.
+ *
+ * Nothing here assigns innerHTML: addon UIs routinely render message text,
+ * and a helper that parses HTML is one forgotten escape away from XSS in a
+ * renderer with full app privileges.
  */
 
 import type {
   ModalAPI,
   ModalOptions,
+  ToastType,
   UIElementOptions,
 } from './types.dom.ts';
 
-function escapeHtml(text: string): string {
-  const map: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
-  };
-  return text.replace(/[&<>"']/g, m => map[m] ?? m);
+const TOAST_MS = 4000;
+const MAX_TOASTS = 4;
+
+function getToastStack(): HTMLElement {
+  let stack = document.querySelector<HTMLElement>('.BeaconToastStack');
+  if (!stack) {
+    stack = document.createElement('div');
+    stack.className = 'BeaconToastStack';
+    stack.setAttribute('role', 'status');
+    stack.setAttribute('aria-live', 'polite');
+    document.body.appendChild(stack);
+  }
+  return stack;
 }
 
-export function showNotification(
-  text: string,
-  type: 'info' | 'warning' | 'error' | 'success' = 'info'
-): void {
-  const notif = document.createElement('div');
-  notif.className = `addon-notification addon-notification--${type}`;
-  notif.textContent = text;
-  document.body.appendChild(notif);
-  setTimeout(() => notif.remove(), 4000);
+export function showNotification(text: string, type: ToastType = 'info'): void {
+  const stack = getToastStack();
+  while (stack.childElementCount >= MAX_TOASTS) {
+    stack.firstElementChild?.remove();
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `BeaconToast BeaconToast--${type}`;
+  toast.textContent = text;
+  toast.addEventListener('click', () => toast.remove());
+  stack.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('BeaconToast--leaving');
+    setTimeout(() => toast.remove(), 200);
+  }, TOAST_MS);
 }
 
 export function createElement(options: UIElementOptions): HTMLElement {
@@ -42,86 +58,124 @@ export function createElement(options: UIElementOptions): HTMLElement {
   if (options.id) {
     el.id = options.id;
   }
-  if (options.text) {
+  if (options.text != null) {
     el.textContent = options.text;
   }
-  if (options.html) {
-    el.innerHTML = options.html;
-  }
   if (options.onClick) {
-    el.addEventListener('click', options.onClick);
+    const { onClick } = options;
+    el.addEventListener('click', ev => onClick(ev as MouseEvent));
   }
   if (options.attrs) {
     for (const [key, value] of Object.entries(options.attrs)) {
       el.setAttribute(key, value);
     }
   }
-  options.children?.forEach(child => el.appendChild(child));
+  for (const child of options.children ?? []) {
+    el.append(child);
+  }
   return el;
 }
 
 export function createModal(options: ModalOptions): ModalAPI {
-  const modal = document.createElement('div');
-  modal.className = 'addon-modal';
-  modal.innerHTML = `
-    <div class="addon-modal__overlay"></div>
-    <div class="addon-modal__content">
-      <div class="addon-modal__header">
-        <h2 class="addon-modal__title">${escapeHtml(options.title)}</h2>
-        <button class="addon-modal__close">&times;</button>
-      </div>
-      <div class="addon-modal__body"></div>
-      <div class="addon-modal__actions"></div>
-    </div>
-  `;
+  const previouslyFocused = document.activeElement as HTMLElement | null;
+
+  const overlay = createElement({
+    tag: 'div',
+    className: 'BeaconModal__overlay',
+  });
+  const title = createElement({
+    tag: 'h2',
+    className: 'BeaconModal__title',
+    text: options.title,
+    id: `beacon-modal-${Date.now()}`,
+  });
+  const closeBtn = createElement({
+    tag: 'button',
+    className: 'BeaconModal__close',
+    attrs: { type: 'button', 'aria-label': 'Close' },
+  });
+  const header = createElement({
+    tag: 'div',
+    className: 'BeaconModal__header',
+    children: [title, closeBtn],
+  });
+  const body = createElement({ tag: 'div', className: 'BeaconModal__body' });
+  const actions = createElement({
+    tag: 'div',
+    className: 'BeaconModal__actions',
+  });
+  const content = createElement({
+    tag: 'div',
+    className: `BeaconModal__content BeaconModal__content--${options.size ?? 'normal'}`,
+    attrs: {
+      role: 'dialog',
+      'aria-modal': 'true',
+      'aria-labelledby': title.id,
+    },
+    children: [header, body, actions],
+  });
+  const modal = createElement({
+    tag: 'div',
+    className: 'BeaconModal',
+    children: [overlay, content],
+  });
 
   document.body.appendChild(modal);
 
-  const body = modal.querySelector('.addon-modal__body') as HTMLElement;
-  const actionsContainer = modal.querySelector(
-    '.addon-modal__actions'
-  ) as HTMLElement;
-  const closeBtn = modal.querySelector('.addon-modal__close') as HTMLElement;
-
-  const setContent = (content: string | HTMLElement) => {
-    if (typeof content === 'string') {
-      body.textContent = content;
+  const setContent = (next: string | HTMLElement) => {
+    if (typeof next === 'string') {
+      body.textContent = next;
     } else {
-      body.innerHTML = '';
-      body.appendChild(content);
+      body.replaceChildren(next);
     }
   };
   setContent(options.content);
 
   const addAction = (action: NonNullable<ModalOptions['actions']>[0]) => {
-    const btn = document.createElement('button');
-    btn.textContent = action.label;
-    btn.className = `addon-modal__button addon-modal__button--${action.variant || 'secondary'}`;
-    btn.addEventListener('click', () => {
-      void action.onClick();
+    const btn = createElement({
+      tag: 'button',
+      className: `BeaconButton BeaconButton--${action.variant ?? 'secondary'}`,
+      text: action.label,
+      attrs: { type: 'button' },
+      onClick: () => {
+        void action.onClick();
+      },
     });
-    actionsContainer.appendChild(btn);
+    actions.appendChild(btn);
+    actions.hidden = false;
   };
+  actions.hidden = true;
   options.actions?.forEach(addAction);
 
-  const close = () => {
-    modal.remove();
-    options.onClose?.();
+  let closed = false;
+  const onKeyDown = (ev: KeyboardEvent) => {
+    if (ev.key === 'Escape') {
+      ev.stopPropagation();
+      close();
+    }
   };
 
+  function close() {
+    if (closed) {
+      return;
+    }
+    closed = true;
+    document.removeEventListener('keydown', onKeyDown, true);
+    modal.remove();
+    previouslyFocused?.focus?.();
+    options.onClose?.();
+  }
+
+  document.addEventListener('keydown', onKeyDown, true);
   closeBtn.addEventListener('click', close);
-  modal
-    .querySelector('.addon-modal__overlay')
-    ?.addEventListener('click', close);
+  overlay.addEventListener('click', close);
+  closeBtn.focus();
 
   return {
     close,
     setContent,
-    setTitle: title => {
-      const titleEl = modal.querySelector('.addon-modal__title');
-      if (titleEl) {
-        titleEl.textContent = title;
-      }
+    setTitle: text => {
+      title.textContent = text;
     },
     addAction,
   };

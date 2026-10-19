@@ -396,6 +396,33 @@ export const getPastEdits = (
     .reverse();
 };
 
+/**
+ * Beacon: content the message logger retained across a delete-for-everyone.
+ * Rendered under the "This message was deleted" line; hidden by CSS unless
+ * the message-logger addon is running.
+ */
+export const getBeaconDeleted = (
+  message: MessageWithUIFieldsType,
+  isGroup: boolean,
+  options: { conversationSelector: GetConversationByIdType }
+): PropsData['beaconDeleted'] => {
+  const snapshot = message.beaconDeleted;
+  if (!message.deletedForEveryone || !snapshot) {
+    return undefined;
+  }
+
+  return {
+    text: snapshot.body,
+    bodyRanges: processBodyRanges(snapshot, isGroup, options),
+    attachments: (snapshot.attachments ?? []).map(
+      a => a.fileName ?? a.contentType ?? 'attachment'
+    ),
+    stickerEmoji: snapshot.stickerEmoji,
+    previousRevisions: snapshot.previousRevisions,
+    deletedAt: snapshot.deletedAt,
+  };
+};
+
 const getAuthorForMessage = (
   message: MessageWithUIFieldsType,
   options: GetContactOptions
@@ -1049,6 +1076,7 @@ const getPropsForMessage = (
     isBlocked: conversation.isBlocked || false,
     isEditedMessage: Boolean(message.editHistory),
     pastEdits: getPastEdits(message, isGroup, options),
+    beaconDeleted: getBeaconDeleted(message, isGroup, options),
     isMessageRequestAccepted: conversation?.acceptedMessageRequest ?? true,
     isPinned,
     isSelected,

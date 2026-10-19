@@ -1,36 +1,105 @@
 #!/usr/bin/env bash
-# Beacon: launch the app against Signal's PRODUCTION servers.
+# Beacon: build if needed, then launch the app.
 #
-#   scripts/beacon/start.sh          production (real account, links to phone)
-#   scripts/beacon/start.sh --staging   staging servers (standalone device)
+#   scripts/beacon/start.sh [options] [-- extra electron args]
 #
-# Runs inside the `mollydesk` distrobox and pins Node via nvm.
+#   --staging     staging servers (standalone device, not your account)
+#   --prod        production servers — real account, linked-device slot
+#                 (default, matches previous behaviour)
+#   --build       force a full rebuild before starting
+#   --no-build    skip the staleness check and start what's built
+#   --debug       expose DevTools protocol on 127.0.0.1:9229
+#                 (window.Beacon lives in the "Electron Isolated Context")
+#   -h, --help    show this help
+#
+# Works from the host or inside the `mollydesk` distrobox; it re-enters the
+# container itself. Installs dependencies and a pnpm shim on first run.
 set -euo pipefail
 
-CONTAINER="${BEACON_CONTAINER:-mollydesk}"
-REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# shellcheck source=scripts/beacon/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-# Electron's Chromium sandbox needs a user namespace. secureblue blocks
-# unprivileged userns on the host, but podman already established one for the
-# container — so the app only starts from inside. Re-enter if we're outside.
+usage() {
+  sed -n '2,16p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+}
+
+MODE=prod
+BUILD=auto
+DEBUG=0
+EXTRA=()
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --staging) MODE=staging ;;
+    --prod | --production) MODE=prod ;;
+    --build) BUILD=force ;;
+    --no-build) BUILD=skip ;;
+    --debug) DEBUG=1 ;;
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      EXTRA=("$@")
+      break
+      ;;
+    *)
+      usage >&2
+      beacon_die "unknown option: $1"
+      ;;
+  esac
+  shift
+done
+
+# Re-exec inside the container with the original arguments.
 if [ ! -f /run/.containerenv ]; then
-  exec distrobox enter "$CONTAINER" -- "$0" "$@"
+  args=()
+  [ "$MODE" = staging ] && args+=(--staging)
+  [ "$BUILD" = force ] && args+=(--build)
+  [ "$BUILD" = skip ] && args+=(--no-build)
+  [ "$DEBUG" = 1 ] && args+=(--debug)
+  [ ${#EXTRA[@]} -gt 0 ] && args+=(-- "${EXTRA[@]}")
+  beacon_enter_container "${args[@]}"
 fi
 
-cd "$REPO"
+beacon_setup_node
+beacon_ensure_deps
 
-export NVM_DIR="$HOME/.nvm"
-# shellcheck disable=SC1091
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-nvm use >/dev/null
+case "$BUILD" in
+  force)
+    beacon_log "full rebuild..."
+    pnpm run generate
+    touch bundles/preload/main.js
+    ;;
+  auto)
+    if beacon_build_is_stale; then
+      beacon_log "sources changed since last build, rebuilding..."
+      pnpm run generate
+      touch bundles/preload/main.js
+    else
+      beacon_log "build is up to date"
+    fi
+    ;;
+  skip) ;;
+esac
 
-if [ "${1:-}" = "--staging" ]; then
+ELECTRON_ARGS=(.)
+if [ "$DEBUG" = 1 ]; then
+  ELECTRON_ARGS=(--remote-debugging-port=9229 --remote-debugging-address=127.0.0.1 .)
+  beacon_log "DevTools protocol on http://127.0.0.1:9229/json"
+fi
+if [ ${#EXTRA[@]} -gt 0 ]; then
+  ELECTRON_ARGS+=("${EXTRA[@]}")
+fi
+
+if [ "$MODE" = staging ]; then
   # config/default.json points at *.staging.signal.org. Your phone cannot link
   # to it; register via File -> "Set Up as Standalone Device".
-  echo "beacon: starting against STAGING (standalone device, not your account)"
-  exec pnpm start
+  beacon_log "starting against STAGING (standalone device, not your account)"
+  exec pnpm exec electron "${ELECTRON_ARGS[@]}"
 fi
 
-echo "beacon: starting against PRODUCTION — real Signal servers, real account."
-echo "        This uses a linked-device slot and syncs real message history."
-exec env NODE_ENV=production pnpm start
+beacon_log "starting against PRODUCTION — real Signal servers, real account."
+beacon_log "  uses a linked-device slot and syncs real message history."
+exec env NODE_ENV=production pnpm exec electron "${ELECTRON_ARGS[@]}"

@@ -29,33 +29,63 @@ export class CommandRegistry {
   readonly #commands = new Map<string, CommandDefinition>();
 
   register(command: CommandDefinition): Disposer {
-    if (this.#commands.has(command.id)) {
-      log.warn(`command /${command.id} re-registered, replacing`);
+    const id = command.id.toLowerCase();
+    if (this.#commands.has(id)) {
+      log.warn(`command /${id} re-registered, replacing`);
     }
-    this.#commands.set(command.id, command);
+    const entry = { ...command, id };
+    this.#commands.set(id, entry);
     return () => {
-      if (this.#commands.get(command.id) === command) {
-        this.#commands.delete(command.id);
+      if (this.#commands.get(id) === entry) {
+        this.#commands.delete(id);
       }
     };
   }
 
   unregister(commandId: string): void {
-    this.#commands.delete(commandId);
+    this.#commands.delete(commandId.toLowerCase());
+  }
+
+  get(commandId: string): CommandDefinition | undefined {
+    return this.#commands.get(commandId.toLowerCase());
   }
 
   list(): Array<CommandDefinition> {
-    return Array.from(this.#commands.values());
+    return Array.from(this.#commands.values()).sort((a, b) =>
+      a.id.localeCompare(b.id)
+    );
   }
 
+  listForAddon(addonId: string): Array<CommandDefinition> {
+    return this.list().filter(cmd => cmd.addonId === addonId);
+  }
+
+  /**
+   * Ranked: exact id, then id prefix, then substring of id/name/description.
+   * Exact-first matters — Enter runs the top result, so `/stat` must never
+   * resolve to `/logstats` while `/stats` exists.
+   */
   search(query: string): Array<CommandDefinition> {
     const q = query.toLowerCase();
-    return this.list().filter(
-      cmd =>
-        cmd.id.toLowerCase().includes(q) ||
-        cmd.name.toLowerCase().includes(q) ||
-        (cmd.description?.toLowerCase().includes(q) ?? false)
-    );
+    const scored: Array<[number, CommandDefinition]> = [];
+    for (const cmd of this.#commands.values()) {
+      let score: number;
+      if (cmd.id === q) {
+        score = 0;
+      } else if (cmd.id.startsWith(q)) {
+        score = 1;
+      } else if (cmd.id.includes(q) || cmd.name.toLowerCase().includes(q)) {
+        score = 2;
+      } else if (cmd.description?.toLowerCase().includes(q)) {
+        score = 3;
+      } else {
+        continue;
+      }
+      scored.push([score, cmd]);
+    }
+    return scored
+      .sort((a, b) => a[0] - b[0] || a[1].id.localeCompare(b[1].id))
+      .map(([, cmd]) => cmd);
   }
 
   async execute(
@@ -63,15 +93,16 @@ export class CommandRegistry {
     argsRaw = '',
     ui?: Partial<CommandUIAdapter>
   ): Promise<void> {
-    const command = this.#commands.get(commandId);
+    const command = this.get(commandId);
     if (!command) {
       showNotification(`Unknown command: /${commandId}`, 'error');
       return;
     }
 
+    const trimmed = argsRaw.trim();
     const ctx: CommandContext = {
-      args: argsRaw.trim() === '' ? [] : argsRaw.trim().split(/\s+/),
-      argsRaw,
+      args: trimmed === '' ? [] : trimmed.split(/\s+/),
+      argsRaw: trimmed,
       conversationId: ui?.conversationId,
       insertText:
         ui?.insertText ??
@@ -79,15 +110,14 @@ export class CommandRegistry {
           // No composer available (console execution) — fall back to reply.
           showNotification(text, 'info');
         }),
-      reply: text => showNotification(text, 'info'),
+      reply: (text, type = 'info') => showNotification(text, type),
     };
 
     try {
       await command.execute(ctx);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(`[Beacon] command /${commandId} failed:`, error);
-      showNotification(`/${commandId} failed — see console`, 'error');
+      log.error(`command /${command.id} failed:`, error);
+      showNotification(`/${command.id} failed — see console`, 'error');
     }
   }
 }

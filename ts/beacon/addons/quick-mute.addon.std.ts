@@ -13,7 +13,9 @@ export default {
   id: 'quick-mute',
   name: 'Quick Mute',
   version: '2.0.0',
-  description: 'mod+m toggles mute on active conversation',
+  description: 'Ctrl/⌘+M toggles mute on the open conversation.',
+  authors: ['Beacon'],
+  tags: ['utility'],
   start(ctx) {
     ctx.keybinds.register('mod+m', () => {
       const state = ctx.redux.getState();

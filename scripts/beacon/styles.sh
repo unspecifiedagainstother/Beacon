@@ -8,23 +8,11 @@
 # same whether you invoke it from the host or from inside the container.
 set -euo pipefail
 
-CONTAINER="${BEACON_CONTAINER:-mollydesk}"
-REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# shellcheck source=scripts/beacon/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-# Build tooling (g++, native modules) only exists in the container — the
-# secureblue host is immutable. Re-enter if we're outside.
-if [ ! -f /run/.containerenv ]; then
-  exec distrobox enter "$CONTAINER" -- "$0" "$@"
-fi
-
-cd "$REPO"
-
-# The host has a stray Node v20 at ~/bin/node that shadows nvm when nvm isn't
-# sourced. Source it explicitly and honour .nvmrc (24.17.0).
-export NVM_DIR="$HOME/.nvm"
-# shellcheck disable=SC1091
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-nvm use >/dev/null
+beacon_enter_container "$@"
+beacon_setup_node
 
 if [ "${1:-}" = "--watch" ] || [ "${1:-}" = "-w" ]; then
   echo "beacon: watching .scss (Ctrl+C to stop) — Ctrl+R in the app to reload"

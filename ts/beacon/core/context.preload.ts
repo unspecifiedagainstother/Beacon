@@ -5,8 +5,8 @@
  * Builds the AddonContext each addon receives in start().
  *
  * Every registration made through the context lands in one disposable bag, so
- * disabling an addon tears down everything it touched — hooks, patches, DOM
- * listeners, styles, keybinds, commands — without an app reload.
+ * disabling an addon tears down everything it touched — hooks, filters,
+ * patches, DOM listeners, styles, keybinds, commands — without an app reload.
  */
 
 import type { Store } from 'redux';
@@ -14,12 +14,10 @@ import type { StateType } from '../../state/reducer.preload.ts';
 import type { AddonContext, AddonManifest, Disposer } from './types.dom.ts';
 import type { HookBus } from './hook-bus.std.ts';
 import { createPatcher } from './patcher.std.ts';
-import {
-  registerActionInterceptor,
-  registerMessageInterceptor,
-  registerNotificationInterceptor,
-} from './middleware.preload.ts';
+import { addBeaconFilter } from './filters.std.ts';
+import { registerActionInterceptor } from './middleware.preload.ts';
 import { commandRegistry } from './commands.dom.ts';
+import { addonSettings } from './settings.std.ts';
 import { createElement, createModal, showNotification } from './ui.dom.ts';
 import { createLogger } from '../../logging/log.std.ts';
 
@@ -27,7 +25,18 @@ const logger = createLogger('beacon/context');
 
 const IS_MAC = /mac/i.test(navigator.platform);
 
-function matchesCombo(combo: string, ev: KeyboardEvent): boolean {
+/** Normalize KeyboardEvent.code ('KeyF', 'Digit1', 'Slash') to a combo key. */
+function keyFromCode(code: string): string {
+  if (code.startsWith('Key')) {
+    return code.slice(3).toLowerCase();
+  }
+  if (code.startsWith('Digit')) {
+    return code.slice(5);
+  }
+  return code.toLowerCase();
+}
+
+export function matchesCombo(combo: string, ev: KeyboardEvent): boolean {
   const parts = combo.toLowerCase().split('+');
   const key = parts.pop();
   if (!key) {
@@ -39,8 +48,13 @@ function matchesCombo(combo: string, ev: KeyboardEvent): boolean {
   const wantShift = parts.includes('shift');
   const wantAlt = parts.includes('alt');
 
+  // Match on code as well as key so shift/alt layouts still hit: shift+/ is
+  // reported as key '?' but code 'Slash'.
+  const keyMatches =
+    ev.key.toLowerCase() === key || keyFromCode(ev.code) === key;
+
   return (
-    ev.key.toLowerCase() === key &&
+    keyMatches &&
     ev.ctrlKey === wantCtrl &&
     ev.metaKey === wantMeta &&
     ev.shiftKey === wantShift &&
@@ -51,6 +65,8 @@ function matchesCombo(combo: string, ev: KeyboardEvent): boolean {
 export type DisposableContext = {
   ctx: AddonContext;
   dispose: () => void;
+  /** Keybind combos currently registered by this addon, for the UI. */
+  keybinds: () => Array<string>;
 };
 
 export function createAddonContext(
@@ -61,10 +77,23 @@ export function createAddonContext(
   const { id } = manifest;
   const disposers: Array<Disposer> = [];
   const patcher = createPatcher();
+  const activeKeybinds = new Set<string>();
 
   function track(disposer: Disposer): Disposer {
-    disposers.push(disposer);
-    return disposer;
+    let done = false;
+    const once = () => {
+      if (done) {
+        return;
+      }
+      done = true;
+      const idx = disposers.indexOf(once);
+      if (idx !== -1) {
+        disposers.splice(idx, 1);
+      }
+      disposer();
+    };
+    disposers.push(once);
+    return once;
   }
 
   const storagePrefix = `beacon-addon-${id}-`;
@@ -73,7 +102,7 @@ export function createAddonContext(
     id,
 
     // Addon-facing logging goes to the DevTools console on purpose — that is
-    // where addon authors live. oxlint-disable no-console for these three.
+    // where addon authors live.
     // oxlint-disable-next-line no-console
     log: (...args) => console.log(`[Beacon:${id}]`, ...args),
     // oxlint-disable-next-line no-console
@@ -83,6 +112,10 @@ export function createAddonContext(
 
     hooks: {
       on: (name, fn) => track(bus.on(name, fn)),
+    },
+
+    filters: {
+      add: (name, fn) => track(addBeaconFilter(name, fn)),
     },
 
     patcher,
@@ -115,13 +148,13 @@ export function createAddonContext(
         track(registerActionInterceptor(type, interceptor)),
     },
 
-    messages: {
-      intercept: (interceptor) => track(registerMessageInterceptor(interceptor)),
-    },
-
     notifications: {
-      intercept: (interceptor) =>
-        track(registerNotificationInterceptor(interceptor)),
+      intercept: interceptor =>
+        track(
+          addBeaconFilter('notification.show', (show, info) =>
+            show && interceptor(info) ? false : show
+          )
+        ),
     },
 
     signal: {
@@ -164,41 +197,63 @@ export function createAddonContext(
         document.head.appendChild(style);
         return track(() => style.remove());
       },
+      bodyClass: className => {
+        document.body.classList.add(className);
+        return track(() => document.body.classList.remove(className));
+      },
     },
 
     keybinds: {
       register: (combo, fn) => {
-        const handler = (ev: Event) => {
-          const keyEv = ev as KeyboardEvent;
-          if (matchesCombo(combo, keyEv)) {
-            keyEv.preventDefault();
-            try {
-              fn(keyEv);
-            } catch (error) {
-              logger.error(`${id}: keybind ${combo} error:`, error);
-            }
+        const handler = (ev: KeyboardEvent) => {
+          if (ev.repeat || !matchesCombo(combo, ev)) {
+            return;
+          }
+          ev.preventDefault();
+          try {
+            fn(ev);
+          } catch (error) {
+            logger.error(`${id}: keybind ${combo} error:`, error);
           }
         };
         document.addEventListener('keydown', handler);
-        return track(() => document.removeEventListener('keydown', handler));
+        activeKeybinds.add(combo);
+        return track(() => {
+          document.removeEventListener('keydown', handler);
+          activeKeybinds.delete(combo);
+        });
       },
     },
 
     ui: {
-      createModal,
+      createModal: options => {
+        // Close addon modals when the addon goes away; drop the tracking
+        // entry when the user closes one first. Both paths are idempotent.
+        let untrack: Disposer = () => undefined;
+        const modal = createModal({
+          ...options,
+          onClose: () => {
+            untrack();
+            options.onClose?.();
+          },
+        });
+        untrack = track(() => modal.close());
+        return modal;
+      },
       createElement,
       showNotification,
     },
 
     commands: {
-      register: command => track(commandRegistry.register(command)),
+      register: command =>
+        track(commandRegistry.register({ ...command, addonId: id })),
       list: () => commandRegistry.list(),
       execute: (commandId, argsRaw) =>
         commandRegistry.execute(commandId, argsRaw),
     },
 
     storage: {
-      get: <T,>(key: string): T | undefined => {
+      get: <T>(key: string): T | undefined => {
         try {
           const raw = localStorage.getItem(storagePrefix + key);
           return raw == null ? undefined : (JSON.parse(raw) as T);
@@ -229,37 +284,16 @@ export function createAddonContext(
     },
 
     settings: {
-      register: (defs) => {
-        // TODO: wire into Preferences UI to render addon settings
-        // For now, track them in localStorage under 'beacon-addon-settings-{id}'
-        const settingsPrefix = `beacon-addon-settings-${id}-`;
-        return track(() => {
-          // cleanup on dispose: delete all addon settings
-          defs.forEach((def) => {
-            localStorage.removeItem(settingsPrefix + def.key);
-          });
-        });
-      },
-      get: <T,>(key: string): T | undefined => {
-        try {
-          const raw = localStorage.getItem(
-            `beacon-addon-settings-${id}-${key}`
-          );
-          return raw == null ? undefined : (JSON.parse(raw) as T);
-        } catch {
-          return undefined;
-        }
-      },
-      set: (key, value) => {
-        try {
-          localStorage.setItem(
-            `beacon-addon-settings-${id}-${key}`,
-            JSON.stringify(value)
-          );
-        } catch (error) {
-          logger.error(`${id}: settings.set(${key}) failed:`, error);
-        }
-      },
+      get: key => addonSettings.get(id, key),
+      set: (key, value) => addonSettings.set(id, key, value),
+      onChange: fn =>
+        track(
+          addonSettings.subscribe((addonId, key, value) => {
+            if (addonId === id) {
+              fn(key, value);
+            }
+          })
+        ),
     },
 
     net: {
@@ -274,14 +308,19 @@ export function createAddonContext(
   const dispose = () => {
     patcher.unpatchAll();
     // LIFO, mirroring registration order semantics.
-    for (const disposer of disposers.splice(0).reverse()) {
+    for (const disposer of disposers.slice().reverse()) {
       try {
         disposer();
       } catch (error) {
         logger.error(`${id}: dispose error:`, error);
       }
     }
+    disposers.length = 0;
   };
 
-  return { ctx, dispose };
+  return {
+    ctx,
+    dispose,
+    keybinds: () => Array.from(activeKeybinds),
+  };
 }
