@@ -25,6 +25,8 @@ beacon_enter_container() {
   if [ -f /run/.containerenv ]; then
     return 0
   fi
+  beacon_log "entering the $BEACON_CONTAINER container..."
+
   command -v distrobox >/dev/null ||
     beacon_die "not in a container and distrobox is not installed"
   # $0 is the calling script, not this file.
@@ -33,6 +35,7 @@ beacon_enter_container() {
 
 beacon_setup_node() {
   cd "$BEACON_REPO"
+  beacon_log "preparing Node $(cat .nvmrc) + pnpm..."
 
   # The host has a stray Node v20 at ~/bin/node that shadows nvm when nvm
   # isn't sourced. Source it explicitly and honour .nvmrc.
@@ -62,6 +65,11 @@ beacon_setup_node() {
     export PATH="$shim_dir:$PATH"
   fi
   export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+  # The workspace sets verifyDepsBeforeRun: prompt. In a real terminal that
+  # prompt can sit behind redirected output and hang forever; reconcile
+  # automatically instead, for this script and every nested `pnpm run`.
+  export pnpm_config_verify_deps_before_run=install
+  export npm_config_verify_deps_before_run=install
 }
 
 # Never install with CI=true: pnpm 11 derives settings such as
@@ -74,13 +82,6 @@ beacon_ensure_deps() {
   if [ ! -x node_modules/.bin/electron ] || [ ! -x node_modules/.bin/rolldown ]; then
     beacon_log "dependencies missing, running pnpm install (first run is slow)..."
     pnpm install --config.confirm-modules-purge=false --frozen-lockfile
-    return
-  fi
-  # Editing package.json invalidates pnpm's verifyDepsBeforeRun check, and it
-  # cannot prompt non-interactively. Reconcile instead of failing later.
-  if ! pnpm run --silent get-expire-time >/dev/null 2>&1; then
-    beacon_log "lockfile out of date, reconciling..."
-    pnpm install --config.confirm-modules-purge=false
   fi
   # An install from a different environment (e.g. a host pnpm) can leave the
   # native bindings for the wrong platform/libc. Load them to be sure.
