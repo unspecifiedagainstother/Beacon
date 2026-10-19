@@ -69,13 +69,13 @@ beacon_ensure_deps
 case "$BUILD" in
   force)
     beacon_log "full rebuild..."
-    pnpm run generate
+    beacon_run generate
     touch bundles/preload/main.js
     ;;
   auto)
     if beacon_build_is_stale; then
       beacon_log "sources changed since last build, rebuilding..."
-      pnpm run generate
+      beacon_run generate
       touch bundles/preload/main.js
     else
       beacon_log "build is up to date"

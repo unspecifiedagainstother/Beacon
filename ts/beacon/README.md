@@ -14,14 +14,25 @@ Two systems live side by side:
 
 ## Running
 
+From the host, launch through Bun (it only runs the script — it never
+verifies or reinstalls dependencies, which a host-side pnpm can get wrong):
+
 ```sh
-scripts/beacon/start.sh --staging   # build if sources changed, then launch
-scripts/beacon/start.sh --help      # --prod, --build, --no-build, --debug
+bun run beacon:start:prod     # real account (link your phone)
+bun run beacon:start:debug    # same, with DevTools protocol on 127.0.0.1:9229
+bun run beacon:start:staging  # staging servers, standalone test device
+bun run beacon:build          # full rebuild
 ```
 
-Works from the host (re-enters the `mollydesk` distrobox), installs
-dependencies and a pnpm shim on first run, and rebuilds only when something
-under `ts/`, `stylesheets/`, `_locales/` or `protos/` is newer than the bundle.
+or call `scripts/beacon/start.sh --help` directly. The scripts re-enter the
+`mollydesk` distrobox, install the `.nvmrc` Node and a pnpm shim, install
+dependencies on first run, and rebuild only when sources are newer than the
+bundle.
+
+Inside the container, dependency installs and the build pipeline stay on
+pnpm: the lockfile and its release-age/trust guards live in
+`pnpm-workspace.yaml`, and Bun rewrites the pnpm-only regex scripts the
+build uses (`pnpm run "/^build:styles:(sass|tailwind):prod$/"`).
 
 ## Adding a toggle setting
 
