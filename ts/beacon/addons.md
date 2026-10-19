@@ -54,6 +54,7 @@ New capability that needs a hook inside upstream code should become a new
 //   .dom.ts if it touches `document` directly,
 //   .preload.ts if it imports app internals (models, jobs, sql).
 import type { AddonManifest } from '../core/types.dom.ts';
+import { defineIcon } from '../core/icons.std.ts';
 
 export default {
   id: 'my-addon',
@@ -62,6 +63,8 @@ export default {
   description: 'Does a thing',
   authors: ['you'],
   tags: ['utility'],
+  // Optional. Raw <svg> markup, or built from path data:
+  icon: defineIcon(['M4 12h16', 'M12 4v16']),
   settings: [
     { key: 'loud', type: 'toggle', label: 'Shout', defaultValue: false },
   ],
@@ -129,6 +132,25 @@ logged and skipped.
 
 `ctx.notifications.intercept(info => boolean)` is sugar over
 `notification.show` (return `true` to block).
+
+### Icon — `manifest.icon`
+
+SVG markup shown on the addon's card. Any square `<svg>` works (24×24 by
+convention) — paste one from an icon set, write it inline, or build it:
+
+```ts
+import { defineIcon } from '../core/icons.std.ts';
+
+icon: defineIcon('M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14'),            // outline
+icon: defineIcon(['M12 2a10 10 0 1 0 0 20...'], { stroke: false }), // solid
+icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>',
+```
+
+It is drawn as a CSS mask, so only the shape matters: it takes the theme
+color, and the accent color while enabled. Masks load SVG in image mode, so
+scripts or external references inside the markup never run. Without an icon
+(or with markup that is not an `<svg>`), the card shows the name's first
+letter. Builtin icons live in `addons/icons.std.ts`.
 
 ### Settings — `manifest.settings` + `ctx.settings`
 

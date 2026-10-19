@@ -20,6 +20,7 @@
  */
 
 import type { AddonManifest } from '../core/types.dom.ts';
+import { ICON_GHOST_MODE } from './icons.std.ts';
 import { ConversationModel } from '../../models/conversations.preload.ts';
 import {
   conversationJobQueue,
@@ -29,6 +30,7 @@ import { ReceiptType } from '../../types/Receipt.std.ts';
 
 export default {
   id: 'ghost-mode',
+  icon: ICON_GHOST_MODE,
   name: 'Ghost Mode',
   version: '3.0.0',
   description:

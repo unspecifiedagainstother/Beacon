@@ -175,6 +175,7 @@ export class AddonLoader {
       description: manifest.description,
       authors: manifest.authors ?? [],
       tags: manifest.tags ?? [],
+      icon: manifest.icon,
       enabled: running != null,
       error: this.#errors.get(manifest.id),
       settings: manifest.settings ?? [],

@@ -1,7 +1,7 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import type { JSX } from 'react';
+import type { CSSProperties, JSX } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 
@@ -13,6 +13,7 @@ import type {
 } from '../beacon/core/types.dom.ts';
 import { AxoSwitch } from '../axo/AxoSwitch.dom.tsx';
 import { drop } from '../util/drop.std.ts';
+import { iconToCssUrl } from '../beacon/core/icons.std.ts';
 
 export type PropsType = {
   i18n: LocalizerType;
@@ -228,6 +229,24 @@ function AddonSettingsPanel({
   );
 }
 
+function AddonIcon({ addon }: { addon: AddonInfo }): JSX.Element {
+  const maskUrl = iconToCssUrl(addon.icon);
+  if (!maskUrl) {
+    return (
+      <span className="BeaconModules__card-icon" aria-hidden>
+        {addon.name.charAt(0)}
+      </span>
+    );
+  }
+  return (
+    <span
+      className="BeaconModules__card-icon BeaconModules__card-icon--svg"
+      aria-hidden
+      style={{ '--beacon-addon-icon': maskUrl } as CSSProperties}
+    />
+  );
+}
+
 function AddonCard({
   addon,
   i18n,
@@ -256,9 +275,7 @@ function AddonCard({
       )}
     >
       <div className="BeaconModules__card-head">
-        <span className="BeaconModules__card-icon" aria-hidden>
-          {addon.name.charAt(0)}
-        </span>
+        <AddonIcon addon={addon} />
         <div className="BeaconModules__card-title">
           <span className="BeaconModules__card-name">{addon.name}</span>
           {addon.version ? (

@@ -424,6 +424,7 @@ export type AddonInfo = {
   description?: string;
   authors: Array<string>;
   tags: Array<string>;
+  icon?: string;
   enabled: boolean;
   /** Message from the last failed start(), cleared on success. */
   error?: string;
@@ -441,6 +442,12 @@ export type AddonManifest = {
   authors?: Array<string>;
   /** Free-form labels shown as chips, e.g. 'privacy', 'chat', 'utility'. */
   tags?: Array<string>;
+  /**
+   * SVG markup for the Modules page, drawn as a mask in the accent color —
+   * see core/icons.std.ts (defineIcon builds one from path data). Falls back
+   * to the name's first letter.
+   */
+  icon?: string;
   /** Enabled state for a fresh profile. Keep false unless you mean it. */
   defaultEnabled?: boolean;
   /** User-facing settings, rendered in Settings → Beacon → Modules. */
