@@ -6,10 +6,9 @@
  *
  * Signal already "peeks" group calls (that is how the Join button knows a
  * call is running): it asks the call server for the participant list, and
- * the people in the call are not told. This addon shows that list:
- *  - an avatar stack and count just left of the Join button,
- *  - an "Ongoing call" bar under the pinned messages with up to six avatars
- *    and "and N others".
+ * the people in the call are not told. This addon shows that list in an
+ * "Ongoing call" bar under the pinned messages — up to six avatars, then
+ * "and N others" — with its own Join button, replacing the header's.
  * While a call is running in the open chat it re-peeks every few seconds so
  * the list stays current — the same request Signal makes on its own.
  */
@@ -120,24 +119,12 @@ export default {
   id: 'call-peek',
   icon: ICON_CALL_PEEK,
   name: 'Call Peek',
-  version: '1.0.0',
+  version: '1.1.0',
   description:
-    'See who is in a group call before joining — next to Join and in a bar under pinned messages. They are not notified.',
+    'See who is in a group call before joining, in a bar under pinned messages with its own Join button. They are not notified.',
   authors: ['Beacon'],
   tags: ['chat', 'privacy'],
   settings: [
-    {
-      key: 'header',
-      type: 'toggle',
-      label: 'Show avatars next to Join',
-      defaultValue: true,
-    },
-    {
-      key: 'banner',
-      type: 'toggle',
-      label: 'Show “Ongoing call” bar',
-      defaultValue: true,
-    },
     {
       key: 'refreshSeconds',
       type: 'number',
@@ -151,116 +138,44 @@ export default {
   ],
 
   start(ctx) {
-    // Re-render a slot whenever its conversation's peek result changes.
-    const refreshers = new Set<() => void>();
-    ctx.settings.onChange(() => refreshers.forEach(refresh => refresh()));
+    // While our bar is up it carries the Join button; hide the header's.
+    const visibleBars = new Set<HTMLElement>();
+    const syncHeaderJoin = () =>
+      document.body.classList.toggle(
+        'Beacon--call-peek-active',
+        visibleBars.size > 0
+      );
+    ctx.onDispose(() =>
+      document.body.classList.remove('Beacon--call-peek-active')
+    );
 
-    const mount = (
-      container: HTMLElement,
-      conversationId: string,
-      settingKey: string,
-      draw: (peek: Peek) => Array<HTMLElement>
-    ) => {
+    ctx.ui.slot('conversation.belowPinned', (container, { conversationId }) => {
       let last = '\u0000';
-      const update = (force = false) => {
-        const peek = ctx.settings.get<boolean>(settingKey)
-          ? getPeek(ctx.redux.getState(), conversationId)
-          : undefined;
+      const update = () => {
+        const peek = getPeek(ctx.redux.getState(), conversationId);
         const key = peekKey(peek);
-        if (key === last && !force) {
+        if (key === last) {
           return;
         }
         last = key;
-        container.replaceChildren(...(peek ? draw(peek) : []));
+        if (!peek) {
+          container.replaceChildren();
+          visibleBars.delete(container);
+          syncHeaderJoin();
+          return;
+        }
+        container.replaceChildren(renderBar(ctx, peek, conversationId));
+        visibleBars.add(container);
+        syncHeaderJoin();
       };
-      const refresh = () => update(true);
-      refreshers.add(refresh);
       update();
-      const unsubscribe = ctx.redux.subscribe(() => update());
+      const unsubscribe = ctx.redux.subscribe(update);
       return () => {
-        refreshers.delete(refresh);
         unsubscribe();
+        visibleBars.delete(container);
+        syncHeaderJoin();
       };
-    };
-
-    ctx.ui.slot(
-      'conversation.header.beforeCall',
-      (container, { conversationId }) =>
-        mount(container, conversationId, 'header', peek => {
-          const stack = ctx.ui.createElement({
-            tag: 'span',
-            className: 'BeaconCallPeek__stack',
-            attrs: {
-              title: `In this call: ${namesSummary(peek, 20)}`,
-              'aria-label': `${totalOf(peek)} in this call: ${namesSummary(peek, 20)}`,
-            },
-          });
-          peek.participants
-            .slice(0, 3)
-            .forEach(p => stack.append(avatar(ctx, p)));
-          stack.append(
-            ctx.ui.createElement({
-              tag: 'span',
-              className: 'BeaconCallPeek__count',
-              text: String(totalOf(peek)),
-            })
-          );
-          return [stack];
-        })
-    );
-
-    ctx.ui.slot('conversation.belowPinned', (container, { conversationId }) =>
-      mount(container, conversationId, 'banner', peek => {
-        const bar = ctx.ui.createElement({
-          tag: 'div',
-          className: 'BeaconCallPeek__bar',
-          attrs: { role: 'status' },
-        });
-        const avatars = ctx.ui.createElement({
-          tag: 'span',
-          className: 'BeaconCallPeek__avatars',
-        });
-        peek.participants
-          .slice(0, 6)
-          .forEach(p => avatars.append(avatar(ctx, p)));
-        const overflow = totalOf(peek) - Math.min(6, peek.participants.length);
-
-        const text = ctx.ui.createElement({
-          tag: 'span',
-          className: 'BeaconCallPeek__text',
-        });
-        text.append(
-          ctx.ui.createElement({
-            tag: 'span',
-            className: 'BeaconCallPeek__title',
-            text: 'Ongoing call',
-          }),
-          ctx.ui.createElement({
-            tag: 'span',
-            className: 'BeaconCallPeek__names',
-            text: namesSummary(peek, 6),
-          })
-        );
-        bar.append(
-          ctx.ui.createElement({
-            tag: 'span',
-            className: 'BeaconCallPeek__dot',
-          }),
-          avatars,
-          ...(overflow > 0
-            ? [
-                ctx.ui.createElement({
-                  tag: 'span',
-                  className: 'BeaconCallPeek__more',
-                  text: `and ${overflow} other${overflow === 1 ? '' : 's'}`,
-                }),
-              ]
-            : []),
-          text
-        );
-        return [bar];
-      })
-    );
+    });
 
     // Keep the open chat's peek fresh while it has a call.
     let timer: ReturnType<typeof setInterval> | undefined;
@@ -298,39 +213,95 @@ export default {
     ctx.onDispose(() => clearInterval(timer));
 
     ctx.css.inject(`
-.BeaconCallPeek__stack {
-  display: inline-flex; align-items: center; padding: 2px 8px 2px 2px;
-  border-radius: 999px; background: var(--axo-color-fill-secondary);
+.Beacon--call-peek-active .BeaconHeaderJoin { display: none !important; }
+.BeaconCallPeek__bar {
+  display: flex; align-items: center; gap: 12px; min-width: 0;
+  padding: 10px 16px; border-bottom: 1px solid var(--axo-color-border-primary);
+  background: color-mix(in srgb, #2fb344 7%, var(--axo-color-surface-primary));
 }
-.BeaconCallPeek__stack .BeaconCallPeek__avatar { width: 24px; height: 24px; font-size: 10px; }
-.BeaconCallPeek__stack .BeaconCallPeek__avatar + .BeaconCallPeek__avatar { margin-inline-start: -8px; }
-.BeaconCallPeek__count { margin-inline-start: 6px; font-size: 0.8125rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.BeaconCallPeek__avatars { display: inline-flex; flex-shrink: 0; }
 .BeaconCallPeek__avatar {
   display: inline-grid; flex-shrink: 0; place-items: center; overflow: hidden;
-  width: 28px; height: 28px; border-radius: 50%;
+  width: 36px; height: 36px; border-radius: 50%;
   border: 2px solid var(--axo-color-surface-primary);
-  font-size: 11px; font-weight: 600;
+  font-size: 13px; font-weight: 600;
   color: var(--axo-color-label-secondary); background: var(--axo-color-fill-secondary);
 }
 .BeaconCallPeek__avatar img { width: 100%; height: 100%; object-fit: cover; }
-.BeaconCallPeek__bar {
-  display: flex; align-items: center; gap: 10px; min-width: 0;
-  padding: 8px 16px; border-bottom: 1px solid var(--axo-color-border-primary);
-  background: color-mix(in srgb, #3fb950 8%, var(--axo-color-surface-primary));
-}
-.BeaconCallPeek__dot {
-  flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background: #3fb950;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #3fb950 25%, transparent);
-}
-.BeaconCallPeek__avatars { display: inline-flex; flex-shrink: 0; }
-.BeaconCallPeek__avatars .BeaconCallPeek__avatar + .BeaconCallPeek__avatar { margin-inline-start: -6px; }
+.BeaconCallPeek__avatars .BeaconCallPeek__avatar + .BeaconCallPeek__avatar { margin-inline-start: -8px; }
 .BeaconCallPeek__more { flex-shrink: 0; font-size: 0.8125rem; color: var(--axo-color-label-secondary); }
-.BeaconCallPeek__text { display: flex; flex-direction: column; min-width: 0; }
-.BeaconCallPeek__title { font-size: 0.8125rem; font-weight: 600; }
+.BeaconCallPeek__text { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.BeaconCallPeek__title { font-size: 0.875rem; font-weight: 600; }
 .BeaconCallPeek__names {
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   font-size: 0.75rem; color: var(--axo-color-label-secondary);
 }
+.BeaconCallPeek__join {
+  display: inline-flex; flex-shrink: 0; align-items: center; gap: 6px;
+  height: 32px; padding: 0 16px; border: none; border-radius: 999px;
+  font: inherit; font-size: 0.875rem; font-weight: 600; color: #fff;
+  background: #2fb344; cursor: pointer;
+}
+.BeaconCallPeek__join:hover { background: #28a03c; }
+.BeaconCallPeek__join:focus-visible { outline: 2px solid var(--beacon-accent); outline-offset: 2px; }
+.BeaconCallPeek__join::before {
+  content: ''; width: 16px; height: 16px; background: currentColor;
+  mask: url("data:image/svg+xml,${encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 7h12v10H3z M15 10.5l6-3.5v10l-6-3.5z" fill="#000"/></svg>'
+  )}") center / contain no-repeat;
+}
 `);
   },
 } satisfies AddonManifest;
+
+function renderBar(
+  ctx: AddonContext,
+  peek: Peek,
+  conversationId: string
+): HTMLElement {
+  const el = (tag: string, className: string, text?: string) =>
+    ctx.ui.createElement({ tag, className, text });
+
+  const bar = ctx.ui.createElement({
+    tag: 'div',
+    className: 'BeaconCallPeek__bar',
+    attrs: { role: 'status' },
+  });
+
+  const avatars = el('span', 'BeaconCallPeek__avatars');
+  peek.participants.slice(0, 6).forEach(p => avatars.append(avatar(ctx, p)));
+  const overflow = totalOf(peek) - Math.min(6, peek.participants.length);
+
+  const text = el('span', 'BeaconCallPeek__text');
+  text.append(
+    el('span', 'BeaconCallPeek__title', 'Ongoing call'),
+    el('span', 'BeaconCallPeek__names', namesSummary(peek, 6))
+  );
+
+  const join = ctx.ui.createElement({
+    tag: 'button',
+    className: 'BeaconCallPeek__join',
+    text: 'Join',
+    attrs: { type: 'button', 'aria-label': 'Join call' },
+    onClick: () =>
+      ctx.signal.reduxActions.calling.onOutgoingVideoCallInConversation(
+        conversationId
+      ),
+  });
+
+  bar.append(
+    avatars,
+    ...(overflow > 0
+      ? [
+          el(
+            'span',
+            'BeaconCallPeek__more',
+            `and ${overflow} other${overflow === 1 ? '' : 's'}`
+          ),
+        ]
+      : []),
+    text,
+    join
+  );
+  return bar;
+}
