@@ -89,9 +89,9 @@ export default {
       label: 'Deleted message style',
       defaultValue: 'tint',
       options: [
-        { label: 'Red tint', value: 'tint' },
-        { label: 'Strikethrough', value: 'strike' },
-        { label: 'Subtle', value: 'subtle' },
+        { label: 'Red bubble', value: 'tint' },
+        { label: 'Red bubble, struck through', value: 'strike' },
+        { label: 'Red bubble, dimmed text', value: 'subtle' },
       ],
     },
     {
