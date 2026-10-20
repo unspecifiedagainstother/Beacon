@@ -2591,7 +2591,15 @@ export class Message extends PureComponent<Props, State> {
           event.stopPropagation();
         }}
       >
-        {messageStatusContents != null && messageStatusContents}
+        {messageStatusContents != null &&
+          (deletedForEveryone && this.props.beaconDeleted ? (
+            // Beacon: hidden while the logger shows the kept content instead.
+            <span className="module-message__beacon-deleted-notice">
+              {messageStatusContents}
+            </span>
+          ) : (
+            messageStatusContents
+          ))}
         {deletedForEveryone && this.renderBeaconDeleted()}
         {messageStatusContents == null && this.renderPastEdits()}
         {messageStatusContents == null && text != null && (
@@ -3500,6 +3508,10 @@ export class Message extends PureComponent<Props, State> {
       this.#hasReactions() ? 'module-message__container--with-reactions' : null,
       deletedForEveryone
         ? 'module-message__container--deleted-for-everyone'
+        : null,
+      // Beacon: the message logger kept this deleted message's content.
+      deletedForEveryone && this.props.beaconDeleted
+        ? 'module-message__container--beacon-deleted'
         : null,
       this.props.isSignalConversation
         ? tw(

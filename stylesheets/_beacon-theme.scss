@@ -41,6 +41,8 @@
   // Retained content from a deleted message (message-logger addon). Red to
   // read as "this was withdrawn".
   --beacon-deleted-text: #f44336;
+  --beacon-deleted-bubble: #b3261e;
+  --beacon-deleted-on-bubble: #fff;
 
   // -- Flat theme
   // Elevation is drawn with a hairline border rather than a drop shadow.
@@ -1086,15 +1088,41 @@
 }
 
 .Beacon--logger-show-deleted {
+  // The kept text reads as the message itself — no "X deleted this message"
+  // line, no separator — and the bubble turns red to say it was withdrawn.
+  .module-message__beacon-deleted-notice {
+    display: none;
+  }
+
   .module-message__beacon-deleted {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    margin-top: 4px;
-    padding-top: 4px;
-    border-top: 1px dashed
-      color-mix(in srgb, var(--beacon-deleted-text) 45%, transparent);
     font-style: normal;
+  }
+
+  .module-message__container--beacon-deleted {
+    background: var(--beacon-deleted-bubble) !important;
+    background-image: none !important;
+
+    .module-message__text,
+    .module-message__beacon-deleted__body,
+    .module-message__metadata,
+    .module-message__metadata__date {
+      color: var(--beacon-deleted-on-bubble) !important;
+    }
+
+    // Trash glyph in the metadata row, after the time/timer.
+    .module-message__metadata::after {
+      content: '';
+      width: 14px;
+      height: 14px;
+      margin-inline-start: 4px;
+      flex-shrink: 0;
+      background-color: currentColor;
+      -webkit-mask: url('../images/icons/v3/trash/trash.svg') no-repeat center;
+      -webkit-mask-size: 100%;
+    }
   }
 
   .module-message__beacon-deleted__revision {
@@ -1108,17 +1136,12 @@
     padding-inline: 6px;
     border-radius: 6px;
     font-size: 0.75rem;
-    background: color-mix(in srgb, var(--beacon-deleted-text) 14%, transparent);
+    background: rgb(255 255 255 / 0.18);
   }
-}
-
-.Beacon--logger-style-tint .module-message__beacon-deleted__body {
-  color: var(--beacon-deleted-text);
 }
 
 .Beacon--logger-style-strike .module-message__beacon-deleted__body {
   text-decoration: line-through;
-  text-decoration-color: var(--beacon-deleted-text);
 }
 
 .Beacon--logger-style-subtle .module-message__beacon-deleted__body {
