@@ -18,6 +18,7 @@ import { addBeaconFilter } from './filters.std.ts';
 import { registerActionInterceptor } from './middleware.preload.ts';
 import { commandRegistry } from './commands.dom.ts';
 import { addonSettings } from './settings.std.ts';
+import { registerSlot } from './slots.std.ts';
 import { createElement, createModal, showNotification } from './ui.dom.ts';
 import { createLogger } from '../../logging/log.std.ts';
 
@@ -226,6 +227,7 @@ export function createAddonContext(
     },
 
     ui: {
+      slot: (name, render) => track(registerSlot(name, render)),
       createModal: options => {
         // Close addon modals when the addon goes away; drop the tracking
         // entry when the user closes one first. Both paths are idempotent.

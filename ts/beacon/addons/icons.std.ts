@@ -124,3 +124,10 @@ export const ICON_PROFILE_HISTORY = defineIcon([
   'M17.5 22a4.5 4.5 0 1 0 0-9 4.5 4.5 0 1 0 0 9z',
   'M17.5 15.5v2l1.3 1',
 ]);
+
+export const ICON_CALL_PEEK = defineIcon([
+  // Video camera with an eye-like dot.
+  'M3 7h12v10H3z',
+  'M15 10.5l6-3.5v10l-6-3.5',
+  'M9 12h.01',
+]);
