@@ -12,7 +12,8 @@
 import type { Store } from 'redux';
 import type { StateType } from '../../state/reducer.preload.ts';
 import { NavTab, SettingsPage } from '../../types/Nav.std.ts';
-import { HookBus } from './hook-bus.std.ts';
+import type { HookBus } from './hook-bus.std.ts';
+import { beaconHookBus } from './bus.std.ts';
 import { attachHookBus } from './middleware.preload.ts';
 import { addonLoader, type AddonLoader } from './loader.preload.ts';
 import { commandRegistry, type CommandRegistry } from './commands.dom.ts';
@@ -48,7 +49,7 @@ declare global {
   }
 }
 
-export const hookBus = new HookBus();
+export const hookBus: HookBus = beaconHookBus;
 
 let initialized = false;
 

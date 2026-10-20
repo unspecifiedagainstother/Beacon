@@ -65,6 +65,8 @@ import { AxoIconButton } from '../../axo/AxoIconButton.dom.tsx';
 import { AxoButton } from '../../axo/AxoButton.dom.tsx';
 import { AxoConfirmDialog } from '../../axo/AxoConfirmDialog.dom.tsx';
 import { getControlOrAltKey } from '../../hooks/useKeyboardShortcuts.dom.tsx';
+import { applyBeaconFilter } from '../../beacon/core/filters.std.ts';
+import type { AxoSymbol } from '../../axo/AxoSymbol.dom.tsx';
 
 function HeaderInfoTitle({
   name,
@@ -957,6 +959,19 @@ function HeaderDropdownMenuContent({
           >
             {i18n('icu:deleteConversation')}
           </AxoDropdownMenu.Item>
+          {/* Beacon: items contributed by addons (conversation.menuItems). */}
+          {applyBeaconFilter('conversation.menuItems', [], {
+            conversationId: conversation.id,
+            isGroup,
+          }).map(item => (
+            <AxoDropdownMenu.Item
+              key={item.id}
+              symbol={item.symbol as AxoSymbol.Name | undefined}
+              onSelect={item.onSelect}
+            >
+              {item.label}
+            </AxoDropdownMenu.Item>
+          ))}
           {isGroup && !isTerminated && (
             <AxoDropdownMenu.Item
               symbol="leave"
