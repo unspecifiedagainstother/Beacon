@@ -107,3 +107,20 @@ export const ICON_TEXT_FACES = defineIcon([
   'M9 9.5h.01',
   'M15 9.5h.01',
 ]);
+
+export const ICON_PURGE_MESSAGES = defineIcon([
+  // Trash can with a sweep line.
+  'M3 6h18',
+  'M8 6V4h8v2',
+  'M6 6l1 14h10l1-14',
+  'M10 11v5',
+  'M14 11v5',
+]);
+
+export const ICON_PROFILE_HISTORY = defineIcon([
+  // Person with a clock.
+  'M9 11a4 4 0 1 0 0-8 4 4 0 1 0 0 8z',
+  'M2 21a7 7 0 0 1 10-6.3',
+  'M17.5 22a4.5 4.5 0 1 0 0-9 4.5 4.5 0 1 0 0 9z',
+  'M17.5 15.5v2l1.3 1',
+]);

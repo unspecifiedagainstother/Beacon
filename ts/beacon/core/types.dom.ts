@@ -118,6 +118,14 @@ export type FilterPayloads = {
    * ts/services/notifications.preload.ts — whether to show a desktop
    * notification. Return false to suppress it.
    */
+  /**
+   * ts/components/conversation/ConversationHeader.dom.tsx — extra items for
+   * the conversation header ⋯ menu, shown below the built-in ones.
+   */
+  'conversation.menuItems': [
+    value: ReadonlyArray<ConversationMenuItem>,
+    context: { conversationId: string; isGroup: boolean },
+  ];
   'notification.show': [
     value: boolean,
     context: {
@@ -131,6 +139,15 @@ export type FilterPayloads = {
 };
 
 export type FilterName = keyof FilterPayloads;
+
+/** An entry addons can add to a conversation's header ⋯ menu. */
+export type ConversationMenuItem = Readonly<{
+  id: string;
+  label: string;
+  /** AxoSymbol glyph name, e.g. 'trash', 'lock', 'grid'. */
+  symbol?: string;
+  onSelect: () => void;
+}>;
 
 export type FilterFn<Name extends FilterName = FilterName> = (
   value: FilterPayloads[Name][0],

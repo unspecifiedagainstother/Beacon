@@ -37,6 +37,8 @@ import privacyScreen from '../addons/privacy-screen.addon.dom.ts';
 import compactMode from '../addons/compact-mode.addon.std.ts';
 import snippets from '../addons/snippets.addon.std.ts';
 import textFaces from '../addons/text-faces.addon.std.ts';
+import purgeMessages from '../addons/purge-messages.addon.preload.ts';
+import profileHistory from '../addons/profile-history.addon.preload.ts';
 
 const log = createLogger('beacon/loader');
 
@@ -274,6 +276,8 @@ const BUILTIN_MANIFESTS: ReadonlyArray<AddonManifest> = [
   compactMode,
   snippets,
   textFaces,
+  purgeMessages,
+  profileHistory,
 ];
 
 function builtinManifests(): Array<AddonManifest> {

@@ -33,15 +33,16 @@ ts/beacon/util/          pure helpers shared by addons (unit tested)
 
 Every edit to an upstream file is one of these, each marked `// Beacon:`:
 
-| File                                                                                  | What                                        |
-| ------------------------------------------------------------------------------------- | ------------------------------------------- |
-| `ts/state/createStore.preload.ts`                                                     | installs `beaconMiddleware`                 |
-| `ts/state/initializeRedux.preload.ts`                                                 | calls `initializeBeaconRuntime(store)`      |
-| `ts/util/deleteForEveryone.preload.ts`                                                | `message.deleteForEveryone` filter          |
-| `ts/services/notifications.preload.ts`                                                | `notification.show` filter                  |
-| `ts/model-types.d.ts`, `ts/types/Message.std.ts`                                      | `beaconDeleted` attribute + erase policy    |
-| `ts/state/selectors/message.preload.ts`, `ts/components/conversation/Message.dom.tsx` | render retained deleted content             |
-| `ts/components/CompositionInput.dom.tsx`                                              | slash-command completion, Enter/Tab routing |
+| File                                                                                  | What                                                              |
+| ------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | -------------------------- |
+| `ts/state/createStore.preload.ts`                                                     | installs `beaconMiddleware`                                       |
+| `ts/state/initializeRedux.preload.ts`                                                 | calls `initializeBeaconRuntime(store)`                            |
+| `ts/util/deleteForEveryone.preload.ts`                                                | `message.deleteForEveryone` filter                                |
+| `ts/services/notifications.preload.ts`                                                | `notification.show` filter                                        |
+| `conversation.menuItems`                                                              | `ConversationMenuItem[]` — append `{id, label, symbol, onSelect}` | conversation header ⋯ menu |
+| `ts/model-types.d.ts`, `ts/types/Message.std.ts`                                      | `beaconDeleted` attribute + erase policy                          |
+| `ts/state/selectors/message.preload.ts`, `ts/components/conversation/Message.dom.tsx` | render retained deleted content                                   |
+| `ts/components/CompositionInput.dom.tsx`                                              | slash-command completion, Enter/Tab routing                       |
 
 New capability that needs a hook inside upstream code should become a new
 **filter** — one `applyBeaconFilter()` call at the upstream site, typed in
@@ -102,19 +103,19 @@ Modules with a switch, its settings, and its live commands and shortcuts.
 Fire-and-forget; return values are ignored. Payloads are typed (see
 `HookPayloads` in `types.dom.ts`):
 
-| Hook                                                               | Fires when                                        |
-| ------------------------------------------------------------------ | ------------------------------------------------- |
-| `onAppStart`                                                       | all addons loaded, store live                     |
-| `onActionDispatched(action)`                                       | every Redux action, pre-reducer                   |
-| `onStateChanged({action, state})`                                  | every Redux action, post-reducer                  |
-| `onMessageReceived(message, info)`                                 | new incoming message added                        |
-| `onMessageSent(message, info)`                                     | new outgoing message added                        |
-| `onMessageChanged(message, {id, conversationId, previous})`        | any attribute change                              |
-| `onMessageEdited(message, {conversationId, previous})`             | a new revision arrived                            |
-| `onMessageDeletedForEveryone(message, {conversationId, previous})` | remote or local delete-for-everyone               |
-| `onMessageDeleted({id, conversationId})`                           | removed from the timeline (delete for me, expiry) |
-| `onConversationSelected(id \| undefined)`                          | conversation opened/closed                        |
-| `onThemeChanged(theme)`                                            | light/dark flip                                   |
+| Hook                                                               | Fires when                                                                                    |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| `onAppStart`                                                       | all addons loaded, store live                                                                 |
+| `onActionDispatched(action)`                                       | every Redux action, pre-reducer                                                               |
+| `onStateChanged({action, state})`                                  | every Redux action, post-reducer                                                              |
+| `onMessageReceived(message, info)`                                 | new incoming message added                                                                    |
+| `onMessageSent(message, info)`                                     | new outgoing message added                                                                    |
+| `onMessageChanged(message, {id, conversationId, previous})`        | any attribute change                                                                          |
+| `onMessageEdited(message, {conversationId, previous})`             | a new revision arrived (emitted by `handleEditMessage`)                                       |
+| `onMessageDeletedForEveryone(message, {conversationId, previous})` | delete-for-everyone applied (emitted by `applyDeleteForEveryone`; `previous` has the content) |
+| `onMessageDeleted({id, conversationId})`                           | removed from the timeline (delete for me, expiry)                                             |
+| `onConversationSelected(id \| undefined)`                          | conversation opened/closed                                                                    |
+| `onThemeChanged(theme)`                                            | light/dark flip                                                                               |
 
 `previous` is the message as Redux held it before the change, when it was
 loaded — enough to diff edits without keeping your own copy.

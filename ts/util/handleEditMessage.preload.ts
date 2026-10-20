@@ -34,6 +34,7 @@ import { modifyTargetMessage } from './modifyTargetMessage.preload.ts';
 import { isMessageNoteToSelf } from './isMessageNoteToSelf.dom.ts';
 import { MessageModel } from '../models/messages.preload.ts';
 import { itemStorage } from '../textsecure/Storage.preload.ts';
+import { beaconHookBus } from '../beacon/core/bus.std.ts';
 
 const log = createLogger('handleEditMessage');
 
@@ -229,6 +230,11 @@ export async function handleEditMessage(
     editMessageReceivedAtMs: editedMessage.received_at_ms,
     preview: editedMessage.preview,
     quote: editedMessage.quote,
+  });
+  // Beacon: authoritative edit event (message logger, stats).
+  beaconHookBus.emit('onMessageEdited', mainMessageModel.attributes, {
+    conversationId: editAttributes.conversationId,
+    previous: mainMessage,
   });
 
   const conversation = window.ConversationController.get(

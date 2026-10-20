@@ -14,6 +14,7 @@ import { eraseMessageContents } from './cleanup.preload.ts';
 import { notificationService } from '../services/notifications.preload.ts';
 import { DataWriter } from '../sql/Client.preload.ts';
 import { applyBeaconFilter } from '../beacon/core/filters.std.ts';
+import { beaconHookBus } from '../beacon/core/bus.std.ts';
 
 const log = createLogger('deleteForEveryone');
 
@@ -129,7 +130,13 @@ export async function applyDeleteForEveryone(
       additionalProps,
       { message: message.attributes, isAdminDelete: del.isAdminDelete }
     );
+    const beforeErase = message.attributes;
     await eraseMessageContents(message, 'delete-for-everyone', erasedProps);
+    // Beacon: authoritative delete event, with the content before the erase.
+    beaconHookBus.emit('onMessageDeletedForEveryone', message.attributes, {
+      conversationId: message.attributes.conversationId,
+      previous: beforeErase,
+    });
 
     if (shouldPersist) {
       // We delete the message first, before re-saving it -- this causes any foreign key
