@@ -1100,12 +1100,14 @@ function OutgoingCallButtons({
       );
     case OutgoingCallButtonStyle.Join:
       return (
+        // Beacon: `BeaconHeaderJoin` lets addons (call-peek) hide this when
+        // they show their own Join.
         <>
           <div
-            className={tw(
+            className={`BeaconHeaderJoin ${tw(
               '@min-[500px]:hidden',
               inAnotherCall && 'opacity-50 dark:opacity-40'
-            )}
+            )}`}
           >
             <AxoIconButton.Root
               symbol="videocamera-fill"
@@ -1116,7 +1118,9 @@ function OutgoingCallButtons({
               tooltip={callButtonTooltip}
             />
           </div>
-          <div className={tw('hidden @min-[500px]:block')}>
+          <div
+            className={`BeaconHeaderJoin ${tw('hidden @min-[500px]:block')}`}
+          >
             <InAnotherCallTooltip inAnotherCall={inAnotherCall} i18n={i18n}>
               <AxoButton.Root
                 size="md"
