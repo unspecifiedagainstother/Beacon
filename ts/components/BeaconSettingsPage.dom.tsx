@@ -20,6 +20,7 @@ import {
   countCssRules,
   getCustomCSS,
 } from './BeaconCSSEditor.dom.tsx';
+import { BeaconBuiltinFeatures } from './BeaconModules.dom.tsx';
 
 export type PropsType = {
   i18n: LocalizerType;
@@ -80,7 +81,7 @@ export function BeaconSettingsPage({
   const customCss = useMemo(() => getCustomCSS(), [cssVersion]);
   const ruleCount = customCss ? (countCssRules(customCss) ?? 0) : 0;
   const addonSummary = useMemo(() => {
-    const list = window.Beacon?.loader.list() ?? [];
+    const list = (window.Beacon?.loader.list() ?? []).filter(a => !a.builtin);
     return {
       enabled: list.filter(a => a.enabled).length,
       total: list.length,
@@ -109,6 +110,13 @@ export function BeaconSettingsPage({
           />
         ))}
       </Section>
+
+      <AxoList.Root>
+        <AxoList.Header>
+          <AxoList.Label>{i18n('icu:Beacon__settings-builtin')}</AxoList.Label>
+        </AxoList.Header>
+        <BeaconBuiltinFeatures i18n={i18n} />
+      </AxoList.Root>
 
       <Section
         label={i18n('icu:Beacon__settings-window')}

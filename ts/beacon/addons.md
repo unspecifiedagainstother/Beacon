@@ -25,7 +25,10 @@ ts/beacon/core/
   ui.dom.ts              modal / toast / element helpers (no innerHTML)
   loader.preload.ts      enable/disable lifecycle, observable for the UI
   runtime.preload.ts     entry point; exposes window.Beacon
-ts/beacon/addons/        builtin addons (*.addon.{std,dom,preload}.ts)
+ts/beacon/addons/        bundled addons (*.addon.{std,dom,preload}.ts)
+ts/beacon/builtin/       built-in features: same API, `builtin: true` —
+                         always running, no switch, settings on the
+                         Beacon page
 ts/beacon/util/          pure helpers shared by addons (unit tested)
 ```
 

@@ -87,6 +87,10 @@
     "messageformat": "Privacy",
     "description": "Section heading on the Beacon settings page"
   },
+  "icu:Beacon__settings-builtin": {
+    "messageformat": "Built-in features",
+    "description": "Section on the Beacon settings page listing features that are always on"
+  },
   "icu:Beacon__settings-window": {
     "messageformat": "Window",
     "description": "Section heading on the Beacon settings page"

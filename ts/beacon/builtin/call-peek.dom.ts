@@ -16,7 +16,7 @@
 import type { AddonContext, AddonManifest } from '../core/types.dom.ts';
 import type { StateType } from '../../state/reducer.preload.ts';
 import type { ConversationType } from '../../state/ducks/conversations.preload.ts';
-import { ICON_CALL_PEEK } from './icons.std.ts';
+import { ICON_CALL_PEEK } from '../addons/icons.std.ts';
 import { CallMode } from '../../types/CallDisposition.std.ts';
 import { GroupCallJoinState } from '../../types/Calling.std.ts';
 import { AvatarColorMap } from '../../types/Colors.std.ts';
@@ -117,6 +117,7 @@ function namesSummary(peek: Peek, max: number): string {
 
 export default {
   id: 'call-peek',
+  builtin: true,
   icon: ICON_CALL_PEEK,
   name: 'Call Peek',
   version: '1.1.0',
