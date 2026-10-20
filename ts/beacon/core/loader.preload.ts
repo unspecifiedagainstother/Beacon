@@ -39,6 +39,7 @@ import snippets from '../addons/snippets.addon.std.ts';
 import textFaces from '../addons/text-faces.addon.std.ts';
 import purgeMessages from '../addons/purge-messages.addon.preload.ts';
 import profileHistory from '../addons/profile-history.addon.preload.ts';
+import callPeek from '../addons/call-peek.addon.dom.ts';
 
 const log = createLogger('beacon/loader');
 
@@ -278,6 +279,7 @@ const BUILTIN_MANIFESTS: ReadonlyArray<AddonManifest> = [
   textFaces,
   purgeMessages,
   profileHistory,
+  callPeek,
 ];
 
 function builtinManifests(): Array<AddonManifest> {

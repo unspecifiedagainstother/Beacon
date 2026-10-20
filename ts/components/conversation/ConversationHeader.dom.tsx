@@ -67,6 +67,7 @@ import { AxoConfirmDialog } from '../../axo/AxoConfirmDialog.dom.tsx';
 import { getControlOrAltKey } from '../../hooks/useKeyboardShortcuts.dom.tsx';
 import { applyBeaconFilter } from '../../beacon/core/filters.std.ts';
 import type { AxoSymbol } from '../../axo/AxoSymbol.dom.tsx';
+import { BeaconSlot } from '../BeaconSlot.dom.tsx';
 
 function HeaderInfoTitle({
   name,
@@ -374,6 +375,11 @@ export const ConversationHeader = memo(function ConversationHeader({
               isSignalConversation={isSignalConversation ?? false}
             />
             <div className={tw(`flex flex-row gap-1 px-4 @min-[500px]:gap-3`)}>
+              {/* Beacon: addon slot left of the call buttons. */}
+              <BeaconSlot
+                name="conversation.header.beforeCall"
+                props={{ conversationId: conversation.id }}
+              />
               {!isSmsOnlyOrUnregistered &&
                 !isSignalConversation &&
                 !isTerminated && (
@@ -1248,6 +1254,11 @@ function ConversationSubheader(props: {
       {props.shouldShowMiniPlayer &&
         props.renderMiniPlayer({ shouldFlow: true })}
       {!props.shouldShowMiniPlayer && props.renderPinnedMessagesBar()}
+      {/* Beacon: addon slot under the pinned bar. */}
+      <BeaconSlot
+        name="conversation.belowPinned"
+        props={{ conversationId: props.conversationId }}
+      />
     </>
   );
 }

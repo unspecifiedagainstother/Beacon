@@ -24,6 +24,7 @@ import { createElement, createModal } from './ui.dom.ts';
 import { createLogger } from '../../logging/log.std.ts';
 import { BEACON_FEATURES } from '../features.std.ts';
 import { getAccentHex, getAccentProperties } from './accent.std.ts';
+import { getSlotRenderers } from './slots.std.ts';
 
 const log = createLogger('beacon/runtime');
 
@@ -40,6 +41,8 @@ export type BeaconGlobal = {
   store: Store<StateType>;
   /** Jump to Settings → Beacon → Modules. */
   openModules: () => void;
+  /** Slot renderers, for trying addon UI from the console. */
+  slots: { renderers: typeof getSlotRenderers };
 };
 
 declare global {
@@ -84,6 +87,7 @@ export function initializeBeaconRuntime(store: Store<StateType>): void {
       createPatcher,
       store,
       openModules,
+      slots: { renderers: getSlotRenderers },
     };
   } catch (error) {
     log.error('initializeBeaconRuntime error:', error);
