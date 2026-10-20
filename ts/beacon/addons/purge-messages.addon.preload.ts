@@ -9,8 +9,9 @@
  * default, set by the server; longer for group admins on their own groups),
  * and recipients reject anything older. So a purge:
  *  1. scans the conversation for your own messages,
- *  2. deletes the eligible ones for everyone, one at a time, through the
- *     same path as the normal "Delete for everyone" action,
+ *  2. queues deletes for all eligible ones at once, through the same path as
+ *     the normal "Delete for everyone" action, then waits until they have
+ *     all been sent and shows a "Purge completed" toast,
  *  3. optionally deletes the older ones *for you* (they stay on other
  *     people's devices — Signal cannot remove them).
  *
@@ -27,7 +28,7 @@ import { areWeAdmin } from '../../util/areWeAdmin.preload.ts';
 import { canSendDeleteForEveryone } from '../../util/canDeleteForEveryone.preload.ts';
 import { sendDeleteForEveryoneMessage } from '../../util/sendDeleteForEveryoneMessage.preload.ts';
 
-const PAGE_SIZE = 500;
+const PAGE_SIZE = 1000;
 
 type ScanResult = {
   eligible: Array<MessageAttributesType>;
@@ -199,57 +200,135 @@ function runPurge(ctx: AddonContext, conversationId: string): void {
         progress.append(bar, status);
         body.replaceChildren(progress);
 
-        const delayMs = ctx.settings.get<number>('delayMs');
-        let done = 0;
-        let failed = 0;
-        for (const message of eligible) {
-          if (stopped) {
-            break;
-          }
-          status.textContent = `Deleting ${done + 1} of ${eligible.length}…`;
-          try {
-            const current = window.ConversationController.get(conversationId);
-            if (!current) {
-              throw new Error('conversation gone');
+        // Phase 1 — queue. Each delete is its own Signal envelope (the
+        // protocol has no batch delete), sent by the conversation's job
+        // queue, which already retries on rate limits. So queue them all as
+        // fast as the local DB allows instead of pacing them by hand.
+        const concurrency = ctx.settings.get<number>('concurrency');
+        const queued: Array<string> = [];
+        let failedToQueue = 0;
+        let next = 0;
+        const worker = async () => {
+          while (next < eligible.length && !stopped) {
+            const message = eligible[next];
+            next += 1;
+            if (!message) {
+              break;
             }
-            // oxlint-disable-next-line no-await-in-loop
-            await sendDeleteForEveryoneMessage(current.attributes, {
-              id: message.id,
-              timestamp: message.sent_at,
-            });
-          } catch (error) {
-            failed += 1;
-            ctx.warn('purge: delete failed', message.id, error);
+            try {
+              const current = window.ConversationController.get(conversationId);
+              if (!current) {
+                throw new Error('conversation gone');
+              }
+              // oxlint-disable-next-line no-await-in-loop
+              await sendDeleteForEveryoneMessage(current.attributes, {
+                id: message.id,
+                timestamp: message.sent_at,
+              });
+              queued.push(message.id);
+            } catch (error) {
+              failedToQueue += 1;
+              ctx.warn('purge: could not queue delete', message.id, error);
+            }
+            const handled = queued.length + failedToQueue;
+            status.textContent = `Queued ${handled} of ${eligible.length}…`;
+            fill.style.width = `${Math.round((handled / eligible.length) * 50)}%`;
           }
-          done += 1;
-          fill.style.width = `${Math.round((done / eligible.length) * 100)}%`;
-          // Spread the sends out so the job queue and server rate limits
-          // keep up.
-          // oxlint-disable-next-line no-await-in-loop
-          await new Promise(resolve => setTimeout(resolve, delayMs));
-        }
+        };
+        await Promise.all(
+          Array.from({ length: Math.min(concurrency, eligible.length) }, () =>
+            worker()
+          )
+        );
 
         if (deleteOldForMe && tooOld.length && !stopped) {
-          status.textContent = 'Deleting older messages for you…';
           window.reduxActions.conversations.deleteMessages({
             conversationId,
             messageIds: tooOld.map(m => m.id),
           });
         }
 
+        // Phase 2 — wait until every queued delete has actually gone out
+        // (or failed for good), then report. Runs on even if the dialog is
+        // closed; the toast still appears.
+        type SendState = 'sent' | 'failed' | 'pending';
+        const stateOf = (
+          attrs: Pick<
+            MessageAttributesType,
+            'deletedForEveryoneFailed' | 'deletedForEveryoneSendStatus'
+          >
+        ): SendState => {
+          if (attrs.deletedForEveryoneFailed) {
+            return 'failed';
+          }
+          const sendStatus = attrs.deletedForEveryoneSendStatus;
+          return !sendStatus || Object.values(sendStatus).every(Boolean)
+            ? 'sent'
+            : 'pending';
+        };
+        // In-memory models are freshest; anything evicted from the cache is
+        // read back from the database.
+        const settle = async (): Promise<Array<SendState>> => {
+          const states = new Map<string, SendState>();
+          const missing: Array<string> = [];
+          for (const id of queued) {
+            const attrs = window.MessageCache.getById(id)?.attributes;
+            if (attrs) {
+              states.set(id, stateOf(attrs));
+            } else {
+              missing.push(id);
+            }
+          }
+          if (missing.length) {
+            const found = await DataReader.getMessagesById(missing);
+            for (const attrs of found) {
+              states.set(attrs.id, stateOf(attrs));
+            }
+          }
+          // Gone from the DB entirely means it was removed: nothing to send.
+          return queued.map(id => states.get(id) ?? 'sent');
+        };
+
+        let sent = 0;
+        let sendFailed = 0;
+        const deadline = Date.now() + 30 * 60_000;
+        for (;;) {
+          sent = 0;
+          sendFailed = 0;
+          // oxlint-disable-next-line no-await-in-loop
+          for (const state of await settle()) {
+            if (state === 'sent') {
+              sent += 1;
+            } else if (state === 'failed') {
+              sendFailed += 1;
+            }
+          }
+          const settled = sent + sendFailed;
+          status.textContent = `Sent ${settled} of ${queued.length}…`;
+          fill.style.width = `${50 + Math.round((settled / Math.max(1, queued.length)) * 50)}%`;
+          if (settled >= queued.length || Date.now() > deadline) {
+            break;
+          }
+          // oxlint-disable-next-line no-await-in-loop
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+
+        const failed = failedToQueue + sendFailed;
+        const pending = queued.length - sent - sendFailed;
         const parts = [
-          `Deleted ${done - failed} for everyone`,
+          `${sent} deleted for everyone`,
           failed ? `${failed} failed` : '',
+          pending ? `${pending} still sending` : '',
           deleteOldForMe && tooOld.length && !stopped
             ? `${tooOld.length} deleted for you`
             : '',
           stopped ? 'stopped early' : '',
         ].filter(Boolean);
-        status.textContent = `${parts.join(' · ')}.`;
+        status.textContent = `Completed · ${parts.join(' · ')}.`;
         fill.style.width = '100%';
         ctx.ui.showNotification(
-          parts.join(' · '),
-          failed ? 'warning' : 'success'
+          `Purge completed · ${parts.join(' · ')}`,
+          failed || pending ? 'warning' : 'success'
         );
       },
     });
@@ -267,13 +346,14 @@ export default {
   tags: ['privacy', 'chat'],
   settings: [
     {
-      key: 'delayMs',
+      key: 'concurrency',
       type: 'number',
-      label: 'Delay between deletes (ms)',
-      description: 'Higher is gentler on rate limits for big purges.',
-      defaultValue: 400,
-      min: 100,
-      max: 5000,
+      label: 'Parallel deletes',
+      description:
+        'How many deletes are queued at once. Sending is still paced by Signal’s own queue, which retries on rate limits.',
+      defaultValue: 16,
+      min: 1,
+      max: 64,
     },
   ],
 
