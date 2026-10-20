@@ -263,6 +263,10 @@ function registerBuiltinCommands(): void {
         ctx.reply('Unknown addon', 'warning');
         return;
       }
+      if (addon.builtin) {
+        ctx.reply(`${addon.name} is built into Beacon`, 'info');
+        return;
+      }
       await addonLoader.disable(addon.id);
       ctx.reply(`${addon.name} disabled`, 'success');
     },

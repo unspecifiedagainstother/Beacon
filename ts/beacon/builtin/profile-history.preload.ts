@@ -26,7 +26,7 @@ import type {
   BeaconProfileField,
 } from '../features.std.ts';
 import type { ConversationType } from '../../state/ducks/conversations.preload.ts';
-import { ICON_PROFILE_HISTORY } from './icons.std.ts';
+import { ICON_PROFILE_HISTORY } from '../addons/icons.std.ts';
 import { itemStorage } from '../../textsecure/Storage.preload.ts';
 import { drop } from '../../util/drop.std.ts';
 
@@ -135,6 +135,7 @@ function formatTime(ts: number): string {
 
 export default {
   id: 'profile-history',
+  builtin: true,
   icon: ICON_PROFILE_HISTORY,
   name: 'Profile History',
   version: '1.0.0',

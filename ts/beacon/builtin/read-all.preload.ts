@@ -11,11 +11,12 @@
  */
 
 import type { AddonManifest } from '../core/types.dom.ts';
-import { ICON_READ_ALL } from './icons.std.ts';
+import { ICON_READ_ALL } from '../addons/icons.std.ts';
 import { itemStorage } from '../../textsecure/Storage.preload.ts';
 
 export default {
   id: 'read-all',
+  builtin: true,
   icon: ICON_READ_ALL,
   name: 'Read All',
   version: '1.0.0',
