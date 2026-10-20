@@ -507,6 +507,8 @@ export const STORAGE_KEYS_TO_PRESERVE_WHEN_PRIMARY = [
 const STORAGE_KEYS_TO_REMOVE_AFTER_UNLINK = [
   // Beacon: message-logger index — references this account's messages.
   'beaconMessageLog',
+  'beaconProfileHistory',
+  'beaconProfileBaseline',
   'unreadRemindersEnabledAt',
   'lastCallQualitySurveyTime',
   'lastCallQualityFailureSurveyTime',

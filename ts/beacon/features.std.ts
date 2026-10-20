@@ -78,8 +78,42 @@ export type BeaconMessageLogEntry = Readonly<{
  * Non-toggle Beacon data kept in items storage — i.e. inside the encrypted
  * database, unlike addon localStorage. Not preserved across unlink.
  */
+export type BeaconProfileField =
+  | 'profileName'
+  | 'username'
+  | 'about'
+  | 'avatar'
+  | 'phone'
+  | 'contactName'
+  | 'groupName'
+  | 'groupDescription';
+
+/** One observed change to a contact's or group's profile. */
+export type BeaconProfileChange = Readonly<{
+  conversationId: string;
+  field: BeaconProfileField;
+  at: number;
+  from?: string;
+  to?: string;
+  /** Small JPEG data URLs for avatar changes, when the image was readable. */
+  fromThumb?: string;
+  toThumb?: string;
+  /** 'startup' = changed while Beacon was closed, noticed at launch. */
+  source: 'live' | 'startup';
+}>;
+
+/** Last seen value of each tracked field, per conversation. */
+export type BeaconProfileBaseline = Readonly<
+  Record<
+    string,
+    Readonly<Partial<Record<BeaconProfileField | 'avatarThumb', string>>>
+  >
+>;
+
 export type BeaconDataStorageKeys = {
   beaconMessageLog: ReadonlyArray<BeaconMessageLogEntry>;
+  beaconProfileHistory: ReadonlyArray<BeaconProfileChange>;
+  beaconProfileBaseline: BeaconProfileBaseline;
 };
 
 /** Shape mixed into StorageAccessType so each key is typed. */

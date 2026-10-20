@@ -427,7 +427,10 @@ function openLogViewer(
     });
 
     if (visible.length === 0) {
-      let emptyText = `No ${tab} messages logged yet.`;
+      let emptyText =
+        tab === 'deleted'
+          ? 'No deleted messages logged yet. Messages are kept from the moment the logger is on; ones deleted earlier — including messages already deleted when your phone transferred history — never reached Beacon with their content.'
+          : 'No edits logged yet. Edits are logged as they arrive.';
       if (query) {
         emptyText = 'Nothing matches.';
       }

@@ -285,7 +285,8 @@
 
   &--select {
     width: auto;
-    min-width: 160px;
+    min-width: min(160px, 100%);
+    max-width: 100%;
   }
 
   &--textarea {
@@ -1311,4 +1312,54 @@
   &--error {
     color: var(--axo-color-label-destructive);
   }
+}
+
+// -- Profile history viewer ---------------------------------------------------
+
+.BeaconProfileLog__thumb {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--axo-color-label-secondary);
+  background: var(--axo-color-fill-secondary);
+
+  .BeaconProfileLog__change & {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+  }
+}
+
+.BeaconProfileLog__item .BeaconLog__item-head {
+  align-items: center;
+}
+
+.BeaconProfileLog__change {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding-inline-start: 34px;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.BeaconProfileLog__from {
+  color: var(--axo-color-label-secondary);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, currentColor 50%, transparent);
+}
+
+.BeaconProfileLog__arrow {
+  color: var(--axo-color-label-placeholder);
+}
+
+.BeaconProfileLog__to {
+  color: var(--axo-color-label-primary);
 }

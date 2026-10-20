@@ -113,19 +113,10 @@ function emitDerivedHooks(
       const previous = lookupMessage(prevState, id);
       hookBus.emit('onMessageChanged', data, { id, conversationId, previous });
 
-      const prevEdits = previous?.editHistory?.length ?? 0;
-      const nextEdits = data.editHistory?.length ?? 0;
-      // A first edit takes editHistory from undefined to [new, original].
-      if (nextEdits > prevEdits && nextEdits >= 2) {
-        hookBus.emit('onMessageEdited', data, { conversationId, previous });
-      }
-
-      if (data.deletedForEveryone && !previous?.deletedForEveryone) {
-        hookBus.emit('onMessageDeletedForEveryone', data, {
-          conversationId,
-          previous,
-        });
-      }
+      // onMessageEdited / onMessageDeletedForEveryone are emitted by the
+      // upstream handlers themselves (handleEditMessage, deleteForEveryone).
+      // Deriving them from MESSAGE_CHANGED misfired whenever an already
+      // edited message was first loaded into Redux.
       break;
     }
     case MESSAGE_DELETED: {
