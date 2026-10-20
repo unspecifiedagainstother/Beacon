@@ -466,6 +466,7 @@ export type AddonInfo = {
   authors: Array<string>;
   tags: Array<string>;
   icon?: string;
+  builtin: boolean;
   enabled: boolean;
   /** Message from the last failed start(), cleared on success. */
   error?: string;
@@ -491,6 +492,12 @@ export type AddonManifest = {
   icon?: string;
   /** Enabled state for a fresh profile. Keep false unless you mean it. */
   defaultEnabled?: boolean;
+  /**
+   * Part of Beacon itself (ts/beacon/builtin/): always running, cannot be
+   * disabled, listed under Settings → Beacon → Built-in features instead of
+   * Modules.
+   */
+  builtin?: boolean;
   /** User-facing settings, rendered in Settings → Beacon → Modules. */
   settings?: Array<AddonSettingDefinition>;
   /** Called when the addon is enabled (at startup or live from settings). */

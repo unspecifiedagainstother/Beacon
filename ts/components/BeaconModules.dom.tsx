@@ -259,7 +259,8 @@ function AddonCard({
   i18n: LocalizerType;
   busy: boolean;
   expanded: boolean;
-  onToggle: () => void;
+  /** Omitted for built-in features, which have no on/off switch. */
+  onToggle?: () => void;
   onExpand: () => void;
 }): JSX.Element {
   const hasSettings = addon.settings.length > 0;
@@ -284,16 +285,18 @@ function AddonCard({
             </span>
           ) : null}
         </div>
-        <div
-          className="BeaconModules__card-switch"
-          title={i18n('icu:Beacon__modules-toggle', { name: addon.name })}
-        >
-          <AxoSwitch.Root
-            checked={addon.enabled}
-            disabled={busy}
-            onCheckedChange={onToggle}
-          />
-        </div>
+        {onToggle && (
+          <div
+            className="BeaconModules__card-switch"
+            title={i18n('icu:Beacon__modules-toggle', { name: addon.name })}
+          >
+            <AxoSwitch.Root
+              checked={addon.enabled}
+              disabled={busy}
+              onCheckedChange={onToggle}
+            />
+          </div>
+        )}
       </div>
 
       {addon.description ? (
@@ -355,8 +358,35 @@ function AddonCard({
   );
 }
 
+/**
+ * Built-in features (ts/beacon/builtin/): same cards as Modules, without the
+ * on/off switch, so their settings stay reachable.
+ */
+export function BeaconBuiltinFeatures({ i18n }: PropsType): JSX.Element {
+  const features = useAddons().filter(addon => addon.builtin);
+  const [expanded, setExpanded] = useState<string | undefined>(undefined);
+  return (
+    <div className="BeaconModules BeaconModules--builtin">
+      <div className="BeaconModules__grid">
+        {features.map(addon => (
+          <AddonCard
+            key={addon.id}
+            addon={addon}
+            i18n={i18n}
+            busy={false}
+            expanded={expanded === addon.id}
+            onExpand={() =>
+              setExpanded(prev => (prev === addon.id ? undefined : addon.id))
+            }
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function BeaconModules({ i18n }: PropsType): JSX.Element {
-  const addons = useAddons();
+  const addons = useAddons().filter(addon => !addon.builtin);
   const [busy, setBusy] = useState<string | undefined>(undefined);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');

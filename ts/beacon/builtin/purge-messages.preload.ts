@@ -21,7 +21,7 @@
 
 import type { AddonContext, AddonManifest } from '../core/types.dom.ts';
 import type { MessageAttributesType } from '../../model-types.d.ts';
-import { ICON_PURGE_MESSAGES } from './icons.std.ts';
+import { ICON_PURGE_MESSAGES } from '../addons/icons.std.ts';
 import { DataReader } from '../../sql/Client.preload.ts';
 import { itemStorage } from '../../textsecure/Storage.preload.ts';
 import { areWeAdmin } from '../../util/areWeAdmin.preload.ts';
@@ -337,6 +337,7 @@ function runPurge(ctx: AddonContext, conversationId: string): void {
 
 export default {
   id: 'purge-messages',
+  builtin: true,
   icon: ICON_PURGE_MESSAGES,
   name: 'Purge Messages',
   version: '1.0.0',

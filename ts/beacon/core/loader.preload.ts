@@ -23,23 +23,23 @@ import { commandRegistry } from './commands.dom.ts';
 import { addonSettings } from './settings.std.ts';
 import { createLogger } from '../../logging/log.std.ts';
 import * as Errors from '../../types/errors.std.ts';
-import messageLogger from '../addons/message-logger.addon.preload.ts';
+import messageLogger from '../builtin/message-logger.preload.ts';
 import ghostMode from '../addons/ghost-mode.addon.preload.ts';
 import clearUrls from '../addons/clear-urls.addon.preload.ts';
 import notificationFilter from '../addons/notification-filter.addon.std.ts';
 import quickMute from '../addons/quick-mute.addon.std.ts';
 import focusMode from '../addons/focus-mode.addon.std.ts';
 import statsDashboard from '../addons/stats-dashboard.addon.std.ts';
-import readAll from '../addons/read-all.addon.preload.ts';
+import readAll from '../builtin/read-all.preload.ts';
 import textReplace from '../addons/text-replace.addon.preload.ts';
 import blurMedia from '../addons/blur-media.addon.std.ts';
 import privacyScreen from '../addons/privacy-screen.addon.dom.ts';
 import compactMode from '../addons/compact-mode.addon.std.ts';
 import snippets from '../addons/snippets.addon.std.ts';
 import textFaces from '../addons/text-faces.addon.std.ts';
-import purgeMessages from '../addons/purge-messages.addon.preload.ts';
-import profileHistory from '../addons/profile-history.addon.preload.ts';
-import callPeek from '../addons/call-peek.addon.dom.ts';
+import purgeMessages from '../builtin/purge-messages.preload.ts';
+import profileHistory from '../builtin/profile-history.preload.ts';
+import callPeek from '../builtin/call-peek.dom.ts';
 
 const log = createLogger('beacon/loader');
 
@@ -70,8 +70,10 @@ export class AddonLoader {
     }
 
     for (const manifest of manifests) {
+      // Built-in features always run; the enable switch is for addons.
       const enabled =
-        config[manifest.id]?.enabled ?? manifest.defaultEnabled ?? false;
+        manifest.builtin ||
+        (config[manifest.id]?.enabled ?? manifest.defaultEnabled ?? false);
       if (enabled) {
         // Sequential on purpose: start order is registration order, so
         // addons that stack patches on the same method do so predictably.
@@ -136,6 +138,19 @@ export class AddonLoader {
   }
 
   async disable(id: string): Promise<boolean> {
+    if (this.#manifests.get(id)?.builtin) {
+      log.warn(`${id} is built in and cannot be disabled`);
+      return false;
+    }
+    const ok = await this.#stop(id);
+    if (ok) {
+      this.#saveEnabled(id, false);
+      this.#notify();
+    }
+    return ok;
+  }
+
+  async #stop(id: string): Promise<boolean> {
     const running = this.#running.get(id);
     const manifest = this.#manifests.get(id);
     if (!running || !manifest) {
@@ -149,9 +164,7 @@ export class AddonLoader {
     }
     running.dispose();
     this.#running.delete(id);
-    this.#saveEnabled(id, false);
     log.info(`addon ${id} stopped`);
-    this.#notify();
     return true;
   }
 
@@ -161,11 +174,14 @@ export class AddonLoader {
 
   /** Stop and start again — used after settings that only apply on start. */
   async restart(id: string): Promise<boolean> {
-    if (!this.isEnabled(id)) {
+    const manifest = this.#manifests.get(id);
+    if (!manifest || !this.isEnabled(id)) {
       return false;
     }
-    await this.disable(id);
-    return this.enable(id);
+    await this.#stop(id);
+    const ok = await this.#start(manifest);
+    this.#notify();
+    return ok;
   }
 
   #define(manifest: AddonManifest): void {
@@ -186,6 +202,7 @@ export class AddonLoader {
       authors: manifest.authors ?? [],
       tags: manifest.tags ?? [],
       icon: manifest.icon,
+      builtin: manifest.builtin ?? false,
       enabled: running != null,
       error: this.#errors.get(manifest.id),
       settings: manifest.settings ?? [],
