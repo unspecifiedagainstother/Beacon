@@ -153,6 +153,27 @@ scripts or external references inside the markup never run. Without an icon
 (or with markup that is not an `<svg>`), the card shows the name's first
 letter. Builtin icons live in `addons/icons.std.ts`.
 
+### UI slots — `ctx.ui.slot(name, render)`
+
+Named places in upstream UI where an addon draws plain DOM. Upstream renders
+`<BeaconSlot name="…" props={…} />` at the spot (one line each); the
+renderer gets its own container and the slot's props, and returns a cleanup.
+It re-runs when the props change or addons are toggled.
+
+| Slot                             | Props                | Where                                         |
+| -------------------------------- | -------------------- | --------------------------------------------- |
+| `conversation.header.beforeCall` | `{ conversationId }` | conversation header, left of the call buttons |
+| `conversation.belowPinned`       | `{ conversationId }` | under the pinned-messages bar                 |
+
+```ts
+ctx.ui.slot('conversation.belowPinned', (el, { conversationId }) => {
+  el.textContent = `Open: ${conversationId}`;
+  return () => { /* cleanup */ };
+});
+```
+
+From the console: `Beacon.slots.renderers('conversation.belowPinned')`.
+
 ### Settings — `manifest.settings` + `ctx.settings`
 
 Declare settings on the manifest (`toggle`, `text` (optionally

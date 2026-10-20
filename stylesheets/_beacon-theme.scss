@@ -1363,3 +1363,17 @@
 .BeaconProfileLog__to {
   color: var(--axo-color-label-primary);
 }
+
+// -- Addon UI slots (ts/beacon/core/slots.dom.ts) ----------------------------
+
+// Empty slots must not take space — the header row uses `gap`.
+.BeaconSlot:empty,
+.BeaconSlot__item:empty {
+  display: none;
+}
+
+.BeaconSlot--conversation-header-beforeCall {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

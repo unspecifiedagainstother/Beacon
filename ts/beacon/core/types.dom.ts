@@ -155,6 +155,25 @@ export type FilterFn<Name extends FilterName = FilterName> = (
 ) => FilterPayloads[Name][0] | undefined;
 
 // ---------------------------------------------------------------------------
+// UI slots — named places in upstream UI where addons render plain DOM
+// ---------------------------------------------------------------------------
+
+export type SlotProps = {
+  /** Conversation header, just left of the call buttons. */
+  'conversation.header.beforeCall': { conversationId: string };
+  /** Under the pinned-messages bar at the top of a conversation. */
+  'conversation.belowPinned': { conversationId: string };
+};
+
+export type SlotName = keyof SlotProps;
+
+/** Draw into `container`; return a cleanup. Re-run when props change. */
+export type SlotRenderer<Name extends SlotName = SlotName> = (
+  container: HTMLElement,
+  props: SlotProps[Name]
+) => void | (() => void);
+
+// ---------------------------------------------------------------------------
 // Action interception
 // ---------------------------------------------------------------------------
 
@@ -389,6 +408,11 @@ export type AddonContext = {
   };
 
   ui: {
+    /** Render into a named slot in upstream UI. Auto-removed on disable. */
+    slot: <Name extends SlotName>(
+      name: Name,
+      render: SlotRenderer<Name>
+    ) => Disposer;
     createModal: (options: ModalOptions) => ModalAPI;
     createElement: (options: UIElementOptions) => HTMLElement;
     showNotification: (text: string, type?: ToastType) => void;
