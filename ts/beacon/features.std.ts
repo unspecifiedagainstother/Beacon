@@ -114,6 +114,10 @@ export type BeaconDataStorageKeys = {
   beaconMessageLog: ReadonlyArray<BeaconMessageLogEntry>;
   beaconProfileHistory: ReadonlyArray<BeaconProfileChange>;
   beaconProfileBaseline: BeaconProfileBaseline;
+  /** Conversation ids hidden from the chat list and search. */
+  beaconHiddenChats: ReadonlyArray<string>;
+  /** Conversation ids that need the passphrase to open. */
+  beaconLockedChats: ReadonlyArray<string>;
 };
 
 /** Shape mixed into StorageAccessType so each key is typed. */

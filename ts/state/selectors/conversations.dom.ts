@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import memoizee from 'memoizee';
+import { getHiddenChatsState } from '../../beacon/core/hidden-chats.std.ts';
 import { memoize } from '@indutny/sneequals';
 import lodash from 'lodash';
 import { createSelector } from 'reselect';
@@ -441,6 +442,10 @@ type GetLeftPaneListsProps = Readonly<{
   pinnedConversationIds: ReadonlyArray<string> | null;
   selectedChatFolder: ChatFolder | null;
   stableSelectedConversationIdInChatFolder: string | null;
+  /** Beacon: hidden (and, in a duress session, locked) chats. */
+  beaconExcluded?: ReadonlySet<string>;
+  /** Beacon: locked chats — listed, but without a message preview. */
+  beaconRedacted?: ReadonlySet<string>;
 }>;
 
 export const _getLeftPaneLists = ({
@@ -450,6 +455,8 @@ export const _getLeftPaneLists = ({
   pinnedConversationIds,
   selectedChatFolder,
   stableSelectedConversationIdInChatFolder,
+  beaconExcluded,
+  beaconRedacted,
 }: GetLeftPaneListsProps): LeftPaneLists => {
   const conversations: Array<ConversationType> = [];
   const archivedConversations: Array<ConversationType> = [];
@@ -457,6 +464,17 @@ export const _getLeftPaneLists = ({
   const pinnedConversationIdsSet = new Set(pinnedConversationIds);
 
   for (let conversation of Object.values(conversationLookup)) {
+    if (beaconExcluded?.has(conversation.id)) {
+      continue;
+    }
+    if (beaconRedacted?.has(conversation.id)) {
+      conversation = {
+        ...conversation,
+        lastMessage: { deletedForEveryone: false, text: 'Locked chat' },
+        draftPreview: undefined,
+        typingContactIdTimestamps: {},
+      };
+    }
     const isSelected = selectedConversationId === conversation.id;
 
     if (isSelected) {
@@ -519,13 +537,15 @@ export const getLeftPaneLists = createSelector(
   getPinnedConversationIds,
   getSelectedChatFolder,
   getStableSelectedConversationIdInChatFolder,
+  getHiddenChatsState,
   (
     conversationLookup,
     conversationComparator,
     selectedConversationId,
     pinnedConversationIds,
     selectedChatFolder,
-    stableSelectedConversationIdInChatFolder
+    stableSelectedConversationIdInChatFolder,
+    hiddenChats
   ) => {
     return _getLeftPaneLists({
       conversationLookup,
@@ -534,6 +554,8 @@ export const getLeftPaneLists = createSelector(
       pinnedConversationIds,
       selectedChatFolder,
       stableSelectedConversationIdInChatFolder,
+      beaconExcluded: hiddenChats.excluded,
+      beaconRedacted: hiddenChats.redacted,
     });
   }
 );
