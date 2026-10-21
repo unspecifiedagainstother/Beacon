@@ -40,6 +40,15 @@ import textFaces from '../addons/text-faces.addon.std.ts';
 import purgeMessages from '../builtin/purge-messages.preload.ts';
 import profileHistory from '../builtin/profile-history.preload.ts';
 import callPeek from '../builtin/call-peek.dom.ts';
+import appPrivacy from '../builtin/app-privacy.dom.ts';
+import attachmentPrivacy from '../builtin/attachment-privacy.dom.ts';
+import linkSafety from '../builtin/link-safety.dom.ts';
+import chatListPrivacy from '../builtin/chat-list-privacy.std.ts';
+import sealedSender from '../builtin/sealed-sender.std.ts';
+import unverifiedGuard from '../builtin/unverified-guard.dom.ts';
+import notificationPrivacy from '../builtin/notification-privacy.dom.ts';
+import networkMonitor from '../builtin/network-monitor.node.ts';
+import encryptedExports from '../builtin/encrypted-exports.dom.ts';
 
 const log = createLogger('beacon/loader');
 
@@ -203,6 +212,7 @@ export class AddonLoader {
       tags: manifest.tags ?? [],
       icon: manifest.icon,
       builtin: manifest.builtin ?? false,
+      category: manifest.category,
       enabled: running != null,
       error: this.#errors.get(manifest.id),
       settings: manifest.settings ?? [],
@@ -297,6 +307,15 @@ const BUILTIN_MANIFESTS: ReadonlyArray<AddonManifest> = [
   purgeMessages,
   profileHistory,
   callPeek,
+  appPrivacy,
+  attachmentPrivacy,
+  linkSafety,
+  chatListPrivacy,
+  sealedSender,
+  unverifiedGuard,
+  notificationPrivacy,
+  networkMonitor,
+  encryptedExports,
 ];
 
 function builtinManifests(): Array<AddonManifest> {

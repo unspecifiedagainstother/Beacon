@@ -99,6 +99,7 @@ import {
   isContentProtectionEnabledByDefault,
 } from '../ts/types/Settings.std.ts';
 import * as ephemeralConfig from './ephemeral_config.main.ts';
+import { applyBeaconWindowSettings, setupBeaconMain } from './beacon.main.ts';
 import * as mainProcessLogging from '../ts/logging/main_process_logging.main.ts';
 import { MainSQL } from '../ts/sql/main.main.ts';
 import * as sqlChannels from './sql_channel.main.ts';
@@ -804,6 +805,7 @@ async function createWindow() {
 
   // Create the browser window.
   mainWindow = new BrowserWindow(windowOptions);
+  applyBeaconWindowSettings(mainWindow);
 
   mainWindow.webContents.on('preload-error', (_event, _preloadPath, error) => {
     log.error(Errors.toLogFormat(error));
@@ -1214,7 +1216,7 @@ ipc.handle('beacon:titlebar:get', () => {
 });
 
 ipc.handle('beacon:titlebar:set', (_event, value: boolean) => {
-  ephemeralConfig.set('beacon-custom-titlebar', value === true);
+  ephemeralConfig.set('beacon-custom-titlebar', value);
 });
 
 // What the live window actually uses — compare against the stored value to know
@@ -2279,6 +2281,8 @@ app.on('ready', async () => {
   ]);
 
   updateDefaultSession(session.defaultSession, log);
+  // Beacon: content protection, spellcheck block, network log, IPC bridge.
+  setupBeaconMain({ session: session.defaultSession, getMainWindow, log });
 
   if (getEnvironment() !== Environment.Test) {
     installFileHandler({

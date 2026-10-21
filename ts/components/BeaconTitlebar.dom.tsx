@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { JSX } from 'react';
+
+import { drop } from '../util/drop.std.ts';
 import { useCallback, useEffect, useState } from 'react';
 
 export type PropsType = {
@@ -29,11 +31,13 @@ export function BeaconTitlebar({ title }: PropsType): JSX.Element {
 
     // Seed from the current state — the window may already be maximized when
     // the renderer mounts (restored session, or a restart while maximized).
-    void window.IPC.beaconWindowIsMaximized().then(value => {
+    const seed = async () => {
+      const value = await window.IPC.beaconWindowIsMaximized();
       if (!canceled) {
         setIsMaximized(value);
       }
-    });
+    };
+    drop(seed());
 
     const unsubscribe = window.IPC.beaconOnWindowMaximizedChanged(value => {
       if (!canceled) {

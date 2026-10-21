@@ -11,6 +11,7 @@ import type {
 import { isNotNil } from './isNotNil.std.ts';
 import type { ServiceIdString } from '../types/ServiceId.std.ts';
 import { waitForAll } from './waitForAll.std.ts';
+import { applyBeaconAsyncFilter } from '../beacon/core/filters.std.ts';
 
 const log = createLogger('blockSendUntilConversationsAreVerified');
 
@@ -45,7 +46,12 @@ export async function blockSendUntilConversationsAreVerified(
     return explodedPromise.promise;
   }
 
-  return true;
+  // Beacon: the unverified-contact guard may ask before sending.
+  return applyBeaconAsyncFilter('send.verify', true, {
+    conversationIds: Object.keys(byConversationId),
+    serviceIds: Array.from(allServiceIds),
+    source,
+  });
 }
 
 async function updateServiceIdTrust(serviceId: ServiceIdString) {

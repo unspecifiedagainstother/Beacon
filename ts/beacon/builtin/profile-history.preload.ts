@@ -20,6 +20,7 @@
  * is when Beacon learned of the change, not when the person made it.
  */
 
+import { saveBeaconExport } from '../core/exports.dom.ts';
 import type { AddonContext, AddonManifest } from '../core/types.dom.ts';
 import type {
   BeaconProfileChange,
@@ -541,19 +542,12 @@ function openViewer(
             at: new Date(c.at).toISOString(),
             source: c.source,
           }));
-          const url = URL.createObjectURL(
-            new Blob([JSON.stringify(data, null, 2)], {
-              type: 'application/json',
+          drop(
+            saveBeaconExport({
+              basename: `beacon-profile-history-${new Date().toISOString().slice(0, 10)}`,
+              label: 'Beacon profile history',
+              data,
             })
-          );
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `beacon-profile-history-${new Date().toISOString().slice(0, 10)}.json`;
-          a.click();
-          URL.revokeObjectURL(url);
-          ctx.ui.showNotification(
-            'Exported — the file is NOT encrypted',
-            'warning'
           );
         },
       },

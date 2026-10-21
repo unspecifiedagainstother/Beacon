@@ -25,6 +25,11 @@ import { createLogger } from '../../logging/log.std.ts';
 import { BEACON_FEATURES } from '../features.std.ts';
 import { getAccentHex, getAccentProperties } from './accent.std.ts';
 import { getSlotRenderers } from './slots.std.ts';
+import {
+  clearConnections,
+  getConnections,
+  subscribeConnections,
+} from './network-log.std.ts';
 
 const log = createLogger('beacon/runtime');
 
@@ -43,6 +48,12 @@ export type BeaconGlobal = {
   openModules: () => void;
   /** Slot renderers, for trying addon UI from the console. */
   slots: { renderers: typeof getSlotRenderers };
+  /** Connections seen by the network monitor (in memory only). */
+  network: {
+    list: typeof getConnections;
+    clear: typeof clearConnections;
+    subscribe: typeof subscribeConnections;
+  };
 };
 
 declare global {
@@ -88,6 +99,11 @@ export function initializeBeaconRuntime(store: Store<StateType>): void {
       store,
       openModules,
       slots: { renderers: getSlotRenderers },
+      network: {
+        list: getConnections,
+        clear: clearConnections,
+        subscribe: subscribeConnections,
+      },
     };
   } catch (error) {
     log.error('initializeBeaconRuntime error:', error);

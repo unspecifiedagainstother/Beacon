@@ -131,3 +131,72 @@ export const ICON_CALL_PEEK = defineIcon([
   'M15 10.5l6-3.5v10l-6-3.5',
   'M9 12h.01',
 ]);
+
+export const ICON_APP_PRIVACY = defineIcon([
+  // Monitor with a slashed eye.
+  'M3 4h18v12H3z',
+  'M8 20h8',
+  'M12 16v4',
+  'M8 10s1.5-2.5 4-2.5 4 2.5 4 2.5-1.5 2.5-4 2.5S8 10 8 10z',
+  'M7 14l10-8',
+]);
+
+export const ICON_ATTACHMENT_PRIVACY = defineIcon([
+  // Paperclip with a shield.
+  'M14 8l-6 6a2 2 0 0 0 3 3l7-7a4 4 0 0 0-6-6l-7 7a6 6 0 0 0 8 8',
+  'M18 14l3 1v3c0 2-1.5 3.3-3 4-1.5-.7-3-2-3-4v-3z',
+]);
+
+export const ICON_LINK_SAFETY = defineIcon([
+  'M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1',
+  'M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1',
+  'M12 3v2',
+  'M3 12h2',
+]);
+
+export const ICON_CHAT_LIST_PRIVACY = defineIcon([
+  // List rows, the text lines blurred into dots.
+  'M4 6h.01',
+  'M4 12h.01',
+  'M4 18h.01',
+  'M8 6h12',
+  'M8 12h3',
+  'M13 12h.01',
+  'M16 12h.01',
+  'M19 12h.01',
+  'M8 18h12',
+]);
+
+export const ICON_SEALED_SENDER = defineIcon([
+  // Envelope with a seal.
+  'M3 6h18v12H3z',
+  'M3 6l9 7 9-7',
+  'M17 15a2.5 2.5 0 1 0 0 5 2.5 2.5 0 1 0 0-5z',
+]);
+
+export const ICON_UNVERIFIED_GUARD = defineIcon([
+  // Shield with an exclamation.
+  'M12 3l8 3v6c0 4.5-3.4 7.8-8 9-4.6-1.2-8-4.5-8-9V6z',
+  'M12 8v5',
+  'M12 16h.01',
+]);
+
+export const ICON_NOTIFICATION_PRIVACY = defineIcon([
+  'M6 16V11a6 6 0 0 1 12 0v5l2 2H4z',
+  'M10 21h4',
+  'M9 11h6',
+]);
+
+export const ICON_NETWORK_MONITOR = defineIcon([
+  // Globe with a pulse.
+  'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18z',
+  'M3 12h4l2-4 3 8 2-4h7',
+]);
+
+export const ICON_ENCRYPTED_EXPORTS = defineIcon([
+  // File with a padlock.
+  'M14 3H6v18h12V7z',
+  'M14 3v4h4',
+  'M9 13h6v5H9z',
+  'M10 13v-1.5a2 2 0 0 1 4 0V13',
+]);

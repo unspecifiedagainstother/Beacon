@@ -1400,3 +1400,234 @@
   align-items: center;
   gap: 8px;
 }
+
+// ---------------------------------------------------------------------------
+// Prompts (ts/beacon/core/prompts.dom.ts)
+// ---------------------------------------------------------------------------
+
+.BeaconChoice {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__intro {
+    margin-block: 0 8px;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__option {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-block: 10px;
+    padding-inline: 12px;
+    border: 1px solid var(--axo-color-border-primary);
+    border-radius: 10px;
+    font: inherit;
+    text-align: start;
+    color: var(--axo-color-label-primary);
+    background: transparent;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--axo-color-fill-secondary);
+    }
+
+    &--current {
+      border-color: var(--beacon-accent);
+      background: var(--beacon-accent-tint);
+    }
+  }
+
+  &__label {
+    font-weight: 500;
+  }
+
+  &__description {
+    font-size: 0.75rem;
+    color: var(--axo-color-label-secondary);
+  }
+}
+
+.BeaconPrompt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__intro {
+    margin-block: 0 4px;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__error {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--beacon-deleted-text);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Link safety
+// ---------------------------------------------------------------------------
+
+.BeaconLink {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+
+  &__host {
+    font-size: 1.0625rem;
+    overflow-wrap: anywhere;
+  }
+
+  &__site--warn {
+    color: var(--beacon-deleted-text);
+  }
+
+  &__punycode {
+    font-size: 0.75rem;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__full {
+    display: block;
+    max-height: 7.5em;
+    overflow: auto;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    text-transform: none;
+    overflow-wrap: anywhere;
+    background: var(--beacon-code-bg);
+  }
+
+  &__warnings {
+    margin: 0;
+    padding-inline-start: 18px;
+    color: var(--beacon-deleted-text);
+  }
+
+  &__note {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--axo-color-label-secondary);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Unverified badge (conversation header)
+// ---------------------------------------------------------------------------
+
+.BeaconUnverifiedBadge {
+  margin-inline-end: 8px;
+  padding-block: 2px;
+  padding-inline: 8px;
+  border: 1px solid currentcolor;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.6875rem;
+  white-space: nowrap;
+  color: #e3a008;
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(227 160 8 / 0.12);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Privacy tab
+// ---------------------------------------------------------------------------
+
+.BeaconPrivacy {
+  &__checks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 6px 16px;
+    padding-block: 8px;
+    padding-inline: 16px;
+  }
+
+  &__check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8125rem;
+
+    &--on {
+      color: var(--axo-color-label-primary);
+
+      svg,
+      span:first-child {
+        color: var(--beacon-accent);
+      }
+    }
+
+    &--off {
+      color: var(--axo-color-label-secondary);
+    }
+  }
+
+  &__network {
+    padding-block: 4px 8px;
+    padding-inline: 16px;
+    overflow-x: auto;
+  }
+
+  &__empty {
+    margin-block: 8px;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+
+    th,
+    td {
+      padding-block: 4px;
+      padding-inline: 6px;
+      text-align: start;
+      white-space: nowrap;
+    }
+
+    th {
+      font-weight: 500;
+      color: var(--axo-color-label-secondary);
+    }
+
+    tbody tr:nth-child(odd) {
+      background: var(--axo-color-fill-secondary);
+    }
+  }
+
+  &__host {
+    width: 100%;
+    font-family: ui-monospace, monospace;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  &__network-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-block-start: 8px;
+  }
+}
+
+// Addon setting fields rendered as Axo items (BeaconSettingItems.dom.tsx)
+.BeaconSettingItems {
+  &__text,
+  &__textarea {
+    margin-block-start: 8px;
+  }
+
+  &__number {
+    width: 96px;
+    text-align: end;
+  }
+}
