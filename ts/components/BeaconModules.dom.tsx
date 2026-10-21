@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { CSSProperties, JSX } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 
 import type { LocalizerType } from '../types/Util.std.ts';
@@ -12,6 +12,7 @@ import type {
   AddonSettingValue,
 } from '../beacon/core/types.dom.ts';
 import { AxoSwitch } from '../axo/AxoSwitch.dom.tsx';
+import { useAddonSettings, useAddons } from './beaconHooks.dom.ts';
 import { drop } from '../util/drop.std.ts';
 import { iconToCssUrl } from '../beacon/core/icons.std.ts';
 
@@ -25,40 +26,6 @@ type Filter = 'all' | 'enabled' | 'disabled';
 // loader itself lives in preload land (ts/beacon/core/loader.preload.ts).
 function getBeacon() {
   return window.Beacon;
-}
-
-function useAddons(): Array<AddonInfo> {
-  const [addons, setAddons] = useState<Array<AddonInfo>>(
-    () => getBeacon()?.loader.list() ?? []
-  );
-  useEffect(() => {
-    const beacon = getBeacon();
-    if (!beacon) {
-      return undefined;
-    }
-    const refresh = () => setAddons(beacon.loader.list());
-    refresh();
-    return beacon.loader.subscribe(refresh);
-  }, []);
-  return addons;
-}
-
-function useAddonSettings(addonId: string): Record<string, AddonSettingValue> {
-  const [values, setValues] = useState(
-    () => getBeacon()?.settings.getAll(addonId) ?? {}
-  );
-  useEffect(() => {
-    const beacon = getBeacon();
-    if (!beacon) {
-      return undefined;
-    }
-    return beacon.settings.subscribe(changedId => {
-      if (changedId === addonId) {
-        setValues(beacon.settings.getAll(addonId));
-      }
-    });
-  }, [addonId]);
-  return values;
 }
 
 function formatCombo(combo: string): string {
@@ -363,7 +330,9 @@ function AddonCard({
  * on/off switch, so their settings stay reachable.
  */
 export function BeaconBuiltinFeatures({ i18n }: PropsType): JSX.Element {
-  const features = useAddons().filter(addon => addon.builtin);
+  const features = useAddons().filter(
+    addon => addon.builtin && addon.category !== 'privacy'
+  );
   const [expanded, setExpanded] = useState<string | undefined>(undefined);
   return (
     <div className="BeaconModules BeaconModules--builtin">

@@ -506,11 +506,16 @@ export class NotificationService extends EventEmitter {
     switch (type) {
       case NotificationType.Message:
       case NotificationType.Reaction: {
-        const content = redactMessageNotificationContent({
-          notificationData: queuedNotificationData,
-          contentSetting: userSetting,
-          i18n,
-        });
+        // Beacon: per-chat notification privacy can redact further.
+        const content = applyBeaconFilter(
+          'notification.content',
+          redactMessageNotificationContent({
+            notificationData: queuedNotificationData,
+            contentSetting: userSetting,
+            i18n,
+          }),
+          { conversationId, type }
+        );
 
         return this.rawNotify({
           conversationId,

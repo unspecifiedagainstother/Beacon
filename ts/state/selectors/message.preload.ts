@@ -1119,6 +1119,12 @@ const getPropsForMessage = (
     isBlocked: conversation.isBlocked || false,
     isEditedMessage: Boolean(message.editHistory),
     pastEdits: getPastEdits(message, isGroup, options),
+    // Beacon: whether an incoming message arrived via sealed sender
+    // (undefined when unknown, e.g. very old messages).
+    beaconSealedSender:
+      message.type === 'incoming'
+        ? message.unidentifiedDeliveryReceived
+        : undefined,
     beaconDeleted: getBeaconDeleted(message, isGroup, options),
     isMessageRequestAccepted: conversation?.acceptedMessageRequest ?? true,
     isPinned,

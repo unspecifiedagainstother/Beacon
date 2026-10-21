@@ -23,6 +23,7 @@ import { DisappearingTimeDialog } from './DisappearingTimeDialog.dom.tsx';
 import { PhoneNumberDiscoverability } from '../util/phoneNumberDiscoverability.std.ts';
 import { PhoneNumberSharingMode } from '../types/PhoneNumberSharingMode.std.ts';
 import { BeaconModules } from './BeaconModules.dom.tsx';
+import { BeaconPrivacyPage } from './BeaconPrivacyPage.dom.tsx';
 import { BeaconSettingsPage } from './BeaconSettingsPage.dom.tsx';
 import type {
   BeaconFeatureKey,
@@ -2272,6 +2273,14 @@ export function Preferences({
         title={i18n('icu:Preferences__beacon-title')}
       />
     );
+  } else if (settingsLocation.page === SettingsPage.BeaconPrivacy) {
+    content = (
+      <PreferencesContent
+        contents={<BeaconPrivacyPage i18n={i18n} />}
+        contentsRef={settingsPaneRef}
+        title={i18n('icu:Beacon__privacy-title')}
+      />
+    );
   } else if (settingsLocation.page === SettingsPage.BeaconModules) {
     const pageContents = <BeaconModules i18n={i18n} />;
     content = (
@@ -3034,6 +3043,14 @@ export function Preferences({
                 current={settingsLocation.page === SettingsPage.Beacon}
                 onClick={() =>
                   setSettingsLocation({ page: SettingsPage.Beacon })
+                }
+              />
+              <PreferencesButton
+                symbol="shield-check"
+                label={i18n('icu:Preferences__button--beacon-privacy')}
+                current={settingsLocation.page === SettingsPage.BeaconPrivacy}
+                onClick={() =>
+                  setSettingsLocation({ page: SettingsPage.BeaconPrivacy })
                 }
               />
               <PreferencesButton

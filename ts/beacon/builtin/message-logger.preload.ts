@@ -24,6 +24,7 @@
  * me" — that is the user's own choice and is honoured.
  */
 
+import { saveBeaconExport } from '../core/exports.dom.ts';
 import type { AddonContext, AddonManifest } from '../core/types.dom.ts';
 import { ICON_MESSAGE_LOGGER } from '../addons/icons.std.ts';
 import type { BeaconMessageLogEntry } from '../features.std.ts';
@@ -266,19 +267,14 @@ export default {
           loggedAt: new Date(row.entry.at).toISOString(),
           content: row.message ? contentFor(row.entry.kind, row.message) : [],
         }));
-        const blob = new Blob([JSON.stringify(data, null, 2)], {
-          type: 'application/json',
+        const saved = await saveBeaconExport({
+          basename: `beacon-message-log-${new Date().toISOString().slice(0, 10)}`,
+          label: 'Beacon message log',
+          data,
         });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `beacon-message-log-${new Date().toISOString().slice(0, 10)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        cmd.reply(
-          `Exported ${data.length} entries — the file is NOT encrypted`,
-          'warning'
-        );
+        if (saved) {
+          cmd.reply(`Exported ${data.length} entries`, 'success');
+        }
       },
     });
 

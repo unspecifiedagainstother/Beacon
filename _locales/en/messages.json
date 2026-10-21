@@ -31,6 +31,14 @@
     "messageformat": "Disabling or deleting an addon requires an app restart to take effect.",
     "description": "Note about addon changes requiring restart"
   },
+  "icu:Preferences__button--beacon-privacy": {
+    "messageformat": "Beacon Privacy",
+    "description": "Left nav button for Beacon's privacy protections page"
+  },
+  "icu:Beacon__privacy-title": {
+    "messageformat": "Beacon Privacy",
+    "description": "Title of the Beacon privacy protections settings page"
+  },
   "icu:Preferences__button--beacon-modules": {
     "messageformat": "Modules",
     "description": "Left nav button for Beacon modules (addons)"

@@ -233,6 +233,8 @@ export type PropsData = {
     text?: string;
     bodyRanges?: HydratedBodyRangesType;
   }>;
+  // Beacon: incoming only — true if delivered via sealed sender.
+  beaconSealedSender?: boolean;
   // Beacon: content retained by the message logger after a delete-for-everyone.
   beaconDeleted?: {
     text?: string;
@@ -3512,6 +3514,13 @@ export class Message extends PureComponent<Props, State> {
       // Beacon: the message logger kept this deleted message's content.
       deletedForEveryone && this.props.beaconDeleted
         ? 'module-message__container--beacon-deleted'
+        : null,
+      // Beacon: sealed-sender indicator (styled by the privacy feature).
+      this.props.beaconSealedSender === true
+        ? 'module-message__container--beacon-sealed'
+        : null,
+      this.props.beaconSealedSender === false
+        ? 'module-message__container--beacon-unsealed'
         : null,
       this.props.isSignalConversation
         ? tw(

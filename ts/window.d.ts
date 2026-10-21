@@ -73,6 +73,8 @@ export type IPCType = {
   startTrackingQueryStats: () => void;
   stopTrackingQueryStats: (options?: QueryStatsOptions) => void;
   titleBarDoubleClick: () => void;
+  // Beacon: generic bridge to app/beacon.main.ts (whitelisted names).
+  beaconInvoke: (name: string, payload?: unknown) => Promise<unknown>;
   // Beacon: custom titlebar window controls.
   beaconWindowMinimize: () => void;
   beaconWindowToggleMaximize: () => void;
