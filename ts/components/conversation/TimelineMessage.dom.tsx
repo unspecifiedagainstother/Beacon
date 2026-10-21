@@ -341,6 +341,7 @@ export function TimelineMessage(props: Props): JSX.Element {
         <MessageContextMenu
           i18n={i18n}
           renderer={renderer}
+          beaconMessage={{ messageId: id, conversationId }}
           shouldShowAdditional={shouldShowAdditional}
           onDownload={handleDownload}
           onEdit={

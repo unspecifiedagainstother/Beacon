@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { createSelector } from 'reselect';
+import { beaconTweaks } from '../../beacon/core/tweaks.std.ts';
 import {
   getIntl,
   getUserACI,
@@ -167,7 +168,9 @@ export const selectVoiceNoteAndConsecutive = createSelector(
       return {
         conversationId: selectedConversationId,
         voiceNote,
-        playbackRate: conversation?.voiceNotePlaybackRate ?? 1,
+        playbackRate:
+          conversation?.voiceNotePlaybackRate ??
+          beaconTweaks.defaultPlaybackRate,
       };
     };
   }

@@ -1,6 +1,7 @@
 // Copyright 2021 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 import { memo, useCallback } from 'react';
+import { beaconTweaks } from '../../beacon/core/tweaks.std.ts';
 import { useSelector } from 'react-redux';
 
 import type { RenderingContextType } from '../../types/RenderingContext.d.ts';
@@ -43,7 +44,8 @@ export const SmartMessageAudio = memo(function SmartMessageAudio({
     throw new Error('No selected conversation');
   }
   const playbackRate =
-    getConversationById(selectedConversationId)?.voiceNotePlaybackRate ?? 1;
+    getConversationById(selectedConversationId)?.voiceNotePlaybackRate ??
+    beaconTweaks.defaultPlaybackRate;
 
   const content = active?.content;
 

@@ -51,6 +51,11 @@ import networkMonitor from '../builtin/network-monitor.node.ts';
 import encryptedExports from '../builtin/encrypted-exports.dom.ts';
 import appLock from '../builtin/app-lock.preload.ts';
 import hiddenChats from '../builtin/hidden-chats.preload.ts';
+import charCounter from '../builtin/char-counter.dom.ts';
+import voiceSpeed from '../builtin/voice-speed.std.ts';
+import chatListTyping from '../builtin/chat-list-typing.dom.ts';
+import betterTimestamps from '../builtin/better-timestamps.std.ts';
+import bookmarks from '../builtin/bookmarks.preload.ts';
 
 const log = createLogger('beacon/loader');
 
@@ -320,6 +325,11 @@ const BUILTIN_MANIFESTS: ReadonlyArray<AddonManifest> = [
   encryptedExports,
   appLock,
   hiddenChats,
+  charCounter,
+  voiceSpeed,
+  chatListTyping,
+  betterTimestamps,
+  bookmarks,
 ];
 
 function builtinManifests(): Array<AddonManifest> {
