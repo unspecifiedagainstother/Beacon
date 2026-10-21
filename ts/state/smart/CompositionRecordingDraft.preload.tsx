@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { memo, useCallback } from 'react';
+import { beaconTweaks } from '../../beacon/core/tweaks.std.ts';
 import { useSelector } from 'react-redux';
 import { CompositionRecordingDraft } from '../../components/CompositionRecordingDraft.dom.tsx';
 import type { AttachmentDraftType } from '../../types/Attachment.std.ts';
@@ -40,7 +41,8 @@ export const SmartCompositionRecordingDraft = memo(
     }
 
     const playbackRate =
-      getConversationById(selectedConversationId)?.voiceNotePlaybackRate ?? 1;
+      getConversationById(selectedConversationId)?.voiceNotePlaybackRate ??
+      beaconTweaks.defaultPlaybackRate;
 
     const audioUrl = !voiceNoteAttachment.pending
       ? voiceNoteAttachment.url

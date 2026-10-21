@@ -132,6 +132,30 @@ export function askPassword(options: {
   minLength?: number;
   submitLabel?: string;
 }): Promise<string | undefined> {
+  return askInput({ ...options, inputType: 'password' });
+}
+
+/** A single line of plain text; empty is allowed. */
+export function askText(options: {
+  title: string;
+  intro?: string;
+  initial?: string;
+  placeholder?: string;
+  submitLabel?: string;
+}): Promise<string | undefined> {
+  return askInput({ ...options, inputType: 'text', minLength: 0 });
+}
+
+function askInput(options: {
+  title: string;
+  intro?: string;
+  confirm?: boolean;
+  minLength?: number;
+  submitLabel?: string;
+  inputType: 'password' | 'text';
+  initial?: string;
+  placeholder?: string;
+}): Promise<string | undefined> {
   const minLength = options.minLength ?? (options.confirm ? 8 : 1);
   return new Promise(resolve => {
     let settled = false;
@@ -147,14 +171,16 @@ export function askPassword(options: {
         tag: 'input',
         className: 'BeaconInput',
         attrs: {
-          type: 'password',
+          type: options.inputType,
           placeholder,
-          autocomplete: 'new-password',
+          autocomplete:
+            options.inputType === 'password' ? 'new-password' : 'off',
           spellcheck: 'false',
         },
       }) as HTMLInputElement;
 
-    const first = field('Password');
+    const first = field(options.placeholder ?? 'Password');
+    first.value = options.initial ?? '';
     const second = options.confirm ? field('Repeat password') : undefined;
     const error = createElement({ tag: 'p', className: 'BeaconPrompt__error' });
     error.hidden = true;

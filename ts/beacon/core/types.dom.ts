@@ -128,6 +128,14 @@ export type FilterPayloads = {
     context: { conversationId: string; isGroup: boolean },
   ];
   /**
+   * ts/components/conversation/MessageContextMenu.dom.tsx — extra items for
+   * a message's context menu, shown after Copy.
+   */
+  'message.menuItems': [
+    value: ReadonlyArray<ConversationMenuItem>,
+    context: { messageId: string; conversationId: string },
+  ];
+  /**
    * ts/services/notifications.preload.ts — title/body/icon of a message or
    * reaction notification, after Signal's own content setting is applied.
    */

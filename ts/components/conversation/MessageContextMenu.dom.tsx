@@ -5,6 +5,8 @@ import { useRef, type ReactNode, type JSX } from 'react';
 import type { LocalizerType } from '../../types/I18N.std.ts';
 import { AxoMenuBuilder } from '../../axo/AxoMenuBuilder.dom.tsx';
 import { isInternalFeaturesEnabled } from '../../util/isInternalFeaturesEnabled.dom.ts';
+import type { AxoSymbol } from '../../axo/AxoSymbol.dom.tsx';
+import { applyBeaconFilter } from '../../beacon/core/filters.std.ts';
 
 type MessageContextMenuProps = Readonly<{
   i18n: LocalizerType;
@@ -27,6 +29,8 @@ type MessageContextMenuProps = Readonly<{
   onUnpinMessage: (() => void) | null;
   onMoreInfo: (() => void) | null;
   onSelect: (() => void) | null;
+  /** Beacon: identifies the message for message.menuItems. */
+  beaconMessage?: { messageId: string; conversationId: string };
   children: ReactNode;
 }>;
 
@@ -51,6 +55,7 @@ export function MessageContextMenu({
   onDeleteMessage,
   onPinMessage,
   onUnpinMessage,
+  beaconMessage,
   children,
 }: MessageContextMenuProps): JSX.Element {
   const shouldReturnFocusToTrigger = useRef(true);
@@ -132,6 +137,19 @@ export function MessageContextMenu({
             {i18n('icu:copy')}
           </AxoMenuBuilder.Item>
         )}
+        {/* Beacon: items contributed by built-ins (message.menuItems). */}
+        {beaconMessage &&
+          applyBeaconFilter('message.menuItems', [], beaconMessage).map(
+            item => (
+              <AxoMenuBuilder.Item
+                key={item.id}
+                symbol={item.symbol as AxoSymbol.Name | undefined}
+                onSelect={item.onSelect}
+              >
+                {item.label}
+              </AxoMenuBuilder.Item>
+            )
+          )}
         {onPinMessage && (
           <AxoMenuBuilder.Item symbol="pin" onSelect={onPinMessage}>
             {i18n('icu:MessageContextMenu__PinMessage')}

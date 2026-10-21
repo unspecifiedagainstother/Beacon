@@ -110,6 +110,16 @@ export type BeaconProfileBaseline = Readonly<
   >
 >;
 
+export type BeaconBookmark = Readonly<{
+  messageId: string;
+  conversationId: string;
+  sentAt: number;
+  addedAt: number;
+  /** First part of the text when bookmarked, if snapshots are on. */
+  snapshot?: string;
+  note?: string;
+}>;
+
 export type BeaconDataStorageKeys = {
   beaconMessageLog: ReadonlyArray<BeaconMessageLogEntry>;
   beaconProfileHistory: ReadonlyArray<BeaconProfileChange>;
@@ -118,6 +128,7 @@ export type BeaconDataStorageKeys = {
   beaconHiddenChats: ReadonlyArray<string>;
   /** Conversation ids that need the passphrase to open. */
   beaconLockedChats: ReadonlyArray<string>;
+  beaconBookmarks: ReadonlyArray<BeaconBookmark>;
 };
 
 /** Shape mixed into StorageAccessType so each key is typed. */

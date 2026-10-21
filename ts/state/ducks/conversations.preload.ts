@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { ThunkAction } from 'redux-thunk';
+import { beaconTweaks } from '../../beacon/core/tweaks.std.ts';
 import lodash from 'lodash';
 import { type PhoneNumber } from 'google-libphonenumber';
 
@@ -2725,7 +2726,8 @@ export function setVoiceNotePlaybackRate({
     const conversationModel = window.ConversationController.get(conversationId);
     if (conversationModel) {
       conversationModel.set({
-        voiceNotePlaybackRate: rate === 1 ? undefined : rate,
+        voiceNotePlaybackRate:
+          rate === beaconTweaks.defaultPlaybackRate ? undefined : rate,
       });
       await DataWriter.updateConversation(conversationModel.attributes);
     }

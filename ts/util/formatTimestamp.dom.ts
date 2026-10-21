@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import moment from 'moment';
+import { beaconTweaks } from '../beacon/core/tweaks.std.ts';
 import { HourCyclePreference } from '../types/I18N.std.ts';
 import type { LocalizerType } from '../types/Util.std.ts';
 import { assertDev } from './assert.std.ts';
@@ -216,6 +217,15 @@ export function formatTime(
 ): string {
   const timestamp = rawTimestamp.valueOf();
   const diff = now.valueOf() - timestamp;
+
+  // Beacon: better timestamps built-in.
+  const beaconLabel = beaconTweaks.formatMessageTime?.(
+    timestamp,
+    now.valueOf()
+  );
+  if (beaconLabel) {
+    return beaconLabel;
+  }
 
   if (diff < MINUTE) {
     return i18n('icu:justNow');
