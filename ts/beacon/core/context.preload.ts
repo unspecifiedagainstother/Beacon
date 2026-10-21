@@ -14,7 +14,7 @@ import type { StateType } from '../../state/reducer.preload.ts';
 import type { AddonContext, AddonManifest, Disposer } from './types.dom.ts';
 import type { HookBus } from './hook-bus.std.ts';
 import { createPatcher } from './patcher.std.ts';
-import { addBeaconFilter } from './filters.std.ts';
+import { addBeaconAsyncFilter, addBeaconFilter } from './filters.std.ts';
 import { registerActionInterceptor } from './middleware.preload.ts';
 import { commandRegistry } from './commands.dom.ts';
 import { addonSettings } from './settings.std.ts';
@@ -117,6 +117,7 @@ export function createAddonContext(
 
     filters: {
       add: (name, fn) => track(addBeaconFilter(name, fn)),
+      addAsync: (name, fn) => track(addBeaconAsyncFilter(name, fn)),
     },
 
     patcher,

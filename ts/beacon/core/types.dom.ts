@@ -15,6 +15,7 @@ import type {
   MessageAttributesType,
   ReadonlyMessageAttributesType,
 } from '../../model-types.d.ts';
+import type { InMemoryAttachmentDraftType } from '../../types/Attachment.std.ts';
 
 // ---------------------------------------------------------------------------
 // Hooks — fire-and-forget notifications
@@ -126,6 +127,41 @@ export type FilterPayloads = {
     value: ReadonlyArray<ConversationMenuItem>,
     context: { conversationId: string; isGroup: boolean },
   ];
+  /**
+   * ts/services/notifications.preload.ts — title/body/icon of a message or
+   * reaction notification, after Signal's own content setting is applied.
+   */
+  'notification.content': [
+    value: {
+      title: string;
+      body: string;
+      iconUrl: string | null;
+      iconAbsolutePath: string | null;
+    },
+    context: { conversationId: string; type: string },
+  ];
+  /**
+   * ts/util/queueAttachmentDownloads.preload.ts — whether an attachment that
+   * Signal's own setting would auto-download is actually downloaded.
+   */
+  'attachment.autoDownload': [
+    value: boolean,
+    context: {
+      conversationId: string;
+      sourceServiceId: string | undefined;
+      disposition: 'photos' | 'videos' | 'audio' | 'documents';
+      size: number;
+    },
+  ];
+  /**
+   * ts/util/openLinkInWebBrowser.dom.ts (link previews, help links) and
+   * Beacon's click guard for links in messages. Return a different URL to
+   * open that instead, or null to cancel (the filter may open it later).
+   */
+  'link.open': [
+    value: string | null,
+    context: { source: 'app' | 'message'; text?: string },
+  ];
   'notification.show': [
     value: boolean,
     context: {
@@ -139,6 +175,45 @@ export type FilterPayloads = {
 };
 
 export type FilterName = keyof FilterPayloads;
+
+/**
+ * Async filters — like FilterPayloads, but each filter may await. Run in
+ * registration order; used where upstream code is already async.
+ */
+export type AsyncFilterPayloads = {
+  /**
+   * ts/util/processAttachment.preload.ts — an attachment the user is about to
+   * send, after Signal's own processing. Rewrite the name, strip metadata, or
+   * return null to drop it.
+   */
+  'attachment.outgoing': [
+    value: InMemoryAttachmentDraftType | null,
+    context: { originalName: string; contentType: string },
+  ];
+  /**
+   * ts/util/blockSendUntilConversationsAreVerified.dom.ts — after Signal's own
+   * safety-number check passed, before a message, story or call goes out.
+   * Return false to stop it; the draft stays in the composer.
+   */
+  'send.verify': [
+    value: boolean,
+    context: {
+      conversationIds: ReadonlyArray<string>;
+      serviceIds: ReadonlyArray<string>;
+      source: string;
+    },
+  ];
+};
+
+export type AsyncFilterName = keyof AsyncFilterPayloads;
+
+export type AsyncFilterFn<Name extends AsyncFilterName = AsyncFilterName> = (
+  value: AsyncFilterPayloads[Name][0],
+  context: AsyncFilterPayloads[Name][1]
+) =>
+  | AsyncFilterPayloads[Name][0]
+  | undefined
+  | Promise<AsyncFilterPayloads[Name][0] | undefined>;
 
 /** An entry addons can add to a conversation's header ⋯ menu. */
 export type ConversationMenuItem = Readonly<{
@@ -292,6 +367,8 @@ type SettingBase = {
   key: string;
   label: string;
   description?: string;
+  /** AxoSymbol glyph shown next to the setting in the Privacy tab. */
+  symbol?: string;
 };
 
 /**
@@ -344,6 +421,10 @@ export type AddonContext = {
   /** Value-transforming patch points in upstream code. Auto-disposed. */
   filters: {
     add: <Name extends FilterName>(name: Name, fn: FilterFn<Name>) => Disposer;
+    addAsync: <Name extends AsyncFilterName>(
+      name: Name,
+      fn: AsyncFilterFn<Name>
+    ) => Disposer;
   };
 
   /** Monkey-patcher scoped to this addon. Auto-unpatched. */
@@ -467,6 +548,7 @@ export type AddonInfo = {
   tags: Array<string>;
   icon?: string;
   builtin: boolean;
+  category?: 'privacy';
   enabled: boolean;
   /** Message from the last failed start(), cleared on success. */
   error?: string;
@@ -498,6 +580,11 @@ export type AddonManifest = {
    * Modules.
    */
   builtin?: boolean;
+  /**
+   * Built-ins only: 'privacy' features are listed in Settings → Beacon
+   * Privacy instead of the Built-in features section.
+   */
+  category?: 'privacy';
   /** User-facing settings, rendered in Settings → Beacon → Modules. */
   settings?: Array<AddonSettingDefinition>;
   /** Called when the addon is enabled (at startup or live from settings). */
