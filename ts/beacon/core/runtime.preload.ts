@@ -25,6 +25,7 @@ import { createLogger } from '../../logging/log.std.ts';
 import { BEACON_FEATURES } from '../features.std.ts';
 import { getAccentHex, getAccentProperties } from './accent.std.ts';
 import { getSlotRenderers } from './slots.std.ts';
+import { lockOnStartup } from './lock.dom.ts';
 import {
   clearConnections,
   getConnections,
@@ -80,6 +81,13 @@ export function initializeBeaconRuntime(store: Store<StateType>): void {
     return;
   }
   initialized = true;
+
+  // App lock first, before any chat UI can render.
+  try {
+    lockOnStartup();
+  } catch (error) {
+    log.error('lockOnStartup error:', error);
+  }
 
   try {
     purgeLegacyPlaintext();

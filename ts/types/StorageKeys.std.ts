@@ -509,6 +509,8 @@ const STORAGE_KEYS_TO_REMOVE_AFTER_UNLINK = [
   'beaconMessageLog',
   'beaconProfileHistory',
   'beaconProfileBaseline',
+  'beaconHiddenChats',
+  'beaconLockedChats',
   'unreadRemindersEnabledAt',
   'lastCallQualitySurveyTime',
   'lastCallQualityFailureSurveyTime',

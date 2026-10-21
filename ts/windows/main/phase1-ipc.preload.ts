@@ -186,6 +186,13 @@ const IPC: IPCType = {
   beaconInvoke: (name: string, payload?: unknown): Promise<unknown> => {
     return ipc.invoke('beacon:invoke', name, payload);
   },
+  beaconOnSystemEvent: (callback: (name: string) => void): (() => void) => {
+    const handler = (_event: unknown, name: string) => callback(name);
+    ipc.on('beacon:system', handler);
+    return () => {
+      ipc.off('beacon:system', handler);
+    };
+  },
 
   // Beacon: custom titlebar window controls.
   beaconWindowMinimize: () => {
