@@ -75,6 +75,7 @@ export type IPCType = {
   titleBarDoubleClick: () => void;
   // Beacon: generic bridge to app/beacon.main.ts (whitelisted names).
   beaconInvoke: (name: string, payload?: unknown) => Promise<unknown>;
+  beaconOnSystemEvent: (callback: (name: string) => void) => () => void;
   // Beacon: custom titlebar window controls.
   beaconWindowMinimize: () => void;
   beaconWindowToggleMaximize: () => void;

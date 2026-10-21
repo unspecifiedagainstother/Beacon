@@ -49,6 +49,8 @@ import unverifiedGuard from '../builtin/unverified-guard.dom.ts';
 import notificationPrivacy from '../builtin/notification-privacy.dom.ts';
 import networkMonitor from '../builtin/network-monitor.node.ts';
 import encryptedExports from '../builtin/encrypted-exports.dom.ts';
+import appLock from '../builtin/app-lock.preload.ts';
+import hiddenChats from '../builtin/hidden-chats.preload.ts';
 
 const log = createLogger('beacon/loader');
 
@@ -316,6 +318,8 @@ const BUILTIN_MANIFESTS: ReadonlyArray<AddonManifest> = [
   notificationPrivacy,
   networkMonitor,
   encryptedExports,
+  appLock,
+  hiddenChats,
 ];
 
 function builtinManifests(): Array<AddonManifest> {

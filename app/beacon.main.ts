@@ -15,7 +15,7 @@
  */
 
 import type { BrowserWindow, Session } from 'electron';
-import { ipcMain } from 'electron';
+import { ipcMain, powerMonitor } from 'electron';
 import * as ephemeralConfig from './ephemeral_config.main.ts';
 import type { LoggerType } from '../ts/types/Logging.std.ts';
 
@@ -130,6 +130,13 @@ export function setupBeaconMain(opts: Options): void {
       requestLog.splice(0, requestLog.length - MAX_REQUEST_LOG);
     }
   });
+
+  // System events the app lock reacts to (renderer decides what to do).
+  for (const name of ['lock-screen', 'suspend'] as const) {
+    powerMonitor.on(name as 'lock-screen', () => {
+      opts.getMainWindow()?.webContents.send('beacon:system', name);
+    });
+  }
 
   ipcMain.handle('beacon:invoke', (_event, name: unknown, payload: unknown) => {
     const handler = typeof name === 'string' ? HANDLERS[name] : undefined;

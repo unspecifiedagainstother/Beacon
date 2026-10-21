@@ -12,6 +12,21 @@ import { AxoClickableItem } from '../axo/items/AxoClickableItem.dom.tsx';
 import type { AddonInfo } from '../beacon/core/types.dom.ts';
 import type { NetworkEntry } from '../beacon/core/network-log.std.ts';
 import { decryptBeaconExportFile } from '../beacon/core/exports.dom.ts';
+import type { DuressAction } from '../beacon/core/lock.dom.ts';
+import {
+  isLockConfigured,
+  lock,
+  onLockChange,
+  removePassphrase,
+  setDuress,
+  setPassphrase,
+} from '../beacon/core/lock.dom.ts';
+import {
+  askChoice,
+  askConfirm,
+  askPassword,
+} from '../beacon/core/prompts.dom.ts';
+import { showNotification } from '../beacon/core/ui.dom.ts';
 import { BeaconSettingItems } from './BeaconSettingItems.dom.tsx';
 import { useAddons, useAddonSettings } from './beaconHooks.dom.ts';
 import { drop } from '../util/drop.std.ts';
@@ -22,6 +37,8 @@ export type PropsType = {
 
 // Order of sections on the page; anything not listed goes last.
 const SECTION_ORDER = [
+  'app-lock',
+  'hidden-chats',
   'app-privacy',
   'chat-list-privacy',
   'attachment-privacy',
@@ -76,6 +93,11 @@ const CHECKS: ReadonlyArray<Check> = [
     isOn: v => v.mode !== 'off',
   },
   {
+    label: 'App lock passphrase',
+    addonId: 'app-lock',
+    isOn: () => isLockConfigured(),
+  },
+  {
     label: 'Exports encrypted',
     addonId: 'encrypted-exports',
     isOn: v => v.enabled === true,
@@ -96,6 +118,8 @@ const CHECK_IDS = [...new Set(CHECKS.map(c => c.addonId))];
 
 function Dashboard(): JSX.Element {
   const values = useAllValues(CHECK_IDS);
+  // Re-render when the passphrase is set or removed.
+  useLockConfigured();
   const results = CHECKS.map(check => ({
     check,
     on: check.isOn(values[check.addonId] ?? {}),
@@ -279,6 +303,173 @@ function NetworkTable(): JSX.Element {
   );
 }
 
+async function changePassphrase(configured: boolean): Promise<void> {
+  let current: string | undefined;
+  if (configured) {
+    current = await askPassword({
+      title: 'Current passphrase',
+      submitLabel: 'Next',
+    });
+    if (current == null) {
+      return;
+    }
+  }
+  const next = await askPassword({
+    title: configured ? 'New passphrase' : 'Set a passphrase',
+    intro:
+      'Beacon will ask for it on start and after inactivity. If you forget it you’ll have to reinstall Beacon and link it again.',
+    confirm: true,
+    minLength: 6,
+    submitLabel: 'Save',
+  });
+  if (next == null) {
+    return;
+  }
+  const ok = await setPassphrase(next, current);
+  showNotification(
+    ok ? 'Passphrase saved' : 'Wrong current passphrase',
+    ok ? 'success' : 'error'
+  );
+}
+
+async function turnOffLock(): Promise<void> {
+  const current = await askPassword({
+    title: 'Turn off app lock',
+    intro: 'Also removes the duress passphrase.',
+    submitLabel: 'Turn off',
+  });
+  if (current == null) {
+    return;
+  }
+  const ok = await removePassphrase(current);
+  showNotification(
+    ok ? 'App lock turned off' : 'Wrong passphrase',
+    ok ? 'success' : 'error'
+  );
+}
+
+async function configureDuress(): Promise<void> {
+  const action = await askChoice<DuressAction | 'remove'>({
+    title: 'Duress passphrase',
+    intro:
+      'A second passphrase for when you’re forced to unlock Beacon. It opens the app normally but:',
+    choices: [
+      {
+        value: 'decoy',
+        label: 'Keep hidden and locked chats out of sight',
+        description:
+          'They can’t be shown or opened until Beacon restarts, and send no notifications.',
+      },
+      {
+        value: 'wipe',
+        label: 'Erase all Beacon data',
+        description:
+          'Unlinks this device and deletes all messages on this computer. Cannot be undone.',
+      },
+      {
+        value: 'remove',
+        label: 'Remove the duress passphrase',
+      },
+    ],
+  });
+  if (!action) {
+    return;
+  }
+  if (action === 'wipe') {
+    const sure = await askConfirm({
+      title: 'Erase everything on duress?',
+      body: 'Entering the duress passphrase will immediately unlink this device and delete every message, attachment and setting Beacon has on this computer. Your phone keeps its messages.',
+      confirmLabel: 'Use erase',
+      destructive: true,
+    });
+    if (!sure) {
+      return;
+    }
+  }
+  const real = await askPassword({
+    title: 'Your real passphrase',
+    intro: 'To confirm it’s you.',
+    submitLabel: 'Next',
+  });
+  if (real == null) {
+    return;
+  }
+  let duress: { passphrase: string; action: DuressAction } | undefined;
+  if (action !== 'remove') {
+    const passphrase = await askPassword({
+      title: 'Duress passphrase',
+      intro: 'Must differ from your real passphrase.',
+      confirm: true,
+      minLength: 6,
+      submitLabel: 'Save',
+    });
+    if (passphrase == null) {
+      return;
+    }
+    duress = { passphrase, action };
+  }
+  const result = await setDuress(real, duress);
+  if (result === 'ok') {
+    showNotification(
+      duress ? 'Duress passphrase saved' : 'Duress passphrase removed',
+      'success'
+    );
+  } else if (result === 'same') {
+    showNotification('Use a different passphrase for duress', 'error');
+  } else {
+    showNotification('Wrong passphrase', 'error');
+  }
+}
+
+function useLockConfigured(): boolean {
+  const [configured, setConfigured] = useState(isLockConfigured);
+  useEffect(() => onLockChange(() => setConfigured(isLockConfigured())), []);
+  return configured;
+}
+
+function LockActions(): JSX.Element {
+  const configured = useLockConfigured();
+  return (
+    <AxoItem.Group>
+      <AxoClickableItem.Root
+        symbol="key"
+        label={configured ? 'Change passphrase' : 'Set a passphrase'}
+        description={
+          configured
+            ? 'App lock is on.'
+            : 'App lock, locked chats and the duress passphrase need one.'
+        }
+        arrow="next"
+        onClick={() => drop(changePassphrase(configured))}
+      />
+      {configured ? (
+        <>
+          <AxoClickableItem.Root
+            symbol="error-triangle"
+            label="Duress passphrase"
+            description="Set, change or remove. Nothing on disk shows whether one exists."
+            arrow="next"
+            onClick={() => drop(configureDuress())}
+          />
+          <AxoClickableItem.Root
+            symbol="lock"
+            label="Lock now"
+            description="Mod+Alt+L"
+            arrow="next"
+            onClick={lock}
+          />
+          <AxoClickableItem.Root
+            symbol="lock-open"
+            label="Turn off app lock"
+            variant="destructive"
+            onClick={() => drop(turnOffLock())}
+          />
+        </>
+      ) : null}
+    </AxoItem.Group>
+  );
+}
+
 function AddonSection({ addon }: { addon: AddonInfo }): JSX.Element {
   return (
     <AxoList.Root>
@@ -289,6 +480,7 @@ function AddonSection({ addon }: { addon: AddonInfo }): JSX.Element {
         ) : null}
       </AxoList.Header>
       <AxoList.Body>
+        {addon.id === 'app-lock' ? <LockActions /> : null}
         <BeaconSettingItems addonId={addon.id} settings={addon.settings} />
         {addon.id === 'encrypted-exports' ? (
           <AxoItem.Group>
