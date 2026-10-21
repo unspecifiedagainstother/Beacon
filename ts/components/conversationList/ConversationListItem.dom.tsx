@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { FunctionComponent, ReactNode, JSX } from 'react';
+import { beaconTweaks } from '../../beacon/core/tweaks.std.ts';
 import { useCallback, memo } from 'react';
 import classNames from 'classnames';
 
@@ -149,7 +150,19 @@ export const ConversationListItem: FunctionComponent<Props> = memo(
         </span>
       );
     } else if (isSomeoneTyping) {
-      messageText = <TypingAnimation i18n={i18n} />;
+      // Beacon: optional "Alice is typing" next to the dots.
+      const typingLabel = beaconTweaks.typingLabel?.(
+        Object.keys(typingContactIdTimestamps ?? {}),
+        type
+      );
+      messageText = typingLabel ? (
+        <span className={`${MESSAGE_TEXT_CLASS_NAME}__beacon-typing`}>
+          <span>{typingLabel}</span>
+          <TypingAnimation i18n={i18n} />
+        </span>
+      ) : (
+        <TypingAnimation i18n={i18n} />
+      );
     } else if (shouldShowDraft && draftPreview) {
       messageText = (
         <>

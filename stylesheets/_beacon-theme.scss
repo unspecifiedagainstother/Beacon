@@ -1732,3 +1732,98 @@
     }
   }
 }
+
+// ---------------------------------------------------------------------------
+// Composer character counter
+// ---------------------------------------------------------------------------
+
+.module-composition-input__input {
+  position: relative;
+}
+
+.BeaconCharCounter {
+  position: absolute;
+  inset-block-end: 2px;
+  inset-inline-end: 8px;
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--axo-color-label-secondary, #888);
+  pointer-events: none;
+
+  &--long {
+    color: #e3a008;
+  }
+}
+
+// Chat-list "Alice is typing"
+.module-conversation-list__item--contact-or-conversation__content__message__text__beacon-typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-style: italic;
+}
+
+// ---------------------------------------------------------------------------
+// Bookmarks
+// ---------------------------------------------------------------------------
+
+.BeaconBookmarks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__empty {
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-block: 10px;
+    padding-inline: 12px;
+    border: 1px solid var(--axo-color-border-primary);
+    border-radius: 10px;
+  }
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+  }
+
+  &__date {
+    font-size: 0.75rem;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__text {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  &__note {
+    margin: 0;
+    padding-inline-start: 8px;
+    border-inline-start: 2px solid var(--beacon-accent);
+    font-size: 0.8125rem;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+}

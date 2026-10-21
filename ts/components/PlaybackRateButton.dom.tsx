@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import classNames from 'classnames';
+import { nextPlaybackRate } from '../beacon/core/tweaks.std.ts';
 import {
   useCallback,
   useState,
@@ -81,8 +82,9 @@ export function PlaybackRateButton({
     0.5: i18n('icu:MessageAudio--playbackRatep5'),
   };
 
+  // Beacon: extra speeds have no translated label; show e.g. "1.25×".
   const label = playbackRate
-    ? playbackRateLabels[playbackRate]?.toString()
+    ? (playbackRateLabels[playbackRate]?.toString() ?? `${playbackRate}×`)
     : undefined;
 
   return (
@@ -107,12 +109,6 @@ export function PlaybackRateButton({
   );
 }
 
-const playbackRates = [1, 1.5, 2, 0.5];
-
-PlaybackRateButton.nextPlaybackRate = (currentRate: number): number => {
-  // cycle through the rates
-  // oxlint-disable-next-line typescript/no-non-null-assertion
-  return playbackRates[
-    (playbackRates.indexOf(currentRate) + 1) % playbackRates.length
-  ]!;
-};
+// Beacon: the speeds are configurable (voice-message speed built-in).
+PlaybackRateButton.nextPlaybackRate = (currentRate: number): number =>
+  nextPlaybackRate(currentRate);
