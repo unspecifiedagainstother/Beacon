@@ -56,6 +56,7 @@ import voiceSpeed from '../builtin/voice-speed.std.ts';
 import chatListTyping from '../builtin/chat-list-typing.dom.ts';
 import betterTimestamps from '../builtin/better-timestamps.std.ts';
 import bookmarks from '../builtin/bookmarks.preload.ts';
+import inlineMarkdown from '../builtin/inline-markdown.std.ts';
 
 const log = createLogger('beacon/loader');
 
@@ -330,6 +331,7 @@ const BUILTIN_MANIFESTS: ReadonlyArray<AddonManifest> = [
   chatListTyping,
   betterTimestamps,
   bookmarks,
+  inlineMarkdown,
 ];
 
 function builtinManifests(): Array<AddonManifest> {
