@@ -61,6 +61,7 @@ import hiddenFeatures from '../builtin/hidden-features.std.ts';
 import beaconLook from '../builtin/beacon-look.std.ts';
 import fileDetails from '../builtin/file-details.preload.ts';
 import chatOrganisation from '../builtin/chat-organisation.std.ts';
+import screenShareGuard from '../builtin/screen-share-guard.dom.ts';
 
 const log = createLogger('beacon/loader');
 
@@ -340,6 +341,7 @@ const BUILTIN_MANIFESTS: ReadonlyArray<AddonManifest> = [
   beaconLook,
   fileDetails,
   chatOrganisation,
+  screenShareGuard,
 ];
 
 function builtinManifests(): Array<AddonManifest> {
