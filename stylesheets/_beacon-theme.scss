@@ -1887,6 +1887,31 @@ body.beacon-has-titlebar {
 .BeaconSetup .module-InstallScreenQrCodeNotScannedStep__qr-code {
   margin: 0;
   padding: 12px;
-  border-radius: 16px;
+  border-radius: 8px;
   background: #fff;
+}
+
+// Squarer corners than Signal's pill/blob shapes: buttons, the segmented
+// control, inputs and callouts at 6px, the card at 10px.
+.BeaconSetup {
+  :is(
+    button,
+    input,
+    select,
+    [role='radio'],
+    [role='radiogroup'],
+    [class*='rounded'],
+    [class*='curved']
+  ) {
+    border-radius: 6px !important;
+  }
+
+  .BeaconSetup__card.BeaconSetup__card {
+    border-radius: 10px !important;
+  }
+}
+
+// The registration card's inner scroller shows bare arrows in its corners.
+.BeaconSetup__card ::-webkit-scrollbar-button {
+  display: none;
 }
