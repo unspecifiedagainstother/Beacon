@@ -20,13 +20,26 @@ import classNames from 'classnames';
 import { createPortal } from 'react-dom';
 import type { VirtualElement } from '@popperjs/core';
 import { handleOutsideClick } from '../../util/handleOutsideClick.dom.ts';
+import { drop } from '../../util/drop.std.ts';
 import { commandRegistry } from '../../beacon/core/commands.dom.ts';
 import { getSelectedConversationId } from '../../state/selectors/nav.std.ts';
 import type { CommandDefinition } from '../../beacon/core/types.dom.ts';
+import { iconToCssUrl } from '../../beacon/core/icons.std.ts';
 
 const { debounce } = lodash;
 
-const MAX_RESULTS = 8;
+type CommandSource = { name: string; icon?: string };
+
+/** Module name and icon for a command, via the addon loader. */
+function getSources(): Map<string, CommandSource> {
+  const map = new Map<string, CommandSource>();
+  for (const addon of window.Beacon?.loader.list() ?? []) {
+    map.set(addon.id, { name: addon.name, icon: addon.icon });
+  }
+  return map;
+}
+
+const CORE_SOURCE: CommandSource = { name: 'Beacon' };
 
 export type CommandCompletionOptions = {
   onSelectCommand: (commandId: string) => void;
@@ -69,6 +82,13 @@ export class CommandCompletion {
 
     this.quill.keyboard.addBinding({ key: 'ArrowUp' }, changeIndex(-1));
     this.quill.keyboard.addBinding({ key: 'ArrowDown' }, changeIndex(1));
+    this.quill.keyboard.addBinding({ key: 'Escape' }, (): boolean => {
+      if (this.results.length) {
+        this.reset();
+        return false;
+      }
+      return true;
+    });
 
     this.#debouncedOnTextChange = debounce(() => this.onTextChange(), 60);
     this.quill.on(Emitter.events.TEXT_CHANGE, (_now, _before, source) => {
@@ -130,8 +150,19 @@ export class CommandCompletion {
     if (parsed.hasArgs) {
       const exact = commandRegistry.get(parsed.query);
       this.results = exact ? [exact] : [];
+    } else if (parsed.query === '') {
+      // Everything, grouped by module (core first), alphabetical inside.
+      const sources = getSources();
+      const groupName = (cmd: CommandDefinition) =>
+        cmd.addonId ? (sources.get(cmd.addonId)?.name ?? cmd.addonId) : '';
+      this.results = commandRegistry
+        .list()
+        .sort(
+          (a, b) =>
+            groupName(a).localeCompare(groupName(b)) || a.id.localeCompare(b.id)
+        );
     } else {
-      this.results = commandRegistry.search(parsed.query).slice(0, MAX_RESULTS);
+      this.results = commandRegistry.search(parsed.query);
     }
     this.index = 0;
     this.render();
@@ -212,58 +243,134 @@ export class CommandCompletion {
       },
     };
 
+    const sources = getSources();
+    const sourceOf = (cmd: CommandDefinition): CommandSource =>
+      cmd.addonId
+        ? (sources.get(cmd.addonId) ?? { name: cmd.addonId })
+        : CORE_SOURCE;
+    const query = parsed?.hasArgs ? '' : (parsed?.query ?? '');
+    const grouped = query === '' && !parsed?.hasArgs;
+
     const element = createPortal(
       <Popper placement="top-start" referenceElement={virtualElement}>
         {({ ref, style }) => (
-          <div
-            ref={ref}
-            style={style}
-            className="module-composition-input__suggestions BeaconCommandSuggestions"
-            role="listbox"
-            aria-expanded
-            aria-activedescendant={`command-result--${
-              this.results[this.index]?.id ?? ''
-            }`}
-            tabIndex={0}
-          >
-            {this.results.map((cmd, idx) => (
-              <button
-                type="button"
-                key={cmd.id}
-                id={`command-result--${cmd.id}`}
-                role="option"
-                aria-selected={idx === this.index}
-                className={classNames(
-                  'module-composition-input__suggestions__row',
-                  'BeaconCommandSuggestions__row',
-                  idx === this.index
-                    ? 'module-composition-input__suggestions__row--selected'
-                    : null
-                )}
-                onMouseDown={ev => ev.preventDefault()}
-                onClick={() => this.selectCommand(idx)}
-              >
-                <span className="BeaconCommandSuggestions__name">
-                  /{cmd.id}
-                  {cmd.usage ? (
-                    <span className="BeaconCommandSuggestions__usage">
-                      {' '}
-                      {cmd.usage}
-                    </span>
-                  ) : null}
-                </span>
-                {cmd.description ? (
-                  <span className="BeaconCommandSuggestions__description">
-                    {cmd.description}
-                  </span>
-                ) : null}
-                {cmd.addonId ? (
-                  <span className="BeaconCommandSuggestions__source">
-                    {cmd.addonId}
-                  </span>
-                ) : null}
-              </button>
-            ))}
+          <div ref={ref} style={style} className="BeaconCommands">
+            <div className="BeaconCommands__header">
+              <span className="BeaconCommands__title">
+                {parsed?.hasArgs ? 'Usage' : 'Commands'}
+              </span>
+              <span className="BeaconCommands__count">
+                {this.results.length}
+              </span>
+            </div>
+            <div
+              className="BeaconCommands__list"
+              role="listbox"
+              aria-label="Commands"
+              aria-activedescendant={`command-result--${
+                this.results[this.index]?.id ?? ''
+              }`}
+              tabIndex={-1}
+            >
+              {this.results.map((cmd, idx) => {
+                const source = sourceOf(cmd);
+                const previous = idx > 0 ? this.results[idx - 1] : undefined;
+                const showGroup =
+                  grouped &&
+                  (!previous || sourceOf(previous).name !== source.name);
+                const iconUrl = iconToCssUrl(source.icon);
+                const selected = idx === this.index;
+                const matchLength = cmd.id.startsWith(query.toLowerCase())
+                  ? query.length
+                  : 0;
+                return (
+                  <div key={cmd.id} role="presentation">
+                    {showGroup ? (
+                      <div
+                        className="BeaconCommands__group"
+                        role="presentation"
+                      >
+                        {source.name}
+                      </div>
+                    ) : null}
+                    <button
+                      type="button"
+                      id={`command-result--${cmd.id}`}
+                      role="option"
+                      aria-selected={selected}
+                      ref={el => {
+                        if (selected) {
+                          el?.scrollIntoView({ block: 'nearest' });
+                        }
+                      }}
+                      className={classNames(
+                        'BeaconCommands__row',
+                        selected && 'BeaconCommands__row--selected'
+                      )}
+                      onMouseDown={ev => ev.preventDefault()}
+                      onMouseMove={() => {
+                        if (this.index !== idx) {
+                          this.index = idx;
+                          this.render();
+                        }
+                      }}
+                      onClick={() => this.selectCommand(idx)}
+                    >
+                      <span
+                        className={classNames(
+                          'BeaconCommands__icon',
+                          !iconUrl && 'BeaconCommands__icon--slash'
+                        )}
+                        style={
+                          iconUrl
+                            ? { maskImage: iconUrl, WebkitMaskImage: iconUrl }
+                            : undefined
+                        }
+                        aria-hidden
+                      />
+                      <span className="BeaconCommands__text">
+                        <span className="BeaconCommands__line">
+                          <span className="BeaconCommands__name">
+                            /<mark>{cmd.id.slice(0, matchLength)}</mark>
+                            {cmd.id.slice(matchLength)}
+                          </span>
+                          {cmd.usage ? (
+                            <span className="BeaconCommands__usage">
+                              {cmd.usage}
+                            </span>
+                          ) : null}
+                          {!grouped ? (
+                            <span className="BeaconCommands__source">
+                              {source.name}
+                            </span>
+                          ) : null}
+                        </span>
+                        {cmd.description ? (
+                          <span className="BeaconCommands__description">
+                            {cmd.description}
+                          </span>
+                        ) : null}
+                      </span>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="BeaconCommands__footer">
+              <span>
+                <kbd>↑</kbd>
+                <kbd>↓</kbd> select
+              </span>
+              <span>
+                <kbd>Tab</kbd> complete
+              </span>
+              <span>
+                <kbd>Enter</kbd> run
+              </span>
+              <span>
+                <kbd>Esc</kbd> close
+              </span>
+            </div>
           </div>
         )}
       </Popper>,
@@ -317,13 +424,15 @@ export class CommandCompletion {
       ? getSelectedConversationId(window.reduxStore.getState())
       : undefined;
 
-    void commandRegistry.execute(command.id, parsed.argsRaw, {
-      conversationId,
-      insertText: text => {
-        this.quill.insertText(insertAt, text, 'user');
-        this.quill.setSelection(insertAt + text.length, 0);
-      },
-    });
+    drop(
+      commandRegistry.execute(command.id, parsed.argsRaw, {
+        conversationId,
+        insertText: text => {
+          this.quill.insertText(insertAt, text, 'user');
+          this.quill.setSelection(insertAt + text.length, 0);
+        },
+      })
+    );
 
     this.reset();
   }
