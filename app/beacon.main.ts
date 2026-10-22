@@ -17,10 +17,21 @@
 import type { BrowserWindow, Session } from 'electron';
 import { ipcMain, powerMonitor } from 'electron';
 import * as ephemeralConfig from './ephemeral_config.main.ts';
+import { drop } from '../ts/util/drop.std.ts';
 import { openCaptchaWindow } from './beacon-captcha.main.ts';
 import type { LoggerType } from '../ts/types/Logging.std.ts';
 
 const CONTENT_PROTECTION_KEY = 'beacon-content-protection';
+const PROXY_KEY = 'beacon-proxy-url';
+const PROXY_SCHEMES = new Set([
+  'http:',
+  'https:',
+  'socks:',
+  'socks4:',
+  'socks4a:',
+  'socks5:',
+  'socks5h:',
+]);
 const BLOCK_SPELLCHECK_KEY = 'beacon-block-spellcheck-download';
 
 // Nothing listens here; Chromium's download simply fails and only
@@ -63,6 +74,41 @@ function applySpellcheckBlock(session: Session): void {
       ? BLOCKED_DICTIONARY_URL
       : SPELLCHECK_DEFAULT_URL
   );
+}
+
+function getProxyUrl(): string | undefined {
+  const value = ephemeralConfig.get(PROXY_KEY);
+  return typeof value === 'string' && value ? value : undefined;
+}
+
+/** Returns an error message, or undefined when the URL is usable. */
+export function validateProxyUrl(value: string): string | undefined {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    return 'Not a valid URL (example: socks5h://127.0.0.1:9050)';
+  }
+  if (!PROXY_SCHEMES.has(url.protocol)) {
+    return `Unsupported proxy type ${url.protocol} — use http, https or socks5`;
+  }
+  if (!url.hostname || !url.port) {
+    return 'Include a host and port, e.g. socks5h://127.0.0.1:9050';
+  }
+  return undefined;
+}
+
+/**
+ * Call at the very start of main: Signal reads HTTPS_PROXY when it builds
+ * the renderer config (libsignal chat connection, attachments, contact
+ * discovery) and in the updater, so setting it here routes all of those.
+ * An HTTPS_PROXY already in the environment wins.
+ */
+export function applyBeaconProxyEnv(): void {
+  const proxy = getProxyUrl();
+  if (proxy && !process.env.HTTPS_PROXY && !process.env.https_proxy) {
+    process.env.HTTPS_PROXY = proxy;
+  }
 }
 
 export function applyBeaconWindowSettings(window: BrowserWindow): void {
@@ -114,6 +160,25 @@ const HANDLERS: Record<string, (payload: unknown) => unknown> = {
     return true;
   },
 
+  'proxy:get': () => ({
+    proxyUrl: getProxyUrl() ?? '',
+    fromEnvironment:
+      process.env.HTTPS_PROXY !== undefined &&
+      process.env.HTTPS_PROXY !== getProxyUrl(),
+  }),
+
+  'proxy:set': payload => {
+    const value = typeof payload === 'string' ? payload.trim() : '';
+    if (value) {
+      const error = validateProxyUrl(value);
+      if (error) {
+        return { ok: false, error };
+      }
+    }
+    ephemeralConfig.set(PROXY_KEY, value || undefined);
+    return { ok: true, restartNeeded: true };
+  },
+
   'network:log': () => requestLog.slice(),
 
   'network:clear': () => {
@@ -125,6 +190,15 @@ const HANDLERS: Record<string, (payload: unknown) => unknown> = {
 export function setupBeaconMain(opts: Options): void {
   options = opts;
   applySpellcheckBlock(opts.session);
+
+  // Chromium-side requests (anything loaded by the page itself) follow the
+  // same proxy as Node/libsignal traffic.
+  const proxy = process.env.HTTPS_PROXY || process.env.https_proxy;
+  if (proxy) {
+    const rules = proxy.replace(/^socks5h:/, 'socks5:');
+    drop(opts.session.setProxy({ proxyRules: rules }));
+    opts.log.info('beacon: proxy enabled for this session');
+  }
 
   // Chromium-level requests made by this session (images, link previews
   // loaded in the page, devtools, ...). Connections opened by Node code or
