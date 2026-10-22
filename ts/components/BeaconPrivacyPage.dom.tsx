@@ -48,6 +48,7 @@ const SECTION_ORDER = [
   'unverified-guard',
   'sealed-sender',
   'encrypted-exports',
+  'proxy',
   'network-monitor',
 ];
 
@@ -471,6 +472,99 @@ function LockActions(): JSX.Element {
   );
 }
 
+type ProxyStatus = { proxyUrl: string; fromEnvironment: boolean };
+
+function ProxySection(): JSX.Element {
+  const [value, setValue] = useState('');
+  const [saved, setSaved] = useState<string | undefined>(undefined);
+  const [message, setMessage] = useState<string | undefined>(undefined);
+  const [fromEnvironment, setFromEnvironment] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    drop(
+      (async () => {
+        const status = (await window.IPC.beaconInvoke(
+          'proxy:get'
+        )) as ProxyStatus;
+        if (!cancelled) {
+          setValue(status.proxyUrl);
+          setSaved(status.proxyUrl);
+          setFromEnvironment(status.fromEnvironment);
+        }
+      })()
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const save = async (next: string) => {
+    const result = (await window.IPC.beaconInvoke('proxy:set', next)) as {
+      ok: boolean;
+      error?: string;
+    };
+    if (!result.ok) {
+      setMessage(result.error);
+      return;
+    }
+    setValue(next);
+    setSaved(next);
+    setMessage(
+      next
+        ? 'Saved. Restart Beacon to connect through the proxy.'
+        : 'Proxy removed. Restart Beacon to connect directly.'
+    );
+  };
+
+  return (
+    <div className="BeaconPrivacy__proxy">
+      <div className="BeaconPrivacy__proxy-row">
+        <input
+          className="BeaconInput"
+          type="text"
+          spellCheck={false}
+          placeholder="socks5h://127.0.0.1:9050"
+          value={value}
+          onChange={ev => setValue(ev.target.value)}
+        />
+        <button
+          type="button"
+          className="BeaconButton BeaconButton--primary"
+          disabled={value.trim() === (saved ?? '')}
+          onClick={() => drop(save(value.trim()))}
+        >
+          Save
+        </button>
+      </div>
+      <div className="BeaconPrivacy__proxy-row">
+        <button
+          type="button"
+          className="BeaconButton BeaconButton--ghost"
+          onClick={() => drop(save('socks5h://127.0.0.1:9050'))}
+        >
+          Use Tor (127.0.0.1:9050)
+        </button>
+        {saved ? (
+          <button
+            type="button"
+            className="BeaconButton BeaconButton--ghost"
+            onClick={() => drop(save(''))}
+          >
+            Turn off
+          </button>
+        ) : null}
+      </div>
+      {fromEnvironment ? (
+        <p className="BeaconPrivacy__proxy-note">
+          An HTTPS_PROXY environment variable is set and takes priority.
+        </p>
+      ) : null}
+      {message ? <p className="BeaconPrivacy__proxy-note">{message}</p> : null}
+    </div>
+  );
+}
+
 function AddonSection({ addon }: { addon: AddonInfo }): JSX.Element {
   return (
     <AxoList.Root>
@@ -482,6 +576,7 @@ function AddonSection({ addon }: { addon: AddonInfo }): JSX.Element {
       </AxoList.Header>
       <AxoList.Body>
         {addon.id === 'app-lock' ? <LockActions /> : null}
+        {addon.id === 'proxy' ? <ProxySection /> : null}
         <BeaconSettingItems addonId={addon.id} settings={addon.settings} />
         {addon.id === 'encrypted-exports' ? (
           <AxoItem.Group>
