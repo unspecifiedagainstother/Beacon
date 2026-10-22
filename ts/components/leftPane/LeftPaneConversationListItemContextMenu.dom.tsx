@@ -1,6 +1,7 @@
 // Copyright 2025 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 import type { FC, ReactNode, JSX } from 'react';
+import { isHiddenFeatureOn } from '../../beacon/core/hidden-features.std.ts';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { MuteExpiration } from '@signalapp/types';
 
@@ -261,11 +262,13 @@ export const LeftPaneConversationListItemContextMenu: FC<LeftPaneConversationLis
             >
               {i18n('icu:deleteConversation')}
             </AxoContextMenu.Item>
-            {isInternalFeaturesEnabled() && (
+            {/* Beacon: also shown in Developer mode (Hidden Signal features). */}
+            {(isInternalFeaturesEnabled() ||
+              isHiddenFeatureOn('developerMode')) && (
               <>
                 <AxoContextMenu.Separator />
                 <AxoContextMenu.Group>
-                  <AxoContextMenu.Label>Internal</AxoContextMenu.Label>
+                  <AxoContextMenu.Label>Developer</AxoContextMenu.Label>
                   <ContextMenuCopyTextItem value={conversation.id}>
                     Copy Conversation ID
                   </ContextMenuCopyTextItem>
@@ -289,6 +292,21 @@ export const LeftPaneConversationListItemContextMenu: FC<LeftPaneConversationLis
                       Copy E164
                     </ContextMenuCopyTextItem>
                   )}
+                  {conversation.username != null && (
+                    <ContextMenuCopyTextItem value={conversation.username}>
+                      Copy username
+                    </ContextMenuCopyTextItem>
+                  )}
+                  <ContextMenuCopyTextItem
+                    value={JSON.stringify(
+                      window.ConversationController.get(conversation.id)
+                        ?.attributes ?? conversation,
+                      null,
+                      2
+                    )}
+                  >
+                    Copy raw conversation (JSON)
+                  </ContextMenuCopyTextItem>
                 </AxoContextMenu.Group>
               </>
             )}

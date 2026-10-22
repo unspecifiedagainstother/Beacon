@@ -24,6 +24,7 @@ import { PhoneNumberDiscoverability } from '../util/phoneNumberDiscoverability.s
 import { PhoneNumberSharingMode } from '../types/PhoneNumberSharingMode.std.ts';
 import { BeaconModules } from './BeaconModules.dom.tsx';
 import { BeaconPrivacyPage } from './BeaconPrivacyPage.dom.tsx';
+import { isHiddenFeatureOn } from '../beacon/core/hidden-features.std.ts';
 import { BeaconSettingsPage } from './BeaconSettingsPage.dom.tsx';
 import type {
   BeaconFeatureKey,
@@ -2854,6 +2855,55 @@ export function Preferences({
         title={i18n('icu:Preferences__button--internal')}
       />
     );
+  } else if (settingsLocation.page === SettingsPage.BeaconCalling) {
+    content = (
+      <PreferencesContent
+        contents={
+          <PreferencesInternal
+            i18n={i18n}
+            validateBackup={validateBackup}
+            getMessageCountBySchemaVersion={getMessageCountBySchemaVersion}
+            getMessageSampleForSchemaVersion={getMessageSampleForSchemaVersion}
+            donationReceipts={donationReceipts}
+            internalAddDonationReceipt={internalAddDonationReceipt}
+            saveAttachmentToDisk={saveAttachmentToDisk}
+            generateDonationReceiptBlob={generateDonationReceiptBlob}
+            addVisibleMegaphone={addVisibleMegaphone}
+            internalDeleteAllMegaphones={internalDeleteAllMegaphones}
+            __dangerouslyRunAbitraryReadOnlySqlQuery={
+              __dangerouslyRunAbitraryReadOnlySqlQuery
+            }
+            cqsTestMode={cqsTestMode}
+            setCqsTestMode={setCqsTestMode}
+            dredDuration={dredDuration}
+            setDredDuration={setDredDuration}
+            callStatsIntervalSecs={callStatsIntervalSecs}
+            setCallStatsIntervalSecs={setCallStatsIntervalSecs}
+            setEnableVp9Encode={setEnableVp9Encode}
+            enableVp9Encode={enableVp9Encode}
+            setEnableVp9Decode={setEnableVp9Decode}
+            enableVp9Decode={enableVp9Decode}
+            setDirectMaxBitrate={setDirectMaxBitrate}
+            directMaxBitrate={directMaxBitrate}
+            setGroupMaxBitrate={setGroupMaxBitrate}
+            groupMaxBitrate={groupMaxBitrate}
+            isGroupSvcEnabled={isGroupSvcEnabled}
+            setIsGroupSvcEnabled={setIsGroupSvcEnabled}
+            groupSvcMode={groupSvcMode}
+            setGroupSvcMode={setGroupSvcMode}
+            groupSvcModeForScreenshare={groupSvcModeForScreenshare}
+            setGroupSvcModeForScreenshare={setGroupSvcModeForScreenshare}
+            sfuUrl={sfuUrl}
+            setSfuUrl={setSfuUrl}
+            forceKeyTransparencyCheck={forceKeyTransparencyCheck}
+            keyTransparencySelfHealth={keyTransparencySelfHealth}
+            beaconCallingOnly
+          />
+        }
+        contentsRef={settingsPaneRef}
+        title={i18n('icu:Beacon__calling-title')}
+      />
+    );
   }
   return (
     <>
@@ -3053,6 +3103,16 @@ export function Preferences({
                   setSettingsLocation({ page: SettingsPage.BeaconPrivacy })
                 }
               />
+              {isHiddenFeatureOn('callingSettings') ? (
+                <PreferencesButton
+                  symbol="phone"
+                  label={i18n('icu:Beacon__calling-title')}
+                  current={settingsLocation.page === SettingsPage.BeaconCalling}
+                  onClick={() =>
+                    setSettingsLocation({ page: SettingsPage.BeaconCalling })
+                  }
+                />
+              ) : null}
               <PreferencesButton
                 symbol="grid"
                 label={i18n('icu:Preferences__button--beacon-modules')}
