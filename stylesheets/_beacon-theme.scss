@@ -2033,3 +2033,9 @@ body.beacon-has-titlebar {
 .BeaconSetup__card ::-webkit-scrollbar-button {
   display: none;
 }
+
+// Composer: same corner radius as the chat-list search box (8px) instead of
+// Signal's pill shape.
+body .module-composition-input__input {
+  border-radius: 8px;
+}
