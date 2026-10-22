@@ -472,6 +472,167 @@ function LockActions(): JSX.Element {
   );
 }
 
+type DbCryptStatus = { enabled: boolean; unlockedAtStartup: boolean };
+type DbCryptResult = { ok: boolean; error?: string };
+
+async function enableDatabasePassphrase(): Promise<boolean> {
+  const sure = await askConfirm({
+    title: 'Encrypt the database with a passphrase?',
+    body: 'Beacon will ask for this passphrase every time it starts, before any messages are loaded. The key is removed from your system keychain. There is no recovery: if you forget the passphrase, everything on this computer is lost and you’ll have to link Beacon again.',
+    confirmLabel: 'Continue',
+  });
+  if (!sure) {
+    return false;
+  }
+  const passphrase = await askPassword({
+    title: 'Database passphrase',
+    intro:
+      'At least 8 characters. Use something long — it’s the only thing protecting your messages on this computer.',
+    confirm: true,
+    minLength: 8,
+    submitLabel: 'Encrypt',
+  });
+  if (passphrase == null) {
+    return false;
+  }
+  const result = (await window.IPC.beaconInvoke(
+    'dbcrypt:enable',
+    passphrase
+  )) as DbCryptResult;
+  showNotification(
+    result.ok
+      ? 'Database passphrase set. It will be asked for on next start.'
+      : `Couldn’t set it: ${result.error ?? 'unknown error'}`,
+    result.ok ? 'success' : 'error'
+  );
+  return result.ok;
+}
+
+async function changeDatabasePassphrase(): Promise<void> {
+  const current = await askPassword({
+    title: 'Current database passphrase',
+    submitLabel: 'Next',
+  });
+  if (current == null) {
+    return;
+  }
+  const next = await askPassword({
+    title: 'New database passphrase',
+    confirm: true,
+    minLength: 8,
+    submitLabel: 'Save',
+  });
+  if (next == null) {
+    return;
+  }
+  const result = (await window.IPC.beaconInvoke('dbcrypt:change', {
+    current,
+    next,
+  })) as DbCryptResult;
+  showNotification(
+    result.ok ? 'Database passphrase changed' : (result.error ?? 'Failed'),
+    result.ok ? 'success' : 'error'
+  );
+}
+
+async function disableDatabasePassphrase(): Promise<boolean> {
+  const passphrase = await askPassword({
+    title: 'Remove database passphrase',
+    intro: 'The key goes back into your system keychain.',
+    submitLabel: 'Remove',
+  });
+  if (passphrase == null) {
+    return false;
+  }
+  const result = (await window.IPC.beaconInvoke(
+    'dbcrypt:disable',
+    passphrase
+  )) as DbCryptResult;
+  showNotification(
+    result.ok ? 'Database passphrase removed' : (result.error ?? 'Failed'),
+    result.ok ? 'success' : 'error'
+  );
+  return result.ok;
+}
+
+function DatabaseLockActions(): JSX.Element | null {
+  const [status, setStatus] = useState<DbCryptStatus | undefined>(undefined);
+  const refresh = async () => {
+    setStatus(
+      (await window.IPC.beaconInvoke('dbcrypt:status')) as DbCryptStatus
+    );
+  };
+  useEffect(() => {
+    let cancelled = false;
+    drop(
+      (async () => {
+        const next = (await window.IPC.beaconInvoke(
+          'dbcrypt:status'
+        )) as DbCryptStatus;
+        if (!cancelled) {
+          setStatus(next);
+        }
+      })()
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  if (!status) {
+    return null;
+  }
+  if (!status.enabled) {
+    return (
+      <AxoItem.Group>
+        <AxoClickableItem.Root
+          symbol="key"
+          label="Encrypt database with a passphrase"
+          description="Asked for at startup instead of trusting the system keychain. No recovery if forgotten."
+          arrow="next"
+          onClick={() =>
+            drop(
+              (async () => {
+                if (await enableDatabasePassphrase()) {
+                  await refresh();
+                }
+              })()
+            )
+          }
+        />
+      </AxoItem.Group>
+    );
+  }
+  return (
+    <AxoItem.Group>
+      <AxoClickableItem.Root
+        symbol="key"
+        label="Change database passphrase"
+        description={
+          status.unlockedAtStartup
+            ? 'The database is passphrase-protected.'
+            : 'Passphrase protection starts on next launch.'
+        }
+        arrow="next"
+        onClick={() => drop(changeDatabasePassphrase())}
+      />
+      <AxoClickableItem.Root
+        symbol="lock-open"
+        label="Remove database passphrase"
+        variant="destructive"
+        onClick={() =>
+          drop(
+            (async () => {
+              if (await disableDatabasePassphrase()) {
+                await refresh();
+              }
+            })()
+          )
+        }
+      />
+    </AxoItem.Group>
+  );
+}
+
 type ProxyStatus = { proxyUrl: string; fromEnvironment: boolean };
 
 function ProxySection(): JSX.Element {
@@ -575,7 +736,12 @@ function AddonSection({ addon }: { addon: AddonInfo }): JSX.Element {
         ) : null}
       </AxoList.Header>
       <AxoList.Body>
-        {addon.id === 'app-lock' ? <LockActions /> : null}
+        {addon.id === 'app-lock' ? (
+          <>
+            <LockActions />
+            <DatabaseLockActions />
+          </>
+        ) : null}
         {addon.id === 'proxy' ? <ProxySection /> : null}
         <BeaconSettingItems addonId={addon.id} settings={addon.settings} />
         {addon.id === 'encrypted-exports' ? (
