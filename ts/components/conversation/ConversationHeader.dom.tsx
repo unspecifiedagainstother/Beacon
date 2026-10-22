@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { RefObject, JSX, ReactNode } from 'react';
+import { toAxoSymbol } from '../../beacon/util/axoSymbol.std.ts';
 import {
   memo,
   useCallback,
@@ -66,7 +67,6 @@ import { AxoButton } from '../../axo/AxoButton.dom.tsx';
 import { AxoConfirmDialog } from '../../axo/AxoConfirmDialog.dom.tsx';
 import { getControlOrAltKey } from '../../hooks/useKeyboardShortcuts.dom.tsx';
 import { applyBeaconFilter } from '../../beacon/core/filters.std.ts';
-import type { AxoSymbol } from '../../axo/AxoSymbol.dom.tsx';
 import { BeaconSlot } from '../BeaconSlot.dom.tsx';
 
 function HeaderInfoTitle({
@@ -972,7 +972,7 @@ function HeaderDropdownMenuContent({
           }).map(item => (
             <AxoDropdownMenu.Item
               key={item.id}
-              symbol={item.symbol as AxoSymbol.Name | undefined}
+              symbol={toAxoSymbol(item.symbol)}
               onSelect={item.onSelect}
             >
               {item.label}

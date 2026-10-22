@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { useRef, type ReactNode, type JSX } from 'react';
+import { toAxoSymbol } from '../../beacon/util/axoSymbol.std.ts';
 import { isHiddenFeatureOn } from '../../beacon/core/hidden-features.std.ts';
 import { drop } from '../../util/drop.std.ts';
 import type { LocalizerType } from '../../types/I18N.std.ts';
 import { AxoMenuBuilder } from '../../axo/AxoMenuBuilder.dom.tsx';
 import { isInternalFeaturesEnabled } from '../../util/isInternalFeaturesEnabled.dom.ts';
-import type { AxoSymbol } from '../../axo/AxoSymbol.dom.tsx';
 import { applyBeaconFilter } from '../../beacon/core/filters.std.ts';
 
 type MessageContextMenuProps = Readonly<{
@@ -145,7 +145,7 @@ export function MessageContextMenu({
             item => (
               <AxoMenuBuilder.Item
                 key={item.id}
-                symbol={item.symbol as AxoSymbol.Name | undefined}
+                symbol={toAxoSymbol(item.symbol)}
                 onSelect={item.onSelect}
               >
                 {item.label}
