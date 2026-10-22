@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { JSX } from 'react';
+import { toAxoSymbol } from '../beacon/util/axoSymbol.std.ts';
 import { useId, useState } from 'react';
 
 import type { AxoSymbol } from '../axo/AxoSymbol.dom.tsx';
@@ -49,7 +50,7 @@ function SettingItem({
   def: AddonSettingDefinition;
   value: AddonSettingValue;
 }): JSX.Element {
-  const symbol = def.symbol as AxoSymbol.Name | undefined;
+  const symbol = toAxoSymbol(def.symbol);
   const set = (next: AddonSettingValue) =>
     setAddonSetting(addonId, def.key, next);
 

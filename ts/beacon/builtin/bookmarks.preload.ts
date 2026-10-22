@@ -171,7 +171,7 @@ export default {
           {
             id: 'beacon-bookmark',
             label: isBookmarked ? 'Remove bookmark' : 'Bookmark',
-            symbol: 'tag',
+            symbol: 'label',
             onSelect: () => drop(toggleBookmark(messageId, conversationId)),
           },
           {
