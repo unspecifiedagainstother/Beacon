@@ -44,7 +44,7 @@ import type {
 import { isImageAttachment, isVoiceMessage } from '../util/Attachment.std.ts';
 import { isViewOnceEligible } from '../util/viewOnceEligibility.std.ts';
 import type { AciString } from '../types/ServiceId.std.ts';
-import { AudioCapture } from './conversation/AudioCapture.dom.tsx';
+import { ToastType } from '../types/Toast.dom.tsx';
 import { CompositionUpload } from './CompositionUpload.dom.tsx';
 import type {
   ConversationRemovalStage,
@@ -778,42 +778,34 @@ export const CompositionArea = memo(function CompositionArea({
           {i18n('icu:CompositionArea__ConfirmGifSelection__ReplaceButton')}
         </AxoConfirmDialog.Action>
       </AxoConfirmDialog.Root>
-      <div
-        aria-hidden={isViewOnceActive || undefined}
-        className={classNames(
-          'CompositionArea__button-cell',
-          isViewOnceActive ? tw('invisible') : null
-        )}
-      >
-        <FunPicker
-          isReply={Boolean(quotedMessageId)}
-          placement="top start"
-          open={funPickerOpen}
-          onOpenChange={handleFunPickerOpenChange}
-          onSelectEmoji={handleFunPickerSelectEmoji}
-          onSelectSticker={handleFunPickerSelectSticker}
-          onSelectGif={handleFunPickerSelectGif}
-          onAddStickerPack={handleFunPickerAddStickerPack}
-        >
-          <FunPickerButton i18n={i18n} />
-        </FunPicker>
-      </div>
       {mediaQualitySelectorFragment}
     </>
   );
 
-  const micButtonFragment = shouldShowMicrophone ? (
-    <div className="CompositionArea__button-cell">
-      <AudioCapture
-        conversationId={conversationId}
-        draftAttachments={draftAttachments}
-        i18n={i18n}
-        showToast={showToast}
-        warmupRecording={warmupRecording}
-        startRecording={startRecording}
-      />
+  // Beacon: emoji / sticker / GIF picker on the right, where the microphone
+  // was; voice notes moved into the + menu.
+  const funPickerFragment = (
+    <div
+      aria-hidden={isViewOnceActive || undefined}
+      className={classNames(
+        'CompositionArea__button-cell',
+        isViewOnceActive ? tw('invisible') : null
+      )}
+    >
+      <FunPicker
+        isReply={Boolean(quotedMessageId)}
+        placement="top end"
+        open={funPickerOpen}
+        onOpenChange={handleFunPickerOpenChange}
+        onSelectEmoji={handleFunPickerSelectEmoji}
+        onSelectSticker={handleFunPickerSelectSticker}
+        onSelectGif={handleFunPickerSelectGif}
+        onAddStickerPack={handleFunPickerAddStickerPack}
+      >
+        <FunPickerButton i18n={i18n} />
+      </FunPicker>
     </div>
-  ) : null;
+  );
 
   const editMessageFragment = draftEditMessage ? (
     <>
@@ -837,6 +829,43 @@ export const CompositionArea = memo(function CompositionArea({
   ) : null;
 
   const isRecording = recordingState === RecordingState.Recording;
+
+  // Beacon: voice notes start from the + menu (and Mod+Shift+Y) now that
+  // the microphone button's slot holds the emoji/sticker picker.
+  const handleStartVoiceNote = useCallback(() => {
+    if (draftAttachments.length) {
+      showToast({ toastType: ToastType.VoiceNoteMustBeTheOnlyAttachment });
+      return;
+    }
+    warmupRecording();
+    startRecording(conversationId);
+  }, [
+    conversationId,
+    draftAttachments,
+    showToast,
+    startRecording,
+    warmupRecording,
+  ]);
+
+  const onVoiceNoteShortcut = useEffectEvent((event: KeyboardEvent) => {
+    if (
+      draftEditMessage != null ||
+      document.querySelector('[data-fun-overlay], [role=dialog]')
+    ) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    handleStartVoiceNote();
+  });
+
+  useEffect(() => {
+    return tinykeys(
+      window,
+      { '$mod+Shift+Y': onVoiceNoteShortcut },
+      { ignore: () => false }
+    );
+  }, []);
   const actionSlotClassName = tw(
     'flex size-8 shrink-0 items-center justify-center'
   );
@@ -863,6 +892,14 @@ export const CompositionArea = memo(function CompositionArea({
             <AxoDropdownMenu.Item symbol="file" onSelect={launchFilePicker}>
               {i18n('icu:CompositionArea__AttachMenu__File')}
             </AxoDropdownMenu.Item>
+            {draftEditMessage == null && (
+              <AxoDropdownMenu.Item
+                symbol="mic"
+                onSelect={handleStartVoiceNote}
+              >
+                Voice message
+              </AxoDropdownMenu.Item>
+            )}
             {(conversationType === 'group' || isPollSend1to1Enabled) && (
               <AxoDropdownMenu.Item
                 symbol="poll"
@@ -1357,7 +1394,7 @@ export const CompositionArea = memo(function CompositionArea({
         )}
         {!isViewOnceActive && !large && (
           <>
-            {!dirty ? micButtonFragment : null}
+            {funPickerFragment}
             {editMessageFragment}
             {composerAddMenuButton}
           </>
@@ -1372,7 +1409,7 @@ export const CompositionArea = memo(function CompositionArea({
         >
           {leftHandSideButtonsFragment}
           {composerAddMenuButton}
-          {!dirty ? micButtonFragment : null}
+          {funPickerFragment}
           {editMessageFragment}
           {dirty || !shouldShowMicrophone ? sendButtonFragment : null}
         </div>

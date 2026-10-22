@@ -2108,3 +2108,81 @@ body .module-message__metadata__date {
   overflow-wrap: anywhere;
   user-select: text;
 }
+
+// ---------------------------------------------------------------------------
+// Sticker picker, Discord-style: search on top, pack icons in a vertical
+// sidebar on the left, stickers on the right; remove button on pack headers.
+// (FunPanelStickers.dom.tsx adds FunPanel--stickers.)
+// ---------------------------------------------------------------------------
+
+.FunPanel.FunPanel--stickers {
+  width: 400px;
+  grid-template:
+    'FunPanel__Header FunPanel__Header' auto
+    'FunPanel__Footer FunPanel__Body' 1fr
+    / 52px 1fr;
+
+  .FunPanel__Footer {
+    display: flex;
+    min-height: 0;
+    border-inline-end: 1px solid var(--axo-color-border-primary, #333);
+  }
+
+  .FunSubNav__Container {
+    flex: 1;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+  }
+
+  .FunSubNav__Scroller {
+    flex: 1;
+    min-height: 0;
+
+    &::before,
+    &::after {
+      display: none;
+    }
+  }
+
+  .FunSubNav__ScrollerMask {
+    display: none;
+  }
+
+  .FunSubNav__ScrollerViewport {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .FunSubNav__ScrollerViewportInner {
+    display: block;
+  }
+
+  .FunSubNav__ListBox {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding-block: 8px;
+    padding-inline: 0;
+  }
+
+  .FunSubNav__ListBoxItem {
+    flex: none;
+  }
+
+  .FunSubNav__Buttons {
+    justify-content: center;
+    padding-block: 8px;
+    border-block-start: 1px solid var(--axo-color-border-primary, #333);
+  }
+
+  .FunPanel__Body {
+    min-width: 0;
+  }
+}
+
+.FunGrid__HeaderIcon--Remove {
+  background-color: var(--axo-color-label-secondary);
+  mask: url('../images/icons/v3/trash/trash.svg') center / 16px no-repeat;
+}

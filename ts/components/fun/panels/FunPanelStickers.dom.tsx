@@ -24,6 +24,8 @@ import {
   FunGridCell,
   FunGridContainer,
   FunGridHeader,
+  FunGridHeaderButton,
+  FunGridHeaderIcon,
   FunGridHeaderText,
   FunGridRow,
   FunGridRowGroup,
@@ -71,6 +73,7 @@ import { FunSticker } from '../FunSticker.dom.tsx';
 import { getAnalogTime } from '../../../util/getAnalogTime.std.ts';
 import { getDateTimeFormatter } from '../../../util/formatTimestamp.dom.ts';
 import { Emoji } from '../../../axo/emoji.std.ts';
+import { AxoAlertDialog } from '../../../axo/AxoAlertDialog.dom.tsx';
 
 const STICKER_GRID_COLUMNS = 4;
 const STICKER_GRID_CELL_WIDTH = 80;
@@ -197,6 +200,7 @@ export function FunPanelStickers({
     onStoredSearchInputChange,
     recentStickers,
     installedStickerPacks,
+    onRemoveStickerPack,
     onSelectSticker: onFunSelectSticker,
     onStageStickerReply,
   } = fun;
@@ -228,6 +232,11 @@ export function FunPanelStickers({
   }, [recentStickers, installedStickerPacks]);
 
   const [focusedCellKey, setFocusedCellKey] = useState<CellKey | null>(null);
+  // Beacon: pack waiting for "Remove sticker pack?" confirmation.
+  const [packToRemove, setPackToRemove] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
   const [searchInput, setSearchInput] = useState(storedSearchInput);
   const searchQuery = useMemo(() => searchInput.trim(), [searchInput]);
 
@@ -394,7 +403,7 @@ export function FunPanelStickers({
   }, [onAddStickerPack, onClose]);
 
   return (
-    <FunPanel>
+    <FunPanel className="FunPanel--stickers">
       <FunPanelHeader>
         <FunSearch
           i18n={i18n}
@@ -506,6 +515,24 @@ export function FunPanelStickers({
                             packsLookup
                           )}
                         </FunGridHeaderText>
+                        {onRemoveStickerPack &&
+                        section.id.startsWith('StickerPack:') ? (
+                          <FunGridHeaderButton
+                            label="Remove sticker pack"
+                            onPress={() => {
+                              const packId = section.id.replace(
+                                /^StickerPack:/,
+                                ''
+                              );
+                              setPackToRemove({
+                                id: packId,
+                                title: packsLookup[packId]?.title ?? '',
+                              });
+                            }}
+                          >
+                            <FunGridHeaderIcon iconClassName="FunGrid__HeaderIcon--Remove" />
+                          </FunGridHeaderButton>
+                        ) : null}
                       </FunGridHeader>
                       <FunGridRowGroup
                         aria-labelledby={section.header.key}
@@ -536,6 +563,44 @@ export function FunPanelStickers({
           </FunLightboxProvider>
         </FunScroller>
       </FunPanelBody>
+      {packToRemove ? (
+        <AxoAlertDialog.Root
+          open
+          onOpenChange={open => {
+            if (!open) {
+              setPackToRemove(null);
+            }
+          }}
+        >
+          <AxoAlertDialog.Content escape="cancel-is-noop">
+            <AxoAlertDialog.Body>
+              <AxoAlertDialog.Title>Remove sticker pack?</AxoAlertDialog.Title>
+              <AxoAlertDialog.Description>
+                {packToRemove.title
+                  ? `“${packToRemove.title}” will be removed from your stickers. You can add it again from a sticker someone sends you.`
+                  : 'This pack will be removed from your stickers.'}
+              </AxoAlertDialog.Description>
+            </AxoAlertDialog.Body>
+            <AxoAlertDialog.Footer>
+              <AxoAlertDialog.Action
+                variant="strong-secondary"
+                onClick={() => setPackToRemove(null)}
+              >
+                {i18n('icu:cancel')}
+              </AxoAlertDialog.Action>
+              <AxoAlertDialog.Action
+                variant="strong-destructive"
+                onClick={() => {
+                  onRemoveStickerPack?.(packToRemove.id);
+                  setPackToRemove(null);
+                }}
+              >
+                Remove
+              </AxoAlertDialog.Action>
+            </AxoAlertDialog.Footer>
+          </AxoAlertDialog.Content>
+        </AxoAlertDialog.Root>
+      ) : null}
     </FunPanel>
   );
 }

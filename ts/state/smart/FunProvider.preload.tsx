@@ -51,7 +51,8 @@ export const SmartFunProvider = memo(function SmartFunProvider(
   const { openCustomizePreferredReactionsModal } =
     usePreferredReactionsActions();
   const { onUseEmoji } = useEmojisActions();
-  const { useSticker: onUseSticker } = useStickersActions();
+  const { useSticker: onUseSticker, uninstallStickerPack } =
+    useStickersActions();
   const { onAddRecentGif, onRemoveRecentGif } = useGifsActions();
 
   // Beacon: sticker replies always on (Signal gates them behind a
@@ -90,6 +91,17 @@ export const SmartFunProvider = memo(function SmartFunProvider(
     removeItem('showStickerPickerHint');
   }, [removeItem]);
 
+  // Beacon: remove a pack from the sticker picker.
+  const handleRemoveStickerPack = useCallback(
+    (packId: string) => {
+      const pack = installedStickerPacks.find(p => p.id === packId);
+      if (pack) {
+        uninstallStickerPack(pack.id, pack.key, { actionSource: 'ui' });
+      }
+    },
+    [installedStickerPacks, uninstallStickerPack]
+  );
+
   const handleSelectSticker = useCallback(
     (stickerSelection: FunStickerSelection) => {
       // oxlint-disable-next-line react/hooks
@@ -126,6 +138,7 @@ export const SmartFunProvider = memo(function SmartFunProvider(
       showStickerPickerHint={showStickerPickerHint}
       onClearStickerPickerHint={handleClearStickerPickerHint}
       onSelectSticker={handleSelectSticker}
+      onRemoveStickerPack={handleRemoveStickerPack}
       // Gifs
       fetchGiphySearch={fetchGiphySearch}
       fetchGiphyTrending={fetchGiphyTrending}
