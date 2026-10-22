@@ -273,22 +273,22 @@ export function StandaloneRegistration({
 
   return (
     <div
-      className={tw(
+      className={`${tw(
         'flex size-full flex-col overflow-hidden bg-[url("../images/registration-background.png")] bg-cover bg-center'
-      )}
+      )} BeaconRegistration`}
     >
       <TitlebarDragArea />
-      <img
-        className="StandaloneRegistration--SignalLogo"
-        src="images/signal-logo-with-text.svg"
-        alt={i18n('icu:StandaloneRegistration--signal-logo')}
-      />
+      {/* Beacon: own branding instead of the Signal wordmark. */}
+      <div className="BeaconRegistration__brand">
+        <div className="BeaconInstall__logo" aria-hidden="true" />
+        <span>Beacon</span>
+      </div>
       <Spacer className={tw('h-8')} />
       <div className={tw('relative grow')}>
         <div
-          className={tw(
+          className={`${tw(
             'absolute inset-s-1/2 top-1/2 flex max-h-[calc(100%-32px)] w-143 max-w-[calc(100%-32px)] -translate-1/2 transform flex-col overflow-hidden rounded-[26px] bg-surface-primary'
-          )}
+          )} BeaconRegistration__card`}
         >
           <AnimatePresence>
             <motion.div

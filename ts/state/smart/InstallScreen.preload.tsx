@@ -63,6 +63,9 @@ export const SmartInstallScreen = memo(function SmartInstallScreen() {
           continueInstallWithDataDeletion,
           OS: OS.getName(),
           isStaging: isStagingServer(),
+          onRegister: () => {
+            window.reduxActions.app.openStandalone();
+          },
         },
       };
       break;

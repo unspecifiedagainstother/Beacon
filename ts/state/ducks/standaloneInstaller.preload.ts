@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { isNumber } from 'lodash';
+import { openCaptcha } from '../../beacon/core/captcha.dom.ts';
 import { v7 as generateUuid } from 'uuid';
 import { SvrKey } from '@signalapp/libsignal-client/dist/AccountKeys';
 
@@ -391,7 +392,7 @@ export function openBrowserForCaptcha(): NoopActionType {
     };
   }
 
-  document.location.href = url;
+  openCaptcha('registration', url);
   return {
     type: `NOOP/${logId}`,
     payload: null,
