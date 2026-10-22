@@ -85,6 +85,7 @@ import {
 import { missingCaseError } from '../util/missingCaseError.std.ts';
 import type { AutoSubstituteAsciiEmojisOptions } from '../quill/auto-substitute-ascii-emojis/index.dom.tsx';
 import { AutoSubstituteAsciiEmojis } from '../quill/auto-substitute-ascii-emojis/index.dom.tsx';
+import { InlineMarkdown } from '../quill/markdown/index.std.ts';
 import { dropNull } from '../util/dropNull.std.ts';
 import { SimpleQuillWrapper } from './SimpleQuillWrapper.dom.tsx';
 import { FUN_STATIC_EMOJI_CLASS } from './fun/FunEmoji.dom.tsx';
@@ -111,6 +112,8 @@ Quill.register(
     'modules/emojiCompletion': EmojiCompletion,
     'modules/mentionCompletion': MentionCompletion,
     'modules/commandCompletion': CommandCompletion,
+    // Beacon: live **markdown** → Signal formatting.
+    'modules/inlineMarkdown': InlineMarkdown,
     'modules/formattingMenu': FormattingMenu,
     'modules/signalClipboard': SignalClipboard,
   },
@@ -963,6 +966,7 @@ export function CompositionInput(props: Props): ReactElement {
               i18n,
               theme,
             },
+            inlineMarkdown: true,
             commandCompletion: {
               onSelectCommand: (commandId: string) =>
                 callbacksRef.current.onSelectCommand(commandId),
