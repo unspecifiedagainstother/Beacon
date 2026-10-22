@@ -23,6 +23,16 @@ import { InstallScreenUpdateDialog } from './InstallScreenUpdateDialog.dom.tsx';
 import { getClassNamesFor } from '../../util/getClassNamesFor.std.ts';
 import type { UpdatesStateType } from '../../state/ducks/updates.preload.ts';
 import { AxoAlertDialog } from '../../axo/AxoAlertDialog.dom.tsx';
+import { AxoButton } from '../../axo/AxoButton.dom.tsx';
+import { tw } from '../../axo/tw.dom.tsx';
+import { openLinkInWebBrowser } from '../../util/openLinkInWebBrowser.dom.ts';
+import {
+  Buttons,
+  Description,
+  Spacer,
+  Title,
+} from '../standaloneRegistration/util/StepComponents.dom.tsx';
+import { BeaconSetupBrand } from '../BeaconSetupBrand.dom.tsx';
 
 const { noop } = lodash;
 
@@ -84,77 +94,97 @@ export function InstallScreenQrCodeNotScannedStep({
     );
   }
 
+  // Beacon: same frame and Axo pieces as the standalone registration screen
+  // (StandaloneRegistration.dom.tsx), so linking and registering look alike.
   return (
-    <div className="module-InstallScreenQrCodeNotScannedStep">
+    <div
+      className={`${tw('flex size-full flex-col overflow-hidden')} BeaconSetup`}
+    >
       <TitlebarDragArea />
-
-      {/* Beacon: branded header above the card. */}
-      <header className="BeaconInstall__header">
-        <div className="BeaconInstall__logo" aria-hidden="true" />
-        <h1 className="BeaconInstall__title">Welcome to Beacon</h1>
-        <p className="BeaconInstall__subtitle">
-          Link this computer to Signal on your phone, or register it as its own
-          account.
-        </p>
-      </header>
-
-      <div className="module-InstallScreenQrCodeNotScannedStep__contents">
-        <InstallScreenQrCode
-          i18n={i18n}
-          {...provisioningUrl}
-          retryGetQrCode={retryGetQrCode}
-        />
-        <div className="module-InstallScreenQrCodeNotScannedStep__instructions">
-          <h1>{i18n('icu:Install__scan-this-code')}</h1>
-          <ol>
-            <li>{i18n('icu:Install__instructions__1')}</li>
-            <li>
-              <I18n
-                i18n={i18n}
-                id="icu:Install__instructions__2"
-                components={{
-                  settings: (
-                    <strong>
-                      {i18n('icu:Install__instructions__2__settings')}
-                    </strong>
-                  ),
-                  linkedDevices: <strong>{i18n('icu:linkedDevices')}</strong>,
-                }}
-              />
-            </li>
-            <li>
-              <I18n
-                i18n={i18n}
-                id="icu:Install__instructions__3"
-                components={{
-                  linkNewDevice: <strong>{i18n('icu:linkNewDevice')}</strong>,
-                }}
-              />
-            </li>
-          </ol>
-          <div className="BeaconInstall__links">
-            <a target="_blank" rel="noreferrer" href={SUPPORT_PAGE}>
-              {i18n('icu:Install__support-link')}
-            </a>
-            {isStaging ? (
-              <span className="BeaconInstall__staging">Staging server</span>
-            ) : null}
+      <BeaconSetupBrand />
+      <Spacer className={tw('h-8')} />
+      <div className={tw('relative grow')}>
+        <div
+          className={tw(
+            'absolute inset-s-1/2 top-1/2 flex max-h-[calc(100%-32px)] w-143 max-w-[calc(100%-32px)] -translate-1/2 transform flex-col overflow-hidden rounded-[26px] bg-surface-primary'
+          )}
+        >
+          <div
+            className={tw(
+              'flex grow flex-col items-center overflow-x-hidden overflow-y-auto p-6 text-center'
+            )}
+          >
+            <Spacer className={tw('h-4')} />
+            <InstallScreenQrCode
+              i18n={i18n}
+              {...provisioningUrl}
+              retryGetQrCode={retryGetQrCode}
+            />
+            <Spacer className={tw('h-6')} />
+            <Title text={i18n('icu:Install__scan-this-code')} />
+            <Description>
+              <ol className={tw('list-inside list-decimal text-start')}>
+                <li>{i18n('icu:Install__instructions__1')}</li>
+                <li>
+                  <I18n
+                    i18n={i18n}
+                    id="icu:Install__instructions__2"
+                    components={{
+                      settings: (
+                        <strong className={tw('text-primary')}>
+                          {i18n('icu:Install__instructions__2__settings')}
+                        </strong>
+                      ),
+                      linkedDevices: (
+                        <strong className={tw('text-primary')}>
+                          {i18n('icu:linkedDevices')}
+                        </strong>
+                      ),
+                    }}
+                  />
+                </li>
+                <li>
+                  <I18n
+                    i18n={i18n}
+                    id="icu:Install__instructions__3"
+                    components={{
+                      linkNewDevice: (
+                        <strong className={tw('text-primary')}>
+                          {i18n('icu:linkNewDevice')}
+                        </strong>
+                      ),
+                    }}
+                  />
+                </li>
+              </ol>
+            </Description>
+            <Spacer className={tw('h-8 grow')} />
+            <Buttons
+              leftSideContent={
+                <AxoButton.Root
+                  variant="implied-secondary"
+                  size="md"
+                  onClick={() => openLinkInWebBrowser(SUPPORT_PAGE)}
+                >
+                  {isStaging
+                    ? `${i18n('icu:Install__support-link')} · Staging`
+                    : i18n('icu:Install__support-link')}
+                </AxoButton.Root>
+              }
+            >
+              {onRegister ? (
+                <AxoButton.Root
+                  variant="subtle-secondary"
+                  size="md"
+                  onClick={() => setConfirmingRegister(true)}
+                >
+                  Use a phone number instead
+                </AxoButton.Root>
+              ) : null}
+            </Buttons>
           </div>
         </div>
       </div>
-
-      {onRegister ? (
-        <div className="BeaconInstall__alt">
-          <span className="BeaconInstall__alt-text">No phone to link?</span>
-          <button
-            type="button"
-            className="BeaconInstall__alt-button"
-            onClick={() => setConfirmingRegister(true)}
-          >
-            Register this computer with a phone number
-          </button>
-        </div>
-      ) : null}
 
       {onRegister ? (
         <AxoAlertDialog.Root
