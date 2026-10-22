@@ -1639,7 +1639,8 @@
 .BeaconLock {
   position: fixed;
   inset: 0;
-  z-index: 2147483647;
+  // One below the custom titlebar, which stays usable while locked.
+  z-index: 2147483646;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1825,5 +1826,38 @@
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 6px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Custom titlebar stays on top: dialogs, overlays and the lock screen start
+// below it, so they never cover or blur it. BeaconTitlebar.dom.tsx sets the
+// body class while it is mounted.
+// ---------------------------------------------------------------------------
+
+body.beacon-has-titlebar {
+  --beacon-titlebar-height: 32px;
+
+  .BeaconTitlebar {
+    position: relative;
+    z-index: 2147483647;
+  }
+
+  .BeaconModal,
+  .BeaconLock,
+  .module-modal-host__overlay,
+  .module-modal-host__overlay-container,
+  .legacy-z-index-modal-host {
+    inset-block-start: var(--beacon-titlebar-height);
+  }
+
+  .module-modal-host__overlay,
+  .module-modal-host__overlay-container {
+    height: calc(100vh - var(--beacon-titlebar-height));
+  }
+
+  // The real titlebar stays usable, so the lock's own buttons aren't needed.
+  .BeaconLock__controls {
+    display: none;
   }
 }
