@@ -82,6 +82,11 @@ export function initializeBeaconRuntime(store: Store<StateType>): void {
   }
   initialized = true;
 
+  // Squarer look before first paint (built-in "Look" keeps it in sync).
+  if (addonSettings.get('beacon-look', 'squareCorners') !== false) {
+    document.body?.classList.add('beacon-square');
+  }
+
   // App lock first, before any chat UI can render.
   try {
     lockOnStartup();

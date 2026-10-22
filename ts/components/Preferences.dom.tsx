@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { AudioDevice } from '@signalapp/ringrtc';
+import { BeaconErrorBoundary } from './BeaconErrorBoundary.dom.tsx';
 import {
   useCallback,
   useEffect,
@@ -2255,20 +2256,22 @@ export function Preferences({
     content = (
       <PreferencesContent
         contents={
-          <BeaconSettingsPage
-            i18n={i18n}
-            beaconSettings={beaconSettings}
-            onBeaconSettingChange={onBeaconSettingChange}
-            hasCustomTitlebar={hasCustomTitlebar}
-            onCustomTitlebarChange={onCustomTitlebarChange}
-            beaconNeedsRestart={beaconNeedsRestart}
-            onOpenModules={() =>
-              setSettingsLocation({ page: SettingsPage.BeaconModules })
-            }
-            onOpenAppearance={() =>
-              setSettingsLocation({ page: SettingsPage.Appearance })
-            }
-          />
+          <BeaconErrorBoundary name="Beacon settings">
+            <BeaconSettingsPage
+              i18n={i18n}
+              beaconSettings={beaconSettings}
+              onBeaconSettingChange={onBeaconSettingChange}
+              hasCustomTitlebar={hasCustomTitlebar}
+              onCustomTitlebarChange={onCustomTitlebarChange}
+              beaconNeedsRestart={beaconNeedsRestart}
+              onOpenModules={() =>
+                setSettingsLocation({ page: SettingsPage.BeaconModules })
+              }
+              onOpenAppearance={() =>
+                setSettingsLocation({ page: SettingsPage.Appearance })
+              }
+            />
+          </BeaconErrorBoundary>
         }
         contentsRef={settingsPaneRef}
         title={i18n('icu:Preferences__beacon-title')}
@@ -2277,13 +2280,21 @@ export function Preferences({
   } else if (settingsLocation.page === SettingsPage.BeaconPrivacy) {
     content = (
       <PreferencesContent
-        contents={<BeaconPrivacyPage i18n={i18n} />}
+        contents={
+          <BeaconErrorBoundary name="Beacon Privacy">
+            <BeaconPrivacyPage i18n={i18n} />
+          </BeaconErrorBoundary>
+        }
         contentsRef={settingsPaneRef}
         title={i18n('icu:Beacon__privacy-title')}
       />
     );
   } else if (settingsLocation.page === SettingsPage.BeaconModules) {
-    const pageContents = <BeaconModules i18n={i18n} />;
+    const pageContents = (
+      <BeaconErrorBoundary name="Beacon modules">
+        <BeaconModules i18n={i18n} />
+      </BeaconErrorBoundary>
+    );
     content = (
       <PreferencesContent
         contents={pageContents}
