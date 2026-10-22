@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { useEffect, useState, type JSX } from 'react';
+import { BeaconErrorBoundary } from './BeaconErrorBoundary.dom.tsx';
 
 import { AppViewType } from '../types/app.std.ts';
 import { missingCaseError } from '../util/missingCaseError.std.ts';
@@ -129,7 +130,11 @@ export function App({
 
   return (
     <div className="App">
-      {hasCustomTitlebar && <BeaconTitlebar title="Beacon" />}
+      {hasCustomTitlebar && (
+        <BeaconErrorBoundary name="titlebar">
+          <BeaconTitlebar title="Beacon" />
+        </BeaconErrorBoundary>
+      )}
       {contents}
       {renderGlobalModalContainer()}
       {renderCallManager()}
