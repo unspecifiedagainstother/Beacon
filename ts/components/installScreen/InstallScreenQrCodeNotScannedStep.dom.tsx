@@ -43,6 +43,8 @@ export type PropsType = Readonly<{
   isConfirmingDataDeletion: boolean;
   continueInstallWithDataDeletion: () => void;
   restartInstall: () => void;
+  /** Beacon: register this computer as its own account instead of linking. */
+  onRegister?: () => void;
 }>;
 
 const getQrCodeClassName = getClassNamesFor(
@@ -66,7 +68,9 @@ export function InstallScreenQrCodeNotScannedStep({
   restartInstall,
   continueInstallWithDataDeletion,
   updates,
+  onRegister,
 }: Readonly<PropsType>): ReactElement {
+  const [confirmingRegister, setConfirmingRegister] = useState(false);
   if (hasExpired || updates.dialogType === DialogType.Downloading) {
     return (
       <InstallScreenUpdateDialog
@@ -84,7 +88,15 @@ export function InstallScreenQrCodeNotScannedStep({
     <div className="module-InstallScreenQrCodeNotScannedStep">
       <TitlebarDragArea />
 
-      {/* <InstallScreenSignalLogo /> */}
+      {/* Beacon: branded header above the card. */}
+      <header className="BeaconInstall__header">
+        <div className="BeaconInstall__logo" aria-hidden="true" />
+        <h1 className="BeaconInstall__title">Welcome to Beacon</h1>
+        <p className="BeaconInstall__subtitle">
+          Link this computer to Signal on your phone, or register it as its own
+          account.
+        </p>
+      </header>
 
       <div className="module-InstallScreenQrCodeNotScannedStep__contents">
         <InstallScreenQrCode
@@ -120,15 +132,67 @@ export function InstallScreenQrCodeNotScannedStep({
               />
             </li>
           </ol>
-          {isStaging ? (
-            'THIS IS A STAGING DESKTOP'
-          ) : (
+          <div className="BeaconInstall__links">
             <a target="_blank" rel="noreferrer" href={SUPPORT_PAGE}>
               {i18n('icu:Install__support-link')}
             </a>
-          )}
+            {isStaging ? (
+              <span className="BeaconInstall__staging">Staging server</span>
+            ) : null}
+          </div>
         </div>
       </div>
+
+      {onRegister ? (
+        <div className="BeaconInstall__alt">
+          <span className="BeaconInstall__alt-text">No phone to link?</span>
+          <button
+            type="button"
+            className="BeaconInstall__alt-button"
+            onClick={() => setConfirmingRegister(true)}
+          >
+            Register this computer with a phone number
+          </button>
+        </div>
+      ) : null}
+
+      {onRegister ? (
+        <AxoAlertDialog.Root
+          open={confirmingRegister}
+          onOpenChange={setConfirmingRegister}
+        >
+          <AxoAlertDialog.Content escape="cancel-is-noop">
+            <AxoAlertDialog.Body>
+              <AxoAlertDialog.Title>
+                Register this computer?
+              </AxoAlertDialog.Title>
+              <AxoAlertDialog.Description>
+                Beacon becomes the main device for the number you enter, with
+                its own account. If that number is already used by Signal on a
+                phone, the phone is signed out of Signal. To use both, link
+                instead by scanning the code.
+              </AxoAlertDialog.Description>
+            </AxoAlertDialog.Body>
+            <AxoAlertDialog.Footer>
+              <AxoAlertDialog.Action
+                variant="strong-secondary"
+                onClick={() => setConfirmingRegister(false)}
+              >
+                {i18n('icu:cancel')}
+              </AxoAlertDialog.Action>
+              <AxoAlertDialog.Action
+                variant="strong-primary"
+                onClick={() => {
+                  setConfirmingRegister(false);
+                  onRegister();
+                }}
+              >
+                Continue
+              </AxoAlertDialog.Action>
+            </AxoAlertDialog.Footer>
+          </AxoAlertDialog.Content>
+        </AxoAlertDialog.Root>
+      ) : null}
       {isConfirmingDataDeletion ? (
         <AxoAlertDialog.Root open>
           <AxoAlertDialog.Content escape="cancel-is-destructive">
