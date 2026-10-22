@@ -73,7 +73,6 @@ import { FunSticker } from '../FunSticker.dom.tsx';
 import { getAnalogTime } from '../../../util/getAnalogTime.std.ts';
 import { getDateTimeFormatter } from '../../../util/formatTimestamp.dom.ts';
 import { Emoji } from '../../../axo/emoji.std.ts';
-import { AxoAlertDialog } from '../../../axo/AxoAlertDialog.dom.tsx';
 
 const STICKER_GRID_COLUMNS = 4;
 const STICKER_GRID_CELL_WIDTH = 80;
@@ -232,11 +231,10 @@ export function FunPanelStickers({
   }, [recentStickers, installedStickerPacks]);
 
   const [focusedCellKey, setFocusedCellKey] = useState<CellKey | null>(null);
-  // Beacon: pack waiting for "Remove sticker pack?" confirmation.
-  const [packToRemove, setPackToRemove] = useState<{
-    id: string;
-    title: string;
-  } | null>(null);
+  // Beacon: pack whose header shows the inline "Remove?" confirmation.
+  // Inline rather than a dialog: a dialog sits outside the picker popover,
+  // so clicking it closed the picker before the click registered.
+  const [packToRemove, setPackToRemove] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(storedSearchInput);
   const searchQuery = useMemo(() => searchInput.trim(), [searchInput]);
 
@@ -517,21 +515,19 @@ export function FunPanelStickers({
                         </FunGridHeaderText>
                         {onRemoveStickerPack &&
                         section.id.startsWith('StickerPack:') ? (
-                          <FunGridHeaderButton
-                            label="Remove sticker pack"
-                            onPress={() => {
-                              const packId = section.id.replace(
-                                /^StickerPack:/,
-                                ''
-                              );
-                              setPackToRemove({
-                                id: packId,
-                                title: packsLookup[packId]?.title ?? '',
-                              });
+                          <BeaconRemovePackControl
+                            packId={section.id.replace(/^StickerPack:/, '')}
+                            confirming={
+                              packToRemove ===
+                              section.id.replace(/^StickerPack:/, '')
+                            }
+                            onAsk={setPackToRemove}
+                            onCancel={() => setPackToRemove(null)}
+                            onRemove={packId => {
+                              setPackToRemove(null);
+                              onRemoveStickerPack(packId);
                             }}
-                          >
-                            <FunGridHeaderIcon iconClassName="FunGrid__HeaderIcon--Remove" />
-                          </FunGridHeaderButton>
+                          />
                         ) : null}
                       </FunGridHeader>
                       <FunGridRowGroup
@@ -563,45 +559,47 @@ export function FunPanelStickers({
           </FunLightboxProvider>
         </FunScroller>
       </FunPanelBody>
-      {packToRemove ? (
-        <AxoAlertDialog.Root
-          open
-          onOpenChange={open => {
-            if (!open) {
-              setPackToRemove(null);
-            }
-          }}
-        >
-          <AxoAlertDialog.Content escape="cancel-is-noop">
-            <AxoAlertDialog.Body>
-              <AxoAlertDialog.Title>Remove sticker pack?</AxoAlertDialog.Title>
-              <AxoAlertDialog.Description>
-                {packToRemove.title
-                  ? `“${packToRemove.title}” will be removed from your stickers. You can add it again from a sticker someone sends you.`
-                  : 'This pack will be removed from your stickers.'}
-              </AxoAlertDialog.Description>
-            </AxoAlertDialog.Body>
-            <AxoAlertDialog.Footer>
-              <AxoAlertDialog.Action
-                variant="strong-secondary"
-                onClick={() => setPackToRemove(null)}
-              >
-                {i18n('icu:cancel')}
-              </AxoAlertDialog.Action>
-              <AxoAlertDialog.Action
-                variant="strong-destructive"
-                onClick={() => {
-                  onRemoveStickerPack?.(packToRemove.id);
-                  setPackToRemove(null);
-                }}
-              >
-                Remove
-              </AxoAlertDialog.Action>
-            </AxoAlertDialog.Footer>
-          </AxoAlertDialog.Content>
-        </AxoAlertDialog.Root>
-      ) : null}
     </FunPanel>
+  );
+}
+
+/** Beacon: trash button on a pack header, then inline Remove / Cancel. */
+function BeaconRemovePackControl(props: {
+  packId: string;
+  confirming: boolean;
+  onAsk: (packId: string) => void;
+  onCancel: () => void;
+  onRemove: (packId: string) => void;
+}): JSX.Element {
+  const { packId, confirming, onAsk, onCancel, onRemove } = props;
+  if (!confirming) {
+    return (
+      <FunGridHeaderButton
+        label="Remove sticker pack"
+        onPress={() => onAsk(packId)}
+      >
+        <FunGridHeaderIcon iconClassName="FunGrid__HeaderIcon--Remove" />
+      </FunGridHeaderButton>
+    );
+  }
+  return (
+    <span className="FunGrid__BeaconRemoveConfirm">
+      <span className="FunGrid__BeaconRemoveConfirm__Text">Remove pack?</span>
+      <button
+        type="button"
+        className="FunGrid__BeaconRemoveConfirm__Button"
+        onClick={onCancel}
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        className="FunGrid__BeaconRemoveConfirm__Button FunGrid__BeaconRemoveConfirm__Button--danger"
+        onClick={() => onRemove(packId)}
+      >
+        Remove
+      </button>
+    </span>
   );
 }
 
