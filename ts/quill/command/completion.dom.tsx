@@ -316,18 +316,16 @@ export class CommandCompletion {
                       }}
                       onClick={() => this.selectCommand(idx)}
                     >
-                      <span
-                        className={classNames(
-                          'BeaconCommands__icon',
-                          !iconUrl && 'BeaconCommands__icon--slash'
-                        )}
-                        style={
-                          iconUrl
-                            ? { maskImage: iconUrl, WebkitMaskImage: iconUrl }
-                            : undefined
-                        }
-                        aria-hidden
-                      />
+                      {iconUrl ? (
+                        <span
+                          className="BeaconCommands__icon"
+                          style={{
+                            maskImage: iconUrl,
+                            WebkitMaskImage: iconUrl,
+                          }}
+                          aria-hidden
+                        />
+                      ) : null}
                       <span className="BeaconCommands__text">
                         <span className="BeaconCommands__line">
                           <span className="BeaconCommands__name">
