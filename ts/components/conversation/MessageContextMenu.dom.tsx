@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { useRef, type ReactNode, type JSX } from 'react';
+import { BeaconErrorBoundary } from '../BeaconErrorBoundary.dom.tsx';
 import { toAxoSymbol } from '../../beacon/util/axoSymbol.std.ts';
 import { isHiddenFeatureOn } from '../../beacon/core/hidden-features.std.ts';
 import { drop } from '../../util/drop.std.ts';
@@ -143,13 +144,14 @@ export function MessageContextMenu({
         {beaconMessage &&
           applyBeaconFilter('message.menuItems', [], beaconMessage).map(
             item => (
-              <AxoMenuBuilder.Item
-                key={item.id}
-                symbol={toAxoSymbol(item.symbol)}
-                onSelect={item.onSelect}
-              >
-                {item.label}
-              </AxoMenuBuilder.Item>
+              <BeaconErrorBoundary key={item.id} name={`menu item ${item.id}`}>
+                <AxoMenuBuilder.Item
+                  symbol={toAxoSymbol(item.symbol)}
+                  onSelect={item.onSelect}
+                >
+                  {item.label}
+                </AxoMenuBuilder.Item>
+              </BeaconErrorBoundary>
             )
           )}
         {onPinMessage && (

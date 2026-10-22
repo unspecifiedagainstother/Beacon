@@ -415,7 +415,7 @@
   min-width: 0;
   padding: 16px;
   border: 1px solid var(--axo-color-border-primary);
-  border-radius: 14px;
+  border-radius: 10px;
   background: var(--axo-color-surface-secondary);
 
   &--expanded {
@@ -663,7 +663,7 @@
   width: min(480px, calc(100vw - 32px));
   max-height: min(85vh, 720px);
   border: 1px solid var(--axo-color-border-primary);
-  border-radius: 16px;
+  border-radius: 10px;
   color: var(--axo-color-label-primary);
   background: var(--beacon-window-bg);
   box-shadow:
@@ -1315,7 +1315,7 @@
   min-height: 0;
   margin-inline: 20px;
   border: 1px solid var(--axo-color-border-primary);
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
   background: var(--beacon-code-bg);
 
@@ -1473,7 +1473,7 @@
   .BeaconProfileLog__change & {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: 8px;
   }
 }
 
@@ -1643,7 +1643,7 @@
   padding-block: 2px;
   padding-inline: 8px;
   border: 1px solid currentcolor;
-  border-radius: 999px;
+  border-radius: 6px;
   font: inherit;
   font-size: 0.6875rem;
   white-space: nowrap;
@@ -2215,4 +2215,57 @@ body .module-message__metadata__date {
       background: #d93a3a;
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Consistent look (built-in "Look"): squarer corners across the app.
+// Signal's Axo radii all derive from these variables; pill buttons and
+// segmented controls get a small fixed radius. Avatars/icon buttons stay
+// round.
+// ---------------------------------------------------------------------------
+
+body.beacon-square {
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 9px;
+  --radius-3xl: 10px;
+  --radius-4xl: 12px;
+
+  .axo-button {
+    border-radius: 6px;
+  }
+
+  [role='radiogroup'][class*='rounded-full'],
+  [role='radiogroup'] [class*='rounded-full'] {
+    border-radius: 6px;
+  }
+
+  .module-modal-host__overlay-container .module-Modal,
+  .module-Modal {
+    border-radius: 10px;
+  }
+}
+
+// Staged attachments with several files (Beacon allows any mix): Signal's
+// rail always showed a scrollbar and file tiles were block-level, so a
+// second file wrapped onto a hidden line. One scrollable row instead.
+body .module-attachments__rail {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  > * {
+    flex-shrink: 0;
+    margin-inline-end: 0;
+  }
+}
+
+body .module-staged-generic-attachment {
+  border-radius: 8px;
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { RefObject, JSX, ReactNode } from 'react';
+import { BeaconErrorBoundary } from '../BeaconErrorBoundary.dom.tsx';
 import { toAxoSymbol } from '../../beacon/util/axoSymbol.std.ts';
 import {
   memo,
@@ -970,13 +971,14 @@ function HeaderDropdownMenuContent({
             conversationId: conversation.id,
             isGroup,
           }).map(item => (
-            <AxoDropdownMenu.Item
-              key={item.id}
-              symbol={toAxoSymbol(item.symbol)}
-              onSelect={item.onSelect}
-            >
-              {item.label}
-            </AxoDropdownMenu.Item>
+            <BeaconErrorBoundary key={item.id} name={`menu item ${item.id}`}>
+              <AxoDropdownMenu.Item
+                symbol={toAxoSymbol(item.symbol)}
+                onSelect={item.onSelect}
+              >
+                {item.label}
+              </AxoDropdownMenu.Item>
+            </BeaconErrorBoundary>
           ))}
           {isGroup && !isTerminated && (
             <AxoDropdownMenu.Item
