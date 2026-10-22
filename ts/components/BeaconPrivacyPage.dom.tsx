@@ -40,6 +40,7 @@ const SECTION_ORDER = [
   'app-lock',
   'hidden-chats',
   'app-privacy',
+  'screen-share-guard',
   'chat-list-privacy',
   'attachment-privacy',
   'link-safety',
