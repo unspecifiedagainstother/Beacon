@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { DataReader, DataWriter } from '../sql/Client.preload.ts';
+import { getBeaconPinLimit } from '../beacon/core/chat-list-state.std.ts';
 import type { ConversationAttributesType } from '../model-types.d.ts';
 import { maybeDeleteAttachmentFile } from './migrations.preload.ts';
 import * as Bytes from '../Bytes.std.ts';
@@ -44,5 +45,6 @@ export function computeGroupNameHash(name: string): string {
 
 export function getPinnedConversationLimit(): number {
   const remoteValue = RemoteConfig.getValue('global.pinnedChatLimit');
-  return parseIntWithFallback(remoteValue, 4);
+  // Beacon: higher pin limit (Chat list organisation).
+  return Math.max(parseIntWithFallback(remoteValue, 4), getBeaconPinLimit());
 }

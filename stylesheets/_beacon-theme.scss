@@ -2389,3 +2389,18 @@ body .module-staged-generic-attachment {
     background: rgb(129 201 149 / 0.14);
   }
 }
+
+// Collapsible "Pinned" header in the chat list.
+.module-conversation-list__item--header--beacon-toggle {
+  width: 100%;
+  border: 0;
+  font: inherit;
+  text-align: start;
+  color: inherit;
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--axo-color-label-primary);
+  }
+}

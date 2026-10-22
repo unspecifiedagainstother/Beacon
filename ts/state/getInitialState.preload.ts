@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { getEmptyState as accountsEmptyState } from './ducks/accounts.preload.ts';
+import { getEmptyState as beaconEmptyState } from './ducks/beacon.std.ts';
 import { getEmptyState as appEmptyState } from './ducks/app.preload.ts';
 import { getEmptyState as audioPlayerEmptyState } from './ducks/audioPlayer.preload.ts';
 import { getEmptyState as audioRecorderEmptyState } from './ducks/audioRecorder.preload.ts';
@@ -154,6 +155,7 @@ function getEmptyState(): StateType {
     audioRecorder: audioRecorderEmptyState(),
     backups: backupsEmptyState(),
     badges: badgesEmptyState(),
+    beacon: beaconEmptyState(),
     callHistory: callHistoryEmptyState(),
     calling: callingEmptyState(),
     chatFolders: chatFoldersEmptyState(),

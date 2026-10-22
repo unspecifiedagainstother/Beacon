@@ -5,8 +5,9 @@
  * Which conversations the chat list and search leave out. Read by the
  * left-pane and search selectors (ts/state/selectors/), written by the
  * hidden-chats built-in. The state object is replaced on every change, so
- * reselect sees a new input; the built-in then dispatches a no-op action to
- * make connected components re-run their selectors.
+ * reselect sees a new input; the built-in then dispatches
+ * beacon/STATE_CHANGED (ducks/beacon.std.ts) so whole-state selectors
+ * recompute too.
  */
 
 export type HiddenChatsState = Readonly<{
@@ -33,5 +34,3 @@ export function setHiddenChatsState(next: {
     redacted: new Set(next.redacted),
   };
 }
-
-export const BEACON_HIDDEN_CHATS_CHANGED = 'beacon/HIDDEN_CHATS_CHANGED';
