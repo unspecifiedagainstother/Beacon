@@ -2282,7 +2282,22 @@ app.on('ready', async () => {
 
   updateDefaultSession(session.defaultSession, log);
   // Beacon: content protection, spellcheck block, network log, IPC bridge.
-  setupBeaconMain({ session: session.defaultSession, getMainWindow, log });
+  setupBeaconMain({
+    session: session.defaultSession,
+    getMainWindow,
+    log,
+    captcha: {
+      urls: {
+        chat: config.get<string>('challengeUrl'),
+        registration: config.get<string>('registrationChallengeUrl'),
+      },
+      onToken: token => {
+        challengeHandler.handleCaptcha(token);
+        // Same as the protocol-handler path: bring the app back up front.
+        getMainWindow()?.show();
+      },
+    },
+  });
 
   if (getEnvironment() !== Environment.Test) {
     installFileHandler({

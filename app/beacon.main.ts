@@ -17,6 +17,7 @@
 import type { BrowserWindow, Session } from 'electron';
 import { ipcMain, powerMonitor } from 'electron';
 import * as ephemeralConfig from './ephemeral_config.main.ts';
+import { openCaptchaWindow } from './beacon-captcha.main.ts';
 import type { LoggerType } from '../ts/types/Logging.std.ts';
 
 const CONTENT_PROTECTION_KEY = 'beacon-content-protection';
@@ -42,6 +43,11 @@ type Options = {
   session: Session;
   getMainWindow: () => BrowserWindow | undefined;
   log: LoggerType;
+  /** In-app captcha (beacon-captcha.main.ts). */
+  captcha: {
+    urls: { chat: string; registration: string };
+    onToken: (token: string) => void;
+  };
 };
 
 let options: Options | undefined;
@@ -89,6 +95,23 @@ const HANDLERS: Record<string, (payload: unknown) => unknown> = {
       applySpellcheckBlock(options.session);
     }
     return value;
+  },
+
+  'captcha:open': payload => {
+    if (!options) {
+      return false;
+    }
+    const { captcha, getMainWindow, log } = options;
+    openCaptchaWindow({
+      parent: getMainWindow(),
+      url:
+        payload === 'registration'
+          ? captcha.urls.registration
+          : captcha.urls.chat,
+      onToken: captcha.onToken,
+      log,
+    });
+    return true;
   },
 
   'network:log': () => requestLog.slice(),
