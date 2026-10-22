@@ -144,6 +144,8 @@ type MessageRowType = {
 type HeaderRowType = {
   type: RowType.Header;
   getHeaderText: (i18n: LocalizerType) => string;
+  /** Beacon: makes the header a toggle (collapsible Pinned section). */
+  beaconOnClick?: () => void;
 };
 
 /** @testexport */
@@ -560,7 +562,16 @@ export function ConversationList({
           break;
         case RowType.Header: {
           const headerText = row.getHeaderText(i18n);
-          result = (
+          result = row.beaconOnClick ? (
+            <button
+              type="button"
+              className="module-conversation-list__item--header module-conversation-list__item--header--beacon-toggle"
+              aria-label={headerText}
+              onClick={row.beaconOnClick}
+            >
+              {headerText}
+            </button>
+          ) : (
             <div
               className="module-conversation-list__item--header"
               aria-label={headerText}

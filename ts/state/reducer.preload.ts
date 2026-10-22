@@ -9,6 +9,7 @@ import { reducer as audioPlayer } from './ducks/audioPlayer.preload.ts';
 import { reducer as audioRecorder } from './ducks/audioRecorder.preload.ts';
 import { reducer as backups } from './ducks/backups.preload.ts';
 import { reducer as badges } from './ducks/badges.preload.ts';
+import { reducer as beacon } from './ducks/beacon.std.ts';
 import { reducer as calling } from './ducks/calling.preload.ts';
 import { reducer as callHistory } from './ducks/callHistory.preload.ts';
 import { reducer as chatFolders } from './ducks/chatFolders.preload.ts';
@@ -49,6 +50,7 @@ export const reducer = combineReducers({
   audioRecorder,
   backups,
   badges,
+  beacon,
   calling,
   callHistory,
   chatFolders,

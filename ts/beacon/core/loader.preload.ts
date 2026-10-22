@@ -60,6 +60,7 @@ import inlineMarkdown from '../builtin/inline-markdown.std.ts';
 import hiddenFeatures from '../builtin/hidden-features.std.ts';
 import beaconLook from '../builtin/beacon-look.std.ts';
 import fileDetails from '../builtin/file-details.preload.ts';
+import chatOrganisation from '../builtin/chat-organisation.std.ts';
 
 const log = createLogger('beacon/loader');
 
@@ -338,6 +339,7 @@ const BUILTIN_MANIFESTS: ReadonlyArray<AddonManifest> = [
   hiddenFeatures,
   beaconLook,
   fileDetails,
+  chatOrganisation,
 ];
 
 function builtinManifests(): Array<AddonManifest> {

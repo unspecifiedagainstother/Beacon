@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import memoizee from 'memoizee';
+import { getChatListState } from '../../beacon/core/chat-list-state.std.ts';
 import { getHiddenChatsState } from '../../beacon/core/hidden-chats.std.ts';
 import { memoize } from '@indutny/sneequals';
 import lodash from 'lodash';
@@ -538,6 +539,7 @@ export const getLeftPaneLists = createSelector(
   getSelectedChatFolder,
   getStableSelectedConversationIdInChatFolder,
   getHiddenChatsState,
+  getChatListState,
   (
     conversationLookup,
     conversationComparator,
@@ -545,7 +547,9 @@ export const getLeftPaneLists = createSelector(
     pinnedConversationIds,
     selectedChatFolder,
     stableSelectedConversationIdInChatFolder,
-    hiddenChats
+    hiddenChats,
+    // Only here so collapsing Pinned produces new lists (re-render).
+    _chatListState
   ) => {
     return _getLeftPaneLists({
       conversationLookup,
