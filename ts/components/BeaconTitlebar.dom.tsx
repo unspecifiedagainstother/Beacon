@@ -26,6 +26,13 @@ export function BeaconTitlebar({ title }: PropsType): JSX.Element {
   const { i18n } = window.SignalContext;
   const [isMaximized, setIsMaximized] = useState(false);
 
+  // Overlays and dialogs read this to stay below the titlebar
+  // (stylesheets/_beacon-theme.scss, "Custom titlebar stays on top").
+  useEffect(() => {
+    document.body.classList.add('beacon-has-titlebar');
+    return () => document.body.classList.remove('beacon-has-titlebar');
+  }, []);
+
   useEffect(() => {
     let canceled = false;
 
