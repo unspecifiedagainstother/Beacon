@@ -321,12 +321,55 @@ export function setUnlockHandler(
 }
 
 function inertOthers(): void {
-  for (const child of Array.from(document.body.children)) {
-    if (child instanceof HTMLElement && child !== overlay && !child.inert) {
-      child.inert = true;
-      inerted.push(child);
+  // Everything except the overlay and the custom titlebar. The titlebar is
+  // nested in the app root, so walk down its ancestor chain and inert the
+  // siblings at each level instead of the ancestors themselves.
+  const titlebar = document.querySelector('.BeaconTitlebar');
+  if (titlebar) {
+    // A startup lock runs before the titlebar exists and may have inerted
+    // its ancestor; release that one and inert at a finer level below.
+    const keep: Array<HTMLElement> = [];
+    for (const element of inerted) {
+      if (element.contains(titlebar)) {
+        element.inert = false;
+      } else {
+        keep.push(element);
+      }
     }
+    inerted = keep;
   }
+  const visit = (parent: Element) => {
+    for (const child of Array.from(parent.children)) {
+      if (!(child instanceof HTMLElement) || child === overlay) {
+        continue;
+      }
+      if (titlebar && child.contains(titlebar)) {
+        if (child !== titlebar) {
+          visit(child);
+        }
+        continue;
+      }
+      if (!child.inert) {
+        child.inert = true;
+        inerted.push(child);
+      }
+    }
+  };
+  visit(document.body);
+}
+
+let inertScheduled = false;
+function scheduleInert(): void {
+  if (inertScheduled) {
+    return;
+  }
+  inertScheduled = true;
+  requestAnimationFrame(() => {
+    inertScheduled = false;
+    if (locked) {
+      inertOthers();
+    }
+  });
 }
 
 function buildOverlay(): HTMLElement {
@@ -466,8 +509,9 @@ export function lock(): void {
     overlay = buildOverlay();
     document.body.appendChild(overlay);
     inertOthers();
-    bodyObserver = new MutationObserver(inertOthers);
-    bodyObserver.observe(document.body, { childList: true });
+    // Subtree: the app renders (and the titlebar appears) after a startup lock.
+    bodyObserver = new MutationObserver(scheduleInert);
+    bodyObserver.observe(document.body, { childList: true, subtree: true });
     overlay.querySelector('input')?.focus();
   };
   if (document.body) {
