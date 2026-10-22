@@ -796,8 +796,7 @@
   padding-block: 10px;
   padding-inline: 14px;
   border: var(--beacon-elevation-border);
-  border-inline-start: 3px solid var(--axo-color-label-secondary);
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 0.8125rem;
   color: var(--axo-color-label-primary);
   background: var(--beacon-window-bg);
@@ -809,22 +808,6 @@
   transition:
     opacity 180ms ease-in,
     transform 180ms ease-in;
-
-  &--success {
-    border-inline-start-color: #3fb950;
-  }
-
-  &--warning {
-    border-inline-start-color: #e3a008;
-  }
-
-  &--error {
-    border-inline-start-color: var(--axo-color-label-destructive);
-  }
-
-  &--info {
-    border-inline-start-color: var(--beacon-accent);
-  }
 
   &--leaving {
     opacity: 0;
