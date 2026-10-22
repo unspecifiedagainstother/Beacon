@@ -2039,3 +2039,65 @@ body.beacon-has-titlebar {
 body .module-composition-input__input {
   border-radius: 8px;
 }
+
+// ---------------------------------------------------------------------------
+// Messages and replies: squarer bubbles, quotes without the side stripe.
+// Media corners follow CurveType in conversation/Image.dom.tsx.
+// ---------------------------------------------------------------------------
+
+// Base radius only — Signal's 4px corners between grouped messages
+// (more specific selectors) still apply.
+body .module-message__container {
+  border-radius: 10px;
+}
+
+body .module-quote {
+  border-radius: 6px;
+  // A tint of the bubble's own text colour works on every bubble colour;
+  // beats Signal's per-chat-colour quote backgrounds.
+  background-color: color-mix(
+    in srgb,
+    currentcolor 12%,
+    transparent
+  ) !important;
+  // Signal paints quotes with a per-colour gradient on top.
+  background-image: none !important;
+
+  &__container {
+    .module-message & {
+      margin-block-end: 6px;
+    }
+  }
+
+  &__primary {
+    min-height: 0;
+    padding-block: 6px;
+    padding-inline: 10px;
+    border-width: 0;
+  }
+
+  // Room for the thumbnail / icon only when there is one.
+  &:has(.module-quote__icon-container) .module-quote__primary {
+    min-height: 54px;
+  }
+
+  &__primary__author {
+    font-weight: 600;
+  }
+
+  &__primary__text {
+    opacity: 0.85;
+  }
+}
+
+body .module-quote__reference-warning {
+  border-inline-start-width: 0;
+  border-end-start-radius: 6px;
+  border-end-end-radius: 6px;
+}
+
+// Quieter time / status line.
+body .module-message__metadata__date {
+  font-size: 0.6875rem;
+  opacity: 0.8;
+}
