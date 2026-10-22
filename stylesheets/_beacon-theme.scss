@@ -2186,3 +2186,33 @@ body .module-message__metadata__date {
   background-color: var(--axo-color-label-secondary);
   mask: url('../images/icons/v3/trash/trash.svg') center / 16px no-repeat;
 }
+
+// Inline "Remove pack?" confirmation in sticker pack headers.
+.FunGrid__BeaconRemoveConfirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-inline-start: auto;
+  font-size: 0.75rem;
+
+  &__Text {
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__Button {
+    padding-block: 2px;
+    padding-inline: 8px;
+    border: 0;
+    border-radius: 6px;
+    font: inherit;
+    font-weight: 600;
+    color: var(--axo-color-label-primary);
+    background: var(--axo-color-fill-secondary, #333);
+    cursor: pointer;
+
+    &--danger {
+      color: #fff;
+      background: #d93a3a;
+    }
+  }
+}
