@@ -26,6 +26,7 @@ import { Spacer } from './util/StepComponents.dom.tsx';
 import { CONTACT_SUPPORT_URL } from '../../util/contactSupport.dom.tsx';
 import { openLinkInWebBrowser } from '../../util/openLinkInWebBrowser.dom.ts';
 import { InstallScreenUpdateDialog } from '../installScreen/InstallScreenUpdateDialog.dom.tsx';
+import { BeaconSetupBrand } from '../BeaconSetupBrand.dom.tsx';
 
 import type { LocalizerType } from '../../types/I18N.std.ts';
 import type { ActionCreator } from '../../state/types.std.ts';
@@ -275,20 +276,17 @@ export function StandaloneRegistration({
     <div
       className={`${tw(
         'flex size-full flex-col overflow-hidden bg-[url("../images/registration-background.png")] bg-cover bg-center'
-      )} BeaconRegistration`}
+      )} BeaconSetup`}
     >
       <TitlebarDragArea />
       {/* Beacon: own branding instead of the Signal wordmark. */}
-      <div className="BeaconRegistration__brand">
-        <div className="BeaconInstall__logo" aria-hidden="true" />
-        <span>Beacon</span>
-      </div>
+      <BeaconSetupBrand />
       <Spacer className={tw('h-8')} />
       <div className={tw('relative grow')}>
         <div
-          className={`${tw(
+          className={tw(
             'absolute inset-s-1/2 top-1/2 flex max-h-[calc(100%-32px)] w-143 max-w-[calc(100%-32px)] -translate-1/2 transform flex-col overflow-hidden rounded-[26px] bg-surface-primary'
-          )} BeaconRegistration__card`}
+          )}
         >
           <AnimatePresence>
             <motion.div
