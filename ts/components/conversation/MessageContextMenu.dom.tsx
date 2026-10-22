@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { useRef, type ReactNode, type JSX } from 'react';
+import { isHiddenFeatureOn } from '../../beacon/core/hidden-features.std.ts';
+import { drop } from '../../util/drop.std.ts';
 import type { LocalizerType } from '../../types/I18N.std.ts';
 import { AxoMenuBuilder } from '../../axo/AxoMenuBuilder.dom.tsx';
 import { isInternalFeaturesEnabled } from '../../util/isInternalFeaturesEnabled.dom.ts';
@@ -183,17 +185,45 @@ export function MessageContextMenu({
             {i18n('icu:retryDeleteForEveryone')}
           </AxoMenuBuilder.Item>
         )}
-        {isInternalFeaturesEnabled() && onDebugMessage && (
-          <>
-            <AxoMenuBuilder.Separator />
-            <AxoMenuBuilder.Group>
-              <AxoMenuBuilder.Label>Internal</AxoMenuBuilder.Label>
-              <AxoMenuBuilder.Item symbol="copy" onSelect={onDebugMessage}>
-                Copy & debug message
-              </AxoMenuBuilder.Item>
-            </AxoMenuBuilder.Group>
-          </>
-        )}
+        {/* Beacon: also shown in Developer mode (Hidden Signal features). */}
+        {(isInternalFeaturesEnabled() || isHiddenFeatureOn('developerMode')) &&
+          onDebugMessage && (
+            <>
+              <AxoMenuBuilder.Separator />
+              <AxoMenuBuilder.Group>
+                <AxoMenuBuilder.Label>Developer</AxoMenuBuilder.Label>
+                <AxoMenuBuilder.Item symbol="copy" onSelect={onDebugMessage}>
+                  Copy raw message (JSON)
+                </AxoMenuBuilder.Item>
+                {beaconMessage ? (
+                  <>
+                    <AxoMenuBuilder.Item
+                      symbol="copy"
+                      onSelect={() =>
+                        drop(
+                          navigator.clipboard.writeText(beaconMessage.messageId)
+                        )
+                      }
+                    >
+                      Copy message ID
+                    </AxoMenuBuilder.Item>
+                    <AxoMenuBuilder.Item
+                      symbol="copy"
+                      onSelect={() =>
+                        drop(
+                          navigator.clipboard.writeText(
+                            beaconMessage.conversationId
+                          )
+                        )
+                      }
+                    >
+                      Copy conversation ID
+                    </AxoMenuBuilder.Item>
+                  </>
+                ) : null}
+              </AxoMenuBuilder.Group>
+            </>
+          )}
       </AxoMenuBuilder.Content>
     </AxoMenuBuilder.Root>
   );

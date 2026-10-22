@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { memo, useCallback } from 'react';
+import { isHiddenFeatureOn } from '../../beacon/core/hidden-features.std.ts';
 import { useSelector } from 'react-redux';
 import { StoryViewer } from '../../components/StoryViewer.dom.tsx';
 import { ToastType } from '../../types/Toast.dom.tsx';
@@ -71,7 +72,9 @@ export const SmartStoryViewer = memo(function SmartStoryViewer() {
   const getPreferredBadge = useSelector(getPreferredBadgeSelector);
   const preferredReactionEmoji = useSelector(getPreferredReactionEmoji);
   const selectedStoryData = useSelector(getSelectedStoryData);
-  const internalUser = useSelector(isInternalUser);
+  // Beacon: Hidden Signal features → download others' stories.
+  const internalUser =
+    useSelector(isInternalUser) || isHiddenFeatureOn('storyDownload');
 
   strictAssert(selectedStoryData, 'StoryViewer: !selectedStoryData');
 

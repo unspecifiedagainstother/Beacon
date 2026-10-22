@@ -39,6 +39,10 @@
     "messageformat": "Beacon Privacy",
     "description": "Title of the Beacon privacy protections settings page"
   },
+  "icu:Beacon__calling-title": {
+    "messageformat": "Calling",
+    "description": "Beacon settings page with Signal's advanced calling options (bitrate, call server, video modes)"
+  },
   "icu:Preferences__button--beacon-modules": {
     "messageformat": "Modules",
     "description": "Left nav button for Beacon modules (addons)"
