@@ -10,7 +10,6 @@ import type { JSX } from 'react';
 export function BeaconSetupBrand(): JSX.Element {
   return (
     <div className="StandaloneRegistration--SignalLogo BeaconSetupBrand">
-      <span className="BeaconSetupBrand__mark" aria-hidden="true" />
       Beacon
     </div>
   );
