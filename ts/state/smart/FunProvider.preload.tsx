@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { memo, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { FunProvider } from '../../components/fun/FunProvider.dom.tsx';
-import { getIntl, getVersion } from '../selectors/user.std.ts';
+import { getIntl } from '../selectors/user.std.ts';
 import { selectRecentEmojis } from '../selectors/emojis.std.ts';
 import type { FunGifSelection } from '../../components/fun/panels/FunPanelGifs.dom.tsx';
 import {
@@ -15,7 +15,6 @@ import {
 import { strictAssert } from '../../util/assert.std.ts';
 import {
   getEmojiSkinToneDefault,
-  getItems,
   getShowStickerPickerHint,
 } from '../selectors/items.dom.ts';
 import { useItemsActions } from '../ducks/items.preload.ts';
@@ -32,7 +31,6 @@ import type { FunStickerSelection } from '../../components/fun/panels/FunPanelSt
 import type { FunEmojiSelection } from '../../components/fun/panels/FunPanelEmojis.dom.tsx';
 import { getRecentGifs } from '../selectors/gifs.std.ts';
 import { Emoji } from '../../axo/emoji.std.ts';
-import { isFeaturedEnabledSelector } from '../../util/isFeatureEnabled.dom.ts';
 
 export type SmartFunProviderProps = Readonly<{
   children: ReactNode;
@@ -56,15 +54,9 @@ export const SmartFunProvider = memo(function SmartFunProvider(
   const { useSticker: onUseSticker } = useStickersActions();
   const { onAddRecentGif, onRemoveRecentGif } = useGifsActions();
 
-  const items = useSelector(getItems);
-  const version = useSelector(getVersion);
-
-  const isStickerReplySendEnabled = isFeaturedEnabledSelector({
-    betaKey: 'desktop.stickerReply.send.beta',
-    prodKey: 'desktop.stickerReply.send.prod',
-    currentVersion: version,
-    remoteConfig: items.remoteConfig,
-  });
+  // Beacon: sticker replies always on (Signal gates them behind a
+  // remote-config rollout).
+  const isStickerReplySendEnabled = true;
 
   // Translate recent emojis to keys
   const recentEmojisKeys = useMemo(() => {
