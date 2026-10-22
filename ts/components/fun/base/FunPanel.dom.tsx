@@ -3,11 +3,19 @@
 import type { ReactNode, JSX } from 'react';
 
 export type FunPanelProps = Readonly<{
+  /** Beacon: per-panel layout modifier, e.g. FunPanel--stickers. */
+  className?: string;
   children: ReactNode;
 }>;
 
 export function FunPanel(props: FunPanelProps): JSX.Element {
-  return <div className="FunPanel">{props.children}</div>;
+  return (
+    <div
+      className={props.className ? `FunPanel ${props.className}` : 'FunPanel'}
+    >
+      {props.children}
+    </div>
+  );
 }
 
 export type FunPanelHeaderProps = Readonly<{
