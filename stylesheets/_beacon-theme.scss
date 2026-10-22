@@ -2269,3 +2269,73 @@ body .module-attachments__rail {
 body .module-staged-generic-attachment {
   border-radius: 8px;
 }
+
+// Name + size above audio files that aren't voice notes (MessageAudio).
+.module-message__audio-attachment__beacon-filename {
+  display: flex;
+  // The player's own box can measure 0px wide (its parts overflow it),
+  // so size this line by its content, capped.
+  align-self: flex-start;
+  width: max-content;
+  max-width: 240px;
+  gap: 8px;
+  align-items: baseline;
+  min-width: 0;
+  margin-block-end: 6px;
+  font-size: 0.8125rem;
+  // The player zeroes line-height; the clipped name would be 0px tall.
+  line-height: 1.35;
+
+  &__name {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__size {
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    opacity: 0.75;
+  }
+}
+
+// File details dialog (builtin/file-details.preload.ts).
+.BeaconFileDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+
+  &__heading {
+    margin-block: 6px 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__table {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 6px 14px;
+    margin: 0;
+    font-size: 0.8125rem;
+
+    dt {
+      color: var(--axo-color-label-secondary);
+    }
+
+    dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+      cursor: copy;
+      user-select: text;
+
+      &:hover {
+        color: var(--beacon-accent-text);
+      }
+    }
+  }
+}

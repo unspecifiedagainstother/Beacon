@@ -11,7 +11,7 @@ import type { LocalizerType } from '../../types/Util.std.ts';
 import type { AttachmentForUIType } from '../../types/Attachment.std.ts';
 import type { MessageStatusType } from '../../types/message/MessageStatus.std.ts';
 import type { PushPanelForConversationActionType } from '../../state/ducks/conversations.preload.ts';
-import { isDownloaded } from '../../util/Attachment.std.ts';
+import { isDownloaded, isVoiceMessage } from '../../util/Attachment.std.ts';
 import type { DirectionType } from './Message.dom.tsx';
 
 import type { ComputeWaveformResult } from '../VoiceNotesPlaybackContext.dom.tsx';
@@ -409,6 +409,22 @@ export function MessageAudio(props: Props): JSX.Element {
         withContentAbove ? `${CSS_BASE}--with-content-above` : null
       )}
     >
+      {/* Beacon: audio files (not voice notes) show their name and size. */}
+      {attachment.fileName && !isVoiceMessage(attachment) ? (
+        <div
+          className={`${CSS_BASE}__beacon-filename`}
+          title={attachment.fileName}
+        >
+          <span className={`${CSS_BASE}__beacon-filename__name`}>
+            {attachment.fileName}
+          </span>
+          {attachment.size ? (
+            <span className={`${CSS_BASE}__beacon-filename__size`}>
+              {formatFileSize(attachment.size)}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
       <div className={`${CSS_BASE}__button-and-waveform`}>
         {button}
         {waveform}

@@ -59,6 +59,7 @@ import bookmarks from '../builtin/bookmarks.preload.ts';
 import inlineMarkdown from '../builtin/inline-markdown.std.ts';
 import hiddenFeatures from '../builtin/hidden-features.std.ts';
 import beaconLook from '../builtin/beacon-look.std.ts';
+import fileDetails from '../builtin/file-details.preload.ts';
 
 const log = createLogger('beacon/loader');
 
@@ -336,6 +337,7 @@ const BUILTIN_MANIFESTS: ReadonlyArray<AddonManifest> = [
   inlineMarkdown,
   hiddenFeatures,
   beaconLook,
+  fileDetails,
 ];
 
 function builtinManifests(): Array<AddonManifest> {
