@@ -4,6 +4,7 @@
 import { assert } from 'chai';
 
 import { findInlineMarkdown } from '../../quill/markdown/match.std.ts';
+import { diffWords } from '../../beacon/util/wordDiff.std.ts';
 
 const styleOf = (text: string) => findInlineMarkdown(text)?.style;
 
@@ -48,5 +49,36 @@ describe('beacon inline markdown', () => {
 
   it('works after emoji and mentions (embed placeholders)', () => {
     assert.strictEqual(styleOf('￼ *hey*'), 'italic');
+  });
+});
+
+describe('beacon word diff', () => {
+  it('marks added and removed words and keeps both texts', () => {
+    const parts = diffWords('see you at 5 tomorrow', 'see you at 6 tomorrow!');
+    const before = parts
+      .filter(p => p.type !== 'added')
+      .map(p => p.text)
+      .join('');
+    const after = parts
+      .filter(p => p.type !== 'removed')
+      .map(p => p.text)
+      .join('');
+    assert.strictEqual(before, 'see you at 5 tomorrow');
+    assert.strictEqual(after, 'see you at 6 tomorrow!');
+    assert.deepEqual(
+      parts.filter(p => p.type !== 'same').map(p => [p.type, p.text]),
+      [
+        ['removed', '5 tomorrow'],
+        ['added', '6 tomorrow!'],
+      ]
+    );
+  });
+
+  it('handles empty sides', () => {
+    assert.deepEqual(diffWords('', 'hi'), [{ type: 'added', text: 'hi' }]);
+    assert.deepEqual(diffWords('hi', ''), [{ type: 'removed', text: 'hi' }]);
+    assert.deepEqual(diffWords('same', 'same'), [
+      { type: 'same', text: 'same' },
+    ]);
   });
 });

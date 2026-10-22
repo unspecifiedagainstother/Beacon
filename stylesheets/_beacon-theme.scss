@@ -2339,3 +2339,53 @@ body .module-staged-generic-attachment {
     }
   }
 }
+
+// Edit history: word-level changes (EditHistoryMessagesModal.dom.tsx).
+.EditHistoryMessagesModal__beacon-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.EditHistoryMessagesModal__beacon-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--axo-color-label-secondary);
+  cursor: pointer;
+}
+
+.EditHistoryMessagesModal__beacon-diff {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-block: 2px 12px;
+  padding-block: 8px;
+  padding-inline: 10px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  background: var(--axo-color-fill-secondary, #2a2a2a);
+
+  &__label {
+    font-size: 0.6875rem;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  &__removed {
+    color: #f28b82;
+    text-decoration: line-through;
+    background: rgb(242 139 130 / 0.12);
+  }
+
+  &__added {
+    color: #81c995;
+    background: rgb(129 201 149 / 0.14);
+  }
+}
