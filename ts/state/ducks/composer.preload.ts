@@ -104,7 +104,6 @@ import {
 } from '../selectors/nav.std.ts';
 import { isPoll } from '../../messages/helpers.std.ts';
 import type { Emoji } from '../../axo/emoji.std.ts';
-import { isFeaturedEnabledNoRedux } from '../../util/isFeatureEnabled.dom.ts';
 
 const { debounce, isEqual } = lodash;
 
@@ -807,10 +806,9 @@ function sendStickerMessage(
         return;
       }
 
-      const isStickerReplySendEnabled = isFeaturedEnabledNoRedux({
-        betaKey: 'desktop.stickerReply.send.beta',
-        prodKey: 'desktop.stickerReply.send.prod',
-      });
+      // Beacon: sticker replies always on (Signal gates them behind a
+      // remote-config rollout).
+      const isStickerReplySendEnabled = true;
 
       let sendStickerMessageOptions;
       if (isStickerReplySendEnabled) {
