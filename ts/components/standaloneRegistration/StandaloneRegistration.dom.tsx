@@ -284,9 +284,9 @@ export function StandaloneRegistration({
       <Spacer className={tw('h-8')} />
       <div className={tw('relative grow')}>
         <div
-          className={tw(
+          className={`${tw(
             'absolute inset-s-1/2 top-1/2 flex max-h-[calc(100%-32px)] w-143 max-w-[calc(100%-32px)] -translate-1/2 transform flex-col overflow-hidden rounded-[26px] bg-surface-primary'
-          )}
+          )} BeaconSetup__card`}
         >
           <AnimatePresence>
             <motion.div
