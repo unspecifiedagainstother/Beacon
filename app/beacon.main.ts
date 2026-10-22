@@ -19,6 +19,12 @@ import { ipcMain, powerMonitor } from 'electron';
 import * as ephemeralConfig from './ephemeral_config.main.ts';
 import { drop } from '../ts/util/drop.std.ts';
 import { openCaptchaWindow } from './beacon-captcha.main.ts';
+import {
+  changeDatabasePassphrase,
+  disableDatabasePassphrase,
+  enableDatabasePassphrase,
+  getDatabasePassphraseStatus,
+} from './beacon-dbcrypt.main.ts';
 import type { LoggerType } from '../ts/types/Logging.std.ts';
 
 const CONTENT_PROTECTION_KEY = 'beacon-content-protection';
@@ -177,6 +183,48 @@ const HANDLERS: Record<string, (payload: unknown) => unknown> = {
     }
     ephemeralConfig.set(PROXY_KEY, value || undefined);
     return { ok: true, restartNeeded: true };
+  },
+
+  'dbcrypt:status': () => getDatabasePassphraseStatus(),
+
+  'dbcrypt:enable': async payload => {
+    if (typeof payload !== 'string') {
+      return { ok: false, error: 'Missing passphrase' };
+    }
+    try {
+      await enableDatabasePassphrase(payload);
+      options?.log.info('beacon dbcrypt: passphrase protection enabled');
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: String(error) };
+    }
+  },
+
+  'dbcrypt:change': async payload => {
+    const { current, next } = (payload ?? {}) as {
+      current?: unknown;
+      next?: unknown;
+    };
+    if (typeof current !== 'string' || typeof next !== 'string') {
+      return { ok: false, error: 'Missing passphrase' };
+    }
+    try {
+      const ok = await changeDatabasePassphrase(current, next);
+      return ok ? { ok: true } : { ok: false, error: 'Wrong passphrase' };
+    } catch (error) {
+      return { ok: false, error: String(error) };
+    }
+  },
+
+  'dbcrypt:disable': async payload => {
+    if (typeof payload !== 'string') {
+      return { ok: false, error: 'Missing passphrase' };
+    }
+    const ok = await disableDatabasePassphrase(payload);
+    if (ok) {
+      options?.log.info('beacon dbcrypt: passphrase protection disabled');
+    }
+    return ok ? { ok: true } : { ok: false, error: 'Wrong passphrase' };
   },
 
   'network:log': () => requestLog.slice(),

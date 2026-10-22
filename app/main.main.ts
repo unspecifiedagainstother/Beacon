@@ -104,6 +104,10 @@ import {
   applyBeaconWindowSettings,
   setupBeaconMain,
 } from './beacon.main.ts';
+import {
+  promptForDatabaseKey,
+  setUnlockedDatabaseKey,
+} from './beacon-dbcrypt.main.ts';
 import * as mainProcessLogging from '../ts/logging/main_process_logging.main.ts';
 import { MainSQL } from '../ts/sql/main.main.ts';
 import * as sqlChannels from './sql_channel.main.ts';
@@ -1960,13 +1964,16 @@ function handleSafeStorageDecryptionError(): 'continue' | 'quit' {
 }
 
 async function initializeSQL(
-  userDataPath: string
+  userDataPath: string,
+  beaconKey?: string
 ): Promise<{ ok: true; error: undefined } | { ok: false; error: Error }> {
   sqlInitTimeStart = Date.now();
 
   let key: string;
   try {
-    key = getSQLKey();
+    // Beacon: a passphrase-protected key replaces the keychain copy.
+    key = beaconKey ?? getSQLKey();
+    setUnlockedDatabaseKey(key, beaconKey !== undefined);
   } catch (error) {
     try {
       // Initialize with *some* key to setup paths
@@ -2336,7 +2343,11 @@ app.on('ready', async () => {
 
   resolveTranslationsLocale();
 
-  sqlInitPromise = initializeSQL(userDataPath);
+  // Beacon: ask for the database passphrase (if set) before anything
+  // touches the database, so sql.initialize stays the first await inside
+  // initializeSQL.
+  const beaconKey = await promptForDatabaseKey(log);
+  sqlInitPromise = initializeSQL(userDataPath, beaconKey);
 
   // First run: configure Signal to minimize to tray. Additionally, on Windows
   // enable auto-start with start-in-tray so that starting from a Desktop icon

@@ -47,7 +47,7 @@ export default {
   name: 'App lock',
   version: '1.0.0',
   description:
-    'Ask for a passphrase when Beacon opens and after you’ve been away. This locks the window; it doesn’t re-encrypt Signal’s database.',
+    'Ask for a passphrase when Beacon opens and after you’ve been away. This locks the window. To also protect the database itself, encrypt it with a passphrase below.',
   authors: ['Beacon'],
   settings: [
     {
