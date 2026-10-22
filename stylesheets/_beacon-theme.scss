@@ -964,17 +964,8 @@
 .BeaconLog__item {
   padding-block: 10px 12px;
   padding-inline: 14px;
-  border-radius: 12px;
-  border-inline-start: 3px solid var(--axo-color-border-primary);
+  border-radius: 8px;
   background: var(--axo-color-fill-secondary);
-
-  &--deleted {
-    border-inline-start-color: var(--beacon-deleted-text);
-  }
-
-  &--edited {
-    border-inline-start-color: var(--beacon-accent);
-  }
 }
 
 .BeaconLog__item-head {
