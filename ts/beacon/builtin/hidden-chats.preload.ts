@@ -16,11 +16,9 @@
  */
 
 import type { AddonManifest } from '../core/types.dom.ts';
+import { BEACON_STATE_CHANGED } from '../../state/ducks/beacon.std.ts';
 import { defineIcon } from '../core/icons.std.ts';
-import {
-  BEACON_HIDDEN_CHATS_CHANGED,
-  setHiddenChatsState,
-} from '../core/hidden-chats.std.ts';
+import { setHiddenChatsState } from '../core/hidden-chats.std.ts';
 import {
   isDuressSession,
   isLockConfigured,
@@ -105,7 +103,7 @@ export default {
       }
       const redacted = [...lockedIds].filter(id => !unlockedChats.has(id));
       setHiddenChatsState({ excluded, redacted });
-      ctx.redux.dispatch({ type: BEACON_HIDDEN_CHATS_CHANGED });
+      ctx.redux.dispatch({ type: BEACON_STATE_CHANGED });
     };
 
     const save = async (
@@ -119,7 +117,7 @@ export default {
     sync();
     ctx.onDispose(() => {
       setHiddenChatsState({ excluded: [], redacted: [] });
-      ctx.redux.dispatch({ type: BEACON_HIDDEN_CHATS_CHANGED });
+      ctx.redux.dispatch({ type: BEACON_STATE_CHANGED });
     });
 
     const isGuarded = (id: string) =>
