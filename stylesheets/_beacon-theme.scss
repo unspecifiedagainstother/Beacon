@@ -1041,41 +1041,189 @@
   }
 }
 
-// -- Composer slash-command suggestions ------------------------------------
+// -- Composer slash-command popup (ts/quill/command/completion.dom.tsx) --
 
-.BeaconCommandSuggestions__row {
+.BeaconCommands {
+  z-index: 101; // above the composer's own popups
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  text-align: start;
-}
-
-.BeaconCommandSuggestions__name {
-  flex-shrink: 0;
-  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  font-weight: 600;
-  color: var(--axo-color-label-accent);
-}
-
-.BeaconCommandSuggestions__usage {
-  font-weight: 400;
-  color: var(--axo-color-label-secondary);
-}
-
-.BeaconCommandSuggestions__description {
-  flex: 1;
-  min-width: 0;
+  flex-direction: column;
+  inline-size: min(420px, calc(100vw - 32px));
+  max-block-size: min(420px, 60vh);
+  margin-block-end: 8px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.75rem;
-  color: var(--axo-color-label-secondary);
-}
+  border: var(--beacon-elevation-border, 1px solid #2f2f2f);
+  border-radius: 8px;
+  color: var(--axo-color-label-primary);
+  background: var(--beacon-window-bg, #1f1f1f);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
 
-.BeaconCommandSuggestions__source {
-  flex-shrink: 0;
-  font-size: 0.6875rem;
-  color: var(--axo-color-label-placeholder);
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 8px 6px;
+    padding-inline: 12px;
+    border-block-end: 1px solid var(--axo-color-border-primary, #333);
+  }
+
+  &__title {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__count {
+    padding-block: 1px;
+    padding-inline: 6px;
+    border-radius: 4px;
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--axo-color-label-secondary);
+    background: var(--axo-color-fill-secondary);
+  }
+
+  &__list {
+    flex: 1;
+    min-block-size: 0;
+    padding: 4px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar-button {
+      display: none;
+    }
+  }
+
+  &__group {
+    padding-block: 10px 4px;
+    padding-inline: 8px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--axo-color-label-secondary);
+
+    &:first-child {
+      padding-block-start: 4px;
+    }
+  }
+
+  &__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    inline-size: 100%;
+    padding-block: 7px;
+    padding-inline: 8px;
+    border: 0;
+    border-radius: 6px;
+    font: inherit;
+    text-align: start;
+    color: inherit;
+    background: transparent;
+    cursor: pointer;
+
+    &--selected {
+      background: var(--beacon-accent-tint);
+
+      .BeaconCommands__icon {
+        background-color: var(--beacon-accent-text);
+      }
+    }
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    inline-size: 18px;
+    block-size: 18px;
+    margin-block-start: 1px;
+    background-color: var(--axo-color-label-secondary);
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-size: contain;
+
+    &--slash {
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M15 4L9 20'/%3E%3C/svg%3E");
+    }
+  }
+
+  &__text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-inline-size: 0;
+  }
+
+  &__line {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-inline-size: 0;
+  }
+
+  &__name {
+    flex-shrink: 0;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.8125rem;
+    font-weight: 600;
+
+    mark {
+      color: var(--beacon-accent-text);
+      background: none;
+    }
+  }
+
+  &__usage {
+    overflow: hidden;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__source {
+    flex-shrink: 0;
+    margin-inline-start: auto;
+    font-size: 0.6875rem;
+    color: var(--axo-color-label-placeholder, #777);
+  }
+
+  &__description {
+    overflow: hidden;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    padding-block: 6px;
+    padding-inline: 12px;
+    border-block-start: 1px solid var(--axo-color-border-primary, #333);
+    font-size: 0.6875rem;
+    color: var(--axo-color-label-secondary);
+
+    kbd {
+      display: inline-block;
+      min-inline-size: 16px;
+      margin-inline-end: 2px;
+      padding-block: 0;
+      padding-inline: 4px;
+      border: 1px solid var(--axo-color-border-primary, #444);
+      border-radius: 3px;
+      font-family: inherit;
+      font-size: 0.625rem;
+      line-height: 15px;
+      text-align: center;
+    }
+  }
 }
 
 // -- Message logger: retained content of deleted messages ------------------
