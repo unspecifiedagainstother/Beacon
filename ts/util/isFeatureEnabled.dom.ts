@@ -9,6 +9,7 @@ import { createLogger } from '../logging/log.std.ts';
 import { isTestOrMockEnvironment } from '../environment.std.ts';
 import { getValue, isEnabled } from '../RemoteConfig.dom.ts';
 import { isAlpha, isBeta, isProduction, isStaging } from './version.std.ts';
+import { isRolloutForcedOn } from '../beacon/core/hidden-features.std.ts';
 
 import type { SemverKeyType, ConfigMapType } from '../RemoteConfig.dom.ts';
 
@@ -25,6 +26,10 @@ export function isFeaturedEnabledSelector({
   prodKey: SemverKeyType;
   remoteConfig: ReadonlyDeep<ConfigMapType> | undefined;
 }): boolean {
+  // Beacon: hidden-features switches force some rollouts on.
+  if (isRolloutForcedOn(betaKey)) {
+    return true;
+  }
   return _isFeatureEnabledInner({
     betaValue: remoteConfig?.[betaKey]?.value,
     currentVersion,
@@ -40,6 +45,9 @@ export function isFeaturedEnabledNoRedux({
   betaKey: SemverKeyType;
   prodKey: SemverKeyType;
 }): boolean {
+  if (isRolloutForcedOn(betaKey)) {
+    return true;
+  }
   return _isFeatureEnabledInner({
     betaValue: getValue(betaKey),
     currentVersion: window.getVersion(),

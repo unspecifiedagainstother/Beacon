@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { RefObject, JSX } from 'react';
+import { isHiddenFeatureOn } from '../../beacon/core/hidden-features.std.ts';
 import { useCallback, memo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -246,7 +247,7 @@ export const SmartTimelineItem = memo(function SmartTimelineItem(
   );
 
   const handleDebugMessage = useCallback(async () => {
-    if (!isInternalFeaturesEnabled()) {
+    if (!isInternalFeaturesEnabled() && !isHiddenFeatureOn('developerMode')) {
       return;
     }
     const message = await DataReader.getMessageById(messageId);
