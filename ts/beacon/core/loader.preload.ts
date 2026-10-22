@@ -62,6 +62,7 @@ import beaconLook from '../builtin/beacon-look.std.ts';
 import fileDetails from '../builtin/file-details.preload.ts';
 import chatOrganisation from '../builtin/chat-organisation.std.ts';
 import screenShareGuard from '../builtin/screen-share-guard.dom.ts';
+import proxy from '../builtin/proxy.std.ts';
 
 const log = createLogger('beacon/loader');
 
@@ -342,6 +343,7 @@ const BUILTIN_MANIFESTS: ReadonlyArray<AddonManifest> = [
   fileDetails,
   chatOrganisation,
   screenShareGuard,
+  proxy,
 ];
 
 function builtinManifests(): Array<AddonManifest> {

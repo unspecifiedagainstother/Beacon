@@ -2404,3 +2404,30 @@ body .module-staged-generic-attachment {
     color: var(--axo-color-label-primary);
   }
 }
+
+// Proxy controls on the Privacy tab.
+.BeaconPrivacy__proxy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-block: 10px;
+  padding-inline: 16px;
+
+  &-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .BeaconInput {
+      flex: 1;
+      min-width: 220px;
+      font-family: ui-monospace, monospace;
+    }
+  }
+
+  &-note {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--axo-color-label-secondary);
+  }
+}

@@ -99,7 +99,11 @@ import {
   isContentProtectionEnabledByDefault,
 } from '../ts/types/Settings.std.ts';
 import * as ephemeralConfig from './ephemeral_config.main.ts';
-import { applyBeaconWindowSettings, setupBeaconMain } from './beacon.main.ts';
+import {
+  applyBeaconProxyEnv,
+  applyBeaconWindowSettings,
+  setupBeaconMain,
+} from './beacon.main.ts';
 import * as mainProcessLogging from '../ts/logging/main_process_logging.main.ts';
 import { MainSQL } from '../ts/sql/main.main.ts';
 import * as sqlChannels from './sql_channel.main.ts';
@@ -144,6 +148,9 @@ import { getAppRootDir } from '../ts/util/appRootDir.main.ts';
 import { trackHeapSize } from '../ts/util/oomNotifier.node.ts';
 import { sendDummyKeystroke } from './WindowsNotifications.main.ts';
 import { maybeMigrateSafeStorageBackend } from '../ts/util/linuxPasswordStoreMigration.main.ts';
+
+// Beacon: proxy from settings, before anything reads HTTPS_PROXY.
+applyBeaconProxyEnv();
 
 const { chmod, realpath, writeFile } = fsExtra;
 const { get, pick, isNumber, isBoolean, some, debounce, noop } = lodash;
