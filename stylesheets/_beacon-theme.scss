@@ -2593,3 +2593,8 @@ body .module-staged-generic-attachment {
     color: var(--axo-color-label-secondary);
   }
 }
+
+// Breathing room between the custom titlebar and the sidebar header.
+body.beacon-has-titlebar .NavSidebar__Header {
+  padding-block-start: 8px;
+}
