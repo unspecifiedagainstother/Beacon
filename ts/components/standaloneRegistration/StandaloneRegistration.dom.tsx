@@ -22,11 +22,9 @@ import { VerifyPINScreen } from './stages/VerifyPIN.dom.tsx';
 import { CreatePINScreen } from './stages/CreatePIN.dom.tsx';
 import { CreatePINConfirmScreen } from './stages/CreatePINConfirm.dom.tsx';
 import { AccountLockedScreen } from './stages/AccountLocked.dom.tsx';
-import { Spacer } from './util/StepComponents.dom.tsx';
 import { CONTACT_SUPPORT_URL } from '../../util/contactSupport.dom.tsx';
 import { openLinkInWebBrowser } from '../../util/openLinkInWebBrowser.dom.ts';
 import { InstallScreenUpdateDialog } from '../installScreen/InstallScreenUpdateDialog.dom.tsx';
-import { BeaconSetupBrand } from '../BeaconSetupBrand.dom.tsx';
 
 import type { LocalizerType } from '../../types/I18N.std.ts';
 import type { ActionCreator } from '../../state/types.std.ts';
@@ -279,9 +277,6 @@ export function StandaloneRegistration({
       )} BeaconSetup`}
     >
       <TitlebarDragArea />
-      {/* Beacon: own branding instead of the Signal wordmark. */}
-      <BeaconSetupBrand />
-      <Spacer className={tw('h-8')} />
       <div className={tw('relative grow')}>
         <div
           className={`${tw(
