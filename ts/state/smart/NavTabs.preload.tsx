@@ -1,7 +1,7 @@
 // Copyright 2023 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import type { ReactNode, JSX } from 'react';
 import { useSelector } from 'react-redux';
 import { NavTabs } from '../../components/NavTabs.dom.tsx';
@@ -15,6 +15,7 @@ import { useConversationsActions } from '../ducks/conversations.preload.ts';
 import { NavTab } from '../../types/Nav.std.ts';
 import { drop } from '../../util/drop.std.ts';
 import { themeChanged } from '../../shims/themeChanged.dom.ts';
+import { getUnreadCountForBadge } from '../../util/countUnreadStats.std.ts';
 import type { BeaconNavDrawerExtras } from '../../components/BeaconNavDrawer.dom.tsx';
 import {
   getHasAnyFailedStorySends,
@@ -66,6 +67,27 @@ export const SmartNavTabs = memo(function SmartNavTabs({
     showConversation,
     startComposing,
   } = useConversationsActions();
+
+  // Beacon: tell the account switcher who this account is and how many
+  // unread messages it has (shown in other accounts' menus and the tray).
+  const accountUnread = getUnreadCountForBadge(
+    unreadConversationsStats,
+    unreadCountBadgeType
+  );
+  const accountName = me.profileName ?? me.title;
+  const accountSubtitle = me.username ?? me.phoneNumber;
+  const accountColor = me.color;
+  useEffect(() => {
+    drop(
+      window.IPC.beaconInvoke('accounts:report', {
+        name: accountName,
+        subtitle: accountSubtitle,
+        color: accountColor,
+        unread: accountUnread,
+        linked: true,
+      })
+    );
+  }, [accountName, accountSubtitle, accountColor, accountUnread]);
 
   const beaconDrawer = useMemo((): BeaconNavDrawerExtras => {
     const toChats = () =>

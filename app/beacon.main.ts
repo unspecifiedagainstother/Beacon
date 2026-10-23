@@ -19,6 +19,8 @@ import { ipcMain, powerMonitor } from 'electron';
 import * as ephemeralConfig from './ephemeral_config.main.ts';
 import { drop } from '../ts/util/drop.std.ts';
 import { openCaptchaWindow } from './beacon-captcha.main.ts';
+import { accountsRequest, reportAccountInfo } from './beacon-accounts.main.ts';
+import { getAccountId, isMainAccount } from './beacon-account-path.node.ts';
 import {
   changeDatabasePassphrase,
   disableDatabasePassphrase,
@@ -225,6 +227,21 @@ const HANDLERS: Record<string, (payload: unknown) => unknown> = {
       options?.log.info('beacon dbcrypt: passphrase protection disabled');
     }
     return ok ? { ok: true } : { ok: false, error: 'Wrong passphrase' };
+  },
+
+  'accounts:self': () => ({
+    id: getAccountId(),
+    isMain: isMainAccount(),
+  }),
+  'accounts:list': () => accountsRequest('list'),
+  'accounts:switch': payload => accountsRequest('switch', String(payload)),
+  'accounts:add': () => accountsRequest('add'),
+  'accounts:remove': payload => accountsRequest('remove', String(payload)),
+  'accounts:report': payload => {
+    if (payload && typeof payload === 'object') {
+      reportAccountInfo(payload);
+    }
+    return true;
   },
 
   'network:log': () => requestLog.slice(),
