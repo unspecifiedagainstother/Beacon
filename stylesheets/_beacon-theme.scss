@@ -2001,6 +2001,14 @@ body.beacon-has-titlebar {
   color: var(--axo-color-label-primary, #fff);
 }
 
+.BeaconSetupBrand__back {
+  margin-inline-start: auto;
+  font-size: initial;
+  font-weight: initial;
+  letter-spacing: normal;
+  -webkit-app-region: no-drag;
+}
+
 // QR codes need a white quiet zone to scan.
 .BeaconSetup .module-InstallScreenQrCodeNotScannedStep__qr-code {
   margin: 0;
@@ -2602,4 +2610,109 @@ body.beacon-has-titlebar .NavSidebar__Header {
 // The sidebar shares the titlebar's color so they read as one surface.
 .NavSidebar.NavSidebar {
   background-color: var(--beacon-window-bg);
+}
+
+// Account switcher in the menu drawer.
+.BeaconNavDrawer__profile-row {
+  display: flex;
+  align-items: stretch;
+  border-block-end: 1px solid var(--axo-color-border-primary, #333);
+
+  .BeaconNavDrawer__profile {
+    flex: 1;
+    min-inline-size: 0;
+    border-block-end: none;
+  }
+}
+
+.BeaconNavDrawer__accounts-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 48px;
+  color: var(--axo-color-label-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  > * {
+    transition: rotate 160ms ease;
+  }
+
+  &:hover {
+    color: var(--axo-color-label-primary);
+    background: var(--axo-color-fill-secondary);
+  }
+
+  &--open > * {
+    rotate: 180deg;
+  }
+}
+
+.BeaconAccounts {
+  display: flex;
+  flex-direction: column;
+  padding-block: 6px;
+  border-block-end: 1px solid var(--axo-color-border-primary, #333);
+
+  &__row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    min-block-size: 48px;
+    padding-inline: 20px;
+    color: inherit;
+    text-align: start;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--axo-color-fill-secondary);
+      outline: none;
+    }
+  }
+
+  &__avatar {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    inline-size: 32px;
+    block-size: 32px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--axo-color-label-primary);
+    background: var(--axo-color-fill-secondary);
+    border-radius: 50%;
+  }
+
+  &__text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+
+  &__name,
+  &__sub {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__name {
+    font-size: 0.875rem;
+  }
+
+  &__sub {
+    font-size: 0.75rem;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__check {
+    display: flex;
+    color: var(--beacon-accent-text);
+  }
 }

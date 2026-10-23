@@ -13,6 +13,10 @@ import type { Location } from '../types/Nav.std.ts';
 import { AxoSymbol } from '../axo/AxoSymbol.dom.tsx';
 import { Avatar, AvatarSize } from './Avatar.dom.tsx';
 import { isLockConfigured, lock } from '../beacon/core/lock.dom.ts';
+import {
+  BeaconAccountList,
+  useAccountsExpanded,
+} from './BeaconAccounts.dom.tsx';
 
 /**
  * Telegram-style navigation: the tab rail is gone and the ☰ button in each
@@ -107,6 +111,7 @@ export function BeaconNavDrawer({
   onOpenArchived,
 }: Props): JSX.Element {
   const panelRef = useRef<HTMLDivElement>(null);
+  const [accountsExpanded, toggleAccounts] = useAccountsExpanded();
 
   useEffect(() => {
     if (!open) {
@@ -174,30 +179,46 @@ export function BeaconNavDrawer({
         aria-modal="true"
         aria-label="Menu"
       >
-        <button
-          type="button"
-          className="BeaconNavDrawer__profile"
-          onClick={settings(SettingsPage.Profile)}
-        >
-          <Avatar
-            {...me}
-            conversationType="direct"
-            badge={undefined}
-            i18n={i18n}
-            size={AvatarSize.FORTY_EIGHT}
-            theme={undefined}
-          />
-          <span className="BeaconNavDrawer__profile-text">
-            <span className="BeaconNavDrawer__profile-name">
-              {me.profileName ?? me.title}
-            </span>
-            {subtitle ? (
-              <span className="BeaconNavDrawer__profile-sub Beacon-pii">
-                {subtitle}
+        <div className="BeaconNavDrawer__profile-row">
+          <button
+            type="button"
+            className="BeaconNavDrawer__profile"
+            onClick={settings(SettingsPage.Profile)}
+          >
+            <Avatar
+              {...me}
+              conversationType="direct"
+              badge={undefined}
+              i18n={i18n}
+              size={AvatarSize.FORTY_EIGHT}
+              theme={undefined}
+            />
+            <span className="BeaconNavDrawer__profile-text">
+              <span className="BeaconNavDrawer__profile-name">
+                {me.profileName ?? me.title}
               </span>
-            ) : null}
-          </span>
-        </button>
+              {subtitle ? (
+                <span className="BeaconNavDrawer__profile-sub Beacon-pii">
+                  {subtitle}
+                </span>
+              ) : null}
+            </span>
+          </button>
+          <button
+            type="button"
+            className={classNames('BeaconNavDrawer__accounts-toggle', {
+              'BeaconNavDrawer__accounts-toggle--open': accountsExpanded,
+            })}
+            aria-expanded={accountsExpanded}
+            aria-label={accountsExpanded ? 'Hide accounts' : 'Show accounts'}
+            onClick={toggleAccounts}
+          >
+            <AxoSymbol.Icon size={20} symbol="chevron-down" label={null} />
+          </button>
+        </div>
+        {accountsExpanded ? (
+          <BeaconAccountList open={open} onClose={onClose} />
+        ) : null}
 
         <div className="BeaconNavDrawer__list">
           <Item

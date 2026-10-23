@@ -104,6 +104,14 @@ import {
   applyBeaconWindowSettings,
   setupBeaconMain,
 } from './beacon.main.ts';
+import { isMainAccount } from './beacon-account-path.node.ts';
+import {
+  beaconHideOnClose,
+  isHiddenStart,
+  setupBeaconAccounts,
+  showCurrentAccount,
+  watchBeaconAccountWindow,
+} from './beacon-accounts.main.ts';
 import {
   promptForDatabaseKey,
   setUnlockedDatabaseKey,
@@ -281,7 +289,17 @@ if (!gotLock) {
       sendDummyKeystroke();
     }
 
+    // Beacon: the main account starting a background account that is
+    // already running must not bring this window up.
+    if (argv.includes('--beacon-hidden')) {
+      return true;
+    }
+
     // Someone tried to run a second instance, we should focus our window
+    // (Beacon: or whichever account is current).
+    if (showCurrentAccount()) {
+      return true;
+    }
     if (mainWindow) {
       if (mainWindow.isMinimized()) {
         mainWindow.restore();
@@ -741,6 +759,7 @@ async function createWindow() {
 
   const startInTray =
     isTestEnvironment(getEnvironment()) ||
+    isHiddenStart() ||
     systemTraySetting === SystemTraySetting.MinimizeToAndStartInSystemTray;
 
   const shouldShowWindow = !startInTray;
@@ -816,6 +835,7 @@ async function createWindow() {
 
   // Create the browser window.
   mainWindow = new BrowserWindow(windowOptions);
+  watchBeaconAccountWindow(mainWindow);
   applyBeaconWindowSettings(mainWindow);
 
   mainWindow.webContents.on('preload-error', (_event, _preloadPath, error) => {
@@ -997,9 +1017,9 @@ async function createWindow() {
     if (
       mainWindow &&
       !windowState.shouldQuit() &&
-      (usingTrayIcon || OS.isMacOS())
+      (beaconHideOnClose() || usingTrayIcon || OS.isMacOS())
     ) {
-      if (usingTrayIcon) {
+      if (usingTrayIcon && isMainAccount()) {
         const shownTrayNotice = ephemeralConfig.get('shown-tray-notice');
         if (shownTrayNotice) {
           log.info('close: not showing tray notice');
@@ -2603,6 +2623,14 @@ app.on('ready', async () => {
   systemTrayService.setEnabled(
     shouldMinimizeToSystemTray(await systemTraySettingCache.get())
   );
+
+  // Beacon: multiple accounts (one process each, coordinated from here).
+  setupBeaconAccounts({
+    getMainWindow,
+    log,
+    isTrayEnabled: () => systemTrayService?.isEnabled() ?? false,
+    onTrayChange: () => systemTrayService?.refresh(),
+  });
 
   await ensureFilePermissions([
     'config.json',
