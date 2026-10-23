@@ -24,6 +24,8 @@ export type BeaconTweaks = {
   formatMessageTime?: (timestamp: number, now: number) => string | undefined;
   /** Hover text on message times. */
   messageTimeTitle?: (timestamp: number) => string | undefined;
+  /** Telegram-style ☰ drawer instead of the tab rail. */
+  navDrawer: boolean;
 };
 
 export const DEFAULT_PLAYBACK_RATES: ReadonlyArray<number> = [1, 1.5, 2, 0.5];
@@ -31,6 +33,7 @@ export const DEFAULT_PLAYBACK_RATES: ReadonlyArray<number> = [1, 1.5, 2, 0.5];
 export const beaconTweaks: BeaconTweaks = {
   playbackRates: DEFAULT_PLAYBACK_RATES,
   defaultPlaybackRate: 1,
+  navDrawer: true,
 };
 
 export function nextPlaybackRate(current: number): number {
