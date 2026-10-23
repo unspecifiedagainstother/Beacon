@@ -2673,6 +2673,7 @@ body.beacon-has-titlebar .NavSidebar__Header {
     font-size: 0.8125rem;
     font-weight: 600;
     color: var(--axo-color-label-primary);
+    object-fit: cover;
     background: var(--axo-color-fill-secondary);
     border-radius: 50%;
   }

@@ -48,6 +48,8 @@ export type BeaconAccountInfo = {
   name?: string;
   subtitle?: string;
   color?: string;
+  /** Small JPEG of the profile photo (data: URL). */
+  avatar?: string;
   unread?: number;
   linked?: boolean;
 };
@@ -715,7 +717,19 @@ export async function accountsRequest(
   return clientRequest(method, params);
 }
 
-export function reportAccountInfo(info: BeaconAccountInfo): void {
+const MAX_AVATAR_LENGTH = 64 * 1024;
+
+export function reportAccountInfo(reported: BeaconAccountInfo): void {
+  const { avatar } = reported;
+  const info: BeaconAccountInfo = {
+    ...reported,
+    avatar:
+      typeof avatar === 'string' &&
+      avatar.startsWith('data:image/jpeg;base64,') &&
+      avatar.length <= MAX_AVATAR_LENGTH
+        ? avatar
+        : undefined,
+  };
   lastInfo = info;
   if (isMainAccount()) {
     setInfo(MAIN_ACCOUNT_ID, info);

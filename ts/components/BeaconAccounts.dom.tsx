@@ -26,6 +26,7 @@ export type BeaconAccountRow = {
   name?: string;
   subtitle?: string;
   color?: string;
+  avatar?: string;
   unread?: number;
 };
 
@@ -66,10 +67,15 @@ async function fetchAccounts(): Promise<Array<BeaconAccountRow>> {
 export function AccountAvatar({
   name,
   color,
+  avatar,
 }: {
   name: string | undefined;
   color: string | undefined;
+  avatar?: string;
 }): JSX.Element {
+  if (avatar?.startsWith('data:image/')) {
+    return <img className="BeaconAccounts__avatar" src={avatar} alt="" />;
+  }
   const colors = color
     ? AvatarColorMap.get(color as Parameters<typeof AvatarColorMap.get>[0])
     : undefined;
@@ -190,7 +196,11 @@ export function BeaconAccountList({
             drop(removeAccount(account));
           }}
         >
-          <AccountAvatar name={account.name} color={account.color} />
+          <AccountAvatar
+            name={account.name}
+            color={account.color}
+            avatar={account.avatar}
+          />
           <span className="BeaconAccounts__text">
             <span className="BeaconAccounts__name">
               {account.name ?? 'Not signed in'}
