@@ -1,15 +1,21 @@
 // Copyright 2023 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import type { ReactNode, JSX } from 'react';
 import { useSelector } from 'react-redux';
 import { NavTabs } from '../../components/NavTabs.dom.tsx';
-import { getIntl } from '../selectors/user.std.ts';
+import { getIntl, getTheme } from '../selectors/user.std.ts';
 import {
   getAllConversationsUnreadStats,
   getCallHistoryUnreadCount,
+  getMe,
 } from '../selectors/conversations.dom.ts';
+import { useConversationsActions } from '../ducks/conversations.preload.ts';
+import { NavTab } from '../../types/Nav.std.ts';
+import { drop } from '../../util/drop.std.ts';
+import { themeChanged } from '../../shims/themeChanged.dom.ts';
+import type { BeaconNavDrawerExtras } from '../../components/BeaconNavDrawer.dom.tsx';
 import {
   getHasAnyFailedStorySends,
   getStoriesNotificationCount,
@@ -52,6 +58,60 @@ export const SmartNavTabs = memo(function SmartNavTabs({
   const hasPendingUpdate = useSelector(getHasPendingUpdate);
 
   const { changeLocation } = useNavActions();
+  const me = useSelector(getMe);
+  const theme = useSelector(getTheme);
+  const {
+    showArchivedConversations,
+    showChooseGroupMembers,
+    showConversation,
+    startComposing,
+  } = useConversationsActions();
+
+  const beaconDrawer = useMemo((): BeaconNavDrawerExtras => {
+    const toChats = () =>
+      changeLocation({
+        tab: NavTab.Chats,
+        details: { conversationId: undefined },
+      });
+    return {
+      me,
+      theme,
+      onToggleTheme: () =>
+        drop(
+          (async () => {
+            await window.Events.setThemeSetting(
+              theme === 'dark' ? 'light' : 'dark'
+            );
+            await themeChanged();
+          })()
+        ),
+      onNavigate: changeLocation,
+      onNewChat: () => {
+        toChats();
+        startComposing();
+      },
+      onNewGroup: () => {
+        toChats();
+        showChooseGroupMembers();
+      },
+      onOpenNoteToSelf: () => {
+        toChats();
+        showConversation({ conversationId: me.id });
+      },
+      onOpenArchived: () => {
+        toChats();
+        showArchivedConversations();
+      },
+    };
+  }, [
+    changeLocation,
+    me,
+    theme,
+    showArchivedConversations,
+    showChooseGroupMembers,
+    showConversation,
+    startComposing,
+  ]);
 
   const onChangeLocation = useCallback(
     (location: Location) => {
@@ -82,6 +142,7 @@ export const SmartNavTabs = memo(function SmartNavTabs({
       unreadCallsCount={unreadCallsCount}
       unreadConversationsStats={unreadConversationsStats}
       unreadStoriesCount={unreadStoriesCount}
+      beaconDrawer={beaconDrawer}
     />
   );
 });

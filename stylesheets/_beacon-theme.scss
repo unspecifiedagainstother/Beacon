@@ -2431,3 +2431,165 @@ body .module-staged-generic-attachment {
     color: var(--axo-color-label-secondary);
   }
 }
+
+// ---------------------------------------------------------------------------
+// Navigation drawer (Telegram style): ☰ in the sidebar header opens it.
+// ---------------------------------------------------------------------------
+
+.BeaconNavDrawer {
+  position: absolute;
+  z-index: 210; // over the toast/megaphone layer (200), under modals
+  inset: 0;
+  pointer-events: none;
+
+  &--open {
+    pointer-events: auto;
+  }
+
+  &__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 0.4);
+    opacity: 0;
+    transition: opacity 180ms ease;
+
+    .BeaconNavDrawer--open & {
+      opacity: 1;
+    }
+  }
+
+  &__panel {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: calc(-1 * min(300px, 85vw) - 24px);
+    display: flex;
+    flex-direction: column;
+    inline-size: min(300px, 85vw);
+    overflow: hidden;
+    color: var(--axo-color-label-primary);
+    background: var(--beacon-window-bg, #1f1f1f);
+    box-shadow: 4px 0 24px rgb(0 0 0 / 0.3);
+    transition: inset-inline-start 200ms cubic-bezier(0.2, 0, 0, 1);
+
+    .BeaconNavDrawer--open & {
+      inset-inline-start: 0;
+    }
+  }
+
+  &__profile {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding-block: 20px 16px;
+    padding-inline: 20px;
+    color: inherit;
+    text-align: start;
+    background: none;
+    border: none;
+    border-block-end: 1px solid var(--axo-color-border-primary, #333);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--axo-color-fill-secondary);
+    }
+  }
+
+  &__profile-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-inline-size: 0;
+  }
+
+  &__profile-name {
+    overflow: hidden;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__profile-sub {
+    overflow: hidden;
+    font-size: 0.8125rem;
+    color: var(--axo-color-label-secondary);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__list {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding-block: 6px;
+    overflow-y: auto;
+  }
+
+  &__item {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    min-block-size: 40px;
+    padding-inline: 20px;
+    font-size: 0.875rem;
+    color: inherit;
+    text-align: start;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    > :first-child {
+      color: var(--axo-color-label-secondary);
+    }
+
+    &:hover,
+    &:focus-visible {
+      background: var(--axo-color-fill-secondary);
+      outline: none;
+    }
+
+    &--active {
+      color: var(--beacon-accent-text);
+
+      > :first-child {
+        color: var(--beacon-accent-text);
+      }
+    }
+  }
+
+  &__label {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  &__badge {
+    min-inline-size: 20px;
+    padding-block: 1px;
+    padding-inline: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    text-align: center;
+    background: var(--beacon-accent);
+    border-radius: 6px;
+  }
+
+  &__dot {
+    inline-size: 8px;
+    block-size: 8px;
+    background: var(--beacon-accent);
+    border-radius: 2px;
+  }
+
+  &__divider {
+    margin-block: 6px;
+    border-block-start: 1px solid var(--axo-color-border-primary, #333);
+  }
+
+  &__footer {
+    padding-block: 10px 14px;
+    padding-inline: 20px;
+    font-size: 0.75rem;
+    color: var(--axo-color-label-secondary);
+  }
+}
