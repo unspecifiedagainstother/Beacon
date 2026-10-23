@@ -16,6 +16,7 @@ import { NavTab } from '../../types/Nav.std.ts';
 import { drop } from '../../util/drop.std.ts';
 import { themeChanged } from '../../shims/themeChanged.dom.ts';
 import { getUnreadCountForBadge } from '../../util/countUnreadStats.std.ts';
+import { getAvatarThumbnail } from '../../beacon/util/avatarThumbnail.dom.ts';
 import type { BeaconNavDrawerExtras } from '../../components/BeaconNavDrawer.dom.tsx';
 import {
   getHasAnyFailedStorySends,
@@ -77,17 +78,28 @@ export const SmartNavTabs = memo(function SmartNavTabs({
   const accountName = me.profileName ?? me.title;
   const accountSubtitle = me.username ?? me.phoneNumber;
   const accountColor = me.color;
+  const accountAvatarUrl = me.avatarUrl;
   useEffect(() => {
     drop(
-      window.IPC.beaconInvoke('accounts:report', {
-        name: accountName,
-        subtitle: accountSubtitle,
-        color: accountColor,
-        unread: accountUnread,
-        linked: true,
-      })
+      (async () => {
+        const avatar = await getAvatarThumbnail(accountAvatarUrl);
+        await window.IPC.beaconInvoke('accounts:report', {
+          name: accountName,
+          subtitle: accountSubtitle,
+          color: accountColor,
+          avatar,
+          unread: accountUnread,
+          linked: true,
+        });
+      })()
     );
-  }, [accountName, accountSubtitle, accountColor, accountUnread]);
+  }, [
+    accountName,
+    accountSubtitle,
+    accountColor,
+    accountAvatarUrl,
+    accountUnread,
+  ]);
 
   const beaconDrawer = useMemo((): BeaconNavDrawerExtras => {
     const toChats = () =>
