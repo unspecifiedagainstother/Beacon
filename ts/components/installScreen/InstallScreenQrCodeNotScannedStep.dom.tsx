@@ -33,7 +33,7 @@ import {
   Spacer,
   Title,
 } from '../standaloneRegistration/util/StepComponents.dom.tsx';
-import { BeaconSetupBrand } from '../BeaconSetupBrand.dom.tsx';
+import { BeaconAccountBackButton } from '../BeaconAccountBackButton.dom.tsx';
 
 const { noop } = lodash;
 
@@ -107,14 +107,13 @@ export function InstallScreenQrCodeNotScannedStep({
       className={`${tw('flex size-full flex-col overflow-hidden')} BeaconSetup`}
     >
       <TitlebarDragArea />
-      <BeaconSetupBrand />
-      <Spacer className={tw('h-8')} />
       <div className={tw('relative grow')}>
         <div
           className={`${tw(
             'absolute inset-s-1/2 top-1/2 flex max-h-[calc(100%-32px)] w-143 max-w-[calc(100%-32px)] -translate-1/2 transform flex-col overflow-hidden rounded-[26px] bg-surface-primary'
           )} BeaconSetup__card`}
         >
+          <BeaconAccountBackButton />
           <div
             className={tw(
               'flex h-[568px] grow flex-col items-center overflow-x-hidden overflow-y-auto p-6 text-center'
