@@ -2598,3 +2598,8 @@ body .module-staged-generic-attachment {
 body.beacon-has-titlebar .NavSidebar__Header {
   padding-block-start: 8px;
 }
+
+// The sidebar shares the titlebar's color so they read as one surface.
+.NavSidebar.NavSidebar {
+  background-color: var(--beacon-window-bg);
+}
