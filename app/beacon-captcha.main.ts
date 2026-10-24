@@ -86,6 +86,15 @@ export function openCaptchaWindow({
   });
   current = win;
 
+  // hCaptcha scores the browser; an "Electron/…" or app token in the user
+  // agent reads as automation and Signal then rejects the solved captcha.
+  // Present as the plain Chromium this is.
+  win.webContents.setUserAgent(
+    win.webContents
+      .getUserAgent()
+      .replace(/\s(?:Electron|[\w-]*(?:signal|beacon)[\w-]*)\/\S+/gi, '')
+  );
+
   let done = false;
   const handle = (event: { preventDefault: () => void }, target: string) => {
     const token = captchaTokenFromUrl(target);
@@ -93,7 +102,13 @@ export function openCaptchaWindow({
       event.preventDefault();
       if (!done) {
         done = true;
-        log.info('beacon captcha: token received');
+        // The first parts name the captcha type and site key; not secret.
+        log.info(
+          `beacon captcha: token received (${token
+            .split('.')
+            .slice(0, 3)
+            .join('.')}…, ${token.length} chars)`
+        );
         onToken(token);
         win.close();
       }

@@ -237,6 +237,7 @@ const HANDLERS: Record<string, (payload: unknown) => unknown> = {
   'accounts:switch': payload => accountsRequest('switch', String(payload)),
   'accounts:add': () => accountsRequest('add'),
   'accounts:remove': payload => accountsRequest('remove', String(payload)),
+  'accounts:cancelSetup': () => accountsRequest('cancelSetup'),
   'accounts:report': payload => {
     if (payload && typeof payload === 'object') {
       reportAccountInfo(payload);
