@@ -10,6 +10,7 @@ import type { ReadonlyDeep } from 'type-fest';
 import type { ThunkAction } from 'redux-thunk';
 
 import { SECOND } from '../../util/durations/constants.std.ts';
+import { sleep } from '../../util/sleep.std.ts';
 import { toLogFormat } from '../../types/errors.std.ts';
 import { createLogger } from '../../logging/log.std.ts';
 import { drop } from '../../util/drop.std.ts';
@@ -223,7 +224,29 @@ export function moveToCaptchaStage({
 
     let result;
     try {
-      result = await createVerificationSession(phoneNumber);
+      // Beacon: a short server rate limit ("retry after 5s") isn't a
+      // connection problem; wait it out and try again a few times.
+      for (let attempt = 1; ; attempt += 1) {
+        try {
+          // oxlint-disable-next-line no-await-in-loop
+          result = await createVerificationSession(phoneNumber);
+          break;
+        } catch (error) {
+          const retryAfterSecs =
+            error instanceof LibSignalErrorBase &&
+            error.is(ErrorCode.RateLimitedError)
+              ? error.retryAfterSecs
+              : undefined;
+          if (retryAfterSecs == null || retryAfterSecs > 60 || attempt >= 3) {
+            throw error;
+          }
+          log.warn(
+            `${logId}: rate limited, retrying in ${retryAfterSecs}s (attempt ${attempt})`
+          );
+          // oxlint-disable-next-line no-await-in-loop
+          await sleep((retryAfterSecs + 1) * SECOND);
+        }
+      }
     } catch (error) {
       log.error(`${logId}: error`, toLogFormat(error));
 
