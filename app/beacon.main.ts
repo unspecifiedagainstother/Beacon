@@ -15,10 +15,14 @@
  */
 
 import type { BrowserWindow, Session } from 'electron';
-import { ipcMain, powerMonitor } from 'electron';
+import { ipcMain, powerMonitor, shell } from 'electron';
 import * as ephemeralConfig from './ephemeral_config.main.ts';
 import { drop } from '../ts/util/drop.std.ts';
-import { openCaptchaWindow } from './beacon-captcha.main.ts';
+import {
+  captchaTokenFromUrl,
+  closeCaptchaWindow,
+  openCaptchaWindow,
+} from './beacon-captcha.main.ts';
 import { accountsRequest, reportAccountInfo } from './beacon-accounts.main.ts';
 import { getAccountId, isMainAccount } from './beacon-account-path.node.ts';
 import {
@@ -165,6 +169,39 @@ const HANDLERS: Record<string, (payload: unknown) => unknown> = {
       onToken: captcha.onToken,
       log,
     });
+    return true;
+  },
+
+  // Solve the captcha in the system browser instead (signal-cli style): a
+  // real browser profile scores better with hCaptcha than the in-app
+  // window. The finished "Open Signal" link is pasted back in.
+  'captcha:open-external': payload => {
+    if (!options) {
+      return false;
+    }
+    closeCaptchaWindow();
+    const { urls } = options.captcha;
+    drop(
+      shell.openExternal(
+        payload === 'registration' ? urls.registration : urls.chat
+      )
+    );
+    return true;
+  },
+
+  'captcha:submit': payload => {
+    const raw = typeof payload === 'string' ? payload.trim() : '';
+    // The full "signalcaptcha://…" link, or just the token part.
+    const token =
+      captchaTokenFromUrl(raw) ??
+      (/^signal-[a-z0-9-]*captcha[^\s/]*\.\S+$/i.test(raw) ? raw : undefined);
+    if (!options || !token) {
+      return false;
+    }
+    options.log.info(
+      `beacon captcha: pasted token (${token.split('.').slice(0, 3).join('.')}…)`
+    );
+    options.captcha.onToken(token);
     return true;
   },
 

@@ -2706,3 +2706,41 @@ body.beacon-has-titlebar .NavSidebar__Header {
     color: var(--beacon-accent-text);
   }
 }
+
+// Registration captcha: solve in the system browser and paste the link.
+.BeaconBrowserCaptcha {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  margin-block: 8px 16px;
+  text-align: start;
+
+  &--open {
+    align-items: stretch;
+  }
+
+  &__steps {
+    margin: 0;
+    padding-inline-start: 20px;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--axo-color-label-secondary);
+  }
+
+  &__row {
+    display: flex;
+    gap: 8px;
+
+    .BeaconInput {
+      flex: 1;
+      min-inline-size: 0;
+    }
+  }
+
+  &__error {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--axo-color-label-destructive);
+  }
+}

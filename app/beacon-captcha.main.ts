@@ -152,3 +152,11 @@ export function openCaptchaWindow({
   log.info('beacon captcha: opening in-app captcha window');
   drop(win.loadURL(url));
 }
+
+/** Close the in-app captcha window (switching to the system browser). */
+export function closeCaptchaWindow(): void {
+  if (current && !current.isDestroyed()) {
+    current.close();
+  }
+  current = undefined;
+}
