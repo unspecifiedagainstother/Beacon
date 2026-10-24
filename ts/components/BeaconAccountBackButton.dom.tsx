@@ -9,7 +9,8 @@ import { drop } from '../util/drop.std.ts';
 
 /**
  * Setup card corner button for an extra account that isn't signed in yet:
- * goes back to the main account. Renders nothing for the main account.
+ * cancels adding it (its empty folder is removed) and goes back to the
+ * main account. Renders nothing for the main account.
  */
 export function BeaconAccountBackButton(): JSX.Element | null {
   const [isExtraAccount, setIsExtraAccount] = useState(false);
@@ -43,7 +44,7 @@ export function BeaconAccountBackButton(): JSX.Element | null {
       <AxoButton.Root
         variant="subtle-secondary"
         size="sm"
-        onClick={() => drop(window.IPC.beaconInvoke('accounts:switch', 'main'))}
+        onClick={() => drop(window.IPC.beaconInvoke('accounts:cancelSetup'))}
       >
         Back
       </AxoButton.Root>

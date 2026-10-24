@@ -72,7 +72,8 @@ type Message =
   | { t: 'res'; rid: number; result?: unknown; error?: string }
   | { t: 'show'; state?: WindowState }
   | { t: 'hide' }
-  | { t: 'quit' };
+  | { t: 'quit' }
+  | { t: 'captcha'; token: string };
 
 type Options = {
   getMainWindow: () => BrowserWindow | undefined;
@@ -81,6 +82,8 @@ type Options = {
   isTrayEnabled: () => boolean;
   /** Main account only: refresh the tray after visibility/unread changes. */
   onTrayChange: () => void;
+  /** Hand a captcha token (from a browser link) to this account. */
+  onCaptchaToken: (token: string) => void;
 };
 
 let options: Options | undefined;
@@ -388,11 +391,26 @@ async function coordinatorRequest(
       }
       return false;
     case 'add': {
-      const id = randomBytes(5).toString('hex');
-      registry.accounts.push({ id });
-      saveRegistry();
+      // Reuse an account that was added but never signed in, rather than
+      // piling up empty ones.
+      const unused = registry.accounts.find(a => !isSignedIn(a));
+      const id = unused?.id ?? randomBytes(5).toString('hex');
+      if (!unused) {
+        registry.accounts.push({ id });
+        saveRegistry();
+      }
       showAccount(id, state);
       return id;
+    }
+    case 'cancelSetup': {
+      // "Back" from an account's setup screen: discard it if it never
+      // signed in, and return to the main account.
+      const account = registry.accounts.find(a => a.id === fromId);
+      if (!account || isSignedIn(account)) {
+        showAccount(MAIN_ACCOUNT_ID, state);
+        return false;
+      }
+      return removeAccount(fromId, state);
     }
     case 'remove':
       return removeAccount(String(target), state);
@@ -404,6 +422,27 @@ async function coordinatorRequest(
   }
 }
 
+function isSignedIn(account: { info?: BeaconAccountInfo }): boolean {
+  return account.info?.linked === true;
+}
+
+/**
+ * Main account: hand a captcha token from a browser link to the account
+ * that is on screen (it's the one registering). False when that's us.
+ */
+export function forwardCaptchaToCurrentAccount(token: string): boolean {
+  if (!isMainAccount() || currentId === MAIN_ACCOUNT_ID) {
+    return false;
+  }
+  const socket = clients.get(currentId);
+  if (!socket) {
+    return false;
+  }
+  send(socket, { t: 'captcha', token });
+  showAccount(currentId);
+  return true;
+}
+
 function listAccounts(currentFor: string): Array<BeaconAccountListItem> {
   return [
     {
@@ -413,13 +452,16 @@ function listAccounts(currentFor: string): Array<BeaconAccountListItem> {
       isCurrent: currentFor === MAIN_ACCOUNT_ID,
       running: true,
     },
-    ...registry.accounts.map(account => ({
-      ...account.info,
-      id: account.id,
-      isMain: false,
-      isCurrent: currentFor === account.id,
-      running: clients.has(account.id),
-    })),
+    // Accounts that were added but never signed in stay out of the list.
+    ...registry.accounts
+      .filter(account => isSignedIn(account) || account.id === currentFor)
+      .map(account => ({
+        ...account.info,
+        id: account.id,
+        isMain: false,
+        isCurrent: currentFor === account.id,
+        running: clients.has(account.id),
+      })),
   ];
 }
 
@@ -489,8 +531,10 @@ function startCoordinator(): void {
   // Give background accounts left running by a previous session a moment
   // to reconnect before starting the missing ones.
   setTimeout(() => {
-    for (const { id } of registry.accounts) {
-      startAccount(id);
+    for (const account of registry.accounts) {
+      if (isSignedIn(account)) {
+        startAccount(account.id);
+      }
     }
   }, 3000);
 
@@ -558,6 +602,9 @@ function connectToCoordinator(): void {
       case 'quit':
         quitting = true;
         app.quit();
+        break;
+      case 'captcha':
+        options?.onCaptchaToken(message.token);
         break;
       case 'res': {
         const pending = pendingRequests.get(message.rid);
@@ -707,7 +754,7 @@ export { isHiddenStart };
 // Renderer API (via beacon.main.ts HANDLERS)
 
 export async function accountsRequest(
-  method: 'list' | 'switch' | 'add' | 'remove',
+  method: 'list' | 'switch' | 'add' | 'remove' | 'cancelSetup',
   target?: string
 ): Promise<unknown> {
   const params = { target, state: windowState() };

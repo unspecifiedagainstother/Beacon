@@ -107,6 +107,7 @@ import {
 import { isMainAccount } from './beacon-account-path.node.ts';
 import {
   beaconHideOnClose,
+  forwardCaptchaToCurrentAccount,
   isHiddenStart,
   setupBeaconAccounts,
   showCurrentAccount,
@@ -296,8 +297,12 @@ if (!gotLock) {
     }
 
     // Someone tried to run a second instance, we should focus our window
-    // (Beacon: or whichever account is current).
+    // (Beacon: or whichever account is current, still handling any link).
     if (showCurrentAccount()) {
+      const accountRoute = maybeGetIncomingSignalRoute(argv);
+      if (accountRoute != null) {
+        handleSignalRoute(accountRoute);
+      }
       return true;
     }
     if (mainWindow) {
@@ -2630,6 +2635,7 @@ app.on('ready', async () => {
     log,
     isTrayEnabled: () => systemTrayService?.isEnabled() ?? false,
     onTrayChange: () => systemTrayService?.refresh(),
+    onCaptchaToken: token => challengeHandler.handleCaptcha(token),
   });
 
   await ensureFilePermissions([
@@ -3292,6 +3298,10 @@ function handleSignalRoute(route: ParsedSignalRoute) {
   } else if (route.key === 'cancelPresenting') {
     mainWindow.webContents.send('cancel-presenting');
   } else if (route.key === 'captcha') {
+    // Beacon: the account on screen may be another account's process.
+    if (forwardCaptchaToCurrentAccount(route.args.captchaId)) {
+      return;
+    }
     challengeHandler.handleCaptcha(route.args.captchaId);
     // Show window after handling captcha
     showWindow();
