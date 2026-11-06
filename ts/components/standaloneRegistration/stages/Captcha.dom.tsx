@@ -12,6 +12,7 @@ import { AxoSymbol } from '../../../axo/AxoSymbol.dom.tsx';
 import { AxoConfirmDialog } from '../../../axo/AxoConfirmDialog.dom.tsx';
 import { AxoAlertDialog } from '../../../axo/AxoAlertDialog.dom.tsx';
 import { AxoButton } from '../../../axo/AxoButton.dom.tsx';
+import { BeaconBrowserCaptcha } from '../../BeaconBrowserCaptcha.dom.tsx';
 import {
   Buttons,
   Container,
@@ -135,6 +136,8 @@ export function CaptchaScreen({
       ) : (
         <Spacer className={tw('h-35.5 grow')} />
       )}
+      {/* Beacon: browser + paste fallback while waiting for the captcha. */}
+      {pending ? <BeaconBrowserCaptcha /> : null}
       <Buttons>
         <AxoButton.Root
           variant="strong-primary"

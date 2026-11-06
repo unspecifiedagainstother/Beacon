@@ -4,6 +4,13 @@ lockfileIncludeTarballUrl: true
 verifyDepsBeforeRun: prompt
 verifyStoreIntegrity: true
 
+supportedArchitectures:
+  os: [current]
+  cpu: [current]
+  libc: [glibc]
+
+enableGlobalVirtualStore: false
+
 packages:
   - 'packages/*'
   - 'sticker-creator'

@@ -30,7 +30,6 @@ import type { BoundActionCreatorsMapObject } from '../../hooks/useBoundActions.s
 import { useBoundActions } from '../../hooks/useBoundActions.std.ts';
 import { createLogger } from '../../logging/log.std.ts';
 import { backupsService } from '../../services/backups/index.preload.ts';
-import OS from '../../util/os/osMain.node.ts';
 import { signalProtocolStore } from '../../SignalProtocolStore.preload.ts';
 import { itemStorage } from '../../textsecure/Storage.preload.ts';
 import {
@@ -278,7 +277,7 @@ function startInstaller(): ThunkAction<
         });
       } else if (event.kind === ProvisionEventKind.Envelope) {
         const { envelope } = event;
-        const defaultDeviceName = OS.getName() || 'Signal Desktop';
+        const defaultDeviceName = 'Beacon';
         const deviceName = window.SignalCI?.deviceName ?? defaultDeviceName;
 
         const finishInstallOptions: FinishInstallOptionsType = {

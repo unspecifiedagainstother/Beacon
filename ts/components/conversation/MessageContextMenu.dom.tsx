@@ -2,9 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { useRef, type ReactNode, type JSX } from 'react';
+import { BeaconErrorBoundary } from '../BeaconErrorBoundary.dom.tsx';
+import { toAxoSymbol } from '../../beacon/util/axoSymbol.std.ts';
+import { isHiddenFeatureOn } from '../../beacon/core/hidden-features.std.ts';
+import { drop } from '../../util/drop.std.ts';
 import type { LocalizerType } from '../../types/I18N.std.ts';
 import { AxoMenuBuilder } from '../../axo/AxoMenuBuilder.dom.tsx';
 import { isInternalFeaturesEnabled } from '../../util/isInternalFeaturesEnabled.dom.ts';
+import { applyBeaconFilter } from '../../beacon/core/filters.std.ts';
 
 type MessageContextMenuProps = Readonly<{
   i18n: LocalizerType;
@@ -27,6 +32,7 @@ type MessageContextMenuProps = Readonly<{
   onUnpinMessage: (() => void) | null;
   onMoreInfo: (() => void) | null;
   onSelect: (() => void) | null;
+  beaconMessage?: { messageId: string; conversationId: string };
   children: ReactNode;
 }>;
 
@@ -51,6 +57,7 @@ export function MessageContextMenu({
   onDeleteMessage,
   onPinMessage,
   onUnpinMessage,
+  beaconMessage,
   children,
 }: MessageContextMenuProps): JSX.Element {
   const shouldReturnFocusToTrigger = useRef(true);
@@ -132,6 +139,20 @@ export function MessageContextMenu({
             {i18n('icu:copy')}
           </AxoMenuBuilder.Item>
         )}
+        {/* Beacon: items contributed by built-ins (message.menuItems). */}
+        {beaconMessage &&
+          applyBeaconFilter('message.menuItems', [], beaconMessage).map(
+            item => (
+              <BeaconErrorBoundary key={item.id} name={`menu item ${item.id}`}>
+                <AxoMenuBuilder.Item
+                  symbol={toAxoSymbol(item.symbol)}
+                  onSelect={item.onSelect}
+                >
+                  {item.label}
+                </AxoMenuBuilder.Item>
+              </BeaconErrorBoundary>
+            )
+          )}
         {onPinMessage && (
           <AxoMenuBuilder.Item symbol="pin" onSelect={onPinMessage}>
             {i18n('icu:MessageContextMenu__PinMessage')}
@@ -165,17 +186,45 @@ export function MessageContextMenu({
             {i18n('icu:retryDeleteForEveryone')}
           </AxoMenuBuilder.Item>
         )}
-        {isInternalFeaturesEnabled() && onDebugMessage && (
-          <>
-            <AxoMenuBuilder.Separator />
-            <AxoMenuBuilder.Group>
-              <AxoMenuBuilder.Label>Internal</AxoMenuBuilder.Label>
-              <AxoMenuBuilder.Item symbol="copy" onSelect={onDebugMessage}>
-                Copy & debug message
-              </AxoMenuBuilder.Item>
-            </AxoMenuBuilder.Group>
-          </>
-        )}
+        {/* Beacon: also shown in Developer mode (Hidden Signal features). */}
+        {(isInternalFeaturesEnabled() || isHiddenFeatureOn('developerMode')) &&
+          onDebugMessage && (
+            <>
+              <AxoMenuBuilder.Separator />
+              <AxoMenuBuilder.Group>
+                <AxoMenuBuilder.Label>Developer</AxoMenuBuilder.Label>
+                <AxoMenuBuilder.Item symbol="copy" onSelect={onDebugMessage}>
+                  Copy raw message (JSON)
+                </AxoMenuBuilder.Item>
+                {beaconMessage ? (
+                  <>
+                    <AxoMenuBuilder.Item
+                      symbol="copy"
+                      onSelect={() =>
+                        drop(
+                          navigator.clipboard.writeText(beaconMessage.messageId)
+                        )
+                      }
+                    >
+                      Copy message ID
+                    </AxoMenuBuilder.Item>
+                    <AxoMenuBuilder.Item
+                      symbol="copy"
+                      onSelect={() =>
+                        drop(
+                          navigator.clipboard.writeText(
+                            beaconMessage.conversationId
+                          )
+                        )
+                      }
+                    >
+                      Copy conversation ID
+                    </AxoMenuBuilder.Item>
+                  </>
+                ) : null}
+              </AxoMenuBuilder.Group>
+            </>
+          )}
       </AxoMenuBuilder.Content>
     </AxoMenuBuilder.Root>
   );

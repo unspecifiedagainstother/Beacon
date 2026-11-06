@@ -99,6 +99,24 @@ import {
   isContentProtectionEnabledByDefault,
 } from '../ts/types/Settings.std.ts';
 import * as ephemeralConfig from './ephemeral_config.main.ts';
+import {
+  applyBeaconProxyEnv,
+  applyBeaconWindowSettings,
+  setupBeaconMain,
+} from './beacon.main.ts';
+import { isMainAccount } from './beacon-account-path.node.ts';
+import {
+  beaconHideOnClose,
+  forwardCaptchaToCurrentAccount,
+  isHiddenStart,
+  setupBeaconAccounts,
+  showCurrentAccount,
+  watchBeaconAccountWindow,
+} from './beacon-accounts.main.ts';
+import {
+  promptForDatabaseKey,
+  setUnlockedDatabaseKey,
+} from './beacon-dbcrypt.main.ts';
 import * as mainProcessLogging from '../ts/logging/main_process_logging.main.ts';
 import { MainSQL } from '../ts/sql/main.main.ts';
 import * as sqlChannels from './sql_channel.main.ts';
@@ -143,6 +161,8 @@ import { getAppRootDir } from '../ts/util/appRootDir.main.ts';
 import { trackHeapSize } from '../ts/util/oomNotifier.node.ts';
 import { sendDummyKeystroke } from './WindowsNotifications.main.ts';
 import { maybeMigrateSafeStorageBackend } from '../ts/util/linuxPasswordStoreMigration.main.ts';
+
+applyBeaconProxyEnv();
 
 const { chmod, realpath, writeFile } = fsExtra;
 const { get, pick, isNumber, isBoolean, some, debounce, noop } = lodash;
@@ -269,7 +289,18 @@ if (!gotLock) {
       sendDummyKeystroke();
     }
 
+    if (argv.includes('--beacon-hidden')) {
+      return true;
+    }
+
     // Someone tried to run a second instance, we should focus our window
+    if (showCurrentAccount()) {
+      const accountRoute = maybeGetIncomingSignalRoute(argv);
+      if (accountRoute != null) {
+        handleSignalRoute(accountRoute);
+      }
+      return true;
+    }
     if (mainWindow) {
       if (mainWindow.isMinimized()) {
         mainWindow.restore();
@@ -651,6 +682,15 @@ const mainTitleBarStyle = OS.isMacOS()
   ? ('hidden' as const)
   : ('default' as const);
 
+let beaconAppliedCustomTitlebar: boolean | undefined;
+
+function getBeaconCustomTitlebar(): boolean {
+  if (OS.isMacOS()) {
+    return false;
+  }
+  return ephemeralConfig.get('beacon-custom-titlebar') === true;
+}
+
 const nonMainTitleBarStyle = 'default' as const;
 
 async function safeLoadURL(window: BrowserWindow, url: string): Promise<void> {
@@ -706,6 +746,7 @@ async function createWindow() {
 
   const startInTray =
     isTestEnvironment(getEnvironment()) ||
+    isHiddenStart() ||
     systemTraySetting === SystemTraySetting.MinimizeToAndStartInSystemTray;
 
   const shouldShowWindow = !startInTray;
@@ -718,6 +759,10 @@ async function createWindow() {
     minHeight: MIN_HEIGHT,
     autoHideMenuBar: false,
     titleBarStyle: mainTitleBarStyle,
+    ...((): { frame?: false } => {
+      beaconAppliedCustomTitlebar = getBeaconCustomTitlebar();
+      return beaconAppliedCustomTitlebar ? { frame: false } : {};
+    })(),
     backgroundColor,
     webPreferences: {
       ...defaultWebPrefs,
@@ -776,6 +821,8 @@ async function createWindow() {
 
   // Create the browser window.
   mainWindow = new BrowserWindow(windowOptions);
+  watchBeaconAccountWindow(mainWindow);
+  applyBeaconWindowSettings(mainWindow);
 
   mainWindow.webContents.on('preload-error', (_event, _preloadPath, error) => {
     log.error(Errors.toLogFormat(error));
@@ -861,6 +908,17 @@ async function createWindow() {
   mainWindow.on('maximize', captureWindowStats);
   mainWindow.on('unmaximize', captureWindowStats);
 
+  const sendMaximizedState = () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send(
+        'beacon:window:maximized-changed',
+        mainWindow.isMaximized()
+      );
+    }
+  };
+  mainWindow.on('maximize', sendMaximizedState);
+  mainWindow.on('unmaximize', sendMaximizedState);
+
   if (
     !ciMode &&
     config.get<boolean>('openDevTools') &&
@@ -944,9 +1002,9 @@ async function createWindow() {
     if (
       mainWindow &&
       !windowState.shouldQuit() &&
-      (usingTrayIcon || OS.isMacOS())
+      (beaconHideOnClose() || usingTrayIcon || OS.isMacOS())
     ) {
-      if (usingTrayIcon) {
+      if (usingTrayIcon && isMainAccount()) {
         const shownTrayNotice = ephemeralConfig.get('shown-tray-notice');
         if (shownTrayNotice) {
           log.info('close: not showing tray notice');
@@ -1141,6 +1199,36 @@ ipc.on('title-bar-double-click', () => {
     //   we add support for other operating systems.
     toggleMaximizedBrowserWindow(mainWindow);
   }
+});
+
+ipc.on('beacon:window:minimize', () => {
+  mainWindow?.minimize();
+});
+
+ipc.on('beacon:window:toggle-maximize', () => {
+  if (mainWindow) {
+    toggleMaximizedBrowserWindow(mainWindow);
+  }
+});
+
+ipc.on('beacon:window:close', () => {
+  mainWindow?.close();
+});
+
+ipc.handle('beacon:window:is-maximized', () => {
+  return mainWindow?.isMaximized() ?? false;
+});
+
+ipc.handle('beacon:titlebar:get', () => {
+  return getBeaconCustomTitlebar();
+});
+
+ipc.handle('beacon:titlebar:set', (_event, value: boolean) => {
+  ephemeralConfig.set('beacon-custom-titlebar', value);
+});
+
+ipc.handle('beacon:titlebar:get-applied', () => {
+  return beaconAppliedCustomTitlebar ?? false;
 });
 
 ipc.handle('pdf:generate', async (_event, data) => {
@@ -1871,13 +1959,15 @@ function handleSafeStorageDecryptionError(): 'continue' | 'quit' {
 }
 
 async function initializeSQL(
-  userDataPath: string
+  userDataPath: string,
+  beaconKey?: string
 ): Promise<{ ok: true; error: undefined } | { ok: false; error: Error }> {
   sqlInitTimeStart = Date.now();
 
   let key: string;
   try {
-    key = getSQLKey();
+    key = beaconKey ?? getSQLKey();
+    setUnlockedDatabaseKey(key, beaconKey !== undefined);
   } catch (error) {
     try {
       // Initialize with *some* key to setup paths
@@ -2199,6 +2289,21 @@ app.on('ready', async () => {
   ]);
 
   updateDefaultSession(session.defaultSession, log);
+  setupBeaconMain({
+    session: session.defaultSession,
+    getMainWindow,
+    log,
+    captcha: {
+      urls: {
+        chat: config.get<string>('challengeUrl'),
+        registration: config.get<string>('registrationChallengeUrl'),
+      },
+      onToken: token => {
+        challengeHandler.handleCaptcha(token);
+        getMainWindow()?.show();
+      },
+    },
+  });
 
   if (getEnvironment() !== Environment.Test) {
     installFileHandler({
@@ -2230,7 +2335,8 @@ app.on('ready', async () => {
 
   resolveTranslationsLocale();
 
-  sqlInitPromise = initializeSQL(userDataPath);
+  const beaconKey = await promptForDatabaseKey(log);
+  sqlInitPromise = initializeSQL(userDataPath, beaconKey);
 
   // First run: configure Signal to minimize to tray. Additionally, on Windows
   // enable auto-start with start-in-tray so that starting from a Desktop icon
@@ -2486,6 +2592,14 @@ app.on('ready', async () => {
   systemTrayService.setEnabled(
     shouldMinimizeToSystemTray(await systemTraySettingCache.get())
   );
+
+  setupBeaconAccounts({
+    getMainWindow,
+    log,
+    isTrayEnabled: () => systemTrayService?.isEnabled() ?? false,
+    onTrayChange: () => systemTrayService?.refresh(),
+    onCaptchaToken: token => challengeHandler.handleCaptcha(token),
+  });
 
   await ensureFilePermissions([
     'config.json',
@@ -3147,6 +3261,9 @@ function handleSignalRoute(route: ParsedSignalRoute) {
   } else if (route.key === 'cancelPresenting') {
     mainWindow.webContents.send('cancel-presenting');
   } else if (route.key === 'captcha') {
+    if (forwardCaptchaToCurrentAccount(route.args.captchaId)) {
+      return;
+    }
     challengeHandler.handleCaptcha(route.args.captchaId);
     // Show window after handling captcha
     showWindow();

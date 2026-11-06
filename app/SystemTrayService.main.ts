@@ -9,6 +9,13 @@ import { readFileSync } from 'node:fs';
 import { createLogger } from '../ts/logging/log.std.ts';
 import type { LocalizerType } from '../ts/types/I18N.std.ts';
 import { getAppRootDir } from '../ts/util/appRootDir.main.ts';
+import {
+  getOtherAccountsUnread,
+  hideCurrentAccount,
+  isAnyAccountVisible,
+  isBeaconTrayAllowed,
+  showCurrentAccount,
+} from './beacon-accounts.main.ts';
 
 const log = createLogger('SystemTrayService');
 
@@ -79,7 +86,8 @@ export class SystemTrayService {
    * Enable or disable the tray icon. Note: if there is no associated browser window (see
    * `setMainWindow`), the tray icon will not be shown, even if enabled.
    */
-  setEnabled(isEnabled: boolean): void {
+  setEnabled(enabled: boolean): void {
+    const isEnabled = enabled && isBeaconTrayAllowed();
     if (this.#isEnabled === isEnabled) {
       return;
     }
@@ -120,6 +128,14 @@ export class SystemTrayService {
     return this.#tray !== undefined;
   }
 
+  isEnabled(): boolean {
+    return this.#isEnabled;
+  }
+
+  refresh(): void {
+    this.#render();
+  }
+
   readonly #render = (): void => {
     if (this.#isEnabled && this.#browserWindow) {
       this.#renderEnabled();
@@ -141,7 +157,7 @@ export class SystemTrayService {
     const browserWindow = this.#browserWindow;
 
     try {
-      tray.setImage(getIcon(this.#unreadCount));
+      tray.setImage(getIcon(this.#unreadCount + getOtherAccountsUnread()));
     } catch (err: unknown) {
       log.warn(
         'System tray service: failed to set preferred image. Falling back...'
@@ -157,7 +173,7 @@ export class SystemTrayService {
       Menu.buildFromTemplate([
         {
           id: 'toggleWindowVisibility',
-          ...(browserWindow?.isVisible()
+          ...(browserWindow?.isVisible() || isAnyAccountVisible()
             ? {
                 label: this.#i18n('icu:hide'),
                 click: () => {
@@ -167,7 +183,9 @@ export class SystemTrayService {
                   // We re-fetch `this.browserWindow` here just in case the browser window
                   //   has changed while the context menu was open. Same applies in the
                   //   "show" case below.
-                  this.#browserWindow?.hide();
+                  if (!hideCurrentAccount()) {
+                    this.#browserWindow?.hide();
+                  }
                 },
               }
             : {
@@ -176,6 +194,9 @@ export class SystemTrayService {
                   log.info(
                     'System tray service: showing the window from the context menu'
                   );
+                  if (showCurrentAccount()) {
+                    return;
+                  }
                   if (this.#browserWindow) {
                     this.#browserWindow.show();
                     focusAndForceToTop(this.#browserWindow);
@@ -223,9 +244,11 @@ export class SystemTrayService {
       if (!browserWindow) {
         return;
       }
-      if (browserWindow.isVisible()) {
-        browserWindow.hide();
-      } else {
+      if (browserWindow.isVisible() || isAnyAccountVisible()) {
+        if (!hideCurrentAccount()) {
+          browserWindow.hide();
+        }
+      } else if (!showCurrentAccount()) {
         browserWindow.show();
         focusAndForceToTop(browserWindow);
       }

@@ -22,7 +22,6 @@ import { VerifyPINScreen } from './stages/VerifyPIN.dom.tsx';
 import { CreatePINScreen } from './stages/CreatePIN.dom.tsx';
 import { CreatePINConfirmScreen } from './stages/CreatePINConfirm.dom.tsx';
 import { AccountLockedScreen } from './stages/AccountLocked.dom.tsx';
-import { Spacer } from './util/StepComponents.dom.tsx';
 import { CONTACT_SUPPORT_URL } from '../../util/contactSupport.dom.tsx';
 import { openLinkInWebBrowser } from '../../util/openLinkInWebBrowser.dom.ts';
 import { InstallScreenUpdateDialog } from '../installScreen/InstallScreenUpdateDialog.dom.tsx';
@@ -273,22 +272,16 @@ export function StandaloneRegistration({
 
   return (
     <div
-      className={tw(
+      className={`${tw(
         'flex size-full flex-col overflow-hidden bg-[url("../images/registration-background.png")] bg-cover bg-center'
-      )}
+      )} BeaconSetup`}
     >
       <TitlebarDragArea />
-      <img
-        className="StandaloneRegistration--SignalLogo"
-        src="images/signal-logo-with-text.svg"
-        alt={i18n('icu:StandaloneRegistration--signal-logo')}
-      />
-      <Spacer className={tw('h-8')} />
       <div className={tw('relative grow')}>
         <div
-          className={tw(
+          className={`${tw(
             'absolute inset-s-1/2 top-1/2 flex max-h-[calc(100%-32px)] w-143 max-w-[calc(100%-32px)] -translate-1/2 transform flex-col overflow-hidden rounded-[26px] bg-surface-primary'
-          )}
+          )} BeaconSetup__card`}
         >
           <AnimatePresence>
             <motion.div

@@ -2,10 +2,15 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { isValidLink } from '../types/LinkPreview.std.ts';
+import { applyBeaconFilter } from '../beacon/core/filters.std.ts';
 
 export function openLinkInWebBrowser(url: string): void {
   if (!isValidLink(url)) {
     return;
   }
-  window.location.href = url;
+  const target = applyBeaconFilter('link.open', url, { source: 'app' });
+  if (!target) {
+    return;
+  }
+  window.location.href = target;
 }

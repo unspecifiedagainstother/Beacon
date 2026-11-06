@@ -25,31 +25,31 @@ const VERSION_PATH = 'version';
 const STAGING_VERSION = packageJson.version.replace('alpha', 'staging');
 
 const NAME_PATH = 'name';
-const PRODUCTION_NAME = 'signal-desktop';
-const STAGING_NAME = 'signal-desktop-staging';
+const PRODUCTION_NAME = 'beacon-desktop';
+const STAGING_NAME = 'beacon-desktop-staging';
 
 const PRODUCT_NAME_PATH = 'productName';
-const PRODUCTION_PRODUCT_NAME = 'Signal';
-const STAGING_PRODUCT_NAME = 'Signal Staging';
+const PRODUCTION_PRODUCT_NAME = 'Beacon';
+const STAGING_PRODUCT_NAME = 'Beacon Staging';
 
 const APP_ID_PATH = 'build.appId';
-const PRODUCTION_APP_ID = 'org.whispersystems.signal-desktop';
-const STAGING_APP_ID = 'org.whispersystems.signal-desktop-staging';
+const PRODUCTION_APP_ID = 'im.beacon.desktop';
+const STAGING_APP_ID = 'im.beacon.desktop-staging';
 
 const STARTUP_WM_CLASS_PATH = 'build.linux.desktop.entry.StartupWMClass';
-const PRODUCTION_WM_CLASS = 'signal';
-const STAGING_WM_CLASS = 'signal staging';
+const PRODUCTION_WM_CLASS = 'beacon';
+const STAGING_WM_CLASS = 'beacon staging';
 
 const DESKTOP_NAME_PATH = 'desktopName';
 
 // Note: we're avoiding dashes in our .desktop name due to xdg-settings behavior
 //   https://github.com/signalapp/Signal-Desktop/issues/3602
-const PRODUCTION_DESKTOP_NAME = 'signal.desktop';
-const STAGING_DESKTOP_NAME = 'signal staging.desktop';
+const PRODUCTION_DESKTOP_NAME = 'beacon.desktop';
+const STAGING_DESKTOP_NAME = 'beacon staging.desktop';
 
 const EXECUTABLE_NAME_PATH = 'build.linux.executableName';
-const PRODUCTION_EXECUTABLE_NAME = 'signal-desktop';
-const STAGING_EXECUTABLE_NAME = 'signal-desktop-staging';
+const PRODUCTION_EXECUTABLE_NAME = 'beacon-desktop';
+const STAGING_EXECUTABLE_NAME = 'beacon-desktop-staging';
 
 // -------
 

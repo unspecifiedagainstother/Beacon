@@ -166,7 +166,7 @@ describe('standalone/registration', function (this: Mocha.Suite) {
 
     {
       debug('COMPLETE: verify welcome screen');
-      await expect(window.getByText('Welcome to Signal')).toBeVisible();
+      await expect(window.getByText('Welcome to Beacon')).toBeVisible();
     }
 
     debug('COMPLETE: verify that storage service is updated with profile');
@@ -319,7 +319,7 @@ describe('standalone/registration', function (this: Mocha.Suite) {
 
       {
         debug('COMPLETE: verify welcome screen');
-        await expect(window.getByText('Welcome to Signal')).toBeVisible();
+        await expect(window.getByText('Welcome to Beacon')).toBeVisible();
       }
 
       {
@@ -547,7 +547,7 @@ describe('standalone/registration', function (this: Mocha.Suite) {
 
     {
       debug('COMPLETE: verify welcome screen');
-      await expect(window.getByText('Welcome to Signal')).toBeVisible();
+      await expect(window.getByText('Welcome to Beacon')).toBeVisible();
     }
 
     {

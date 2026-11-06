@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import classNames from 'classnames';
+import { nextPlaybackRate } from '../beacon/core/tweaks.std.ts';
 import {
   useCallback,
   useState,
@@ -82,7 +83,7 @@ export function PlaybackRateButton({
   };
 
   const label = playbackRate
-    ? playbackRateLabels[playbackRate]?.toString()
+    ? (playbackRateLabels[playbackRate]?.toString() ?? `${playbackRate}×`)
     : undefined;
 
   return (
@@ -107,12 +108,5 @@ export function PlaybackRateButton({
   );
 }
 
-const playbackRates = [1, 1.5, 2, 0.5];
-
-PlaybackRateButton.nextPlaybackRate = (currentRate: number): number => {
-  // cycle through the rates
-  // oxlint-disable-next-line typescript/no-non-null-assertion
-  return playbackRates[
-    (playbackRates.indexOf(currentRate) + 1) % playbackRates.length
-  ]!;
-};
+PlaybackRateButton.nextPlaybackRate = (currentRate: number): number =>
+  nextPlaybackRate(currentRate);

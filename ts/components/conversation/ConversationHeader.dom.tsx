@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { RefObject, JSX, ReactNode } from 'react';
+import { BeaconErrorBoundary } from '../BeaconErrorBoundary.dom.tsx';
+import { toAxoSymbol } from '../../beacon/util/axoSymbol.std.ts';
 import {
   memo,
   useCallback,
@@ -65,6 +67,8 @@ import { AxoIconButton } from '../../axo/AxoIconButton.dom.tsx';
 import { AxoButton } from '../../axo/AxoButton.dom.tsx';
 import { AxoConfirmDialog } from '../../axo/AxoConfirmDialog.dom.tsx';
 import { getControlOrAltKey } from '../../hooks/useKeyboardShortcuts.dom.tsx';
+import { applyBeaconFilter } from '../../beacon/core/filters.std.ts';
+import { BeaconSlot } from '../BeaconSlot.dom.tsx';
 
 function HeaderInfoTitle({
   name,
@@ -372,6 +376,11 @@ export const ConversationHeader = memo(function ConversationHeader({
               isSignalConversation={isSignalConversation ?? false}
             />
             <div className={tw(`flex flex-row gap-1 px-4 @min-[500px]:gap-3`)}>
+              {/* Beacon: addon slot left of the call buttons. */}
+              <BeaconSlot
+                name="conversation.header.beforeCall"
+                props={{ conversationId: conversation.id }}
+              />
               {!isSmsOnlyOrUnregistered &&
                 !isSignalConversation &&
                 !isTerminated && (
@@ -957,6 +966,20 @@ function HeaderDropdownMenuContent({
           >
             {i18n('icu:deleteConversation')}
           </AxoDropdownMenu.Item>
+          {/* Beacon: items contributed by addons (conversation.menuItems). */}
+          {applyBeaconFilter('conversation.menuItems', [], {
+            conversationId: conversation.id,
+            isGroup,
+          }).map(item => (
+            <BeaconErrorBoundary key={item.id} name={`menu item ${item.id}`}>
+              <AxoDropdownMenu.Item
+                symbol={toAxoSymbol(item.symbol)}
+                onSelect={item.onSelect}
+              >
+                {item.label}
+              </AxoDropdownMenu.Item>
+            </BeaconErrorBoundary>
+          ))}
           {isGroup && !isTerminated && (
             <AxoDropdownMenu.Item
               symbol="leave"
@@ -1081,10 +1104,10 @@ function OutgoingCallButtons({
       return (
         <>
           <div
-            className={tw(
+            className={`BeaconHeaderJoin ${tw(
               '@min-[500px]:hidden',
               inAnotherCall && 'opacity-50 dark:opacity-40'
-            )}
+            )}`}
           >
             <AxoIconButton.Root
               symbol="videocamera-fill"
@@ -1095,7 +1118,9 @@ function OutgoingCallButtons({
               tooltip={callButtonTooltip}
             />
           </div>
-          <div className={tw('hidden @min-[500px]:block')}>
+          <div
+            className={`BeaconHeaderJoin ${tw('hidden @min-[500px]:block')}`}
+          >
             <InAnotherCallTooltip inAnotherCall={inAnotherCall} i18n={i18n}>
               <AxoButton.Root
                 size="md"
@@ -1233,6 +1258,11 @@ function ConversationSubheader(props: {
       {props.shouldShowMiniPlayer &&
         props.renderMiniPlayer({ shouldFlow: true })}
       {!props.shouldShowMiniPlayer && props.renderPinnedMessagesBar()}
+      {/* Beacon: addon slot under the pinned bar. */}
+      <BeaconSlot
+        name="conversation.belowPinned"
+        props={{ conversationId: props.conversationId }}
+      />
     </>
   );
 }

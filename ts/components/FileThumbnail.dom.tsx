@@ -25,11 +25,11 @@ export function FileThumbnail(props: PropsType): JSX.Element {
     >
       <span
         className={tw(
-          'mx-1 overflow-hidden',
+          'mx-0.5 overflow-hidden',
           // oxlint-disable-next-line better-tailwindcss/no-restricted-classes
           'text-[rgba(0,0,0,0.85)]',
           'text-ellipsis',
-          extension.length > 3 ? 'text-[9px]' : '',
+          extension.length >= 3 ? 'text-[9px]' : '',
           'type-caption whitespace-nowrap'
         )}
       >

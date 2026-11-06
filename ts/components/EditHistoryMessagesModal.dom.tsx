@@ -1,7 +1,8 @@
 // Copyright 2023 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 import type { ReactNode, JSX } from 'react';
-import { useCallback, useState, useRef, Fragment } from 'react';
+import { diffWords } from '../beacon/util/wordDiff.std.ts';
+import { useCallback, useMemo, useState, useRef, Fragment } from 'react';
 import lodash from 'lodash';
 import type { AttachmentType } from '../types/Attachment.std.ts';
 import type { LocalizerType } from '../types/Util.std.ts';
@@ -114,6 +115,8 @@ export function EditHistoryMessagesModal({
     Record<string, number | undefined>
   >({});
 
+  const [showChanges, setShowChanges] = useState(true);
+
   const [currentMessage, ...pastEdits] = editHistoryMessages;
   strictAssert(currentMessage, 'Missing currentMessage');
   const currentMessageId = `${currentMessage.id}.${currentMessage.timestamp}`;
@@ -187,11 +190,24 @@ export function EditHistoryMessagesModal({
 
             <hr className="EditHistoryMessagesModal__divider" />
 
-            <h3 className="EditHistoryMessagesModal__title">
-              {i18n('icu:EditHistoryMessagesModal__title')}
-            </h3>
+            <div className="EditHistoryMessagesModal__beacon-title-row">
+              <h3 className="EditHistoryMessagesModal__title">
+                {i18n('icu:EditHistoryMessagesModal__title')}
+              </h3>
+              <label className="EditHistoryMessagesModal__beacon-toggle">
+                <input
+                  type="checkbox"
+                  checked={showChanges}
+                  onChange={ev => setShowChanges(ev.target.checked)}
+                />
+                Show changes
+              </label>
+            </div>
 
-            {pastEdits.map(messageAttributes => {
+            {pastEdits.map((messageAttributes, index) => {
+              const newerText =
+                (index === 0 ? currentMessage : pastEdits[index - 1])?.text ??
+                '';
               const syntheticId = `${messageAttributes.id}.${messageAttributes.timestamp}`;
 
               const shouldShowDateHeader =
@@ -263,6 +279,12 @@ export function EditHistoryMessagesModal({
                       );
                     }}
                   />
+                  {showChanges ? (
+                    <BeaconEditDiff
+                      before={messageAttributes.text ?? ''}
+                      after={newerText}
+                    />
+                  ) : null}
                 </Fragment>
               );
             })}
@@ -270,6 +292,37 @@ export function EditHistoryMessagesModal({
         </AxoDialog.Body>
       </AxoDialog.Content>
     </AxoDialog.Root>
+  );
+}
+
+function BeaconEditDiff({
+  before,
+  after,
+}: {
+  before: string;
+  after: string;
+}): JSX.Element | null {
+  const parts = useMemo(() => diffWords(before, after), [before, after]);
+  if (before === after) {
+    return null;
+  }
+  return (
+    <div className="EditHistoryMessagesModal__beacon-diff">
+      <span className="EditHistoryMessagesModal__beacon-diff__label">
+        Changed to
+      </span>
+      <span className="EditHistoryMessagesModal__beacon-diff__text">
+        {parts.map((part, i) => (
+          <span
+            // oxlint-disable-next-line react/no-array-index-key
+            key={i}
+            className={`EditHistoryMessagesModal__beacon-diff__${part.type}`}
+          >
+            {part.text}
+          </span>
+        ))}
+      </span>
+    </div>
   );
 }
 

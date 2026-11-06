@@ -5,7 +5,6 @@ import { useEffect, useState, type JSX } from 'react';
 
 import { TitlebarDragArea } from './TitlebarDragArea.dom.tsx';
 import { ProgressBar } from './ProgressBar.dom.tsx';
-import { InstallScreenSignalLogo } from './installScreen/InstallScreenSignalLogo.dom.tsx';
 
 import type { LocalizerType } from '../types/Util.std.ts';
 import type { StateType } from '../shims/deleteAllData.preload.ts';
@@ -46,7 +45,7 @@ export function ClearingData({ deleteAllData, i18n }: PropsType): JSX.Element {
   return (
     <div className="ClearingData">
       <TitlebarDragArea />
-      <InstallScreenSignalLogo />
+      {/* <InstallScreenSignalLogo /> */}
 
       <div className="InstallScreenBackupImportStep__content">
         <h3 className="InstallScreenBackupImportStep__title">{title}</h3>

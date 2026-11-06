@@ -14,10 +14,10 @@ import { createLogger } from '../logging/log.std.ts';
 const log = createLogger('Storage');
 
 export const DEFAULT_AUTO_DOWNLOAD_ATTACHMENT = {
-  photos: true,
-  videos: true,
-  audio: true,
-  documents: true,
+  photos: false,
+  videos: false,
+  audio: false,
+  documents: false,
 };
 
 export class Storage implements StorageInterface {

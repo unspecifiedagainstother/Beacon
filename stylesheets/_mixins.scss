@@ -333,9 +333,8 @@ $rtl-icon-map: (
 
 @mixin popper-shadow() {
   & {
-    box-shadow:
-      0px 8px 20px rgba(0, 0, 0, 0.3),
-      0px 0px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--beacon-elevation-shadow, none);
+    border: var(--beacon-elevation-border, 1px solid #2f2f2f);
   }
 
   @media (forced-colors: active) {

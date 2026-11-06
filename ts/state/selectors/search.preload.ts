@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import memoizee from 'memoizee';
+import { getHiddenChatsState } from '../../beacon/core/hidden-chats.std.ts';
 import { createSelector } from 'reselect';
 
 import { deconstructLookup } from '../../util/deconstructLookup.std.ts';
@@ -146,7 +147,7 @@ function isUnreadAndInChatFolder(
   });
 }
 
-export const getSearchResults = createSelector(
+const getSearchResultsUnfiltered = createSelector(
   [
     getSearch,
     getSearchConversationName,
@@ -217,7 +218,7 @@ export const getSearchResults = createSelector(
       messagesLoading,
     } = state;
 
-    const searchResults: ReturnType<typeof getSearchResults> = {
+    const searchResults: ReturnType<typeof getSearchResultsUnfiltered> = {
       conversationResults: discussionsLoading
         ? { isLoading: true }
         : {
@@ -252,6 +253,38 @@ export const getSearchResults = createSelector(
     }
 
     return searchResults;
+  }
+);
+
+export const getSearchResults = createSelector(
+  [getSearchResultsUnfiltered, getHiddenChatsState],
+  (results, hiddenChats): ReturnType<typeof getSearchResultsUnfiltered> => {
+    const { excluded } = hiddenChats;
+    if (excluded.size === 0) {
+      return results;
+    }
+    const withoutHidden = <T extends { id: string }>(
+      list: { isLoading: true } | { isLoading: false; results: Array<T> }
+    ) =>
+      list.isLoading
+        ? list
+        : {
+            isLoading: false as const,
+            results: list.results.filter(item => !excluded.has(item.id)),
+          };
+    return {
+      ...results,
+      conversationResults: withoutHidden(results.conversationResults),
+      contactResults: withoutHidden(results.contactResults),
+      messageResults: results.messageResults.isLoading
+        ? results.messageResults
+        : {
+            isLoading: false,
+            results: results.messageResults.results.filter(
+              message => !excluded.has(message.conversationId)
+            ),
+          },
+    };
   }
 );
 

@@ -73,6 +73,18 @@ export type IPCType = {
   startTrackingQueryStats: () => void;
   stopTrackingQueryStats: (options?: QueryStatsOptions) => void;
   titleBarDoubleClick: () => void;
+  beaconInvoke: (name: string, payload?: unknown) => Promise<unknown>;
+  beaconOnSystemEvent: (callback: (name: string) => void) => () => void;
+  beaconWindowMinimize: () => void;
+  beaconWindowToggleMaximize: () => void;
+  beaconWindowClose: () => void;
+  beaconWindowIsMaximized: () => Promise<boolean>;
+  beaconGetCustomTitlebar: () => Promise<boolean>;
+  beaconSetCustomTitlebar: (value: boolean) => Promise<void>;
+  beaconGetAppliedCustomTitlebar: () => Promise<boolean>;
+  beaconOnWindowMaximizedChanged: (
+    handler: (isMaximized: boolean) => void
+  ) => () => void;
   updateTrayIcon: (count: number) => void;
 };
 

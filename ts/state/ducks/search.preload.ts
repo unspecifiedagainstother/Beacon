@@ -2,6 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { ThunkAction, ThunkDispatch } from 'redux-thunk';
+import type { SearchFilters } from '../../beacon/util/searchFilters.std.ts';
+import {
+  hasFilters,
+  matchesFilters,
+  parseSearchFilters,
+} from '../../beacon/util/searchFilters.std.ts';
 import lodash from 'lodash';
 
 import type { ReadonlyDeep } from 'type-fest';
@@ -425,7 +431,9 @@ const doSearch = debounce(
       return;
     }
 
-    const query = getQuery(state);
+    const rawQuery = getQuery(state);
+    const beaconFilters = parseSearchFilters(rawQuery);
+    const query = beaconFilters.text;
     const filterByUnread = getFilterByUnread(state);
     const i18n = getIntl(state);
     const allConversations = getAllConversations(state);
@@ -454,18 +462,24 @@ const doSearch = debounce(
         .filter(isNotNil)
         .slice(0, MAX_MATCHING_CONTACTS);
 
-      const messages = await queryMessages({
-        query,
-        searchConversationId,
-        contactServiceIdsMatchingQuery,
-        filterByUnread,
-      });
+      const messages = hasFilters(beaconFilters)
+        ? await queryMessagesWithFilters({
+            filters: beaconFilters,
+            searchConversationId,
+            allConversations,
+          })
+        : await queryMessages({
+            query,
+            searchConversationId,
+            contactServiceIdsMatchingQuery,
+            filterByUnread,
+          });
 
       dispatch({
         type: 'SEARCH_MESSAGES_RESULTS_FULFILLED',
         payload: {
           messages,
-          query,
+          query: rawQuery,
         },
       });
     })();
@@ -502,12 +516,13 @@ const doSearch = debounce(
                 : undefined,
           });
 
+        const onlyFilters = hasFilters(beaconFilters) && query === '';
         dispatch({
           type: 'SEARCH_DISCUSSIONS_RESULTS_FULFILLED',
           payload: {
-            conversationIds,
-            contactIds,
-            query,
+            conversationIds: onlyFilters ? [] : conversationIds,
+            contactIds: onlyFilters ? [] : contactIds,
+            query: rawQuery,
           },
         });
       })();
@@ -547,6 +562,76 @@ async function queryMessages({
       filterByUnread,
     });
   } catch (e) {
+    return [];
+  }
+}
+
+const FILTER_SCAN_CHATS = 30;
+const FILTER_SCAN_PER_CHAT = 400;
+const FILTER_RESULT_LIMIT = 200;
+
+async function queryMessagesWithFilters({
+  filters,
+  searchConversationId,
+  allConversations,
+}: {
+  filters: SearchFilters;
+  searchConversationId?: string;
+  allConversations: ReadonlyArray<ConversationType>;
+}): Promise<Array<ClientSearchResultMessageType>> {
+  const senderName = (message: { sourceServiceId?: string; type?: string }) => {
+    if (message.type === 'outgoing') {
+      return 'me';
+    }
+    const sender = message.sourceServiceId
+      ? window.ConversationController.get(message.sourceServiceId)
+      : undefined;
+    return sender?.getTitle() ?? '';
+  };
+  const keep = (message: MessageType) =>
+    matchesFilters(message, filters, senderName);
+
+  try {
+    if (filters.text) {
+      const found = await dataSearchMessages({
+        query: filters.text,
+        conversationId: searchConversationId,
+        filterByUnread: false,
+      });
+      return found.filter(keep).slice(0, FILTER_RESULT_LIMIT);
+    }
+
+    const conversationIds = searchConversationId
+      ? [searchConversationId]
+      : [...allConversations]
+          .filter(c => c.activeAt)
+          .sort((a, b) => (b.activeAt ?? 0) - (a.activeAt ?? 0))
+          .slice(0, FILTER_SCAN_CHATS)
+          .map(c => c.id);
+
+    const results: Array<ClientSearchResultMessageType> = [];
+    for (const conversationId of conversationIds) {
+      // oxlint-disable-next-line no-await-in-loop -- sequential keeps the DB responsive
+      const recent = await DataReader.getOlderMessagesByConversation({
+        conversationId,
+        includeStoryReplies: false,
+        limit: FILTER_SCAN_PER_CHAT,
+        storyId: undefined,
+      });
+      for (const message of recent) {
+        if (keep(message)) {
+          results.push({
+            ...message,
+            bodyRanges: [],
+            snippet: (message.body ?? '').slice(0, 120),
+          });
+        }
+      }
+    }
+    return results
+      .sort((a, b) => (b.sent_at ?? 0) - (a.sent_at ?? 0))
+      .slice(0, FILTER_RESULT_LIMIT);
+  } catch {
     return [];
   }
 }

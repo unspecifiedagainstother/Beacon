@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import path from 'node:path';
+import { splitAttachmentsForSend } from '../../beacon/util/splitAttachments.std.ts';
 import lodash from 'lodash';
 import type { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { v4 as generateUuid } from 'uuid';
@@ -16,10 +17,7 @@ import type {
   AttachmentDraftType,
   InMemoryAttachmentDraftType,
 } from '../../types/Attachment.std.ts';
-import {
-  isImageAttachment,
-  isVideoAttachment,
-} from '../../util/Attachment.std.ts';
+import { isVideoAttachment } from '../../util/Attachment.std.ts';
 import { isViewOnceEligible } from '../../util/viewOnceEligibility.std.ts';
 import { DataReader, DataWriter } from '../../sql/Client.preload.ts';
 import type { BoundActionCreatorsMapObject } from '../../hooks/useBoundActions.std.ts';
@@ -98,10 +96,6 @@ import { strictAssert } from '../../util/assert.std.ts';
 import { makeQuote } from '../../util/makeQuote.preload.ts';
 import { sendEditedMessage as doSendEditedMessage } from '../../util/sendEditedMessage.preload.ts';
 import { Sound, SoundType } from '../../util/Sound.std.ts';
-import {
-  isImageTypeSupported,
-  isVideoTypeSupported,
-} from '../../util/GoogleChrome.std.ts';
 import type { StateThunk } from '../types.std.ts';
 import { itemStorage } from '../../textsecure/Storage.preload.ts';
 import {
@@ -110,7 +104,6 @@ import {
 } from '../selectors/nav.std.ts';
 import { isPoll } from '../../messages/helpers.std.ts';
 import type { Emoji } from '../../axo/emoji.std.ts';
-import { isFeaturedEnabledNoRedux } from '../../util/isFeatureEnabled.dom.ts';
 
 const { debounce, isEqual } = lodash;
 
@@ -710,11 +703,15 @@ function sendMultiMediaMessage(
           ? shouldSendHighQualityAttachments
           : state.items['sent-media-quality'] === 'high';
 
+      const [firstGroup = attachments, ...laterGroups] = isViewOnce
+        ? [attachments]
+        : splitAttachmentsForSend(attachments);
+
       try {
         await conversation.enqueueMessageForSend(
           {
             body: message,
-            attachments,
+            attachments: firstGroup,
             quote,
             preview: getLinkPreviewForSend(message),
             bodyRanges,
@@ -746,6 +743,13 @@ function sendMultiMediaMessage(
             },
           }
         );
+        for (const [index, group] of laterGroups.entries()) {
+          // oxlint-disable-next-line no-await-in-loop
+          await conversation.enqueueMessageForSend(
+            { body: undefined, attachments: group },
+            { sendHQImages, timestamp: timestamp + index + 1 }
+          );
+        }
       } catch (error) {
         log.error(
           'Error pulling attached files before send',
@@ -799,10 +803,7 @@ function sendStickerMessage(
         return;
       }
 
-      const isStickerReplySendEnabled = isFeaturedEnabledNoRedux({
-        betaKey: 'desktop.stickerReply.send.beta',
-        prodKey: 'desktop.stickerReply.send.prod',
-      });
+      const isStickerReplySendEnabled = true;
 
       let sendStickerMessageOptions;
       if (isStickerReplySendEnabled) {
@@ -1338,24 +1339,7 @@ function preProcessAttachment(
     return { toastType: ToastType.MaxAttachments };
   }
 
-  const haveNonImageOrVideo = draftAttachments.some(
-    (attachment: AttachmentDraftType) => {
-      return !isImageAttachment(attachment) && !isVideoAttachment(attachment);
-    }
-  );
-  // You can't add another attachment if you already have a non-image staged
-  if (haveNonImageOrVideo) {
-    return { toastType: ToastType.UnsupportedMultiAttachment };
-  }
-
   const fileType = stringToMIMEType(file.type);
-  const imageOrVideo =
-    isImageTypeSupported(fileType) || isVideoTypeSupported(fileType);
-
-  // You can't add a non-image attachment if you already have attachments staged
-  if (!imageOrVideo && draftAttachments.length > 0) {
-    return { toastType: ToastType.CannotMixMultiAndNonMultiAttachments };
-  }
 
   // Putting this after everything else because the other checks are more
   // important to show to the user.

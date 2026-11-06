@@ -31,6 +31,7 @@ import { ReadStatus } from '../../messages/MessageReadStatus.std.ts';
 import { Avatar, AvatarSize } from '../Avatar.dom.tsx';
 import { AvatarSpacer } from '../AvatarSpacer.dom.tsx';
 import { MessageBodyReadMore } from './MessageBodyReadMore.dom.tsx';
+import { MessageBody } from './MessageBody.dom.tsx';
 import { MessageMetadata } from './MessageMetadata.dom.tsx';
 import { MessageTextMetadataSpacer } from './MessageTextMetadataSpacer.dom.tsx';
 import { ImageGrid } from './ImageGrid.dom.tsx';
@@ -134,6 +135,7 @@ const EXPIRED_DELAY = 600;
 const GROUP_AVATAR_SIZE = AvatarSize.TWENTY_EIGHT;
 const STICKER_SIZE = 200;
 const GIF_SIZE = 300;
+const MAX_INLINE_PAST_EDITS = 2;
 const SENT_STATUSES = new Set<MessageStatusType>([
   'delivered',
   'read',
@@ -222,6 +224,20 @@ export type PropsData = {
   textDirection: TextDirection;
   textAttachment?: AttachmentForUIType;
   isEditedMessage?: boolean;
+  pastEdits?: ReadonlyArray<{
+    timestamp: number;
+    text?: string;
+    bodyRanges?: HydratedBodyRangesType;
+  }>;
+  beaconSealedSender?: boolean;
+  beaconDeleted?: {
+    text?: string;
+    bodyRanges?: HydratedBodyRangesType;
+    attachments: ReadonlyArray<string>;
+    stickerEmoji?: string;
+    previousRevisions?: ReadonlyArray<{ body?: string; timestamp: number }>;
+    deletedAt: number;
+  };
   isSticker?: boolean;
   isTargeted: boolean;
   isTargetedCounter: number | null;
@@ -2392,6 +2408,108 @@ export class Message extends PureComponent<Props, State> {
     return null;
   }
 
+  public renderPastEdits(): JSX.Element | null {
+    const { direction, i18n, id, pastEdits, showEditHistoryModal } = this.props;
+
+    if (!pastEdits?.length) {
+      return null;
+    }
+
+    const inline = pastEdits.slice(-MAX_INLINE_PAST_EDITS);
+    const hiddenCount = pastEdits.length - inline.length;
+
+    return (
+      <div className="module-message__past-edits">
+        {inline.map(edit => {
+          if (edit.text == null) {
+            return null;
+          }
+
+          return (
+            <div
+              className="module-message__past-edits__item"
+              key={edit.timestamp}
+            >
+              {/* Opacity alone does not convey "superseded" to assistive tech. */}
+              {/* <span className="module-message__past-edits__label">
+                {i18n('icu:Beacon__PastEdit__label')}
+              </span> */}
+              <MessageBody
+                bodyRanges={edit.bodyRanges}
+                direction={direction}
+                disableLinks
+                i18n={i18n}
+                isSpoilerExpanded={{}}
+                originalText={edit.text}
+                renderLocation={RenderLocation.Timeline}
+                text={edit.text}
+              />
+            </div>
+          );
+        })}
+        {hiddenCount > 0 && showEditHistoryModal && (
+          <button
+            className="module-message__past-edits__more"
+            onClick={() => showEditHistoryModal(id)}
+            type="button"
+          >
+            {i18n('icu:Beacon__PastEdit__showEarlier', { count: hiddenCount })}
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  public renderBeaconDeleted(): JSX.Element | null {
+    const { beaconDeleted, direction, i18n } = this.props;
+    if (!beaconDeleted) {
+      return null;
+    }
+
+    return (
+      <div className="module-message__beacon-deleted">
+        {beaconDeleted.previousRevisions?.map(revision =>
+          revision.body ? (
+            <div
+              className="module-message__beacon-deleted__revision"
+              key={revision.timestamp}
+            >
+              {revision.body}
+            </div>
+          ) : null
+        )}
+        {beaconDeleted.text ? (
+          <div className="module-message__beacon-deleted__body">
+            <MessageBody
+              bodyRanges={beaconDeleted.bodyRanges}
+              direction={direction}
+              disableLinks
+              i18n={i18n}
+              isSpoilerExpanded={{}}
+              originalText={beaconDeleted.text}
+              renderLocation={RenderLocation.Timeline}
+              text={beaconDeleted.text}
+            />
+          </div>
+        ) : null}
+        {beaconDeleted.stickerEmoji ? (
+          <span className="module-message__beacon-deleted__attachment">
+            {beaconDeleted.stickerEmoji}
+          </span>
+        ) : null}
+        {beaconDeleted.attachments.map((name, idx) => (
+          <span
+            className="module-message__beacon-deleted__attachment"
+            // oxlint-disable-next-line react/no-array-index-key
+            key={`${name}-${idx}`}
+          >
+            {name}
+          </span>
+        ))}
+      </div>
+    );
+  }
+
   #renderText(): ReactNode {
     const {
       text,
@@ -2454,7 +2572,16 @@ export class Message extends PureComponent<Props, State> {
           event.stopPropagation();
         }}
       >
-        {messageStatusContents != null && messageStatusContents}
+        {messageStatusContents != null &&
+          (deletedForEveryone && this.props.beaconDeleted ? (
+            <span className="module-message__beacon-deleted-notice">
+              {messageStatusContents}
+            </span>
+          ) : (
+            messageStatusContents
+          ))}
+        {deletedForEveryone && this.renderBeaconDeleted()}
+        {messageStatusContents == null && this.renderPastEdits()}
         {messageStatusContents == null && text != null && (
           <MessageBodyReadMore
             bodyRanges={bodyRanges}
@@ -3361,6 +3488,15 @@ export class Message extends PureComponent<Props, State> {
       this.#hasReactions() ? 'module-message__container--with-reactions' : null,
       deletedForEveryone
         ? 'module-message__container--deleted-for-everyone'
+        : null,
+      deletedForEveryone && this.props.beaconDeleted
+        ? 'module-message__container--beacon-deleted'
+        : null,
+      this.props.beaconSealedSender === true
+        ? 'module-message__container--beacon-sealed'
+        : null,
+      this.props.beaconSealedSender === false
+        ? 'module-message__container--beacon-unsealed'
         : null,
       this.props.isSignalConversation
         ? tw(

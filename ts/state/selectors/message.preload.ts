@@ -379,6 +379,48 @@ export const processBodyRanges = (
   );
 };
 
+export const getPastEdits = (
+  message: MessageWithUIFieldsType,
+  isGroup: boolean,
+  options: { conversationSelector: GetConversationByIdType }
+): PropsData['pastEdits'] => {
+  const { editHistory } = message;
+  if (!editHistory || editHistory.length < 2) {
+    return undefined;
+  }
+
+  return editHistory
+    .slice(1)
+    .map(edit => ({
+      timestamp: edit.timestamp,
+      text: edit.body,
+      bodyRanges: processBodyRanges(edit, isGroup, options),
+    }))
+    .reverse();
+};
+
+export const getBeaconDeleted = (
+  message: MessageWithUIFieldsType,
+  isGroup: boolean,
+  options: { conversationSelector: GetConversationByIdType }
+): PropsData['beaconDeleted'] => {
+  const snapshot = message.beaconDeleted;
+  if (!message.deletedForEveryone || !snapshot) {
+    return undefined;
+  }
+
+  return {
+    text: snapshot.body,
+    bodyRanges: processBodyRanges(snapshot, isGroup, options),
+    attachments: (snapshot.attachments ?? []).map(
+      a => a.fileName ?? a.contentType ?? 'attachment'
+    ),
+    stickerEmoji: snapshot.stickerEmoji,
+    previousRevisions: snapshot.previousRevisions,
+    deletedAt: snapshot.deletedAt,
+  };
+};
+
 const getAuthorForMessage = (
   message: MessageWithUIFieldsType,
   options: GetContactOptions
@@ -1064,6 +1106,12 @@ const getPropsForMessage = (
     id: message.id,
     isBlocked: conversation.isBlocked || false,
     isEditedMessage: Boolean(message.editHistory),
+    pastEdits: getPastEdits(message, isGroup, options),
+    beaconSealedSender:
+      message.type === 'incoming'
+        ? message.unidentifiedDeliveryReceived
+        : undefined,
+    beaconDeleted: getBeaconDeleted(message, isGroup, options),
     isMessageRequestAccepted: conversation?.acceptedMessageRequest ?? true,
     isPinned,
     isSelected,

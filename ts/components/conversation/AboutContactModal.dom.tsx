@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { type ReactNode, useCallback, useMemo, type JSX } from 'react';
+import { BeaconErrorBoundary } from '../BeaconErrorBoundary.dom.tsx';
+import { isHiddenFeatureOn } from '../../beacon/core/hidden-features.std.ts';
+import { BeaconContactDetails } from '../BeaconContactDetails.dom.tsx';
 import { isInSystemContacts } from '../../util/isInSystemContacts.std.ts';
 import { Avatar, AvatarBlur, AvatarSize } from '../Avatar.dom.tsx';
 import { UserText } from '../UserText.dom.tsx';
@@ -331,7 +334,11 @@ export function AboutContactModal({
                   {!isMe && contact.phoneNumber && (
                     <AxoTextItem.Root
                       symbol="phone"
-                      label={<UserText text={contact.phoneNumber} />}
+                      label={
+                        <span className="Beacon-pii">
+                          <UserText text={contact.phoneNumber} />
+                        </span>
+                      }
                     />
                   )}
 
@@ -359,6 +366,12 @@ export function AboutContactModal({
                 </AxoItem.Group>
               </AxoList.Body>
             </AxoList.Root>
+            {/* Beacon: Hidden Signal features → Profile details. */}
+            {!isMe && isHiddenFeatureOn('profileDetails') ? (
+              <BeaconErrorBoundary name="contact details">
+                <BeaconContactDetails conversationId={contact.id} />
+              </BeaconErrorBoundary>
+            ) : null}
           </AxoList.Group>
         </AxoDialog.Body>
       </AxoDialog.Content>

@@ -77,6 +77,10 @@ export enum SettingsPage {
   Privacy = 'Privacy',
   DataUsage = 'DataUsage',
   Backups = 'Backups',
+  Beacon = 'Beacon',
+  BeaconModules = 'BeaconModules',
+  BeaconPrivacy = 'BeaconPrivacy',
+  BeaconCalling = 'BeaconCalling',
   Internal = 'Internal',
 
   // Sub pages

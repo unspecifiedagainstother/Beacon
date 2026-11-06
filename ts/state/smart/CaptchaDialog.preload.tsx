@@ -1,6 +1,7 @@
 // Copyright 2021 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 import { memo, useCallback } from 'react';
+import { openCaptcha } from '../../beacon/core/captcha.dom.ts';
 import { useSelector } from 'react-redux';
 import { CaptchaDialog } from '../../components/CaptchaDialog.dom.tsx';
 import { getIntl } from '../selectors/user.std.ts';
@@ -21,8 +22,8 @@ export const SmartCaptchaDialog = memo(function SmartCaptchaDialog({
   const isPending = useSelector(isChallengePending);
   const handleContinue = useCallback(() => {
     const url = getChallengeURL('chat');
-    log.info(`navigating to ${url}`);
-    document.location.href = url;
+    log.info(`opening captcha ${url}`);
+    openCaptcha('chat', url);
   }, []);
   return (
     <CaptchaDialog

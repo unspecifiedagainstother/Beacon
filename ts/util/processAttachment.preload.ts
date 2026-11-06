@@ -22,6 +22,7 @@ import {
 } from './GoogleChrome.std.ts';
 import { isVideoAttachment } from './Attachment.std.ts';
 import { ToastType } from '../types/Toast.dom.tsx';
+import { applyBeaconAsyncFilter } from '../beacon/core/filters.std.ts';
 
 const log = createLogger('processAttachment');
 
@@ -65,6 +66,19 @@ export async function processAttachment(
       size: data.byteLength,
     };
   }
+
+  const filtered = await applyBeaconAsyncFilter(
+    'attachment.outgoing',
+    attachment,
+    {
+      originalName: file.name,
+      contentType: fileType,
+    }
+  );
+  if (!filtered) {
+    return undefined;
+  }
+  attachment = filtered;
 
   const sizeLimit = getAttachmentSizeLimit({
     contentType: fileType,

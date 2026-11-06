@@ -74,6 +74,7 @@ export function PreferencesInternal({
   setSfuUrl,
   forceKeyTransparencyCheck,
   keyTransparencySelfHealth,
+  beaconCallingOnly = false,
 }: {
   i18n: LocalizerType;
   validateBackup: () => Promise<BackupValidationResultType>;
@@ -121,6 +122,7 @@ export function PreferencesInternal({
   setSfuUrl: (value: string | undefined) => void;
   forceKeyTransparencyCheck: () => Promise<void>;
   keyTransparencySelfHealth: StorageAccessType['keyTransparencySelfHealth'];
+  beaconCallingOnly?: boolean;
 }): JSX.Element {
   const [messageCountBySchemaVersion, setMessageCountBySchemaVersion] =
     useState<MessageCountBySchemaVersionType>();
@@ -385,332 +387,344 @@ export function PreferencesInternal({
 
   return (
     <div className="Preferences--internal">
-      <SettingsRow
-        className="Preferences--internal--backups"
-        title={i18n('icu:Preferences__button--backups')}
-      >
-        <FlowingSettingsControl>
-          <div className="Preferences__two-thirds-flow">
-            {i18n('icu:Preferences__internal__validate-backup--description')}
-          </div>
-          <div
-            className={classNames(
-              'Preferences__flow-button',
-              'Preferences__one-third-flow',
-              'Preferences__one-third-flow--align-right'
-            )}
+      {beaconCallingOnly ? null : (
+        <>
+          <SettingsRow
+            className="Preferences--internal--backups"
+            title={i18n('icu:Preferences__button--backups')}
           >
-            <AxoButton.Root
-              variant="strong-secondary"
-              size="lg"
-              onClick={validateBackup}
-              pending={isValidationPending}
-            >
-              {i18n('icu:Preferences__internal__validate-backup')}
-            </AxoButton.Root>
-          </div>
-        </FlowingSettingsControl>
-
-        {renderValidationResult(validationResult)}
-      </SettingsRow>
-
-      <SettingsRow
-        className="Preferences--internal--message-schemas"
-        title="Message schema versions"
-      >
-        <FlowingSettingsControl>
-          <div className="Preferences__two-thirds-flow">
-            Check message schema versions
-          </div>
-          <div
-            className={classNames(
-              'Preferences__flow-button',
-              'Preferences__one-third-flow',
-              'Preferences__one-third-flow--align-right'
-            )}
-          >
-            <AxoButton.Root
-              variant="strong-secondary"
-              size="lg"
-              onClick={async () => {
-                setMessageCountBySchemaVersion(
-                  await getMessageCountBySchemaVersion()
-                );
-                setMessageSampleForVersions({});
-              }}
-            >
-              Fetch data
-            </AxoButton.Root>
-          </div>
-        </FlowingSettingsControl>
-
-        {messageCountBySchemaVersion ? (
-          <div className="Preferences--internal--result">
-            <pre>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Schema version</th>
-                    <th># Messages</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {messageCountBySchemaVersion.map(
-                    ({ schemaVersion, count }) => {
-                      return (
-                        <Fragment key={schemaVersion}>
-                          <tr>
-                            <td>{schemaVersion}</td>
-                            <td>{count}</td>
-                            <td>
-                              <button
-                                type="button"
-                                onClick={async () => {
-                                  const sampleMessages =
-                                    await getMessageSampleForSchemaVersion(
-                                      schemaVersion
-                                    );
-                                  setMessageSampleForVersions({
-                                    [schemaVersion]: sampleMessages,
-                                  });
-                                }}
-                              >
-                                Sample
-                              </button>
-                            </td>
-                          </tr>
-                          {messageSampleForVersions?.[schemaVersion] ? (
-                            <tr
-                              key={`${schemaVersion}_samples`}
-                              className="Preferences--internal--subresult"
-                            >
-                              <td colSpan={3}>
-                                <code>
-                                  {JSON.stringify(
-                                    messageSampleForVersions[schemaVersion],
-                                    null,
-                                    2
-                                  )}
-                                </code>
-                              </td>
-                            </tr>
-                          ) : null}
-                        </Fragment>
-                      );
-                    }
-                  )}
-                </tbody>
-              </table>
-            </pre>
-          </div>
-        ) : null}
-      </SettingsRow>
-
-      {isStagingServer() && (
-        <SettingsRow
-          className="Preferences--internal--donation-receipts"
-          title="Donation Receipts Testing"
-        >
-          <FlowingSettingsControl>
-            <div className="Preferences__two-thirds-flow">
-              Test donation receipt generation functionality
-            </div>
-            <div
-              className={classNames(
-                'Preferences__flow-button',
-                'Preferences__one-third-flow',
-                'Preferences__one-third-flow--align-right'
-              )}
-            >
-              <AxoButton.Root
-                variant="strong-secondary"
-                size="lg"
-                onClick={handleAddTestReceipt}
+            <FlowingSettingsControl>
+              <div className="Preferences__two-thirds-flow">
+                {i18n(
+                  'icu:Preferences__internal__validate-backup--description'
+                )}
+              </div>
+              <div
+                className={classNames(
+                  'Preferences__flow-button',
+                  'Preferences__one-third-flow',
+                  'Preferences__one-third-flow--align-right'
+                )}
               >
-                Add Test Receipt
-              </AxoButton.Root>
-            </div>
-          </FlowingSettingsControl>
+                <AxoButton.Root
+                  variant="strong-secondary"
+                  size="lg"
+                  onClick={validateBackup}
+                  pending={isValidationPending}
+                >
+                  {i18n('icu:Preferences__internal__validate-backup')}
+                </AxoButton.Root>
+              </div>
+            </FlowingSettingsControl>
 
-          {donationReceipts.length > 0 ? (
-            <div className="Preferences--internal--result">
-              <h4>Receipts ({donationReceipts.length})</h4>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid #ddd' }}>
-                    <th style={{ padding: '8px', textAlign: 'left' }}>Date</th>
-                    <th style={{ padding: '8px', textAlign: 'left' }}>
-                      Amount
-                    </th>
-                    <th style={{ padding: '8px', textAlign: 'left' }}>
-                      Last 4
-                    </th>
-                    <th style={{ padding: '8px', textAlign: 'left' }}>ID</th>
-                    <th style={{ padding: '8px', textAlign: 'left' }}>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {donationReceipts.map(receipt => (
-                    <tr
-                      key={receipt.id}
-                      style={{ borderBottom: '1px solid #eee' }}
-                    >
-                      <td style={{ padding: '8px' }}>
-                        {new Date(receipt.timestamp).toLocaleDateString()}
-                      </td>
-                      <td style={{ padding: '8px' }}>
-                        {getHumanDonationAmount(receipt)} {receipt.currencyType}
-                      </td>
-                      <td
-                        style={{
-                          padding: '8px',
-                          fontSize: '12px',
-                          fontFamily: 'monospace',
-                        }}
-                      >
-                        {receipt.id.substring(0, 8)}...
-                      </td>
-                      <td style={{ padding: '8px' }}>
-                        <AxoButton.Root
-                          variant="strong-secondary"
-                          size="lg"
-                          onClick={() => handleGenerateReceipt(receipt)}
-                          pending={isGeneratingReceipt}
+            {renderValidationResult(validationResult)}
+          </SettingsRow>
+
+          <SettingsRow
+            className="Preferences--internal--message-schemas"
+            title="Message schema versions"
+          >
+            <FlowingSettingsControl>
+              <div className="Preferences__two-thirds-flow">
+                Check message schema versions
+              </div>
+              <div
+                className={classNames(
+                  'Preferences__flow-button',
+                  'Preferences__one-third-flow',
+                  'Preferences__one-third-flow--align-right'
+                )}
+              >
+                <AxoButton.Root
+                  variant="strong-secondary"
+                  size="lg"
+                  onClick={async () => {
+                    setMessageCountBySchemaVersion(
+                      await getMessageCountBySchemaVersion()
+                    );
+                    setMessageSampleForVersions({});
+                  }}
+                >
+                  Fetch data
+                </AxoButton.Root>
+              </div>
+            </FlowingSettingsControl>
+
+            {messageCountBySchemaVersion ? (
+              <div className="Preferences--internal--result">
+                <pre>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Schema version</th>
+                        <th># Messages</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {messageCountBySchemaVersion.map(
+                        ({ schemaVersion, count }) => {
+                          return (
+                            <Fragment key={schemaVersion}>
+                              <tr>
+                                <td>{schemaVersion}</td>
+                                <td>{count}</td>
+                                <td>
+                                  <button
+                                    type="button"
+                                    onClick={async () => {
+                                      const sampleMessages =
+                                        await getMessageSampleForSchemaVersion(
+                                          schemaVersion
+                                        );
+                                      setMessageSampleForVersions({
+                                        [schemaVersion]: sampleMessages,
+                                      });
+                                    }}
+                                  >
+                                    Sample
+                                  </button>
+                                </td>
+                              </tr>
+                              {messageSampleForVersions?.[schemaVersion] ? (
+                                <tr
+                                  key={`${schemaVersion}_samples`}
+                                  className="Preferences--internal--subresult"
+                                >
+                                  <td colSpan={3}>
+                                    <code>
+                                      {JSON.stringify(
+                                        messageSampleForVersions[schemaVersion],
+                                        null,
+                                        2
+                                      )}
+                                    </code>
+                                  </td>
+                                </tr>
+                              ) : null}
+                            </Fragment>
+                          );
+                        }
+                      )}
+                    </tbody>
+                  </table>
+                </pre>
+              </div>
+            ) : null}
+          </SettingsRow>
+
+          {isStagingServer() && (
+            <SettingsRow
+              className="Preferences--internal--donation-receipts"
+              title="Donation Receipts Testing"
+            >
+              <FlowingSettingsControl>
+                <div className="Preferences__two-thirds-flow">
+                  Test donation receipt generation functionality
+                </div>
+                <div
+                  className={classNames(
+                    'Preferences__flow-button',
+                    'Preferences__one-third-flow',
+                    'Preferences__one-third-flow--align-right'
+                  )}
+                >
+                  <AxoButton.Root
+                    variant="strong-secondary"
+                    size="lg"
+                    onClick={handleAddTestReceipt}
+                  >
+                    Add Test Receipt
+                  </AxoButton.Root>
+                </div>
+              </FlowingSettingsControl>
+
+              {donationReceipts.length > 0 ? (
+                <div className="Preferences--internal--result">
+                  <h4>Receipts ({donationReceipts.length})</h4>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #ddd' }}>
+                        <th style={{ padding: '8px', textAlign: 'left' }}>
+                          Date
+                        </th>
+                        <th style={{ padding: '8px', textAlign: 'left' }}>
+                          Amount
+                        </th>
+                        <th style={{ padding: '8px', textAlign: 'left' }}>
+                          Last 4
+                        </th>
+                        <th style={{ padding: '8px', textAlign: 'left' }}>
+                          ID
+                        </th>
+                        <th style={{ padding: '8px', textAlign: 'left' }}>
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {donationReceipts.map(receipt => (
+                        <tr
+                          key={receipt.id}
+                          style={{ borderBottom: '1px solid #eee' }}
                         >
-                          Download
-                        </AxoButton.Root>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="Preferences--internal--result">
-              <p style={{ color: '#666' }}>
-                No receipts found. Add some test receipts above.
-              </p>
-            </div>
+                          <td style={{ padding: '8px' }}>
+                            {new Date(receipt.timestamp).toLocaleDateString()}
+                          </td>
+                          <td style={{ padding: '8px' }}>
+                            {getHumanDonationAmount(receipt)}{' '}
+                            {receipt.currencyType}
+                          </td>
+                          <td
+                            style={{
+                              padding: '8px',
+                              fontSize: '12px',
+                              fontFamily: 'monospace',
+                            }}
+                          >
+                            {receipt.id.substring(0, 8)}...
+                          </td>
+                          <td style={{ padding: '8px' }}>
+                            <AxoButton.Root
+                              variant="strong-secondary"
+                              size="lg"
+                              onClick={() => handleGenerateReceipt(receipt)}
+                              pending={isGeneratingReceipt}
+                            >
+                              Download
+                            </AxoButton.Root>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="Preferences--internal--result">
+                  <p style={{ color: '#666' }}>
+                    No receipts found. Add some test receipts above.
+                  </p>
+                </div>
+              )}
+            </SettingsRow>
           )}
-        </SettingsRow>
+
+          <SettingsRow title="Call Quality Survey Testing">
+            <FlowingSettingsControl>
+              <div className="Preferences__two-thirds-flow">
+                CQS testing: disable cooldown and always show for calls under
+                30s
+              </div>
+              <div className="Preferences__one-third-flow Preferences__one-third-flow--justify-end">
+                <AxoSwitch.Root
+                  checked={cqsTestMode}
+                  onCheckedChange={setCqsTestMode}
+                />
+              </div>
+            </FlowingSettingsControl>
+          </SettingsRow>
+
+          <SettingsRow title="Readonly SQL Playground">
+            <FlowingSettingsControl>
+              <AutoSizeTextArea
+                i18n={i18n}
+                value={readOnlySqlInput}
+                onChange={handleReadonlySqlInputChange}
+                placeholder="SELECT * FROM items"
+                moduleClassName="Preferences__ReadonlySqlPlayground__Textarea"
+              />
+              <AxoButton.Root
+                variant="strong-destructive"
+                size="lg"
+                onClick={handleReadOnlySqlInputSubmit}
+              >
+                Run Query
+              </AxoButton.Root>
+              {readOnlySqlResults != null && (
+                <AutoSizeTextArea
+                  i18n={i18n}
+                  value={JSON.stringify(readOnlySqlResults, null, 2)}
+                  onChange={() => null}
+                  readOnly
+                  placeholder=""
+                  moduleClassName="Preferences__ReadonlySqlPlayground__Textarea"
+                />
+              )}
+            </FlowingSettingsControl>
+          </SettingsRow>
+
+          <SettingsRow title="Megaphones">
+            <FlowingSettingsControl>
+              <div className="Preferences__two-thirds-flow">
+                Show a test megaphone in memory. Disappears on restart.
+              </div>
+              <div
+                className={classNames(
+                  'Preferences__flow-button',
+                  'Preferences__one-third-flow',
+                  'Preferences__one-third-flow--align-right'
+                )}
+              >
+                <AxoButton.Root
+                  variant="strong-secondary"
+                  size="lg"
+                  onClick={async () => {
+                    const megaphone = internalGetTestMegaphone();
+                    addVisibleMegaphone(megaphone);
+                    setShowMegaphoneResult(
+                      `Megaphone shown. Go to Chats tab to view.\n${JSON.stringify(megaphone, null, 2)}`
+                    );
+                  }}
+                >
+                  Show megaphone
+                </AxoButton.Root>
+              </div>
+              {showMegaphoneResult != null && (
+                <AutoSizeTextArea
+                  i18n={i18n}
+                  value={showMegaphoneResult}
+                  onChange={() => null}
+                  readOnly
+                  placeholder=""
+                  moduleClassName="Preferences__ReadonlySqlPlayground__Textarea"
+                />
+              )}
+            </FlowingSettingsControl>
+            <FlowingSettingsControl>
+              <div className="Preferences__two-thirds-flow">
+                Delete local records of remote megaphones
+              </div>
+              <div
+                className={classNames(
+                  'Preferences__flow-button',
+                  'Preferences__one-third-flow',
+                  'Preferences__one-third-flow--align-right'
+                )}
+              >
+                <AxoButton.Root
+                  variant="strong-destructive"
+                  size="lg"
+                  onClick={async () => {
+                    const result = await internalDeleteAllMegaphones();
+                    setDeleteAllMegaphonesResult(result);
+                  }}
+                >
+                  Delete
+                </AxoButton.Root>
+              </div>
+            </FlowingSettingsControl>
+            {deleteAllMegaphonesResult != null && (
+              <AutoSizeTextArea
+                i18n={i18n}
+                value={`Deleted: ${deleteAllMegaphonesResult}`}
+                onChange={() => null}
+                readOnly
+                placeholder=""
+                moduleClassName="Preferences__ReadonlySqlPlayground__Textarea"
+              />
+            )}
+          </SettingsRow>
+        </>
       )}
-
-      <SettingsRow title="Call Quality Survey Testing">
-        <FlowingSettingsControl>
-          <div className="Preferences__two-thirds-flow">
-            CQS testing: disable cooldown and always show for calls under 30s
-          </div>
-          <div className="Preferences__one-third-flow Preferences__one-third-flow--justify-end">
-            <AxoSwitch.Root
-              checked={cqsTestMode}
-              onCheckedChange={setCqsTestMode}
-            />
-          </div>
-        </FlowingSettingsControl>
-      </SettingsRow>
-
-      <SettingsRow title="Readonly SQL Playground">
-        <FlowingSettingsControl>
-          <AutoSizeTextArea
-            i18n={i18n}
-            value={readOnlySqlInput}
-            onChange={handleReadonlySqlInputChange}
-            placeholder="SELECT * FROM items"
-            moduleClassName="Preferences__ReadonlySqlPlayground__Textarea"
-          />
-          <AxoButton.Root
-            variant="strong-destructive"
-            size="lg"
-            onClick={handleReadOnlySqlInputSubmit}
-          >
-            Run Query
-          </AxoButton.Root>
-          {readOnlySqlResults != null && (
-            <AutoSizeTextArea
-              i18n={i18n}
-              value={JSON.stringify(readOnlySqlResults, null, 2)}
-              onChange={() => null}
-              readOnly
-              placeholder=""
-              moduleClassName="Preferences__ReadonlySqlPlayground__Textarea"
-            />
-          )}
-        </FlowingSettingsControl>
-      </SettingsRow>
-
-      <SettingsRow title="Megaphones">
-        <FlowingSettingsControl>
-          <div className="Preferences__two-thirds-flow">
-            Show a test megaphone in memory. Disappears on restart.
-          </div>
-          <div
-            className={classNames(
-              'Preferences__flow-button',
-              'Preferences__one-third-flow',
-              'Preferences__one-third-flow--align-right'
-            )}
-          >
-            <AxoButton.Root
-              variant="strong-secondary"
-              size="lg"
-              onClick={async () => {
-                const megaphone = internalGetTestMegaphone();
-                addVisibleMegaphone(megaphone);
-                setShowMegaphoneResult(
-                  `Megaphone shown. Go to Chats tab to view.\n${JSON.stringify(megaphone, null, 2)}`
-                );
-              }}
-            >
-              Show megaphone
-            </AxoButton.Root>
-          </div>
-          {showMegaphoneResult != null && (
-            <AutoSizeTextArea
-              i18n={i18n}
-              value={showMegaphoneResult}
-              onChange={() => null}
-              readOnly
-              placeholder=""
-              moduleClassName="Preferences__ReadonlySqlPlayground__Textarea"
-            />
-          )}
-        </FlowingSettingsControl>
-        <FlowingSettingsControl>
-          <div className="Preferences__two-thirds-flow">
-            Delete local records of remote megaphones
-          </div>
-          <div
-            className={classNames(
-              'Preferences__flow-button',
-              'Preferences__one-third-flow',
-              'Preferences__one-third-flow--align-right'
-            )}
-          >
-            <AxoButton.Root
-              variant="strong-destructive"
-              size="lg"
-              onClick={async () => {
-                const result = await internalDeleteAllMegaphones();
-                setDeleteAllMegaphonesResult(result);
-              }}
-            >
-              Delete
-            </AxoButton.Root>
-          </div>
-        </FlowingSettingsControl>
-        {deleteAllMegaphonesResult != null && (
-          <AutoSizeTextArea
-            i18n={i18n}
-            value={`Deleted: ${deleteAllMegaphonesResult}`}
-            onChange={() => null}
-            readOnly
-            placeholder=""
-            moduleClassName="Preferences__ReadonlySqlPlayground__Textarea"
-          />
-        )}
-      </SettingsRow>
       <SettingsRow title="Calling General">
         <FlowingSettingsControl>
           <div className="Preferences__two-thirds-flow">

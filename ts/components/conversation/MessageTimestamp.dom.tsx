@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { ReactElement } from 'react';
+import { beaconTweaks } from '../../beacon/core/tweaks.std.ts';
 import classNames from 'classnames';
 
 import { formatTime } from '../../util/formatTimestamp.dom.ts';
@@ -45,6 +46,7 @@ export function MessageTimestamp({
         isOutlineOnlyBubble ? `${moduleName}--outline-only-bubble` : null
       )}
       timestamp={timestamp}
+      title={beaconTweaks.messageTimeTitle?.(timestamp)}
     >
       {formatTime(i18n, timestamp, now, isRelativeTime)}
     </Time>

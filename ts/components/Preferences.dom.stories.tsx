@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { Meta, StoryFn } from '@storybook/react';
+import { getBeaconDefaults } from '../beacon/features.std.ts';
 import { useState } from 'react';
 import type { MutableRefObject, JSX } from 'react';
 import { action } from '@storybook/addon-actions';
@@ -729,6 +730,11 @@ export default {
       await sleep(1000);
     },
     keyTransparencySelfHealth: 'ok',
+    hasCustomTitlebar: false,
+    beaconNeedsRestart: false,
+    onCustomTitlebarChange: action('onCustomTitlebarChange'),
+    beaconSettings: getBeaconDefaults(),
+    onBeaconSettingChange: action('onBeaconSettingChange'),
   } satisfies PropsType,
 } satisfies Meta<PropsType>;
 

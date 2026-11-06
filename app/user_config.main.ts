@@ -9,6 +9,7 @@ import { start } from './base_config.node.ts';
 import config from './config.main.ts';
 import * as Errors from '../ts/types/errors.std.ts';
 import OS from '../ts/util/os/osMain.node.ts';
+import { resolveBeaconAccountDir } from './beacon-account-path.node.ts';
 
 let userData: string | undefined;
 // Use separate data directory for benchmarks & development
@@ -33,6 +34,12 @@ if (userData !== undefined) {
   }
 
   app.setPath('userData', userData);
+}
+
+const beaconAccountDir = resolveBeaconAccountDir(app.getPath('userData'));
+if (beaconAccountDir !== undefined) {
+  mkdirSync(beaconAccountDir, { recursive: true });
+  app.setPath('userData', beaconAccountDir);
 }
 
 // Use console.log because logger isn't fully initialized yet

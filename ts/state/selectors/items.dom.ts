@@ -25,6 +25,7 @@ import { isNotUpdatable } from '../../util/version.std.ts';
 import { BackupLevel } from '../../services/backups/types.std.ts';
 import type { StateSelector } from '../types.std.ts';
 import { Emoji } from '../../axo/emoji.std.ts';
+import { beaconTweaks } from '../../beacon/core/tweaks.std.ts';
 import { DEFAULT_SHOW_UNREAD_REMINDERS } from '../../util/unreadReminders.std.ts';
 
 const DEFAULT_PREFERRED_LEFT_PANE_WIDTH = 320;
@@ -254,7 +255,9 @@ export const getTextFormattingEnabled = createSelector(
 
 export const getNavTabsCollapsed = createSelector(
   getItems,
-  (state: ItemsStateType): boolean => state.navTabsCollapsed ?? false
+  (state: StateType) => state.beacon.version,
+  (state: ItemsStateType): boolean =>
+    beaconTweaks.navDrawer || (state.navTabsCollapsed ?? false)
 );
 
 export const getShowStickerPickerHint = createSelector(

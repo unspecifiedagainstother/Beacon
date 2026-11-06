@@ -1,15 +1,23 @@
 // Copyright 2023 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import type { ReactNode, JSX } from 'react';
 import { useSelector } from 'react-redux';
 import { NavTabs } from '../../components/NavTabs.dom.tsx';
-import { getIntl } from '../selectors/user.std.ts';
+import { getIntl, getTheme } from '../selectors/user.std.ts';
 import {
   getAllConversationsUnreadStats,
   getCallHistoryUnreadCount,
+  getMe,
 } from '../selectors/conversations.dom.ts';
+import { useConversationsActions } from '../ducks/conversations.preload.ts';
+import { NavTab } from '../../types/Nav.std.ts';
+import { drop } from '../../util/drop.std.ts';
+import { themeChanged } from '../../shims/themeChanged.dom.ts';
+import { getUnreadCountForBadge } from '../../util/countUnreadStats.std.ts';
+import { getAvatarThumbnail } from '../../beacon/util/avatarThumbnail.dom.ts';
+import type { BeaconNavDrawerExtras } from '../../components/BeaconNavDrawer.dom.tsx';
 import {
   getHasAnyFailedStorySends,
   getStoriesNotificationCount,
@@ -52,6 +60,90 @@ export const SmartNavTabs = memo(function SmartNavTabs({
   const hasPendingUpdate = useSelector(getHasPendingUpdate);
 
   const { changeLocation } = useNavActions();
+  const me = useSelector(getMe);
+  const theme = useSelector(getTheme);
+  const {
+    showArchivedConversations,
+    showChooseGroupMembers,
+    showConversation,
+    startComposing,
+  } = useConversationsActions();
+
+  const accountUnread = getUnreadCountForBadge(
+    unreadConversationsStats,
+    unreadCountBadgeType
+  );
+  const accountName = me.profileName ?? me.title;
+  const accountSubtitle = me.username ?? me.phoneNumber;
+  const accountColor = me.color;
+  const accountAvatarUrl = me.avatarUrl;
+  useEffect(() => {
+    drop(
+      (async () => {
+        const avatar = await getAvatarThumbnail(accountAvatarUrl);
+        await window.IPC.beaconInvoke('accounts:report', {
+          name: accountName,
+          subtitle: accountSubtitle,
+          color: accountColor,
+          avatar,
+          unread: accountUnread,
+          linked: true,
+        });
+      })()
+    );
+  }, [
+    accountName,
+    accountSubtitle,
+    accountColor,
+    accountAvatarUrl,
+    accountUnread,
+  ]);
+
+  const beaconDrawer = useMemo((): BeaconNavDrawerExtras => {
+    const toChats = () =>
+      changeLocation({
+        tab: NavTab.Chats,
+        details: { conversationId: undefined },
+      });
+    return {
+      me,
+      theme,
+      onToggleTheme: () =>
+        drop(
+          (async () => {
+            await window.Events.setThemeSetting(
+              theme === 'dark' ? 'light' : 'dark'
+            );
+            await themeChanged();
+          })()
+        ),
+      onNavigate: changeLocation,
+      onNewChat: () => {
+        toChats();
+        startComposing();
+      },
+      onNewGroup: () => {
+        toChats();
+        showChooseGroupMembers();
+      },
+      onOpenNoteToSelf: () => {
+        toChats();
+        showConversation({ conversationId: me.id });
+      },
+      onOpenArchived: () => {
+        toChats();
+        showArchivedConversations();
+      },
+    };
+  }, [
+    changeLocation,
+    me,
+    theme,
+    showArchivedConversations,
+    showChooseGroupMembers,
+    showConversation,
+    startComposing,
+  ]);
 
   const onChangeLocation = useCallback(
     (location: Location) => {
@@ -82,6 +174,7 @@ export const SmartNavTabs = memo(function SmartNavTabs({
       unreadCallsCount={unreadCallsCount}
       unreadConversationsStats={unreadConversationsStats}
       unreadStoriesCount={unreadStoriesCount}
+      beaconDrawer={beaconDrawer}
     />
   );
 });

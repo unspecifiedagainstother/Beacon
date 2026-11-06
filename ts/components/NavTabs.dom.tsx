@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { Key, ReactNode, JSX } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { Tabs, TabList, Tab, TabPanel } from 'react-aria-components';
 import classNames from 'classnames';
 import type { LocalizerType } from '../types/Util.std.ts';
@@ -12,6 +13,12 @@ import { Theme } from '../util/theme.std.ts';
 import type { UnreadStats } from '../util/countUnreadStats.std.ts';
 import { getUnreadCountForBadge } from '../util/countUnreadStats.std.ts';
 import type { UnreadCountBadgeType } from '../types/StorageKeys.std.ts';
+import { beaconTweaks } from '../beacon/core/tweaks.std.ts';
+import type { BeaconNavDrawerExtras } from './BeaconNavDrawer.dom.tsx';
+import {
+  BeaconNavDrawer,
+  BeaconNavDrawerContext,
+} from './BeaconNavDrawer.dom.tsx';
 
 type NavTabsItemBadgesProps = Readonly<{
   i18n: LocalizerType;
@@ -136,12 +143,21 @@ export function NavTabsToggle({
   otherTabsUnreadCount,
   onToggleNavTabsCollapse,
 }: NavTabsToggleProps): JSX.Element {
+  const openDrawer = useContext(BeaconNavDrawerContext);
+  const drawerMode = beaconTweaks.navDrawer && openDrawer != null;
   function handleToggle() {
+    if (drawerMode) {
+      openDrawer();
+      return;
+    }
     onToggleNavTabsCollapse(!navTabsCollapsed);
   }
-  const label = navTabsCollapsed
+  let label = navTabsCollapsed
     ? i18n('icu:NavTabsToggle__showTabs')
     : i18n('icu:NavTabsToggle__hideTabs');
+  if (drawerMode) {
+    label = 'Menu';
+  }
   const isRTL = i18n.getLocaleDirection() === 'rtl';
   return (
     // FIXME
@@ -194,6 +210,7 @@ export type NavTabsProps = Readonly<{
   unreadConversationsStats: UnreadStats;
   unreadCountBadgeType: UnreadCountBadgeType;
   unreadStoriesCount: number;
+  beaconDrawer?: BeaconNavDrawerExtras;
 }>;
 
 export function NavTabs({
@@ -213,7 +230,12 @@ export function NavTabs({
   unreadConversationsStats,
   unreadCountBadgeType,
   unreadStoriesCount,
+  beaconDrawer,
 }: NavTabsProps): JSX.Element {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const openDrawer = useCallback(() => setDrawerOpen(true), []);
+  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
+
   function handleSelectionChange(key: Key) {
     const tab = key as NavTab;
     if (tab === NavTab.Settings) {
@@ -237,81 +259,100 @@ export function NavTabs({
   }
 
   return (
-    <Tabs
-      orientation="vertical"
-      className="NavTabs__Container"
-      selectedKey={selectedNavTab}
-      onSelectionChange={handleSelectionChange}
-    >
-      <nav
-        data-supertab
-        className={classNames('NavTabs', {
-          'NavTabs--collapsed': navTabsCollapsed,
-        })}
+    <BeaconNavDrawerContext.Provider value={openDrawer}>
+      <Tabs
+        orientation="vertical"
+        className="NavTabs__Container"
+        selectedKey={selectedNavTab}
+        onSelectionChange={handleSelectionChange}
       >
-        <NavTabsToggle
-          i18n={i18n}
-          navTabsCollapsed={navTabsCollapsed}
-          onToggleNavTabsCollapse={onToggleNavTabsCollapse}
-          // These are all shown elsewhere when nav tabs are shown
-          hasFailedStorySends={false}
-          hasPendingUpdate={false}
-          otherTabsUnreadCount={0}
-        />
-        <TabList className="NavTabs__TabList">
-          <NavTabsItem
+        <nav
+          data-supertab
+          className={classNames('NavTabs', {
+            'NavTabs--collapsed': navTabsCollapsed,
+          })}
+        >
+          <NavTabsToggle
             i18n={i18n}
-            id={NavTab.Chats}
-            label={i18n('icu:NavTabs__ItemLabel--Chats')}
-            iconClassName="NavTabs__ItemIcon--Chats"
-            navTabClassName="NavTabs__Item--Chats"
-            unreadCount={getUnreadCountForBadge(
+            navTabsCollapsed={navTabsCollapsed}
+            onToggleNavTabsCollapse={onToggleNavTabsCollapse}
+            hasFailedStorySends={false}
+            hasPendingUpdate={false}
+            otherTabsUnreadCount={0}
+          />
+          <TabList className="NavTabs__TabList">
+            <NavTabsItem
+              i18n={i18n}
+              id={NavTab.Chats}
+              label={i18n('icu:NavTabs__ItemLabel--Chats')}
+              iconClassName="NavTabs__ItemIcon--Chats"
+              navTabClassName="NavTabs__Item--Chats"
+              unreadCount={getUnreadCountForBadge(
+                unreadConversationsStats,
+                unreadCountBadgeType
+              )}
+            />
+            <NavTabsItem
+              i18n={i18n}
+              id={NavTab.Calls}
+              label={i18n('icu:NavTabs__ItemLabel--Calls')}
+              iconClassName="NavTabs__ItemIcon--Calls"
+              navTabClassName="NavTabs__Item--Calls"
+              unreadCount={unreadCallsCount}
+            />
+            {storiesEnabled && (
+              <NavTabsItem
+                i18n={i18n}
+                id={NavTab.Stories}
+                label={i18n('icu:NavTabs__ItemLabel--Stories')}
+                iconClassName="NavTabs__ItemIcon--Stories"
+                hasError={hasFailedStorySends}
+                navTabClassName="NavTabs__Item--Stories"
+                unreadCount={unreadStoriesCount}
+              />
+            )}
+            <NavTabsItem
+              i18n={i18n}
+              id={NavTab.Settings}
+              label={i18n('icu:NavTabs__ItemLabel--Settings')}
+              iconClassName="NavTabs__ItemIcon--Settings"
+              navTabClassName="NavTabs__Item--Settings"
+              unreadCount={0}
+              hasPendingUpdate={hasPendingUpdate}
+            />
+          </TabList>
+        </nav>
+        <TabPanel id={NavTab.Chats} className="NavTabs__TabPanel">
+          {renderChatsTab}
+        </TabPanel>
+        <TabPanel id={NavTab.Calls} className="NavTabs__TabPanel">
+          {renderCallsTab}
+        </TabPanel>
+        <TabPanel id={NavTab.Stories} className="NavTabs__TabPanel">
+          {renderStoriesTab}
+        </TabPanel>
+        <TabPanel id={NavTab.Settings} className="NavTabs__TabPanel">
+          {renderSettingsTab}
+        </TabPanel>
+        {beaconTweaks.navDrawer && beaconDrawer ? (
+          <BeaconNavDrawer
+            {...beaconDrawer}
+            i18n={i18n}
+            open={drawerOpen}
+            onClose={closeDrawer}
+            selectedNavTab={selectedNavTab}
+            storiesEnabled={storiesEnabled}
+            hasPendingUpdate={hasPendingUpdate}
+            hasFailedStorySends={hasFailedStorySends}
+            unreadChatsCount={getUnreadCountForBadge(
               unreadConversationsStats,
               unreadCountBadgeType
             )}
+            unreadCallsCount={unreadCallsCount}
+            unreadStoriesCount={unreadStoriesCount}
           />
-          <NavTabsItem
-            i18n={i18n}
-            id={NavTab.Calls}
-            label={i18n('icu:NavTabs__ItemLabel--Calls')}
-            iconClassName="NavTabs__ItemIcon--Calls"
-            navTabClassName="NavTabs__Item--Calls"
-            unreadCount={unreadCallsCount}
-          />
-          {storiesEnabled && (
-            <NavTabsItem
-              i18n={i18n}
-              id={NavTab.Stories}
-              label={i18n('icu:NavTabs__ItemLabel--Stories')}
-              iconClassName="NavTabs__ItemIcon--Stories"
-              hasError={hasFailedStorySends}
-              navTabClassName="NavTabs__Item--Stories"
-              unreadCount={unreadStoriesCount}
-            />
-          )}
-          <NavTabsItem
-            i18n={i18n}
-            id={NavTab.Settings}
-            label={i18n('icu:NavTabs__ItemLabel--Settings')}
-            iconClassName="NavTabs__ItemIcon--Settings"
-            navTabClassName="NavTabs__Item--Settings"
-            unreadCount={0}
-            hasPendingUpdate={hasPendingUpdate}
-          />
-        </TabList>
-      </nav>
-      <TabPanel id={NavTab.Chats} className="NavTabs__TabPanel">
-        {renderChatsTab}
-      </TabPanel>
-      <TabPanel id={NavTab.Calls} className="NavTabs__TabPanel">
-        {renderCallsTab}
-      </TabPanel>
-      <TabPanel id={NavTab.Stories} className="NavTabs__TabPanel">
-        {renderStoriesTab}
-      </TabPanel>
-      <TabPanel id={NavTab.Settings} className="NavTabs__TabPanel">
-        {renderSettingsTab}
-      </TabPanel>
-    </Tabs>
+        ) : null}
+      </Tabs>
+    </BeaconNavDrawerContext.Provider>
   );
 }

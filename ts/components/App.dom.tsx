@@ -1,12 +1,15 @@
 // Copyright 2021 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { useEffect, type JSX } from 'react';
+import { useEffect, useState, type JSX } from 'react';
+import { BeaconErrorBoundary } from './BeaconErrorBoundary.dom.tsx';
 
 import { AppViewType } from '../types/app.std.ts';
 import { missingCaseError } from '../util/missingCaseError.std.ts';
 import { usePageVisibility } from '../hooks/usePageVisibility.dom.ts';
 import { TitlebarDragArea } from './TitlebarDragArea.dom.tsx';
+import { loadAndInjectCustomCSS } from './BeaconCSSEditor.dom.tsx';
+import { BeaconTitlebar } from './BeaconTitlebar.dom.tsx';
 import { ThemeType } from '../types/Util.std.ts';
 
 import type { ViewStoryActionCreatorType } from '../state/ducks/stories.preload.ts';
@@ -97,6 +100,24 @@ export function App({
     document.body.classList.toggle('maximized', isMaximized);
   }, [isFullScreen, isMaximized]);
 
+  useEffect(() => {
+    loadAndInjectCustomCSS();
+  }, []);
+
+  const [hasCustomTitlebar, setHasCustomTitlebar] = useState(false);
+  useEffect(() => {
+    let canceled = false;
+    void (async () => {
+      const value = await window.IPC.beaconGetCustomTitlebar();
+      if (!canceled) {
+        setHasCustomTitlebar(value);
+      }
+    })();
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
   const isPageVisible = usePageVisibility();
   useEffect(() => {
     document.body.classList.toggle('page-is-visible', isPageVisible);
@@ -104,6 +125,11 @@ export function App({
 
   return (
     <div className="App">
+      {hasCustomTitlebar && (
+        <BeaconErrorBoundary name="titlebar">
+          <BeaconTitlebar title="Beacon" />
+        </BeaconErrorBoundary>
+      )}
       {contents}
       {renderGlobalModalContainer()}
       {renderCallManager()}

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import type { AudioDevice } from '@signalapp/ringrtc';
+import { BeaconErrorBoundary } from './BeaconErrorBoundary.dom.tsx';
 import {
   useCallback,
   useEffect,
@@ -22,6 +23,14 @@ import { WidthBreakpoint } from './_util.std.ts';
 import { DisappearingTimeDialog } from './DisappearingTimeDialog.dom.tsx';
 import { PhoneNumberDiscoverability } from '../util/phoneNumberDiscoverability.std.ts';
 import { PhoneNumberSharingMode } from '../types/PhoneNumberSharingMode.std.ts';
+import { BeaconModules } from './BeaconModules.dom.tsx';
+import { BeaconPrivacyPage } from './BeaconPrivacyPage.dom.tsx';
+import { isHiddenFeatureOn } from '../beacon/core/hidden-features.std.ts';
+import { BeaconSettingsPage } from './BeaconSettingsPage.dom.tsx';
+import type {
+  BeaconFeatureKey,
+  BeaconSettingsType,
+} from '../beacon/features.std.ts';
 import {
   KEY_TRANSPARENCY_URL,
   RESTORE_ACCOUNT_URL,
@@ -193,6 +202,11 @@ export type PropsDataType = {
   notifyWhileMuted: NotifyWhileMuted;
   osName: 'linux' | 'macos' | 'windows' | undefined;
   phoneNumber: string | undefined;
+  hasCustomTitlebar: boolean;
+  onCustomTitlebarChange: (value: boolean) => void;
+  beaconNeedsRestart: boolean;
+  beaconSettings: BeaconSettingsType;
+  onBeaconSettingChange: (key: BeaconFeatureKey, value: boolean) => void;
   selectedCamera?: string;
   selectedMicrophone?: AudioDevice;
   selectedSpeaker?: AudioDevice;
@@ -604,6 +618,11 @@ export function Preferences({
   otherTabsUnreadCount,
   settingsLocation,
   phoneNumber = '',
+  hasCustomTitlebar,
+  onCustomTitlebarChange,
+  beaconNeedsRestart,
+  beaconSettings,
+  onBeaconSettingChange,
   pickLocalBackupFolder,
   preferredSystemLocales,
   preferredWidthFromStorage,
@@ -1010,12 +1029,12 @@ export function Preferences({
           {phoneNumber && (
             <AxoTextItem.Root
               label={i18n('icu:Preferences--phone-number')}
-              value={phoneNumber}
+              value={<span className="Beacon-pii">{phoneNumber}</span>}
             />
           )}
           <AxoTextItem.Root
             label={i18n('icu:Preferences--device-name')}
-            value={deviceName}
+            value={<span className="Beacon-pii">{deviceName}</span>}
           />
         </List>
         {weArePrimaryDevice && (
@@ -2226,6 +2245,56 @@ export function Preferences({
         <AxoPanel.Content>{pageContents}</AxoPanel.Content>
       </AxoPanel.Root>
     );
+  } else if (settingsLocation.page === SettingsPage.Beacon) {
+    content = (
+      <PreferencesContent
+        contents={
+          <BeaconErrorBoundary name="Beacon settings">
+            <BeaconSettingsPage
+              i18n={i18n}
+              beaconSettings={beaconSettings}
+              onBeaconSettingChange={onBeaconSettingChange}
+              hasCustomTitlebar={hasCustomTitlebar}
+              onCustomTitlebarChange={onCustomTitlebarChange}
+              beaconNeedsRestart={beaconNeedsRestart}
+              onOpenModules={() =>
+                setSettingsLocation({ page: SettingsPage.BeaconModules })
+              }
+              onOpenAppearance={() =>
+                setSettingsLocation({ page: SettingsPage.Appearance })
+              }
+            />
+          </BeaconErrorBoundary>
+        }
+        contentsRef={settingsPaneRef}
+        title={i18n('icu:Preferences__beacon-title')}
+      />
+    );
+  } else if (settingsLocation.page === SettingsPage.BeaconPrivacy) {
+    content = (
+      <PreferencesContent
+        contents={
+          <BeaconErrorBoundary name="Beacon Privacy">
+            <BeaconPrivacyPage i18n={i18n} />
+          </BeaconErrorBoundary>
+        }
+        contentsRef={settingsPaneRef}
+        title={i18n('icu:Beacon__privacy-title')}
+      />
+    );
+  } else if (settingsLocation.page === SettingsPage.BeaconModules) {
+    const pageContents = (
+      <BeaconErrorBoundary name="Beacon modules">
+        <BeaconModules i18n={i18n} />
+      </BeaconErrorBoundary>
+    );
+    content = (
+      <PreferencesContent
+        contents={pageContents}
+        contentsRef={settingsPaneRef}
+        title={i18n('icu:Beacon__modules-title')}
+      />
+    );
   } else if (settingsLocation.page === SettingsPage.ChatColor) {
     const backButton = (
       <button
@@ -2790,6 +2859,55 @@ export function Preferences({
         title={i18n('icu:Preferences__button--internal')}
       />
     );
+  } else if (settingsLocation.page === SettingsPage.BeaconCalling) {
+    content = (
+      <PreferencesContent
+        contents={
+          <PreferencesInternal
+            i18n={i18n}
+            validateBackup={validateBackup}
+            getMessageCountBySchemaVersion={getMessageCountBySchemaVersion}
+            getMessageSampleForSchemaVersion={getMessageSampleForSchemaVersion}
+            donationReceipts={donationReceipts}
+            internalAddDonationReceipt={internalAddDonationReceipt}
+            saveAttachmentToDisk={saveAttachmentToDisk}
+            generateDonationReceiptBlob={generateDonationReceiptBlob}
+            addVisibleMegaphone={addVisibleMegaphone}
+            internalDeleteAllMegaphones={internalDeleteAllMegaphones}
+            __dangerouslyRunAbitraryReadOnlySqlQuery={
+              __dangerouslyRunAbitraryReadOnlySqlQuery
+            }
+            cqsTestMode={cqsTestMode}
+            setCqsTestMode={setCqsTestMode}
+            dredDuration={dredDuration}
+            setDredDuration={setDredDuration}
+            callStatsIntervalSecs={callStatsIntervalSecs}
+            setCallStatsIntervalSecs={setCallStatsIntervalSecs}
+            setEnableVp9Encode={setEnableVp9Encode}
+            enableVp9Encode={enableVp9Encode}
+            setEnableVp9Decode={setEnableVp9Decode}
+            enableVp9Decode={enableVp9Decode}
+            setDirectMaxBitrate={setDirectMaxBitrate}
+            directMaxBitrate={directMaxBitrate}
+            setGroupMaxBitrate={setGroupMaxBitrate}
+            groupMaxBitrate={groupMaxBitrate}
+            isGroupSvcEnabled={isGroupSvcEnabled}
+            setIsGroupSvcEnabled={setIsGroupSvcEnabled}
+            groupSvcMode={groupSvcMode}
+            setGroupSvcMode={setGroupSvcMode}
+            groupSvcModeForScreenshare={groupSvcModeForScreenshare}
+            setGroupSvcModeForScreenshare={setGroupSvcModeForScreenshare}
+            sfuUrl={sfuUrl}
+            setSfuUrl={setSfuUrl}
+            forceKeyTransparencyCheck={forceKeyTransparencyCheck}
+            keyTransparencySelfHealth={keyTransparencySelfHealth}
+            beaconCallingOnly
+          />
+        }
+        contentsRef={settingsPaneRef}
+        title={i18n('icu:Beacon__calling-title')}
+      />
+    );
   }
   return (
     <>
@@ -2842,13 +2960,9 @@ export function Preferences({
                   <div className="Preferences__profile-chip__name">
                     {me.title}
                   </div>
-                  {me.phoneNumber && (
-                    <div className="Preferences__profile-chip__number">
-                      {me.phoneNumber}
-                    </div>
-                  )}
+                  {/* Beacon: phone number deliberately not shown here. */}
                   {me.username && (
-                    <div className="Preferences__profile-chip__username">
+                    <div className="Preferences__profile-chip__username Beacon-pii">
                       {me.username}
                     </div>
                   )}
@@ -2897,14 +3011,7 @@ export function Preferences({
                   }
                 />
               )}
-              <PreferencesButton
-                symbol="heart"
-                label={i18n('icu:Preferences__button--donate')}
-                current={isDonationsPage(settingsLocation.page)}
-                onClick={() =>
-                  setSettingsLocation({ page: SettingsPage.Donations })
-                }
-              />
+              {/* Beacon: no Donate to Signal entry. */}
               <div className={tw('mx-3.5 my-2 border-be border-primary')} />
               <PreferencesButton
                 symbol="settings"
@@ -2981,6 +3088,41 @@ export function Preferences({
                 current={isBackupPage(settingsLocation.page)}
                 onClick={() =>
                   setSettingsLocation({ page: SettingsPage.Backups })
+                }
+              />
+              {/* Beacon: fork settings pages. */}
+              <PreferencesButton
+                symbol="tune"
+                label={i18n('icu:Preferences__button--beacon')}
+                current={settingsLocation.page === SettingsPage.Beacon}
+                onClick={() =>
+                  setSettingsLocation({ page: SettingsPage.Beacon })
+                }
+              />
+              <PreferencesButton
+                symbol="shield-check"
+                label={i18n('icu:Preferences__button--beacon-privacy')}
+                current={settingsLocation.page === SettingsPage.BeaconPrivacy}
+                onClick={() =>
+                  setSettingsLocation({ page: SettingsPage.BeaconPrivacy })
+                }
+              />
+              {isHiddenFeatureOn('callingSettings') ? (
+                <PreferencesButton
+                  symbol="phone"
+                  label={i18n('icu:Beacon__calling-title')}
+                  current={settingsLocation.page === SettingsPage.BeaconCalling}
+                  onClick={() =>
+                    setSettingsLocation({ page: SettingsPage.BeaconCalling })
+                  }
+                />
+              ) : null}
+              <PreferencesButton
+                symbol="grid"
+                label={i18n('icu:Preferences__button--beacon-modules')}
+                current={settingsLocation.page === SettingsPage.BeaconModules}
+                onClick={() =>
+                  setSettingsLocation({ page: SettingsPage.BeaconModules })
                 }
               />
               {isInternalUser ? (

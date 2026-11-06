@@ -30,6 +30,7 @@ import type { Context } from '@signalapp/quill-cjs/modules/keyboard.js';
 import type { Range as RangeStatic } from '@signalapp/quill-cjs';
 
 import { MentionCompletion } from '../quill/mentions/completion.dom.tsx';
+import { CommandCompletion } from '../quill/command/completion.dom.tsx';
 import {
   FormattingMenu,
   QuillFormattingStyle,
@@ -84,6 +85,7 @@ import {
 import { missingCaseError } from '../util/missingCaseError.std.ts';
 import type { AutoSubstituteAsciiEmojisOptions } from '../quill/auto-substitute-ascii-emojis/index.dom.tsx';
 import { AutoSubstituteAsciiEmojis } from '../quill/auto-substitute-ascii-emojis/index.dom.tsx';
+import { InlineMarkdown } from '../quill/markdown/index.std.ts';
 import { dropNull } from '../util/dropNull.std.ts';
 import { SimpleQuillWrapper } from './SimpleQuillWrapper.dom.tsx';
 import { FUN_STATIC_EMOJI_CLASS } from './fun/FunEmoji.dom.tsx';
@@ -109,6 +111,8 @@ Quill.register(
     'modules/autoSubstituteAsciiEmojis': AutoSubstituteAsciiEmojis,
     'modules/emojiCompletion': EmojiCompletion,
     'modules/mentionCompletion': MentionCompletion,
+    'modules/commandCompletion': CommandCompletion,
+    'modules/inlineMarkdown': InlineMarkdown,
     'modules/formattingMenu': FormattingMenu,
     'modules/signalClipboard': SignalClipboard,
   },
@@ -241,9 +245,12 @@ export function CompositionInput(props: Props): ReactElement {
     useState<RangeStatic | null>(null);
   const [mentionCompletionElement, setMentionCompletionElement] =
     useState<JSX.Element>();
+  const [commandCompletionElement, setCommandCompletionElement] =
+    useState<JSX.Element | null>();
 
   const emojiCompletionRef = useRef<EmojiCompletion>(undefined);
   const mentionCompletionRef = useRef<MentionCompletion>(undefined);
+  const commandCompletionRef = useRef<CommandCompletion>(undefined);
   const quillRef = useRef<Quill>(undefined);
 
   const propsRef = useRef<Props>(props);
@@ -525,6 +532,10 @@ export function CompositionInput(props: Props): ReactElement {
       return false;
     }
 
+    if (commandCompletionRef.current?.handleEnter()) {
+      return false;
+    }
+
     if (propsRef.current.large) {
       return true;
     }
@@ -557,6 +568,10 @@ export function CompositionInput(props: Props): ReactElement {
       return false;
     }
 
+    if (commandCompletionRef.current?.handleTab()) {
+      return false;
+    }
+
     return true;
   };
 
@@ -569,6 +584,7 @@ export function CompositionInput(props: Props): ReactElement {
 
     const emojiCompletion = emojiCompletionRef.current;
     const mentionCompletion = mentionCompletionRef.current;
+    const commandCompletion = commandCompletionRef.current;
 
     if (emojiCompletion) {
       if (emojiCompletion.results.length) {
@@ -580,6 +596,13 @@ export function CompositionInput(props: Props): ReactElement {
     if (mentionCompletion) {
       if (mentionCompletion.results.length) {
         mentionCompletion.clearResults();
+        return false;
+      }
+    }
+
+    if (commandCompletion) {
+      if (commandCompletion.results.length) {
+        commandCompletion.reset();
         return false;
       }
     }
@@ -781,6 +804,7 @@ export function CompositionInput(props: Props): ReactElement {
     () => () => {
       const emojiCompletion = emojiCompletionRef.current;
       const mentionCompletion = mentionCompletionRef.current;
+      const commandCompletion = commandCompletionRef.current;
 
       if (emojiCompletion !== undefined) {
         emojiCompletion.destroy();
@@ -788,6 +812,10 @@ export function CompositionInput(props: Props): ReactElement {
 
       if (mentionCompletion !== undefined) {
         mentionCompletion.destroy();
+      }
+
+      if (commandCompletion !== undefined) {
+        commandCompletion.destroy();
       }
     },
     []
@@ -832,6 +860,8 @@ export function CompositionInput(props: Props): ReactElement {
     }
   }, [sortedGroupMembers, memberIdList, previousMemberIdList]);
 
+  const onSelectCommand = useCallback((_commandId: string) => undefined, []);
+
   // Placing all of these callbacks inside of a ref since Quill is not able
   // to re-render. We want to make sure that all these callbacks are fresh
   // so that the consumers of this component won't deal with stale props or
@@ -842,6 +872,7 @@ export function CompositionInput(props: Props): ReactElement {
     onEnter,
     onEscape,
     onSelectEmoji,
+    onSelectCommand,
     onShortKeyEnter,
     onTab,
   };
@@ -931,6 +962,12 @@ export function CompositionInput(props: Props): ReactElement {
               i18n,
               theme,
             },
+            inlineMarkdown: true,
+            commandCompletion: {
+              onSelectCommand: (commandId: string) =>
+                callbacksRef.current.onSelectCommand(commandId),
+              setCommandPickerElement: setCommandCompletionElement,
+            },
           }}
           formats={getQuillFormats()}
           placeholder={placeholder || i18n('icu:sendMessage')}
@@ -999,6 +1036,14 @@ export function CompositionInput(props: Props): ReactElement {
               );
             }
             mentionCompletionRef.current = mentionCompletion;
+
+            const commandCompletion = quill.getModule('commandCompletion');
+            if (!(commandCompletion instanceof CommandCompletion)) {
+              throw new Error(
+                'CompositionInput: commandCompletion module not properly initialized'
+              );
+            }
+            commandCompletionRef.current = commandCompletion;
           }}
         />
       );
@@ -1120,6 +1165,7 @@ export function CompositionInput(props: Props): ReactElement {
                 <>
                   {emojiCompletionElement}
                   {mentionCompletionElement}
+                  {commandCompletionElement}
                   {formattingChooserElement}
                 </>
               )}

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { isNumber } from 'lodash';
+import { openCaptcha } from '../../beacon/core/captcha.dom.ts';
 import { v7 as generateUuid } from 'uuid';
 import { SvrKey } from '@signalapp/libsignal-client/dist/AccountKeys';
 
@@ -9,6 +10,7 @@ import type { ReadonlyDeep } from 'type-fest';
 import type { ThunkAction } from 'redux-thunk';
 
 import { SECOND } from '../../util/durations/constants.std.ts';
+import { sleep } from '../../util/sleep.std.ts';
 import { toLogFormat } from '../../types/errors.std.ts';
 import { createLogger } from '../../logging/log.std.ts';
 import { drop } from '../../util/drop.std.ts';
@@ -222,7 +224,27 @@ export function moveToCaptchaStage({
 
     let result;
     try {
-      result = await createVerificationSession(phoneNumber);
+      for (let attempt = 1; ; attempt += 1) {
+        try {
+          // oxlint-disable-next-line no-await-in-loop
+          result = await createVerificationSession(phoneNumber);
+          break;
+        } catch (error) {
+          const retryAfterSecs =
+            error instanceof LibSignalErrorBase &&
+            error.is(ErrorCode.RateLimitedError)
+              ? error.retryAfterSecs
+              : undefined;
+          if (retryAfterSecs == null || retryAfterSecs > 60 || attempt >= 3) {
+            throw error;
+          }
+          log.warn(
+            `${logId}: rate limited, retrying in ${retryAfterSecs}s (attempt ${attempt})`
+          );
+          // oxlint-disable-next-line no-await-in-loop
+          await sleep((retryAfterSecs + 1) * SECOND);
+        }
+      }
     } catch (error) {
       log.error(`${logId}: error`, toLogFormat(error));
 
@@ -391,7 +413,7 @@ export function openBrowserForCaptcha(): NoopActionType {
     };
   }
 
-  document.location.href = url;
+  openCaptcha('registration', url);
   return {
     type: `NOOP/${logId}`,
     payload: null,

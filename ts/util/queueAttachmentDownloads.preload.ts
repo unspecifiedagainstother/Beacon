@@ -51,6 +51,7 @@ import {
   DEFAULT_AUTO_DOWNLOAD_ATTACHMENT,
 } from '../textsecure/Storage.preload.ts';
 import * as RemoteConfig from '../RemoteConfig.dom.ts';
+import { applyBeaconFilter } from '../beacon/core/filters.std.ts';
 
 const defaultLogger = createLogger('queueAttachmentDownloads');
 
@@ -209,6 +210,8 @@ export async function queueAttachmentDownloads(
   const { attachments, count: attachmentsCount } = await queueNormalAttachments(
     {
       attachments: startingAttachments,
+      beaconConversationId: message.get('conversationId'),
+      beaconSourceServiceId: message.get('sourceServiceId'),
       isManualDownload,
       logId,
       messageId,
@@ -419,6 +422,8 @@ export async function queueAttachmentDownloads(
         const { attachments: editAttachments, count: editAttachmentsCount } =
           await queueNormalAttachments({
             attachments: edit.attachments,
+            beaconConversationId: message.get('conversationId'),
+            beaconSourceServiceId: message.get('sourceServiceId'),
             isManualDownload,
             logId,
             messageId,
@@ -486,6 +491,8 @@ export async function queueAttachmentDownloads(
 
 async function queueNormalAttachments({
   attachments = [],
+  beaconConversationId,
+  beaconSourceServiceId,
   isManualDownload,
   logId,
   messageId,
@@ -497,6 +504,8 @@ async function queueNormalAttachments({
   shouldQueueAttachmentBasedOnSignature,
 }: {
   attachments: MessageAttributesType['attachments'];
+  beaconConversationId: string;
+  beaconSourceServiceId: string | undefined;
   isManualDownload: boolean;
   logId: string;
   messageId: string;
@@ -587,7 +596,13 @@ async function queueNormalAttachments({
 
         if (
           disposition != null &&
-          !isAutoDownloadEnabled(attachment, disposition)
+          (!isAutoDownloadEnabled(attachment, disposition) ||
+            !applyBeaconFilter('attachment.autoDownload', true, {
+              conversationId: beaconConversationId,
+              sourceServiceId: beaconSourceServiceId,
+              disposition,
+              size: attachment.size ?? 0,
+            }))
         ) {
           return attachment;
         }

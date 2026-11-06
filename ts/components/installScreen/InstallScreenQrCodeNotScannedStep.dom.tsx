@@ -19,11 +19,21 @@ import { I18n } from '../I18n.dom.tsx';
 import { Spinner } from '../Spinner.dom.tsx';
 import { BrandedQRCode } from '../BrandedQRCode.dom.tsx';
 import { TitlebarDragArea } from '../TitlebarDragArea.dom.tsx';
-import { InstallScreenSignalLogo } from './InstallScreenSignalLogo.dom.tsx';
 import { InstallScreenUpdateDialog } from './InstallScreenUpdateDialog.dom.tsx';
 import { getClassNamesFor } from '../../util/getClassNamesFor.std.ts';
 import type { UpdatesStateType } from '../../state/ducks/updates.preload.ts';
 import { AxoAlertDialog } from '../../axo/AxoAlertDialog.dom.tsx';
+import { AxoButton } from '../../axo/AxoButton.dom.tsx';
+import { ExperimentalAxoSegmentedControl } from '../../axo/AxoSegmentedControl.dom.tsx';
+import { tw } from '../../axo/tw.dom.tsx';
+import { openLinkInWebBrowser } from '../../util/openLinkInWebBrowser.dom.ts';
+import {
+  Buttons,
+  Description,
+  Spacer,
+  Title,
+} from '../standaloneRegistration/util/StepComponents.dom.tsx';
+import { BeaconAccountBackButton } from '../BeaconAccountBackButton.dom.tsx';
 
 const { noop } = lodash;
 
@@ -44,6 +54,7 @@ export type PropsType = Readonly<{
   isConfirmingDataDeletion: boolean;
   continueInstallWithDataDeletion: () => void;
   restartInstall: () => void;
+  onRegister?: () => void;
 }>;
 
 const getQrCodeClassName = getClassNamesFor(
@@ -67,7 +78,9 @@ export function InstallScreenQrCodeNotScannedStep({
   restartInstall,
   continueInstallWithDataDeletion,
   updates,
+  onRegister,
 }: Readonly<PropsType>): ReactElement {
+  const [mode, setMode] = useState<'link' | 'register'>('link');
   if (hasExpired || updates.dialogType === DialogType.Downloading) {
     return (
       <InstallScreenUpdateDialog
@@ -81,53 +94,159 @@ export function InstallScreenQrCodeNotScannedStep({
     );
   }
 
+  const helpLabel = isStaging
+    ? `${i18n('icu:Install__support-link')} · Staging`
+    : i18n('icu:Install__support-link');
+
   return (
-    <div className="module-InstallScreenQrCodeNotScannedStep">
+    <div
+      className={`${tw('flex size-full flex-col overflow-hidden')} BeaconSetup`}
+    >
       <TitlebarDragArea />
+      <div className={tw('relative grow')}>
+        <div
+          className={`${tw(
+            'absolute inset-s-1/2 top-1/2 flex max-h-[calc(100%-32px)] w-143 max-w-[calc(100%-32px)] -translate-1/2 transform flex-col overflow-hidden rounded-[26px] bg-surface-primary'
+          )} BeaconSetup__card`}
+        >
+          <BeaconAccountBackButton />
+          <div
+            className={tw(
+              'flex h-[568px] grow flex-col items-center overflow-x-hidden overflow-y-auto p-6 text-center'
+            )}
+          >
+            {onRegister ? (
+              <div className={tw('w-72 max-w-full')}>
+                <ExperimentalAxoSegmentedControl.Root
+                  variant="track"
+                  width="full"
+                  itemWidth="equal"
+                  value={mode}
+                  onValueChange={value => {
+                    if (value === 'link' || value === 'register') {
+                      setMode(value);
+                    }
+                  }}
+                >
+                  <ExperimentalAxoSegmentedControl.Item value="link">
+                    <ExperimentalAxoSegmentedControl.ItemText>
+                      Link a phone
+                    </ExperimentalAxoSegmentedControl.ItemText>
+                  </ExperimentalAxoSegmentedControl.Item>
+                  <ExperimentalAxoSegmentedControl.Item value="register">
+                    <ExperimentalAxoSegmentedControl.ItemText>
+                      New account
+                    </ExperimentalAxoSegmentedControl.ItemText>
+                  </ExperimentalAxoSegmentedControl.Item>
+                </ExperimentalAxoSegmentedControl.Root>
+              </div>
+            ) : null}
 
-      <InstallScreenSignalLogo />
-
-      <div className="module-InstallScreenQrCodeNotScannedStep__contents">
-        <InstallScreenQrCode
-          i18n={i18n}
-          {...provisioningUrl}
-          retryGetQrCode={retryGetQrCode}
-        />
-        <div className="module-InstallScreenQrCodeNotScannedStep__instructions">
-          <h1>{i18n('icu:Install__scan-this-code')}</h1>
-          <ol>
-            <li>{i18n('icu:Install__instructions__1')}</li>
-            <li>
-              <I18n
-                i18n={i18n}
-                id="icu:Install__instructions__2"
-                components={{
-                  settings: (
-                    <strong>
-                      {i18n('icu:Install__instructions__2__settings')}
-                    </strong>
-                  ),
-                  linkedDevices: <strong>{i18n('icu:linkedDevices')}</strong>,
-                }}
-              />
-            </li>
-            <li>
-              <I18n
-                i18n={i18n}
-                id="icu:Install__instructions__3"
-                components={{
-                  linkNewDevice: <strong>{i18n('icu:linkNewDevice')}</strong>,
-                }}
-              />
-            </li>
-          </ol>
-          {isStaging ? (
-            'THIS IS A STAGING DESKTOP'
-          ) : (
-            <a target="_blank" rel="noreferrer" href={SUPPORT_PAGE}>
-              {i18n('icu:Install__support-link')}
-            </a>
-          )}
+            {mode === 'link' || !onRegister ? (
+              <>
+                <Spacer className={tw('h-6')} />
+                <InstallScreenQrCode
+                  i18n={i18n}
+                  {...provisioningUrl}
+                  retryGetQrCode={retryGetQrCode}
+                />
+                <Spacer className={tw('h-6')} />
+                <Title text={i18n('icu:Install__scan-this-code')} />
+                <Description>
+                  <ol className={tw('list-inside list-decimal text-start')}>
+                    <li>{i18n('icu:Install__instructions__1')}</li>
+                    <li>
+                      <I18n
+                        i18n={i18n}
+                        id="icu:Install__instructions__2"
+                        components={{
+                          settings: (
+                            <strong className={tw('text-primary')}>
+                              {i18n('icu:Install__instructions__2__settings')}
+                            </strong>
+                          ),
+                          linkedDevices: (
+                            <strong className={tw('text-primary')}>
+                              {i18n('icu:linkedDevices')}
+                            </strong>
+                          ),
+                        }}
+                      />
+                    </li>
+                    <li>
+                      <I18n
+                        i18n={i18n}
+                        id="icu:Install__instructions__3"
+                        components={{
+                          linkNewDevice: (
+                            <strong className={tw('text-primary')}>
+                              {i18n('icu:linkNewDevice')}
+                            </strong>
+                          ),
+                        }}
+                      />
+                    </li>
+                  </ol>
+                </Description>
+                <Spacer className={tw('h-8 grow')} />
+                <Buttons
+                  leftSideContent={
+                    <AxoButton.Root
+                      variant="implied-secondary"
+                      size="md"
+                      onClick={() => openLinkInWebBrowser(SUPPORT_PAGE)}
+                    >
+                      {helpLabel}
+                    </AxoButton.Root>
+                  }
+                >
+                  {null}
+                </Buttons>
+              </>
+            ) : (
+              <>
+                <Spacer className={tw('h-12')} />
+                <Title text="Register this computer" />
+                <Description>
+                  Use Beacon as its own Signal account. You’ll confirm your
+                  phone number with a code sent by text or call, then set a PIN
+                  and profile.
+                </Description>
+                <Spacer className={tw('h-6')} />
+                <div
+                  className={tw(
+                    'w-90.5 max-w-full rounded-xl bg-surface-secondary p-4 text-start type-body-medium text-secondary'
+                  )}
+                >
+                  <div className={tw('mb-1 type-body-medium text-primary')}>
+                    Already using Signal on a phone?
+                  </div>
+                  Registering that number here signs the phone out of Signal. To
+                  keep both, link this computer instead.
+                </div>
+                <Spacer className={tw('h-8 grow')} />
+                <Buttons
+                  leftSideContent={
+                    <AxoButton.Root
+                      variant="implied-secondary"
+                      size="md"
+                      onClick={() => setMode('link')}
+                    >
+                      Link instead
+                    </AxoButton.Root>
+                  }
+                >
+                  <AxoButton.Root
+                    variant="strong-primary"
+                    size="md"
+                    onClick={onRegister}
+                  >
+                    Continue
+                  </AxoButton.Root>
+                </Buttons>
+              </>
+            )}
+          </div>
         </div>
       </div>
       {isConfirmingDataDeletion ? (

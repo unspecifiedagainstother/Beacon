@@ -36,6 +36,7 @@ const messageAttributesEraseBehavior: Record<
   sent_at: 'preserve',
   received_at: 'preserve',
 
+  beaconDeleted: 'preserve',
   canReplyToStory: 'preserve',
   deletedForEveryone: 'preserve',
   deletedForEveryoneByAdminAci: 'preserve',

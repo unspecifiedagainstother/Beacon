@@ -19,6 +19,7 @@ import type { LocalizerType } from '../types/Util.std.ts';
 import { NotificationType } from '../types/notifications.std.ts';
 import { drop } from '../util/drop.std.ts';
 import type { Emoji } from '../axo/emoji.std.ts';
+import { applyBeaconFilter } from '../beacon/core/filters.std.ts';
 import {
   getUnreadReminderNotificationContent,
   type UnreadReminderSummary,
@@ -226,6 +227,19 @@ export class NotificationService extends EventEmitter {
    * which doesn't check permissions, do any filtering, etc.
    */
   public add(notificationData: QueuedNotificationData): void {
+    if (
+      (notificationData.type === NotificationType.Message ||
+        notificationData.type === NotificationType.Reaction) &&
+      !applyBeaconFilter('notification.show', true, {
+        conversationId: notificationData.conversationId,
+        messageId: notificationData.messageId,
+        message: notificationData.message,
+        senderTitle: notificationData.senderTitle,
+        type: notificationData.type,
+      })
+    ) {
+      return;
+    }
     this.#queuedNotification = notificationData;
     this.#update();
   }
@@ -490,11 +504,15 @@ export class NotificationService extends EventEmitter {
     switch (type) {
       case NotificationType.Message:
       case NotificationType.Reaction: {
-        const content = redactMessageNotificationContent({
-          notificationData: queuedNotificationData,
-          contentSetting: userSetting,
-          i18n,
-        });
+        const content = applyBeaconFilter(
+          'notification.content',
+          redactMessageNotificationContent({
+            notificationData: queuedNotificationData,
+            contentSetting: userSetting,
+            i18n,
+          }),
+          { conversationId, type }
+        );
 
         return this.rawNotify({
           conversationId,

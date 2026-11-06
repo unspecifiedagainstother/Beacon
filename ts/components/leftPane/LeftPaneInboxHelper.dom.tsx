@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import lodash from 'lodash';
+import {
+  getChatListState,
+  togglePinnedCollapsed,
+} from '../../beacon/core/chat-list-state.std.ts';
 import type { ReactNode, JSX } from 'react';
 
 import type { ToFindType } from './LeftPaneHelper.dom.tsx';
@@ -81,6 +85,10 @@ export class LeftPaneInboxHelper extends LeftPaneHelper<LeftPaneInboxPropsType> 
     this.#filterByUnread = filterByUnread;
   }
 
+  #visiblePinned(): ReadonlyArray<ConversationListItemPropsType> {
+    return getChatListState().pinnedCollapsed ? [] : this.#pinnedConversations;
+  }
+
   getRowCount(): number {
     let headerCount = 0;
     if (this.#hasPinned()) {
@@ -93,7 +101,7 @@ export class LeftPaneInboxHelper extends LeftPaneHelper<LeftPaneInboxPropsType> 
     const buttonCount = this.#shouldShowArchiveButton() ? 1 : 0;
     return (
       headerCount +
-      this.#pinnedConversations.length +
+      this.#visiblePinned().length +
       this.#conversations.length +
       buttonCount
     );
@@ -219,7 +227,7 @@ export class LeftPaneInboxHelper extends LeftPaneHelper<LeftPaneInboxPropsType> 
   }
 
   getRow(rowIndex: number): undefined | Row {
-    const pinnedConversations = this.#pinnedConversations;
+    const pinnedConversations = this.#visiblePinned();
     const archivedConversations = this.#archivedConversations;
     const conversations = this.#conversations;
 
@@ -229,9 +237,15 @@ export class LeftPaneInboxHelper extends LeftPaneHelper<LeftPaneInboxPropsType> 
 
     if (this.#hasPinned()) {
       if (index === 0) {
+        const collapsed = getChatListState().pinnedCollapsed;
+        const count = this.#pinnedConversations.length;
         return {
           type: RowType.Header,
-          getHeaderText: i18n => i18n('icu:LeftPane--pinned'),
+          getHeaderText: i18n =>
+            collapsed
+              ? `${i18n('icu:LeftPane--pinned')} (${count}) ▸`
+              : `${i18n('icu:LeftPane--pinned')} ▾`,
+          beaconOnClick: togglePinnedCollapsed,
         };
       }
       index -= 1;
@@ -286,7 +300,7 @@ export class LeftPaneInboxHelper extends LeftPaneHelper<LeftPaneInboxPropsType> 
       conversation: Readonly<ConversationListItemPropsType>
     ) => conversation.id === selectedConversationId;
 
-    const pinnedConversationIndex = this.#pinnedConversations.findIndex(
+    const pinnedConversationIndex = this.#visiblePinned().findIndex(
       isConversationSelected
     );
     if (pinnedConversationIndex !== -1) {
@@ -297,7 +311,7 @@ export class LeftPaneInboxHelper extends LeftPaneHelper<LeftPaneInboxPropsType> 
       isConversationSelected
     );
     if (conversationIndex !== -1) {
-      const pinnedOffset = this.#pinnedConversations.length;
+      const pinnedOffset = this.#visiblePinned().length;
       const headerOffset = this.#hasPinned() ? 2 : 0;
       return conversationIndex + pinnedOffset + headerOffset;
     }
@@ -314,13 +328,16 @@ export class LeftPaneInboxHelper extends LeftPaneHelper<LeftPaneInboxPropsType> 
   }
 
   shouldRecomputeRowHeights(old: Readonly<LeftPaneInboxPropsType>): boolean {
-    return old.pinnedConversations.length !== this.#pinnedConversations.length;
+    return (
+      old.pinnedConversations.length !== this.#pinnedConversations.length ||
+      old.pinnedConversations !== this.#pinnedConversations
+    );
   }
 
   getConversationAndMessageAtIndex(
     conversationIndex: number
   ): undefined | { conversationId: string } {
-    const pinnedConversations = this.#pinnedConversations;
+    const pinnedConversations = this.#visiblePinned();
     const conversations = this.#conversations;
     const conversation =
       pinnedConversations[conversationIndex] ||
@@ -336,7 +353,7 @@ export class LeftPaneInboxHelper extends LeftPaneHelper<LeftPaneInboxPropsType> 
     _targetedMessageId: unknown
   ): undefined | { conversationId: string } {
     return getConversationInDirection(
-      [...this.#pinnedConversations, ...this.#conversations],
+      [...this.#visiblePinned(), ...this.#conversations],
       toFind,
       selectedConversationId
     );

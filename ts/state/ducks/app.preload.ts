@@ -6,7 +6,6 @@ import type { ReadonlyDeep } from 'type-fest';
 import type { StateType as RootStateType } from '../reducer.preload.ts';
 import { createLogger } from '../../logging/log.std.ts';
 import { AppViewType } from '../../types/app.std.ts';
-import { getEnvironment, Environment } from '../../environment.std.ts';
 import {
   START_INSTALLER,
   type StartInstallerActionType,
@@ -85,13 +84,6 @@ function openStandalone(
   OpenStandaloneActionType
 > {
   return async (dispatch, getState) => {
-    if (!window.SignalCI && getEnvironment() === Environment.PackagedApp) {
-      log.warn(
-        `openStandalone: refusing because environment is ${getEnvironment()}`
-      );
-      return;
-    }
-
     cancelInstall()(dispatch, getState, undefined);
 
     window.IPC.addSetupMenuItems();

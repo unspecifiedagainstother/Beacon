@@ -24,6 +24,8 @@ import {
   FunGridCell,
   FunGridContainer,
   FunGridHeader,
+  FunGridHeaderButton,
+  FunGridHeaderIcon,
   FunGridHeaderText,
   FunGridRow,
   FunGridRowGroup,
@@ -197,6 +199,7 @@ export function FunPanelStickers({
     onStoredSearchInputChange,
     recentStickers,
     installedStickerPacks,
+    onRemoveStickerPack,
     onSelectSticker: onFunSelectSticker,
     onStageStickerReply,
   } = fun;
@@ -228,6 +231,7 @@ export function FunPanelStickers({
   }, [recentStickers, installedStickerPacks]);
 
   const [focusedCellKey, setFocusedCellKey] = useState<CellKey | null>(null);
+  const [packToRemove, setPackToRemove] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(storedSearchInput);
   const searchQuery = useMemo(() => searchInput.trim(), [searchInput]);
 
@@ -394,7 +398,7 @@ export function FunPanelStickers({
   }, [onAddStickerPack, onClose]);
 
   return (
-    <FunPanel>
+    <FunPanel className="FunPanel--stickers">
       <FunPanelHeader>
         <FunSearch
           i18n={i18n}
@@ -506,6 +510,22 @@ export function FunPanelStickers({
                             packsLookup
                           )}
                         </FunGridHeaderText>
+                        {onRemoveStickerPack &&
+                        section.id.startsWith('StickerPack:') ? (
+                          <BeaconRemovePackControl
+                            packId={section.id.replace(/^StickerPack:/, '')}
+                            confirming={
+                              packToRemove ===
+                              section.id.replace(/^StickerPack:/, '')
+                            }
+                            onAsk={setPackToRemove}
+                            onCancel={() => setPackToRemove(null)}
+                            onRemove={packId => {
+                              setPackToRemove(null);
+                              onRemoveStickerPack(packId);
+                            }}
+                          />
+                        ) : null}
                       </FunGridHeader>
                       <FunGridRowGroup
                         aria-labelledby={section.header.key}
@@ -537,6 +557,45 @@ export function FunPanelStickers({
         </FunScroller>
       </FunPanelBody>
     </FunPanel>
+  );
+}
+
+function BeaconRemovePackControl(props: {
+  packId: string;
+  confirming: boolean;
+  onAsk: (packId: string) => void;
+  onCancel: () => void;
+  onRemove: (packId: string) => void;
+}): JSX.Element {
+  const { packId, confirming, onAsk, onCancel, onRemove } = props;
+  if (!confirming) {
+    return (
+      <FunGridHeaderButton
+        label="Remove sticker pack"
+        onPress={() => onAsk(packId)}
+      >
+        <FunGridHeaderIcon iconClassName="FunGrid__HeaderIcon--Remove" />
+      </FunGridHeaderButton>
+    );
+  }
+  return (
+    <span className="FunGrid__BeaconRemoveConfirm">
+      <span className="FunGrid__BeaconRemoveConfirm__Text">Remove pack?</span>
+      <button
+        type="button"
+        className="FunGrid__BeaconRemoveConfirm__Button"
+        onClick={onCancel}
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        className="FunGrid__BeaconRemoveConfirm__Button FunGrid__BeaconRemoveConfirm__Button--danger"
+        onClick={() => onRemove(packId)}
+      >
+        Remove
+      </button>
+    </span>
   );
 }
 
