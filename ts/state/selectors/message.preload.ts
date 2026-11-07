@@ -379,13 +379,6 @@ export const processBodyRanges = (
   );
 };
 
-/**
- * Beacon: past revisions of an edited message, for inline display in the bubble.
- *
- * `editHistory` is newest-first (see handleEditMessage, which prepends), and
- * index 0 is the *current* revision — already rendered as the message body. So
- * we drop it and reverse, giving oldest -> newest to match top-to-bottom order.
- */
 export const getPastEdits = (
   message: MessageWithUIFieldsType,
   isGroup: boolean,
@@ -406,11 +399,6 @@ export const getPastEdits = (
     .reverse();
 };
 
-/**
- * Beacon: content the message logger retained across a delete-for-everyone.
- * Rendered under the "This message was deleted" line; hidden by CSS unless
- * the message-logger addon is running.
- */
 export const getBeaconDeleted = (
   message: MessageWithUIFieldsType,
   isGroup: boolean,
@@ -1119,8 +1107,6 @@ const getPropsForMessage = (
     isBlocked: conversation.isBlocked || false,
     isEditedMessage: Boolean(message.editHistory),
     pastEdits: getPastEdits(message, isGroup, options),
-    // Beacon: whether an incoming message arrived via sealed sender
-    // (undefined when unknown, e.g. very old messages).
     beaconSealedSender:
       message.type === 'incoming'
         ? message.unidentifiedDeliveryReceived

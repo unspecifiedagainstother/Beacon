@@ -1,13 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Look: one switch for Beacon's consistent, squarer style across Signal's
- * own screens (dialogs, buttons, segmented controls, settings cards). The
- * CSS lives in _beacon-theme.scss under body.beacon-square; the class is
- * also applied at startup by the runtime so there's no flash.
- */
-
 import type { AddonManifest } from '../core/types.dom.ts';
 import { defineIcon } from '../core/icons.std.ts';
 import { beaconTweaks } from '../core/tweaks.std.ts';
@@ -56,7 +49,6 @@ export default {
       if (on && !dispose) {
         dispose = ctx.css.bodyClass('beacon-square');
       } else if (!on && dispose) {
-        // Also removes the class the runtime set at startup.
         dispose();
         dispose = undefined;
       }

@@ -1,18 +1,9 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * In-memory record of outgoing connections, for the network monitor.
- *
- * Fed by the renderer-side monitor (Node sockets) and merged with the main
- * process's Chromium request log when displayed. Hosts and ports only —
- * never paths or payloads. Nothing is persisted.
- */
-
 export type NetworkEntry = {
   host: string;
   port: number | undefined;
-  /** 'socket' = Node net/tls connection; 'web' = Chromium request. */
   source: 'socket' | 'web';
   first: number;
   last: number;

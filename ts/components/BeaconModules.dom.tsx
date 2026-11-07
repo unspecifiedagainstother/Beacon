@@ -15,6 +15,7 @@ import { AxoSwitch } from '../axo/AxoSwitch.dom.tsx';
 import { useAddonSettings, useAddons } from './beaconHooks.dom.ts';
 import { drop } from '../util/drop.std.ts';
 import { iconToCssUrl } from '../beacon/core/icons.std.ts';
+import { noop } from 'lodash';
 
 export type PropsType = {
   i18n: LocalizerType;
@@ -22,8 +23,6 @@ export type PropsType = {
 
 type Filter = 'all' | 'enabled' | 'disabled';
 
-// Reached via the window global so this stays a renderer-only module; the
-// loader itself lives in preload land (ts/beacon/core/loader.preload.ts).
 function getBeacon() {
   return window.Beacon;
 }
@@ -64,9 +63,6 @@ function SettingControl({
     getBeacon()?.settings.set(addonId, def.key, next);
   const inputId = `beacon-setting-${addonId}-${def.key}`;
 
-  // Text fields commit on blur so filters don't re-run on every keystroke.
-  // Re-seed the draft when the stored value changes elsewhere (reset, another
-  // window) — adjusted during render, not in an effect.
   const [draft, setDraft] = useState(String(value));
   const [seededFrom, setSeededFrom] = useState(value);
   if (seededFrom !== value) {
@@ -226,7 +222,6 @@ function AddonCard({
   i18n: LocalizerType;
   busy: boolean;
   expanded: boolean;
-  /** Omitted for built-in features, which have no on/off switch. */
   onToggle?: () => void;
   onExpand: () => void;
 }): JSX.Element {
@@ -325,10 +320,6 @@ function AddonCard({
   );
 }
 
-/**
- * Built-in features (ts/beacon/builtin/): same cards as Modules, without the
- * on/off switch, so their settings stay reachable.
- */
 export function BeaconBuiltinFeatures({ i18n }: PropsType): JSX.Element {
   const features = useAddons().filter(
     addon => addon.builtin && addon.category !== 'privacy'
@@ -366,7 +357,7 @@ export function BeaconModules({ i18n }: PropsType): JSX.Element {
     try {
       await getBeacon()?.loader.toggle(id);
     } catch {
-      // The loader logs start/stop failures and surfaces them on the card.
+      noop();
     }
     setBusy(undefined);
   }, []);

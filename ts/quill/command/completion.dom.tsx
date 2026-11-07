@@ -1,16 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Slash-command completion for the composer.
- *
- * Reuses the emoji/mention suggestion markup so it looks native. Enter and
- * Tab are routed here from CompositionInput's own key handlers (which run
- * before module bindings), so a typed command is executed — never sent to
- * the contact as text — even when it is typed faster than the popup's
- * debounce.
- */
-
 import type { JSX } from 'react';
 import Emitter from '@signalapp/quill-cjs/core/emitter.js';
 import lodash from 'lodash';
@@ -30,7 +20,6 @@ const { debounce } = lodash;
 
 type CommandSource = { name: string; icon?: string };
 
-/** Module name and icon for a command, via the addon loader. */
 function getSources(): Map<string, CommandSource> {
   const map = new Map<string, CommandSource>();
   for (const addon of window.Beacon?.loader.list() ?? []) {
@@ -47,12 +36,9 @@ export type CommandCompletionOptions = {
 };
 
 type ParsedSlashLine = {
-  /** Index of the '/' in the document. */
   slashIndex: number;
-  /** Command word typed so far (without '/'). */
   query: string;
   argsRaw: string;
-  /** True once a space follows the command word. */
   hasArgs: boolean;
 };
 
@@ -116,7 +102,6 @@ export class CommandCompletion {
       if (typeof op.insert === 'string') {
         text += op.insert;
       } else {
-        // Embeds (emoji blots, mentions) occupy one index each.
         text += '￼';
       }
     }
@@ -145,13 +130,10 @@ export class CommandCompletion {
     }
 
     this.#lastParsed = parsed;
-    // Once arguments are being typed, only the exact command stays listed —
-    // it acts as a usage hint.
     if (parsed.hasArgs) {
       const exact = commandRegistry.get(parsed.query);
       this.results = exact ? [exact] : [];
     } else if (parsed.query === '') {
-      // Everything, grouped by module (core first), alphabetical inside.
       const sources = getSources();
       const groupName = (cmd: CommandDefinition) =>
         cmd.addonId ? (sources.get(cmd.addonId)?.name ?? cmd.addonId) : '';
@@ -168,12 +150,7 @@ export class CommandCompletion {
     this.render();
   }
 
-  /**
-   * Called from CompositionInput's Enter handler. Returns true when Enter was
-   * consumed (a command ran), false to let the message send normally.
-   */
   handleEnter(): boolean {
-    // Resolve synchronously: the debounced popup may not be up yet.
     this.#debouncedOnTextChange.cancel();
     const text = this.#getTextBeforeCursor();
     const parsed = text == null ? undefined : this.#parse(text);
@@ -189,8 +166,6 @@ export class CommandCompletion {
       return true;
     }
 
-    // Popup open on a partial word: run the highlighted suggestion. Without
-    // a visible popup, a non-command like "/r/funny" is sent as text.
     const pick = this.results.length ? this.results[this.index] : undefined;
     if (pick && !parsed.hasArgs) {
       this.#run(pick, parsed);
@@ -200,7 +175,6 @@ export class CommandCompletion {
     return false;
   }
 
-  /** Tab completes the command word without running it. */
   handleTab(): boolean {
     if (!this.results.length || !this.#lastParsed) {
       return false;
@@ -408,7 +382,6 @@ export class CommandCompletion {
   }
 
   #run(command: CommandDefinition, parsed: ParsedSlashLine): void {
-    // Remove "/cmd args" from the composer, then let the command insert.
     const selection = this.quill.getSelection();
     const end = selection?.index ?? parsed.slashIndex;
     if (end > parsed.slashIndex) {

@@ -231,7 +231,6 @@ export async function handleEditMessage(
     preview: editedMessage.preview,
     quote: editedMessage.quote,
   });
-  // Beacon: authoritative edit event (message logger, stats).
   beaconHookBus.emit('onMessageEdited', mainMessageModel.attributes, {
     conversationId: editAttributes.conversationId,
     previous: mainMessage,

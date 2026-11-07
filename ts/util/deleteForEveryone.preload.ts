@@ -124,7 +124,6 @@ export async function applyDeleteForEveryone(
     if (del.isAdminDelete) {
       additionalProps.deletedForEveryoneByAdminAci = del.deleteSentByAci;
     }
-    // Beacon: let addons (message logger) retain data across the erase.
     const erasedProps = applyBeaconFilter(
       'message.deleteForEveryone',
       additionalProps,
@@ -132,7 +131,6 @@ export async function applyDeleteForEveryone(
     );
     const beforeErase = message.attributes;
     await eraseMessageContents(message, 'delete-for-everyone', erasedProps);
-    // Beacon: authoritative delete event, with the content before the erase.
     beaconHookBus.emit('onMessageDeletedForEveryone', message.attributes, {
       conversationId: message.attributes.conversationId,
       previous: beforeErase,

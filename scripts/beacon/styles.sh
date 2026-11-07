@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-# Beacon: rebuild stylesheets.
-#
-#   scripts/beacon/styles.sh           one-shot production build
-#   scripts/beacon/styles.sh --watch   rebuild on every .scss change
-#
-# Runs inside the `mollydesk` distrobox and pins Node via nvm, so it works the
-# same whether you invoke it from the host or from inside the container.
 set -euo pipefail
 
 # shellcheck source=scripts/beacon/lib.sh

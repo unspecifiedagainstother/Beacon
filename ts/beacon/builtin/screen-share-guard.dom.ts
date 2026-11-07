@@ -1,16 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Screen-share alert: when you start presenting in a Signal call, Beacon
- * says so and (optionally) blurs the chat list and conversation for as long
- * as you share, so a shared screen doesn't show your other chats. Can also
- * hide the Beacon window from the capture where the OS supports it.
- *
- * Only Signal's own screen sharing can be detected — sharing through
- * another app (Zoom, OBS, …) is invisible to Beacon.
- */
-
 import type { AddonManifest } from '../core/types.dom.ts';
 import { defineIcon } from '../core/icons.std.ts';
 import { drop } from '../../util/drop.std.ts';

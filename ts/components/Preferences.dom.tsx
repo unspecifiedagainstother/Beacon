@@ -202,12 +202,8 @@ export type PropsDataType = {
   notifyWhileMuted: NotifyWhileMuted;
   osName: 'linux' | 'macos' | 'windows' | undefined;
   phoneNumber: string | undefined;
-  // Beacon: all Beacon feature values, keyed by registry key.
-  // Beacon: main-process setting — needs an app restart, so it is wired
-  // separately from the registry-driven toggles.
   hasCustomTitlebar: boolean;
   onCustomTitlebarChange: (value: boolean) => void;
-  // True when a setting has changed that only takes effect after a restart.
   beaconNeedsRestart: boolean;
   beaconSettings: BeaconSettingsType;
   onBeaconSettingChange: (key: BeaconFeatureKey, value: boolean) => void;
@@ -2250,9 +2246,6 @@ export function Preferences({
       </AxoPanel.Root>
     );
   } else if (settingsLocation.page === SettingsPage.Beacon) {
-    // Beacon: fork-specific settings live in their own component so upstream
-    // pages stay untouched. Toggles are rendered from the feature registry —
-    // see ts/beacon/features.std.ts.
     content = (
       <PreferencesContent
         contents={

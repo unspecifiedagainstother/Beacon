@@ -55,8 +55,6 @@ export const SmartFunProvider = memo(function SmartFunProvider(
     useStickersActions();
   const { onAddRecentGif, onRemoveRecentGif } = useGifsActions();
 
-  // Beacon: sticker replies always on (Signal gates them behind a
-  // remote-config rollout).
   const isStickerReplySendEnabled = true;
 
   // Translate recent emojis to keys
@@ -91,7 +89,6 @@ export const SmartFunProvider = memo(function SmartFunProvider(
     removeItem('showStickerPickerHint');
   }, [removeItem]);
 
-  // Beacon: remove a pack from the sticker picker.
   const handleRemoveStickerPack = useCallback(
     (packId: string) => {
       const pack = installedStickerPacks.find(p => p.id === packId);

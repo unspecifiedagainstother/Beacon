@@ -1,15 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Imperative UI helpers shared by the addon context and the command system.
- * Class names match stylesheets/_beacon-theme.scss.
- *
- * Nothing here assigns innerHTML: addon UIs routinely render message text,
- * and a helper that parses HTML is one forgotten escape away from XSS in a
- * renderer with full app privileges.
- */
-
 import type {
   ModalAPI,
   ModalOptions,

@@ -4,17 +4,11 @@ lockfileIncludeTarballUrl: true
 verifyDepsBeforeRun: prompt
 verifyStoreIntegrity: true
 
-# Beacon: always install glibc native bindings (rolldown, oxc, oxlint...).
-# A pnpm running outside the build container misdetected libc and skipped
-# every *-linux-x64-gnu binding, leaving rolldown without its binary.
 supportedArchitectures:
   os: [current]
   cpu: [current]
   libc: [glibc]
 
-# Beacon: classic node_modules layout. pnpm 11 otherwise switches to the
-# global virtual store (empty node_modules + .package-map.json) whenever CI is
-# unset, which leaves no node_modules/.bin and breaks `pnpm exec electron`.
 enableGlobalVirtualStore: false
 
 packages:

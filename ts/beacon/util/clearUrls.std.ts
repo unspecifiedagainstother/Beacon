@@ -1,11 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Tracking-parameter removal for the clear-urls addon. Pure string work, kept
- * separate so it can be unit tested without loading the app.
- */
-
 export const DEFAULT_TRACKING_PARAMS = [
   'utm_*',
   'fbclid',
@@ -49,7 +44,6 @@ export function cleanUrl(
   raw: string,
   matchers: ReadonlyArray<(name: string) => boolean>
 ): string {
-  // Keep trailing punctuation outside the URL ("see https://x.com/a?b=1.").
   const trailing = /[.,;:!?)\]]+$/.exec(raw)?.[0] ?? '';
   const candidate = trailing ? raw.slice(0, -trailing.length) : raw;
 

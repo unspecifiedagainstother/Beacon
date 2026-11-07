@@ -1,14 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Typed hook bus. One instance for the whole app (see runtime).
- *
- * Dispatch is fire-and-forget from the caller's perspective: sync handlers run
- * inline, async handlers are not awaited, and a throwing handler never breaks
- * the app or the other handlers.
- */
-
 import { createLogger } from '../../logging/log.std.ts';
 import type { Disposer, HookFn, HookName, HookPayloads } from './types.dom.ts';
 
@@ -34,7 +26,6 @@ export class HookBus {
     if (!set || set.size === 0) {
       return;
     }
-    // Copy: a handler may register/unregister hooks while we iterate.
     for (const fn of Array.from(set)) {
       try {
         const result = (fn as HookFn<Name>)(...args);

@@ -35,7 +35,6 @@ export type PropsType = {
   i18n: LocalizerType;
 };
 
-// Order of sections on the page; anything not listed goes last.
 const SECTION_ORDER = [
   'app-lock',
   'hidden-chats',
@@ -107,7 +106,6 @@ const CHECKS: ReadonlyArray<Check> = [
 ];
 
 function useAllValues(ids: ReadonlyArray<string>) {
-  // One hook per id keeps hook order stable: ids is a constant list.
   const values: Record<string, Record<string, unknown>> = {};
   for (const id of ids) {
     // oxlint-disable-next-line react-hooks/rules-of-hooks
@@ -120,7 +118,6 @@ const CHECK_IDS = [...new Set(CHECKS.map(c => c.addonId))];
 
 function Dashboard(): JSX.Element {
   const values = useAllValues(CHECK_IDS);
-  // Re-render when the passphrase is set or removed.
   useLockConfigured();
   const results = CHECKS.map(check => ({
     check,

@@ -1,14 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Builds the AddonContext each addon receives in start().
- *
- * Every registration made through the context lands in one disposable bag, so
- * disabling an addon tears down everything it touched — hooks, filters,
- * patches, DOM listeners, styles, keybinds, commands — without an app reload.
- */
-
 import type { Store } from 'redux';
 import type { StateType } from '../../state/reducer.preload.ts';
 import type { AddonContext, AddonManifest, Disposer } from './types.dom.ts';
@@ -26,7 +18,6 @@ const logger = createLogger('beacon/context');
 
 const IS_MAC = /mac/i.test(navigator.platform);
 
-/** Normalize KeyboardEvent.code ('KeyF', 'Digit1', 'Slash') to a combo key. */
 function keyFromCode(code: string): string {
   if (code.startsWith('Key')) {
     return code.slice(3).toLowerCase();
@@ -49,8 +40,6 @@ export function matchesCombo(combo: string, ev: KeyboardEvent): boolean {
   const wantShift = parts.includes('shift');
   const wantAlt = parts.includes('alt');
 
-  // Match on code as well as key so shift/alt layouts still hit: shift+/ is
-  // reported as key '?' but code 'Slash'.
   const keyMatches =
     ev.key.toLowerCase() === key || keyFromCode(ev.code) === key;
 
@@ -66,7 +55,6 @@ export function matchesCombo(combo: string, ev: KeyboardEvent): boolean {
 export type DisposableContext = {
   ctx: AddonContext;
   dispose: () => void;
-  /** Keybind combos currently registered by this addon, for the UI. */
   keybinds: () => Array<string>;
 };
 
@@ -102,8 +90,6 @@ export function createAddonContext(
   const ctx: AddonContext = {
     id,
 
-    // Addon-facing logging goes to the DevTools console on purpose — that is
-    // where addon authors live.
     // oxlint-disable-next-line no-console
     log: (...args) => console.log(`[Beacon:${id}]`, ...args),
     // oxlint-disable-next-line no-console
@@ -230,8 +216,6 @@ export function createAddonContext(
     ui: {
       slot: (name, render) => track(registerSlot(name, render)),
       createModal: options => {
-        // Close addon modals when the addon goes away; drop the tracking
-        // entry when the user closes one first. Both paths are idempotent.
         let untrack: Disposer = () => undefined;
         const modal = createModal({
           ...options,
@@ -310,7 +294,6 @@ export function createAddonContext(
 
   const dispose = () => {
     patcher.unpatchAll();
-    // LIFO, mirroring registration order semantics.
     for (const disposer of disposers.slice().reverse()) {
       try {
         disposer();

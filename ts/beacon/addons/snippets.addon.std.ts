@@ -1,13 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Snippets — saved text you insert with a slash command. Each snippet becomes
- * its own command (so it shows in autocomplete); `/snip` lists them.
- *
- * Settings format, one per line:  name: text   (use \n for a line break)
- */
-
 import type { AddonManifest, Disposer } from '../core/types.dom.ts';
 import { ICON_SNIPPETS } from './icons.std.ts';
 

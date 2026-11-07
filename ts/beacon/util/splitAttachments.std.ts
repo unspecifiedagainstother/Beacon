@@ -1,15 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Splits staged attachments into messages Signal clients can show.
- *
- * Signal only renders several attachments in one message as a photo/video
- * album; files (PDFs, audio, archives, ...) must be one per message. Beacon
- * lets you stage any mix and sends: the album first (if any), then each
- * file as its own message, in the order they were added.
- */
-
 import type { AttachmentType } from '../../types/Attachment.std.ts';
 import {
   isImageAttachment,
