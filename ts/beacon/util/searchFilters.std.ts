@@ -1,9 +1,21 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Search filters for the message search box:
+ *
+ *   from:alice        sender name contains "alice" (from:me for yours)
+ *   before:2026-10-01 / after:2026-09-01   (also before:today, after:yesterday)
+ *   has:link | file | image | video | audio | media
+ *
+ * Quote multi-word names: from:"alice smith". Whatever isn't a filter is
+ * searched as text by Signal's own full-text search.
+ */
+
 export type HasKind = 'link' | 'file' | 'image' | 'video' | 'audio' | 'media';
 
 export type SearchFilters = Readonly<{
+  /** Remaining free text. */
   text: string;
   from?: string;
   before?: number;
@@ -71,6 +83,7 @@ export function parseSearchFilters(
           if (k === 'before') {
             before = date;
           } else {
+            // "after:2026-10-01" includes that day? No — strictly after it.
             after = date + (/^\d{4}-\d{1,2}-\d{1,2}$/.test(value) ? DAY : 0);
           }
           return lead;

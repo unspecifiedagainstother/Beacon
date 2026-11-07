@@ -54,6 +54,7 @@ export type PropsType = Readonly<{
   isConfirmingDataDeletion: boolean;
   continueInstallWithDataDeletion: () => void;
   restartInstall: () => void;
+  /** Beacon: register this computer as its own account instead of linking. */
   onRegister?: () => void;
 }>;
 
@@ -94,6 +95,9 @@ export function InstallScreenQrCodeNotScannedStep({
     );
   }
 
+  // Beacon: same frame and Axo pieces as the standalone registration screen
+  // (StandaloneRegistration.dom.tsx). A segmented control switches between
+  // linking to a phone and registering a new account, in place.
   const helpLabel = isStaging
     ? `${i18n('icu:Install__support-link')} · Staging`
     : i18n('icu:Install__support-link');

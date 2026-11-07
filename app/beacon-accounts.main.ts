@@ -1,6 +1,22 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Multiple accounts, Telegram style.
+ *
+ * Signal keeps one account per data folder and opens its database once per
+ * process, so every account runs as its own Beacon process with its own
+ * window. The main account's process coordinates: it starts the others in
+ * the background (so all of them receive messages and notify), owns the
+ * single tray icon, and switches between them. Switching shows the target
+ * account's window at the current window's position; whenever an account's
+ * window appears, all others hide. That also covers clicking a notification
+ * from a background account.
+ *
+ * Processes talk over a local socket (a named pipe on Windows) with
+ * newline-separated JSON messages.
+ */
+
 import { app } from 'electron';
 import type { BrowserWindow, Rectangle } from 'electron';
 import { spawn } from 'node:child_process';
@@ -27,12 +43,12 @@ import {
   isMainAccount,
   isValidAccountId,
 } from './beacon-account-path.node.ts';
-import { noop } from 'lodash';
 
 export type BeaconAccountInfo = {
   name?: string;
   subtitle?: string;
   color?: string;
+  /** Small JPEG of the profile photo (data: URL). */
   avatar?: string;
   unread?: number;
   linked?: boolean;
@@ -62,8 +78,11 @@ type Message =
 type Options = {
   getMainWindow: () => BrowserWindow | undefined;
   log: LoggerType;
+  /** Main account only: whether closing a window keeps Beacon in the tray. */
   isTrayEnabled: () => boolean;
+  /** Main account only: refresh the tray after visibility/unread changes. */
   onTrayChange: () => void;
+  /** Hand a captcha token (from a browser link) to this account. */
   onCaptchaToken: (token: string) => void;
 };
 
@@ -139,6 +158,10 @@ function hideOwnWindow(): void {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Registry (main account only writes it)
+// ---------------------------------------------------------------------------
+
 type Registry = {
   accounts: Array<{ id: string; info?: BeaconAccountInfo }>;
   main?: BeaconAccountInfo;
@@ -178,6 +201,10 @@ function saveRegistry(): void {
   }, 500);
 }
 
+// ---------------------------------------------------------------------------
+// Coordinator (main account)
+// ---------------------------------------------------------------------------
+
 const clients = new Map<string, Socket>();
 const visible = new Map<string, boolean>();
 const pendingShow = new Map<string, WindowState | undefined>();
@@ -199,6 +226,7 @@ function setInfo(id: string, info: BeaconAccountInfo): void {
   options?.onTrayChange();
 }
 
+/** Unread messages in the other accounts, for the tray icon. */
 export function getOtherAccountsUnread(): number {
   if (!isMainAccount()) {
     return 0;
@@ -220,6 +248,7 @@ function spawnArgs(id: string): Array<string> {
   const args = process.argv
     .slice(1)
     .filter(arg => !skip.some(prefix => arg.startsWith(prefix)));
+  // Development aid: give background accounts their own DevTools port.
   const debugBase = Number(process.env.BEACON_ACCOUNT_DEBUG_PORT);
   if (debugBase > 0) {
     const index = registry.accounts.findIndex(a => a.id === id);
@@ -235,6 +264,7 @@ function startAccount(id: string): void {
   if (clients.has(id) || exitWaiters.has(id)) {
     return;
   }
+  // Packaged AppImages must be relaunched through the AppImage itself.
   const executable = process.env.APPIMAGE ?? process.execPath;
   options?.log.info(`beacon accounts: starting ${id}`);
   const child = spawn(executable, spawnArgs(id), {
@@ -268,6 +298,7 @@ function showAccount(id: string, state?: WindowState): void {
   startAccount(id);
 }
 
+/** An account's window appeared: it becomes the current one. */
 function onShown(id: string): void {
   currentId = id;
   visible.set(id, true);
@@ -360,6 +391,8 @@ async function coordinatorRequest(
       }
       return false;
     case 'add': {
+      // Reuse an account that was added but never signed in, rather than
+      // piling up empty ones.
       const unused = registry.accounts.find(a => !isSignedIn(a));
       const id = unused?.id ?? randomBytes(5).toString('hex');
       if (!unused) {
@@ -370,6 +403,8 @@ async function coordinatorRequest(
       return id;
     }
     case 'cancelSetup': {
+      // "Back" from an account's setup screen: discard it if it never
+      // signed in, and return to the main account.
       const account = registry.accounts.find(a => a.id === fromId);
       if (!account || isSignedIn(account)) {
         showAccount(MAIN_ACCOUNT_ID, state);
@@ -391,6 +426,10 @@ function isSignedIn(account: { info?: BeaconAccountInfo }): boolean {
   return account.info?.linked === true;
 }
 
+/**
+ * Main account: hand a captcha token from a browser link to the account
+ * that is on screen (it's the one registering). False when that's us.
+ */
 export function forwardCaptchaToCurrentAccount(token: string): boolean {
   if (!isMainAccount() || currentId === MAIN_ACCOUNT_ID) {
     return false;
@@ -413,6 +452,7 @@ function listAccounts(currentFor: string): Array<BeaconAccountListItem> {
       isCurrent: currentFor === MAIN_ACCOUNT_ID,
       running: true,
     },
+    // Accounts that were added but never signed in stay out of the list.
     ...registry.accounts
       .filter(account => isSignedIn(account) || account.id === currentFor)
       .map(account => ({
@@ -441,6 +481,8 @@ async function removeAccount(
       if (exitWaiters.has(id)) {
         exitWaiters.set(id, resolve);
       } else {
+        // Left running by an earlier session: no child handle, so wait for
+        // its connection to drop and give it a moment to release files.
         socket?.once('close', () => setTimeout(resolve, 1500));
       }
       setTimeout(resolve, 15_000);
@@ -460,6 +502,7 @@ function startCoordinator(): void {
   registry = readRegistry();
   const path = socketPath();
   if (process.platform !== 'win32' && existsSync(path)) {
+    // Left over from a crash; we hold the single-instance lock, so it's ours.
     unlinkSync(path);
   }
   server = createServer(socket => {
@@ -485,6 +528,8 @@ function startCoordinator(): void {
     })()
   );
 
+  // Give background accounts left running by a previous session a moment
+  // to reconnect before starting the missing ones.
   setTimeout(() => {
     for (const account of registry.accounts) {
       if (isSignedIn(account)) {
@@ -506,7 +551,7 @@ function startCoordinator(): void {
       try {
         writeFileSync(registryPath(), JSON.stringify(registry, null, 2));
       } catch {
-        noop();
+        // Ignore
       }
     }
     server?.close();
@@ -514,11 +559,15 @@ function startCoordinator(): void {
       try {
         rmSync(path, { force: true });
       } catch {
-        noop();
+        // Ignore
       }
     }
   });
 }
+
+// ---------------------------------------------------------------------------
+// Client (extra accounts)
+// ---------------------------------------------------------------------------
 
 let coordinator: Socket | undefined;
 let nextRid = 1;
@@ -581,6 +630,8 @@ function connectToCoordinator(): void {
     if (quitting) {
       return;
     }
+    // The main account quit or crashed: a hidden background account has no
+    // way to be reached, so it goes too (after a grace period for restarts).
     clearTimeout(orphanTimer);
     orphanTimer = setTimeout(() => {
       if (!coordinator && !options?.getMainWindow()?.isVisible()) {
@@ -610,11 +661,16 @@ function startClient(): void {
   connectToCoordinator();
   app.on('before-quit', () => {
     if (!quitting && coordinator) {
+      // Quit from this window's menu: quit every account.
       send(coordinator, { t: 'req', rid: 0, method: 'quitAll' });
     }
     quitting = true;
   });
 }
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
 
 export function setupBeaconAccounts(opts: Options): void {
   options = opts;
@@ -625,6 +681,7 @@ export function setupBeaconAccounts(opts: Options): void {
   }
 }
 
+/** Call once the main window exists, to track when it appears. */
 export function watchBeaconAccountWindow(win: BrowserWindow): void {
   win.on('show', () => {
     if (isMainAccount()) {
@@ -641,10 +698,15 @@ export function watchBeaconAccountWindow(win: BrowserWindow): void {
   });
 }
 
+/** Extra accounts never get their own tray icon; the main account's is shared. */
 export function isBeaconTrayAllowed(): boolean {
   return isMainAccount();
 }
 
+/**
+ * Extra accounts hide on close instead of quitting; the main account
+ * decides (it quits everything when the tray is off).
+ */
 export function beaconHideOnClose(): boolean {
   if (isMainAccount() || !coordinator) {
     return false;
@@ -653,6 +715,7 @@ export function beaconHideOnClose(): boolean {
   return true;
 }
 
+/** Main account: is any account's window visible (for the tray menu)? */
 export function isAnyAccountVisible(): boolean {
   if (currentId !== MAIN_ACCOUNT_ID) {
     return visible.get(currentId) === true;
@@ -660,6 +723,10 @@ export function isAnyAccountVisible(): boolean {
   return options?.getMainWindow()?.isVisible() === true;
 }
 
+/**
+ * Main account: show the current account (tray click, launching Beacon
+ * again). Returns false when that is this process's own window.
+ */
 export function showCurrentAccount(): boolean {
   if (!isMainAccount() || currentId === MAIN_ACCOUNT_ID) {
     return false;
@@ -672,6 +739,7 @@ export function showCurrentAccount(): boolean {
   return true;
 }
 
+/** Main account: hide whichever account is current (tray). */
 export function hideCurrentAccount(): boolean {
   if (!isMainAccount() || currentId === MAIN_ACCOUNT_ID) {
     return false;
@@ -682,6 +750,8 @@ export function hideCurrentAccount(): boolean {
 }
 
 export { isHiddenStart };
+
+// Renderer API (via beacon.main.ts HANDLERS)
 
 export async function accountsRequest(
   method: 'list' | 'switch' | 'add' | 'remove' | 'cancelSetup',

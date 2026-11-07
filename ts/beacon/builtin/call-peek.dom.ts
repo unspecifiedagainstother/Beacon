@@ -1,6 +1,21 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Call Peek — see who is in a group call without joining.
+ *
+ * Signal already "peeks" group calls (that is how the Join button knows a
+ * call is running): it asks the call server for the participant list, and
+ * the people in the call are not told. This shows that list in an
+ * "Ongoing call" bar under the pinned messages — up to six avatars, then
+ * "and N others" — with its own Join button, replacing the header's.
+ *
+ * While you are in a call, every chat shows a "Call in progress" bar instead,
+ * with everyone's avatars (yours first) and a Leave button.
+ * While a call is running in the open chat it re-peeks every few seconds so
+ * the list stays current — the same request Signal makes on its own.
+ */
+
 import type { AddonContext, AddonManifest } from '../core/types.dom.ts';
 import type { StateType } from '../../state/reducer.preload.ts';
 import type { ConversationType } from '../../state/ducks/conversations.preload.ts';
@@ -13,6 +28,7 @@ import { getSelectedConversationId } from '../../state/selectors/nav.std.ts';
 type Peek = {
   callMode: CallMode;
   participants: Array<ConversationType>;
+  /** Devices in the call that we could not match to a contact. */
   unknownCount: number;
 };
 
@@ -22,6 +38,7 @@ function getPeek(state: StateType, conversationId: string): Peek | undefined {
     return undefined;
   }
   if (call.joinState !== GroupCallJoinState.NotJoined) {
+    // You're in it (or joining) — Signal's own call UI takes over.
     return undefined;
   }
   const acis = call.peekInfo?.acis ?? [];
@@ -104,6 +121,7 @@ function namesSummary(peek: Peek, max: number): string {
 type ActiveCall = {
   conversationId: string;
   chatTitle: string;
+  /** You first, then everyone else in the call. */
   participants: Array<ConversationType>;
   unknownCount: number;
 };
@@ -184,6 +202,7 @@ export default {
   ],
 
   start(ctx) {
+    // While our bar is up it carries the Join button; hide the header's.
     const visibleBars = new Set<HTMLElement>();
     const syncHeaderJoin = () =>
       document.body.classList.toggle(
@@ -198,6 +217,7 @@ export default {
       let last = '\u0000';
       const update = () => {
         const state = ctx.redux.getState();
+        // In a call: show it in every chat, with Leave.
         const active = getActiveCall(state);
         if (active) {
           const key = activeKey(active);
@@ -236,6 +256,7 @@ export default {
       };
     });
 
+    // Keep the open chat's peek fresh while it has a call.
     let timer: ReturnType<typeof setInterval> | undefined;
     const schedule = () => {
       clearInterval(timer);

@@ -48,6 +48,7 @@ export function initializeRedux(data: ReduxInitData): void {
   const store = createStore(initialState);
   window.reduxStore = store;
 
+  // Beacon: bring up the addon platform now that the real store exists.
   initializeBeaconRuntime(store);
 
   // Binding these actions to our redux store and exposing them allows us to update

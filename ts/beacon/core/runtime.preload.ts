@@ -1,6 +1,14 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Beacon runtime — single entry point for the addon platform.
+ *
+ * Called exactly once from initializeRedux(), right after the real store
+ * exists. Wires the hook bus into the middleware, loads addons, registers
+ * builtin commands, and exposes window.Beacon for console work.
+ */
+
 import type { Store } from 'redux';
 import type { StateType } from '../../state/reducer.preload.ts';
 import { NavTab, SettingsPage } from '../../types/Nav.std.ts';
@@ -23,7 +31,6 @@ import {
   getConnections,
   subscribeConnections,
 } from './network-log.std.ts';
-import { noop } from 'lodash';
 
 const log = createLogger('beacon/runtime');
 
@@ -38,8 +45,11 @@ export type BeaconGlobal = {
   };
   createPatcher: typeof createPatcher;
   store: Store<StateType>;
+  /** Jump to Settings → Beacon → Modules. */
   openModules: () => void;
+  /** Slot renderers, for trying addon UI from the console. */
   slots: { renderers: typeof getSlotRenderers };
+  /** Connections seen by the network monitor (in memory only). */
   network: {
     list: typeof getConnections;
     clear: typeof clearConnections;
@@ -72,10 +82,12 @@ export function initializeBeaconRuntime(store: Store<StateType>): void {
   }
   initialized = true;
 
+  // Squarer look before first paint (built-in "Look" keeps it in sync).
   if (addonSettings.get('beacon-look', 'squareCorners') !== false) {
     document.body?.classList.add('beacon-square');
   }
 
+  // App lock first, before any chat UI can render.
   try {
     lockOnStartup();
   } catch (error) {
@@ -95,6 +107,7 @@ export function initializeBeaconRuntime(store: Store<StateType>): void {
       commands: commandRegistry,
       settings: addonSettings,
       filters: { add: addBeaconFilter, apply: applyBeaconFilter },
+      /** Fresh patcher for console experiments; addons get their own. */
       createPatcher,
       store,
       openModules,
@@ -120,6 +133,11 @@ export function initializeBeaconRuntime(store: Store<StateType>): void {
   })();
 }
 
+/**
+ * Blur PII applies app-wide (Settings, contact details, modals), so the class
+ * goes on <body> rather than on any one component, and follows the setting
+ * live. Elements opt in with the `Beacon-pii` class.
+ */
 function syncBlurPII(store: Store<StateType>): void {
   const fallback =
     BEACON_FEATURES.find(f => f.key === 'beaconBlurPII')?.defaultValue ?? true;
@@ -135,6 +153,7 @@ function syncBlurPII(store: Store<StateType>): void {
   store.subscribe(apply);
 }
 
+/** Keep Beacon/axo accent tokens in step with the default chat color. */
 function syncAccent(store: Store<StateType>): void {
   let current: string | undefined;
   const apply = () => {
@@ -151,6 +170,11 @@ function syncAccent(store: Store<StateType>): void {
   store.subscribe(apply);
 }
 
+/**
+ * Message logger v2 kept message bodies in localStorage, which is not
+ * encrypted at rest. v3 stores retained content in the SQLCipher DB instead;
+ * delete what v2 left behind whether or not the addon is ever enabled again.
+ */
 function purgeLegacyPlaintext(): void {
   for (const key of [
     'beacon-addon-message-logger-log',
@@ -162,7 +186,7 @@ function purgeLegacyPlaintext(): void {
         log.info(`removed legacy plaintext store ${key}`);
       }
     } catch {
-      noop();
+      // Storage unavailable — nothing to purge.
     }
   }
 }

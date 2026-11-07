@@ -85,6 +85,7 @@ export class LeftPaneInboxHelper extends LeftPaneHelper<LeftPaneInboxPropsType> 
     this.#filterByUnread = filterByUnread;
   }
 
+  // Beacon: collapsible Pinned section — rows use the visible pins only.
   #visiblePinned(): ReadonlyArray<ConversationListItemPropsType> {
     return getChatListState().pinnedCollapsed ? [] : this.#pinnedConversations;
   }
@@ -328,6 +329,7 @@ export class LeftPaneInboxHelper extends LeftPaneHelper<LeftPaneInboxPropsType> 
   }
 
   shouldRecomputeRowHeights(old: Readonly<LeftPaneInboxPropsType>): boolean {
+    // Beacon: the pinned list identity changes when the section collapses.
     return (
       old.pinnedConversations.length !== this.#pinnedConversations.length ||
       old.pinnedConversations !== this.#pinnedConversations

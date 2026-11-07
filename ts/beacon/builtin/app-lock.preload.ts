@@ -1,6 +1,15 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * App lock: passphrase on open, auto-lock after inactivity or when the
+ * computer locks/sleeps, and the duress passphrase. Passphrase storage and
+ * the lock screen live in ../core/lock.dom.ts (so the startup lock is up
+ * before any chat renders); this built-in adds the timers, shortcuts,
+ * notification hiding and the duress actions. Passphrase buttons are on
+ * the Privacy tab.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { defineIcon } from '../core/icons.std.ts';
 import {
@@ -81,9 +90,12 @@ export default {
       if (result.action === 'wipe') {
         drop(deleteAllData(() => undefined));
       }
+      // 'decoy': hidden-chats reads isDuressSession() and keeps hidden and
+      // locked chats out of sight for the rest of the session.
     });
     ctx.onDispose(() => setUnlockHandler(undefined));
 
+    // -- Inactivity
     let lastActivity = Date.now();
     const onActivity = () => {
       lastActivity = Date.now();
@@ -119,6 +131,7 @@ export default {
       })
     );
 
+    // -- System lock / sleep
     ctx.onDispose(
       window.IPC.beaconOnSystemEvent(() => {
         if (ctx.settings.get<boolean>('lockOnSystemLock')) {
@@ -127,6 +140,7 @@ export default {
       })
     );
 
+    // -- Lock now
     ctx.keybinds.register('mod+alt+L', () => lock());
     ctx.commands.register({
       id: 'lock',
@@ -144,6 +158,7 @@ export default {
       },
     });
 
+    // -- Notifications while locked
     ctx.filters.add('notification.show', show => {
       if (show && isLocked()) {
         return ctx.settings.get<string>('lockedNotifications') !== 'none';

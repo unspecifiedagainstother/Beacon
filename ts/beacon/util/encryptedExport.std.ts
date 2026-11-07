@@ -1,6 +1,21 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Password-encrypted export files.
+ *
+ * Format (JSON):
+ *   { "format": "beacon-encrypted-export", "version": 1,
+ *     "kdf": { "name": "PBKDF2", "hash": "SHA-256", "iterations": 600000,
+ *              "salt": base64 },
+ *     "cipher": { "name": "AES-GCM", "iv": base64 },
+ *     "label": string, "data": base64 }
+ *
+ * PBKDF2-SHA256 at 600k iterations (OWASP 2023 guidance) derives a 256-bit
+ * AES-GCM key. Only WebCrypto is used, so the same code runs in the renderer
+ * and in tests, and Beacon can open its own exports again.
+ */
+
 const FORMAT = 'beacon-encrypted-export';
 const ITERATIONS = 600_000;
 
@@ -62,6 +77,7 @@ export async function encryptExport(
   const key = await deriveKey(password, salt, iterations);
   const ciphertext = new Uint8Array(
     await crypto.subtle.encrypt(
+      // The label is authenticated, so it cannot be swapped between files.
       { name: 'AES-GCM', iv, additionalData: new TextEncoder().encode(label) },
       key,
       new TextEncoder().encode(plaintext)
@@ -86,6 +102,7 @@ export function isEncryptedExport(value: unknown): value is EncryptedExport {
   );
 }
 
+/** Throws on a wrong password or a tampered file. */
 export async function decryptExport(
   file: EncryptedExport,
   password: string

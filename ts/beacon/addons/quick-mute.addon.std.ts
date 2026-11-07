@@ -7,6 +7,9 @@ import { MuteExpiration } from '@signalapp/types';
 import { getSelectedConversationId } from '../../state/selectors/nav.std.ts';
 import { isConversationMuted } from '../../util/isConversationMuted.std.ts';
 
+/**
+ * Quick Mute — mod+alt+m toggles mute via the real action.
+ */
 export default {
   id: 'quick-mute',
   icon: ICON_QUICK_MUTE,

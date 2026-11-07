@@ -12,6 +12,9 @@ const FOCUS_CSS = `
   }
 `;
 
+/**
+ * Focus Mode — mod+alt+f hides sidebar, /focus toggles.
+ */
 export default {
   id: 'focus-mode',
   icon: ICON_FOCUS_MODE,

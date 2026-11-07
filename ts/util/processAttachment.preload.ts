@@ -67,6 +67,7 @@ export async function processAttachment(
     };
   }
 
+  // Beacon: random file names, metadata stripping (built-in privacy).
   const filtered = await applyBeaconAsyncFilter(
     'attachment.outgoing',
     attachment,

@@ -1,6 +1,12 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Chat-list organisation state (built-in "Chat list organisation"):
+ * collapsible Pinned section and a higher pin limit. Read by the left-pane
+ * selector and LeftPaneInboxHelper; persisted in the addon settings store.
+ */
+
 import { addonSettings } from './settings.std.ts';
 
 export const CHAT_ORGANISATION_ID = 'chat-organisation';
@@ -14,6 +20,7 @@ let state: ChatListState = {
 };
 let notify: (() => void) | undefined;
 
+/** Selector input: a new object whenever something changes. */
 export function getChatListState(): ChatListState {
   return state;
 }

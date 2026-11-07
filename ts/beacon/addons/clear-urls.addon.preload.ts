@@ -1,6 +1,16 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Clear URLs — strips tracking parameters (utm_*, fbclid, gclid, si, ...)
+ * from links in messages you send.
+ *
+ * Patches ConversationModel.prototype.enqueueMessageForSend and rewrites the
+ * body before it is saved or sent. Messages with formatting or mentions are
+ * left alone: their body ranges are character offsets, and shortening a URL
+ * in front of them would shift every range.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_CLEAR_URLS } from './icons.std.ts';
 import { ConversationModel } from '../../models/conversations.preload.ts';

@@ -1,6 +1,29 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Message Logger — keeps deleted messages readable and edits visible, the way
+ * Discord client mods do.
+ *
+ * How it works, end to end:
+ *  1. Delete-for-everyone runs ts/util/deleteForEveryone.preload.ts, which
+ *     passes the erase attributes through the 'message.deleteForEveryone'
+ *     filter. We add a `beaconDeleted` snapshot of the body (and attachment
+ *     metadata) before upstream wipes it. The snapshot is saved with the
+ *     message, so it lives in the encrypted DB and survives restarts.
+ *  2. Message.dom.tsx renders that snapshot under "This message was deleted".
+ *     It is hidden by CSS unless this addon has put its body class on, so
+ *     disabling the addon hides retained content instantly.
+ *  3. Edits are already kept by Signal (editHistory) and Beacon renders past
+ *     revisions inline; we index them so the log viewer can list them.
+ *  4. The index (IDs + timestamps only) lives in items storage, which is also
+ *     the encrypted DB. Nothing here touches localStorage.
+ *
+ * Not retained: attachment files (upstream deletes them during the erase),
+ * messages deleted before the addon was enabled, and messages "deleted for
+ * me" — that is the user's own choice and is honoured.
+ */
+
 import { saveBeaconExport } from '../core/exports.dom.ts';
 import type { AddonContext, AddonManifest } from '../core/types.dom.ts';
 import { ICON_MESSAGE_LOGGER } from '../addons/icons.std.ts';
@@ -119,6 +142,8 @@ export default {
     });
 
     const record = (entry: BeaconMessageLogEntry) => {
+      // An edited-then-deleted message keeps both entries; repeated edits of
+      // the same message collapse into the latest one.
       entries = entries.filter(
         e => !(e.messageId === entry.messageId && e.kind === entry.kind)
       );
@@ -130,6 +155,7 @@ export default {
       save();
     };
 
+    // -- Presentation: body classes drive the CSS in _beacon-theme.scss.
     let classDisposers: Array<() => void> = [];
     const applyClasses = () => {
       classDisposers.forEach(dispose => dispose());
@@ -150,6 +176,7 @@ export default {
       }
     });
 
+    // -- Capture: snapshot content before delete-for-everyone erases it.
     ctx.filters.add(
       'message.deleteForEveryone',
       (props, { message, isAdminDelete }) => {
@@ -192,6 +219,8 @@ export default {
       });
     });
 
+    // Drop index entries for messages the user removed ("delete for me",
+    // expiry) so the log never points at nothing.
     ctx.hooks.on('onMessageDeleted', ({ id }) => {
       const before = entries.length;
       entries = entries.filter(e => e.messageId !== id);
@@ -200,6 +229,7 @@ export default {
       }
     });
 
+    // -- Viewer
     const openViewer = (initialTab: Tab = 'deleted') => {
       openLogViewer(
         ctx,
@@ -261,6 +291,10 @@ export default {
   },
 } satisfies AddonManifest;
 
+// ---------------------------------------------------------------------------
+// Viewer
+// ---------------------------------------------------------------------------
+
 type Row = {
   entry: BeaconMessageLogEntry;
   message: ReadonlyMessageAttributesType | undefined;
@@ -293,6 +327,7 @@ async function loadRows(
     .reverse(); // newest first
 }
 
+/** Lines of text to show for an entry, oldest first. */
 function contentFor(
   kind: Tab,
   message: ReadonlyMessageAttributesType
@@ -307,6 +342,7 @@ function contentFor(
       describeSnapshot(snapshot),
     ].filter(Boolean);
   }
+  // editHistory is newest-first; show the chain oldest -> current.
   return (message.editHistory ?? [])
     .map(edit => edit.body ?? '')
     .reverse()
@@ -448,6 +484,7 @@ function openLogViewer(
           );
           lineEl.append(
             el('span', 'BeaconLog__line-label', label),
+            // Collapse runs of blank lines so long messages stay compact.
             el(
               'span',
               'BeaconLog__line-text',

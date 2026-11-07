@@ -1,6 +1,12 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Typing in the chat list: "Alice is typing…" (or "Alice and Bob are
+ * typing…" in groups) next to the dots Signal already shows. Respects
+ * Signal's typing-indicator setting — nothing shows if that's off.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { defineIcon } from '../core/icons.std.ts';
 import { beaconTweaks } from '../core/tweaks.std.ts';

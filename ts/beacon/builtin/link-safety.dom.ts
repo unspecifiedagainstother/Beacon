@@ -1,6 +1,13 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Safe link opening: before a web link leaves Beacon, show where it really
+ * goes, flag lookalike/shortened/unencrypted links, and strip tracking
+ * parameters. Covers links in messages (click guard, capture phase) and
+ * everything that goes through openLinkInWebBrowser (link previews, help).
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_LINK_SAFETY } from '../addons/icons.std.ts';
 import { createElement, createModal } from '../core/ui.dom.ts';
@@ -18,6 +25,7 @@ import {
 const MATCHERS = toParamMatchers(DEFAULT_TRACKING_PARAMS);
 
 function openDirect(url: string): void {
+  // Main process turns this navigation into shell.openExternal().
   window.location.href = url;
 }
 
@@ -78,6 +86,7 @@ export default {
       }
     };
 
+    /** Returns true when the link was handled (opened, shown or blocked). */
     const guard = (raw: string, text: string | undefined): boolean => {
       const analysis = analyzeLink(raw, text);
       if (!analysis || !/^https?:$/.test(analysis.url.protocol)) {
@@ -205,6 +214,7 @@ export default {
       return guard(url, info.text) ? null : url;
     });
 
+    // Links in message bodies and anywhere else in the page.
     const onClick = (ev: MouseEvent) => {
       if (ev.defaultPrevented || (ev.type === 'auxclick' && ev.button !== 1)) {
         return;

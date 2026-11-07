@@ -1,6 +1,25 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Profile History — keeps a local record of every profile change Beacon
+ * sees: profile names, usernames, about text, avatars (with thumbnails),
+ * phone numbers, and optionally group names/descriptions and the names you
+ * saved for contacts.
+ *
+ * Storage: items storage, i.e. the encrypted SQLCipher database — never
+ * localStorage. Removed on unlink.
+ *
+ * How changes are seen:
+ *  - live: every Redux update to a conversation is diffed against the last
+ *    known values (the "baseline");
+ *  - at launch: the baseline is compared with what the app loaded, so
+ *    changes made while Beacon was closed are recorded too, marked
+ *    "noticed at launch".
+ * Profiles only change here when Signal fetches them, so the time recorded
+ * is when Beacon learned of the change, not when the person made it.
+ */
+
 import { saveBeaconExport } from '../core/exports.dom.ts';
 import type { AddonContext, AddonManifest } from '../core/types.dom.ts';
 import type {
@@ -72,6 +91,7 @@ function extractValues(
   };
 }
 
+/** Downscale an avatar to a small JPEG data URL, or undefined if unreadable. */
 async function makeThumb(url: string | undefined): Promise<string | undefined> {
   if (!url) {
     return undefined;
@@ -102,6 +122,7 @@ async function makeThumb(url: string | undefined): Promise<string | undefined> {
     );
     return canvas.toDataURL('image/jpeg', 0.75);
   } catch {
+    // Missing file or a tainted canvas: record the change without pixels.
     return undefined;
   }
 }
@@ -215,6 +236,7 @@ export default {
       }
       const known = baseline[c.id];
       if (!known) {
+        // First sighting: remember, don't report.
         baseline[c.id] = { ...values };
         save();
         return;
@@ -226,6 +248,7 @@ export default {
         if (next === prev || (next == null && prev == null)) {
           continue;
         }
+        // A field we did not track before is a baseline gap, not a change.
         if (!(field in known)) {
           known[field] = next;
           continue;
@@ -261,6 +284,7 @@ export default {
       save();
     };
 
+    // -- Launch: compare what the app loaded against the stored baseline.
     const lookup = () => ctx.redux.getState().conversations.conversationLookup;
     void (async () => {
       for (const c of Object.values(lookup())) {
@@ -277,6 +301,7 @@ export default {
       save();
     })();
 
+    // -- Live: diff conversations whose Redux object changed.
     ctx.redux.observe(
       state => state.conversations.conversationLookup,
       (next, prev) => {
@@ -288,6 +313,7 @@ export default {
       }
     );
 
+    // -- Background: seed avatar thumbnails so the first change has a "before".
     let seedTimer: ReturnType<typeof setTimeout> | undefined;
     const seedQueue = Object.values(lookup())
       .filter(c => c.avatarUrl && !baseline[c.id]?.avatarThumb)
@@ -308,6 +334,7 @@ export default {
     seedTimer = setTimeout(() => drop(seedNext()), 5000);
     ctx.onDispose(() => clearTimeout(seedTimer));
 
+    // -- UI
     const open = (filter?: { conversationId?: string; query?: string }) =>
       openViewer(
         ctx,
@@ -345,6 +372,10 @@ export default {
     ]);
   },
 } satisfies AddonManifest;
+
+// ---------------------------------------------------------------------------
+// Viewer
+// ---------------------------------------------------------------------------
 
 function openViewer(
   ctx: AddonContext,

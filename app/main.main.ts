@@ -162,6 +162,7 @@ import { trackHeapSize } from '../ts/util/oomNotifier.node.ts';
 import { sendDummyKeystroke } from './WindowsNotifications.main.ts';
 import { maybeMigrateSafeStorageBackend } from '../ts/util/linuxPasswordStoreMigration.main.ts';
 
+// Beacon: proxy from settings, before anything reads HTTPS_PROXY.
 applyBeaconProxyEnv();
 
 const { chmod, realpath, writeFile } = fsExtra;
@@ -289,11 +290,14 @@ if (!gotLock) {
       sendDummyKeystroke();
     }
 
+    // Beacon: the main account starting a background account that is
+    // already running must not bring this window up.
     if (argv.includes('--beacon-hidden')) {
       return true;
     }
 
     // Someone tried to run a second instance, we should focus our window
+    // (Beacon: or whichever account is current, still handling any link).
     if (showCurrentAccount()) {
       const accountRoute = maybeGetIncomingSignalRoute(argv);
       if (accountRoute != null) {
@@ -682,6 +686,20 @@ const mainTitleBarStyle = OS.isMacOS()
   ? ('hidden' as const)
   : ('default' as const);
 
+// Beacon: when enabled we drop the OS frame entirely and draw our own titlebar
+// in the renderer, so it can match the app theme.
+//
+// Read from ephemeralConfig rather than the DB because `frame` is a
+// BrowserWindow construction option — it cannot be changed on a live window, so
+// the value must be known before any window exists, and toggling it needs a
+// restart.
+//
+// macOS is excluded: `titleBarStyle: 'hidden'` there already gives a themed
+// titlebar while keeping the native traffic-light controls. Using `frame: false`
+// would mean reimplementing those, badly.
+// The value the *current* window was created with. Differs from the stored
+// setting after the user toggles it but before restarting — that difference is
+// what drives the "requires restart" warning in Settings.
 let beaconAppliedCustomTitlebar: boolean | undefined;
 
 function getBeaconCustomTitlebar(): boolean {
@@ -759,6 +777,7 @@ async function createWindow() {
     minHeight: MIN_HEIGHT,
     autoHideMenuBar: false,
     titleBarStyle: mainTitleBarStyle,
+    // Beacon: frameless when the custom titlebar is on (non-macOS only).
     ...((): { frame?: false } => {
       beaconAppliedCustomTitlebar = getBeaconCustomTitlebar();
       return beaconAppliedCustomTitlebar ? { frame: false } : {};
@@ -908,6 +927,7 @@ async function createWindow() {
   mainWindow.on('maximize', captureWindowStats);
   mainWindow.on('unmaximize', captureWindowStats);
 
+  // Beacon: keep the custom titlebar's maximize/restore button in sync.
   const sendMaximizedState = () => {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send(
@@ -1201,6 +1221,8 @@ ipc.on('title-bar-double-click', () => {
   }
 });
 
+// Beacon: window controls for the custom titlebar. Only meaningful when the
+// window was created frameless; harmless no-ops otherwise.
 ipc.on('beacon:window:minimize', () => {
   mainWindow?.minimize();
 });
@@ -1212,6 +1234,8 @@ ipc.on('beacon:window:toggle-maximize', () => {
 });
 
 ipc.on('beacon:window:close', () => {
+  // Use close() rather than destroy() so the existing close handling runs —
+  // that is what implements minimize-to-tray and the quit confirmation.
   mainWindow?.close();
 });
 
@@ -1219,6 +1243,10 @@ ipc.handle('beacon:window:is-maximized', () => {
   return mainWindow?.isMaximized() ?? false;
 });
 
+// Beacon: custom titlebar setting. Uses a dedicated channel rather than the
+// generic settings plumbing, because that generates getter types from
+// SettingsValuesType and a hand-written async getter collides with the
+// generated sync one.
 ipc.handle('beacon:titlebar:get', () => {
   return getBeaconCustomTitlebar();
 });
@@ -1227,6 +1255,8 @@ ipc.handle('beacon:titlebar:set', (_event, value: boolean) => {
   ephemeralConfig.set('beacon-custom-titlebar', value);
 });
 
+// What the live window actually uses — compare against the stored value to know
+// whether a restart is pending.
 ipc.handle('beacon:titlebar:get-applied', () => {
   return beaconAppliedCustomTitlebar ?? false;
 });
@@ -1303,14 +1333,19 @@ ipc.on('convert-image', async (event, uuid, data) => {
 
 const OS_AUTH_LOCALE_STRINGS: Record<string, string> = {
   'enable-backups': 'Confirm your identity to enable backups',
-  'view-aep': 'Confirm your identity to view your account encryption passphrase',
+  'view-aep':
+    'Confirm your identity to view your account encryption passphrase',
   'plaintext-export': 'Confirm your identity to export messages in plaintext',
 };
 
 ipc.on('prompt-os-auth', async (event, { reason }) => {
   // Build the display string in the main process from a whitelist — never
   // accept renderer-supplied text for an OS authentication dialog.
-  const validReasons = ['enable-backups', 'view-aep', 'plaintext-export'] as const;
+  const validReasons = [
+    'enable-backups',
+    'view-aep',
+    'plaintext-export',
+  ] as const;
   type ValidReason = (typeof validReasons)[number];
   if (!validReasons.includes(reason as ValidReason)) {
     log.warn(`prompt-os-auth: rejected unknown reason=${reason}`);
@@ -1319,7 +1354,10 @@ ipc.on('prompt-os-auth', async (event, { reason }) => {
   }
   const localeString = OS_AUTH_LOCALE_STRINGS[reason as ValidReason];
   log.info(`Prompt for OS auth reason=${reason}`);
-  const result = await promptOSAuth({ reason: reason as ValidReason, localeString });
+  const result = await promptOSAuth({
+    reason: reason as ValidReason,
+    localeString,
+  });
   log.info(`Prompt for OS auth result=${result}`);
   event.reply(`prompt-os-auth:${reason}`, result);
 });
@@ -1982,6 +2020,7 @@ async function initializeSQL(
 
   let key: string;
   try {
+    // Beacon: a passphrase-protected key replaces the keychain copy.
     key = beaconKey ?? getSQLKey();
     setUnlockedDatabaseKey(key, beaconKey !== undefined);
   } catch (error) {
@@ -2305,6 +2344,7 @@ app.on('ready', async () => {
   ]);
 
   updateDefaultSession(session.defaultSession, log);
+  // Beacon: content protection, spellcheck block, network log, IPC bridge.
   setupBeaconMain({
     session: session.defaultSession,
     getMainWindow,
@@ -2316,6 +2356,7 @@ app.on('ready', async () => {
       },
       onToken: token => {
         challengeHandler.handleCaptcha(token);
+        // Same as the protocol-handler path: bring the app back up front.
         getMainWindow()?.show();
       },
     },
@@ -2351,6 +2392,9 @@ app.on('ready', async () => {
 
   resolveTranslationsLocale();
 
+  // Beacon: ask for the database passphrase (if set) before anything
+  // touches the database, so sql.initialize stays the first await inside
+  // initializeSQL.
   const beaconKey = await promptForDatabaseKey(log);
   sqlInitPromise = initializeSQL(userDataPath, beaconKey);
 
@@ -2609,6 +2653,7 @@ app.on('ready', async () => {
     shouldMinimizeToSystemTray(await systemTraySettingCache.get())
   );
 
+  // Beacon: multiple accounts (one process each, coordinated from here).
   setupBeaconAccounts({
     getMainWindow,
     log,
@@ -3289,6 +3334,7 @@ function handleSignalRoute(route: ParsedSignalRoute) {
   } else if (route.key === 'cancelPresenting') {
     mainWindow.webContents.send('cancel-presenting');
   } else if (route.key === 'captcha') {
+    // Beacon: the account on screen may be another account's process.
     if (forwardCaptchaToCurrentAccount(route.args.captchaId)) {
       return;
     }

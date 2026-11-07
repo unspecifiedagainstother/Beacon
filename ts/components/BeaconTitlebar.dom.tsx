@@ -10,10 +10,24 @@ export type PropsType = {
   title: string;
 };
 
+/**
+ * Beacon: replacement for the OS titlebar, drawn with app styles.
+ *
+ * Only rendered when the window was created frameless — see
+ * `getBeaconCustomTitlebar` in app/main.main.ts. The `frame` option is fixed at
+ * window creation, so toggling the setting requires an app restart.
+ *
+ * The drag region is CSS (`-webkit-app-region: drag`); the buttons opt out with
+ * `no-drag`, otherwise they would be swallowed by the drag handling.
+ */
 export function BeaconTitlebar({ title }: PropsType): JSX.Element {
+  // App.dom.tsx has no i18n prop, and threading one through just for this would
+  // touch upstream props. SignalContext is the same source the app uses.
   const { i18n } = window.SignalContext;
   const [isMaximized, setIsMaximized] = useState(false);
 
+  // Overlays and dialogs read this to stay below the titlebar
+  // (stylesheets/_beacon-theme.scss, "Custom titlebar stays on top").
   useEffect(() => {
     document.body.classList.add('beacon-has-titlebar');
     return () => document.body.classList.remove('beacon-has-titlebar');
@@ -22,6 +36,8 @@ export function BeaconTitlebar({ title }: PropsType): JSX.Element {
   useEffect(() => {
     let canceled = false;
 
+    // Seed from the current state — the window may already be maximized when
+    // the renderer mounts (restored session, or a restart while maximized).
     const seed = async () => {
       const value = await window.IPC.beaconWindowIsMaximized();
       if (!canceled) {

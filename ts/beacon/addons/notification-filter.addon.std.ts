@@ -1,6 +1,14 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Notification Filter — silence desktop notifications by keyword or sender,
+ * or the opposite: only notify for messages that mention a keyword.
+ *
+ * Uses the 'notification.show' filter in NotificationService.add, so
+ * messages still arrive and count as unread — only the popup is dropped.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_NOTIFICATION_FILTER } from './icons.std.ts';
 
@@ -59,6 +67,8 @@ export default {
     let blockedCount = 0;
 
     ctx.filters.add('notification.show', (show, info) => {
+      // Never filter call notifications — missing a ringing call is worse
+      // than any noise this addon is meant to cut.
       if (!show || (info.type !== 'Message' && info.type !== 'Reaction')) {
         return show;
       }

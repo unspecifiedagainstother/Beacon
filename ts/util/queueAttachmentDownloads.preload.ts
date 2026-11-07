@@ -597,6 +597,7 @@ async function queueNormalAttachments({
         if (
           disposition != null &&
           (!isAutoDownloadEnabled(attachment, disposition) ||
+            // Beacon: auto-download rules (contacts only, group size).
             !applyBeaconFilter('attachment.autoDownload', true, {
               conversationId: beaconConversationId,
               sourceServiceId: beaconSourceServiceId,

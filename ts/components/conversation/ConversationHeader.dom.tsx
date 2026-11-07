@@ -1102,6 +1102,8 @@ function OutgoingCallButtons({
       );
     case OutgoingCallButtonStyle.Join:
       return (
+        // Beacon: `BeaconHeaderJoin` lets addons (call-peek) hide this when
+        // they show their own Join.
         <>
           <div
             className={`BeaconHeaderJoin ${tw(

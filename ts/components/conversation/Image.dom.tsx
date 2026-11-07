@@ -16,6 +16,7 @@ import {
 import { SpinnerV2 } from '../SpinnerV2.dom.tsx';
 import { useUndownloadableMediaHandler } from '../../hooks/useUndownloadableMediaHandler.dom.tsx';
 
+// Beacon: squarer media corners, matching the 10px message bubbles.
 export enum CurveType {
   None = 0,
   Tiny = 4,

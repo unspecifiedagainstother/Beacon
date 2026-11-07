@@ -218,6 +218,7 @@ export function formatTime(
   const timestamp = rawTimestamp.valueOf();
   const diff = now.valueOf() - timestamp;
 
+  // Beacon: better timestamps built-in.
   const beaconLabel = beaconTweaks.formatMessageTime?.(
     timestamp,
     now.valueOf()

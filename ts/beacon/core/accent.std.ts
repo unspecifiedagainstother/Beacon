@@ -1,11 +1,23 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Beacon accent color — follows the user's default chat color
+ * (Settings → Appearance → Chat color).
+ *
+ * Upstream colors are mostly compile-time SCSS, but the axo tokens
+ * (--axo-color-fill-accent and friends) are CSS variables, and Beacon UI is
+ * built on those plus --beacon-accent. The runtime writes these onto <body>,
+ * which beats the :root definitions for every descendant.
+ */
+
 import type {
   ConversationColorType,
   CustomColorType,
 } from '../../types/Colors.std.ts';
 
+// Solid chat colors, and a representative stop for each gradient — the one
+// that reads best as a UI accent on both themes (_variables.scss).
 const CHAT_COLOR_HEX: Record<
   Exclude<ConversationColorType, 'custom'>,
   string
@@ -70,6 +82,7 @@ export function getAccentHex(
   return CHAT_COLOR_HEX[selection.color] ?? DEFAULT_ACCENT;
 }
 
+/** CSS custom properties to apply for a given accent. */
 export function getAccentProperties(hex: string): Record<string, string> {
   return {
     '--beacon-accent': hex,

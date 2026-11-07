@@ -277,6 +277,9 @@ function startInstaller(): ThunkAction<
         });
       } else if (event.kind === ProvisionEventKind.Envelope) {
         const { envelope } = event;
+        // Beacon: upstream uses OS.getName() here, which shows up as "Linux" /
+        // "macOS" in the linked devices list. Name the client instead, so the
+        // entry is identifiable when several devices are linked.
         const defaultDeviceName = 'Beacon';
         const deviceName = window.SignalCI?.deviceName ?? defaultDeviceName;
 

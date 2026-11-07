@@ -115,6 +115,7 @@ export function EditHistoryMessagesModal({
     Record<string, number | undefined>
   >({});
 
+  // Beacon: word-level changes between versions.
   const [showChanges, setShowChanges] = useState(true);
 
   const [currentMessage, ...pastEdits] = editHistoryMessages;
@@ -205,6 +206,8 @@ export function EditHistoryMessagesModal({
             </div>
 
             {pastEdits.map((messageAttributes, index) => {
+              // The version this one was edited into (pastEdits run newest
+              // first, after the current message).
               const newerText =
                 (index === 0 ? currentMessage : pastEdits[index - 1])?.text ??
                 '';
@@ -295,6 +298,7 @@ export function EditHistoryMessagesModal({
   );
 }
 
+/** Beacon: what changed from this version to the next one. */
 function BeaconEditDiff({
   before,
   after,
@@ -314,6 +318,7 @@ function BeaconEditDiff({
       <span className="EditHistoryMessagesModal__beacon-diff__text">
         {parts.map((part, i) => (
           <span
+            // Parts are positional; the list is recomputed as a whole.
             // oxlint-disable-next-line react/no-array-index-key
             key={i}
             className={`EditHistoryMessagesModal__beacon-diff__${part.type}`}

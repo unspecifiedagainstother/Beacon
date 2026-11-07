@@ -3,6 +3,7 @@
 import type { ReactNode, JSX } from 'react';
 
 export type FunPanelProps = Readonly<{
+  /** Beacon: per-panel layout modifier, e.g. FunPanel--stickers. */
   className?: string;
   children: ReactNode;
 }>;

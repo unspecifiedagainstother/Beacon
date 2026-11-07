@@ -1,6 +1,12 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Open Signal's captcha in Beacon's own window (app/beacon-captcha.main.ts),
+ * falling back to the system browser if that fails. The token comes back
+ * through the same ChallengeMainHandler path either way.
+ */
+
 import { createLogger } from '../../logging/log.std.ts';
 import { drop } from '../../util/drop.std.ts';
 

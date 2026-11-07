@@ -6,8 +6,12 @@ import { useEffect, useState } from 'react';
 
 import { AxoButton } from '../axo/AxoButton.dom.tsx';
 import { drop } from '../util/drop.std.ts';
-import { noop } from 'lodash';
 
+/**
+ * Setup card corner button for an extra account that isn't signed in yet:
+ * cancels adding it (its empty folder is removed) and goes back to the
+ * main account. Renders nothing for the main account.
+ */
 export function BeaconAccountBackButton(): JSX.Element | null {
   const [isExtraAccount, setIsExtraAccount] = useState(false);
 
@@ -23,7 +27,7 @@ export function BeaconAccountBackButton(): JSX.Element | null {
             setIsExtraAccount(!self.isMain);
           }
         } catch {
-          noop();
+          // No IPC: nothing to go back to.
         }
       })()
     );
