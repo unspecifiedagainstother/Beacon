@@ -1,7 +1,12 @@
 name: Release
 
+# Every push to main builds Linux, Windows and macOS and publishes a
+# prerelease tagged v<version>-build.<run>. Pushing a v* tag publishes a
+# regular release under that tag instead.
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -12,7 +17,7 @@ on:
         default: ''
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:
@@ -91,9 +96,52 @@ jobs:
           if-no-files-found: error
           path: release/*.exe
 
+  macos:
+    name: macOS
+    runs-on: macos-26
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/actions/setup
+        with:
+          cache-electron-builder: true
+
+      # No Apple Developer ID: sign ad hoc so the app still launches on Apple
+      # silicon. Notarization skips itself without APPLE_* secrets.
+      - name: Ad hoc signing script
+        run: |
+          cat > "$RUNNER_TEMP/sign-adhoc.sh" <<'EOF'
+          #!/bin/bash
+          set -euo pipefail
+          codesign --force --deep --sign - "$1"
+          EOF
+          chmod +x "$RUNNER_TEMP/sign-adhoc.sh"
+
+      - name: Build
+        run: |
+          pnpm run generate
+          pnpm run build:rolldown:prod
+          pnpm run build:release --publish=never
+        env:
+          DISABLE_INSPECT_FUSE: on
+          SIGN_MACOS_SCRIPT: ${{ runner.temp }}/sign-adhoc.sh
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          if-no-files-found: error
+          path: |
+            release/*.dmg
+            release/*.zip
+
   release:
     name: Publish release
-    needs: [linux, windows]
+    needs: [linux, windows, macos]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -111,27 +159,35 @@ jobs:
         id: tag
         shell: bash
         run: |
+          version="$(node -p "require('./package.json').version")"
+          prerelease=false
           if [ "${{ github.ref_type }}" = "tag" ]; then
             tag="${{ github.ref_name }}"
           elif [ -n "${{ inputs.tag }}" ]; then
             tag="${{ inputs.tag }}"
           else
-            tag="v$(node -p "require('./package.json').version")"
+            tag="v$version-build.${{ github.run_number }}"
+            prerelease=true
           fi
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
 
       - name: Create or update release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.tag.outputs.tag }}
+          PRERELEASE: ${{ steps.tag.outputs.prerelease }}
         run: |
           ls -la dist
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" dist/* --clobber
           else
+            flags=()
+            [ "$PRERELEASE" = true ] && flags+=(--prerelease)
             gh release create "$TAG" dist/* \
-              --title "Beacon $TAG" \
-              --target "${{ github.sha }}" \
-              --generate-notes
+              --title "Beacon $TAG (${GITHUB_SHA::7})" \
+              --target "$GITHUB_SHA" \
+              --generate-notes \
+              "${flags[@]}"
           fi
