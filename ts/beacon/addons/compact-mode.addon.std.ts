@@ -1,6 +1,12 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Compact Mode — a denser chat timeline: smaller gaps between messages,
+ * tighter bubbles, optional smaller text and hidden group avatars.
+ * CSS only.
+ */
+
 import type { AddonManifest, Disposer } from '../core/types.dom.ts';
 import { ICON_COMPACT_MODE } from './icons.std.ts';
 

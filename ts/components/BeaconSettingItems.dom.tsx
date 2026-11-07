@@ -15,6 +15,10 @@ import type {
 } from '../beacon/core/types.dom.ts';
 import { setAddonSetting, useAddonSettings } from './beaconHooks.dom.ts';
 
+/**
+ * Renders an addon's declared settings as native Signal list items, for the
+ * Privacy tab. Text and number fields commit on blur.
+ */
 export function BeaconSettingItems({
   addonId,
   settings,

@@ -1,6 +1,19 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Beacon main-process features, behind one IPC bridge.
+ *
+ * The renderer calls `window.IPC.beaconInvoke(name, payload)`; only the names
+ * in HANDLERS are accepted. Settings that must apply before the renderer
+ * loads (content protection, spellcheck downloads) are persisted in
+ * ephemeralConfig, like the custom titlebar.
+ *
+ * Wiring in main.main.ts is two calls: setupBeaconMain() once the default
+ * session exists, and applyBeaconWindowSettings() after the main window is
+ * created.
+ */
+
 import type { BrowserWindow, Session } from 'electron';
 import { app, ipcMain, powerMonitor, shell } from 'electron';
 import * as ephemeralConfig from './ephemeral_config.main.ts';
@@ -33,6 +46,8 @@ const PROXY_SCHEMES = new Set([
 ]);
 const BLOCK_SPELLCHECK_KEY = 'beacon-block-spellcheck-download';
 
+// Nothing listens here; Chromium's download simply fails and only
+// dictionaries already on disk are used.
 const BLOCKED_DICTIONARY_URL = 'https://127.0.0.1:9/beacon-blocked/';
 const SPELLCHECK_DEFAULT_URL = `https://updates.signal.org/desktop/hunspell_dictionaries/${process.versions.electron}/`;
 
@@ -51,6 +66,7 @@ type Options = {
   session: Session;
   getMainWindow: () => BrowserWindow | undefined;
   log: LoggerType;
+  /** In-app captcha (beacon-captcha.main.ts). */
   captcha: {
     urls: { chat: string; registration: string };
     onToken: (token: string) => void;
@@ -77,6 +93,7 @@ function getProxyUrl(): string | undefined {
   return typeof value === 'string' && value ? value : undefined;
 }
 
+/** Returns an error message, or undefined when the URL is usable. */
 // RFC1918, loopback, link-local, and other private ranges that must not
 // be used as a proxy target — doing so could redirect Signal traffic to a
 // local attacker-controlled service.
@@ -113,6 +130,12 @@ export function validateProxyUrl(value: string): string | undefined {
   return undefined;
 }
 
+/**
+ * Call at the very start of main: Signal reads HTTPS_PROXY when it builds
+ * the renderer config (libsignal chat connection, attachments, contact
+ * discovery) and in the updater, so setting it here routes all of those.
+ * An HTTPS_PROXY already in the environment wins.
+ */
 export function applyBeaconProxyEnv(): void {
   const proxy = getProxyUrl();
   if (proxy && !process.env.HTTPS_PROXY && !process.env.https_proxy) {
@@ -121,6 +144,8 @@ export function applyBeaconProxyEnv(): void {
 }
 
 export function applyBeaconWindowSettings(window: BrowserWindow): void {
+  // Excludes the window from screenshots and screen sharing on Windows and
+  // macOS. Most Linux compositors ignore it.
   window.setContentProtection(getBool(CONTENT_PROTECTION_KEY));
 }
 
@@ -167,6 +192,9 @@ const HANDLERS: Record<string, (payload: unknown) => unknown> = {
     return true;
   },
 
+  // Solve the captcha in the system browser instead (signal-cli style): a
+  // real browser profile scores better with hCaptcha than the in-app
+  // window. The finished "Open Signal" link is pasted back in.
   'captcha:open-external': payload => {
     if (!options) {
       return false;
@@ -183,6 +211,7 @@ const HANDLERS: Record<string, (payload: unknown) => unknown> = {
 
   'captcha:submit': payload => {
     const raw = typeof payload === 'string' ? payload.trim() : '';
+    // The full "signalcaptcha://…" link, or just the token part.
     const token =
       captchaTokenFromUrl(raw) ??
       (/^signal-[a-z0-9-]*captcha[^\s/]*\.\S+$/i.test(raw) ? raw : undefined);
@@ -287,6 +316,8 @@ export function setupBeaconMain(opts: Options): void {
   options = opts;
   applySpellcheckBlock(opts.session);
 
+  // Chromium-side requests (anything loaded by the page itself) follow the
+  // same proxy as Node/libsignal traffic.
   const proxy = process.env.HTTPS_PROXY || process.env.https_proxy;
   if (proxy) {
     const rules = proxy.replace(/^socks5h:/, 'socks5:');
@@ -294,6 +325,9 @@ export function setupBeaconMain(opts: Options): void {
     opts.log.info('beacon: proxy enabled for this session');
   }
 
+  // Chromium-level requests made by this session (images, link previews
+  // loaded in the page, devtools, ...). Connections opened by Node code or
+  // by libsignal's native networking are recorded on the renderer side.
   opts.session.webRequest.onCompleted(details => {
     let url: URL;
     try {
@@ -301,6 +335,7 @@ export function setupBeaconMain(opts: Options): void {
     } catch {
       return;
     }
+    // Network only: skip file:, data:, devtools:, attachment: and friends.
     if (!/^(https?|wss?):$/.test(url.protocol) || !url.host) {
       return;
     }
@@ -318,6 +353,7 @@ export function setupBeaconMain(opts: Options): void {
     }
   });
 
+  // System events the app lock reacts to (renderer decides what to do).
   for (const name of ['lock-screen', 'suspend'] as const) {
     powerMonitor.on(name as 'lock-screen', () => {
       opts.getMainWindow()?.webContents.send('beacon:system', name);

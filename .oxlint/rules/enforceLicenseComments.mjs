@@ -3,6 +3,7 @@
 // @ts-check
 import { ESLintUtils } from '@typescript-eslint/utils';
 
+// Beacon: fork-owned files carry a Beacon copyright line instead.
 const COMMENT_LINE_1_EXACT =
   /^ Copyright \d{4} (?:Signal Messenger, LLC|Beacon)$/;
 const COMMENT_LINE_2_EXACT = /^ SPDX-License-Identifier: AGPL-3.0-only$/;

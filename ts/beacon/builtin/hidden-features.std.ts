@@ -1,13 +1,19 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Hidden Signal features: switches for things that exist in Signal's code
+ * but are held back by rollouts or limited to Signal staff. The switches
+ * are read directly by the code they unlock (core/hidden-features.std.ts);
+ * this manifest only declares them so they show in settings.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { defineIcon } from '../core/icons.std.ts';
 import {
   HIDDEN_FEATURE_DEFAULTS,
   HIDDEN_FEATURES_ID,
 } from '../core/hidden-features.std.ts';
-import { noop } from 'lodash';
 
 export const ICON_HIDDEN_FEATURES = defineIcon([
   'M12 3l8 4v5c0 4.4-3.4 8-8 9-4.6-1-8-4.6-8-9V7z',
@@ -81,5 +87,7 @@ export default {
     },
   ],
 
-  start: noop,
+  start() {
+    // Nothing to run: the switches are read where they apply.
+  },
 } satisfies AddonManifest;

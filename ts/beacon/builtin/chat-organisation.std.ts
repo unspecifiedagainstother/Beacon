@@ -1,6 +1,11 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Chat list organisation: more pinned chats and a collapsible Pinned
+ * section (click the "Pinned" header). State in core/chat-list-state.std.ts.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { BEACON_STATE_CHANGED } from '../../state/ducks/beacon.std.ts';
 import { defineIcon } from '../core/icons.std.ts';

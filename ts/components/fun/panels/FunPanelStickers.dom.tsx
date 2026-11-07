@@ -231,6 +231,9 @@ export function FunPanelStickers({
   }, [recentStickers, installedStickerPacks]);
 
   const [focusedCellKey, setFocusedCellKey] = useState<CellKey | null>(null);
+  // Beacon: pack whose header shows the inline "Remove?" confirmation.
+  // Inline rather than a dialog: a dialog sits outside the picker popover,
+  // so clicking it closed the picker before the click registered.
   const [packToRemove, setPackToRemove] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(storedSearchInput);
   const searchQuery = useMemo(() => searchInput.trim(), [searchInput]);
@@ -560,6 +563,7 @@ export function FunPanelStickers({
   );
 }
 
+/** Beacon: trash button on a pack header, then inline Remove / Cancel. */
 function BeaconRemovePackControl(props: {
   packId: string;
   confirming: boolean;

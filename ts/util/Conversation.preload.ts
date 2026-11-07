@@ -45,5 +45,6 @@ export function computeGroupNameHash(name: string): string {
 
 export function getPinnedConversationLimit(): number {
   const remoteValue = RemoteConfig.getValue('global.pinnedChatLimit');
+  // Beacon: higher pin limit (Chat list organisation).
   return Math.max(parseIntWithFallback(remoteValue, 4), getBeaconPinLimit());
 }

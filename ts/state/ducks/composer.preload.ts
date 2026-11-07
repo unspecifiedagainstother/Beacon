@@ -703,6 +703,8 @@ function sendMultiMediaMessage(
           ? shouldSendHighQualityAttachments
           : state.items['sent-media-quality'] === 'high';
 
+      // Beacon: several files (or files plus photos) go out as consecutive
+      // messages; the text, quote and link preview ride on the first one.
       const [firstGroup = attachments, ...laterGroups] = isViewOnce
         ? [attachments]
         : splitAttachmentsForSend(attachments);
@@ -744,6 +746,7 @@ function sendMultiMediaMessage(
           }
         );
         for (const [index, group] of laterGroups.entries()) {
+          // In order, each with its own timestamp.
           // oxlint-disable-next-line no-await-in-loop
           await conversation.enqueueMessageForSend(
             { body: undefined, attachments: group },
@@ -803,6 +806,8 @@ function sendStickerMessage(
         return;
       }
 
+      // Beacon: sticker replies always on (Signal gates them behind a
+      // remote-config rollout).
       const isStickerReplySendEnabled = true;
 
       let sendStickerMessageOptions;
@@ -1338,6 +1343,10 @@ function preProcessAttachment(
   if (draftAttachments.length >= 32) {
     return { toastType: ToastType.MaxAttachments };
   }
+
+  // Beacon: any mix of files and photos can be staged; sendMultiMediaMessage
+  // splits them into one album plus one message per file
+  // (beacon/util/splitAttachments.std.ts).
 
   const fileType = stringToMIMEType(file.type);
 

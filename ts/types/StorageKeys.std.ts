@@ -76,6 +76,8 @@ export type BlockedNumber = {
   e164: string;
 };
 
+// Beacon: keys are generated from the feature registry, so adding a feature
+// does not require editing this file. See ts/beacon/features.std.ts.
 export type StorageAccessType = BeaconStorageKeys & {
   'always-relay-calls': boolean;
   'audio-notification': boolean;
@@ -385,6 +387,9 @@ export const STORAGE_KEYS_TO_PRESERVE_AFTER_UNLINK = [
   'auto-download-update',
   'autoConvertEmoji',
   'badge-count-muted-conversations',
+  // Beacon: all Beacon settings are display/behaviour preferences for this
+  // install, not account data, so they survive unlinking like the UI settings
+  // around them. Generated from the registry — no edit needed per feature.
   ...BEACON_FEATURE_KEYS,
   'call-ringtone-notification',
   'customColors',
@@ -500,6 +505,7 @@ export const STORAGE_KEYS_TO_PRESERVE_WHEN_PRIMARY = [
 ] as const satisfies ReadonlyArray<keyof StorageAccessType>;
 
 const STORAGE_KEYS_TO_REMOVE_AFTER_UNLINK = [
+  // Beacon: message-logger index — references this account's messages.
   'beaconMessageLog',
   'beaconProfileHistory',
   'beaconProfileBaseline',
