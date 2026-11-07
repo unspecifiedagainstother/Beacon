@@ -1,14 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Per-chat notification privacy. Signal has one global choice (name and
- * message / name only / nothing); this lets a chat override it — e.g. show
- * everything for family but nothing for one sensitive chat — from the chat's
- * ⋯ menu. Overrides are applied after Signal's own setting, so they can only
- * reveal less than the global setting allows, never more.
- */
-
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_NOTIFICATION_PRIVACY } from '../addons/icons.std.ts';
 import { askChoice } from '../core/prompts.dom.ts';

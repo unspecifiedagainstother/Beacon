@@ -1,11 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Promise-based dialogs on top of createModal(): confirm, choose, password.
- * Each resolves once — closing the dialog counts as cancel.
- */
-
 import { createElement, createModal } from './ui.dom.ts';
 
 export type ConfirmOptions = {
@@ -56,7 +51,6 @@ export type ChoiceOption<T extends string> = {
   description?: string;
 };
 
-/** A list of radio-like buttons; resolves with the picked value. */
 export function askChoice<T extends string>(options: {
   title: string;
   intro?: string;
@@ -121,10 +115,6 @@ export function askChoice<T extends string>(options: {
   });
 }
 
-/**
- * Ask for a password. With `confirm`, a second field must match and the
- * password must be at least `minLength` characters.
- */
 export function askPassword(options: {
   title: string;
   intro?: string;
@@ -135,7 +125,6 @@ export function askPassword(options: {
   return askInput({ ...options, inputType: 'password' });
 }
 
-/** A single line of plain text; empty is allowed. */
 export function askText(options: {
   title: string;
   intro?: string;

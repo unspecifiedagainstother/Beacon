@@ -1,12 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Character counter in the message composer. Signal sends text longer than
- * 2 KiB (UTF-8) as an attached text file instead of a plain body; the
- * counter turns amber past that point.
- */
-
 import type { AddonManifest } from '../core/types.dom.ts';
 import { defineIcon } from '../core/icons.std.ts';
 import { MAX_MESSAGE_BODY_BYTE_LENGTH } from '../../util/longAttachment.std.ts';
@@ -66,8 +60,6 @@ export default {
         input.appendChild(counter);
         counters.set(input, counter);
       }
-      // Quill keeps a trailing newline in textContent-less form; innerText
-      // gives what the user sees.
       const text = (editor as HTMLElement).innerText.replace(/\n$/, '');
       const chars = countGraphemes(text);
       const bytes = new TextEncoder().encode(text).length;
@@ -89,7 +81,6 @@ export default {
     };
     document.addEventListener('input', onInput, true);
     document.addEventListener('keyup', onInput, true);
-    // Sending clears the editor without an input event.
     const observer = new MutationObserver(records => {
       for (const record of records) {
         const editor =

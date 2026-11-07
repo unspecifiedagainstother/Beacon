@@ -10,8 +10,6 @@ on:
         description: 'Ignore version cache and reproduce the latest builds'
         required: true
         default: false
-  schedule:
-    - cron: '0 12 * * *'
 jobs:
   linux:
     strategy:

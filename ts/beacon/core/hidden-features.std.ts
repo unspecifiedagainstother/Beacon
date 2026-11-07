@@ -1,15 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Switches for Signal features that exist in the code but are held back by
- * remote-config rollouts or limited to internal (Signal staff) builds.
- *
- * Read synchronously from the addon settings store (localStorage), so they
- * work during startup before the hidden-features built-in has started; the
- * built-in only declares them for the settings UI.
- */
-
 import { addonSettings } from './settings.std.ts';
 
 export const HIDDEN_FEATURES_ID = 'hidden-features';
@@ -30,7 +21,6 @@ export function isHiddenFeatureOn(feature: HiddenFeature): boolean {
   return typeof value === 'boolean' ? value : HIDDEN_FEATURE_DEFAULTS[feature];
 }
 
-/** Remote-config rollout keys a Beacon switch can force on. */
 const ROLLOUT_KEYS: Record<string, HiddenFeature> = {
   'desktop.disappearingCalls.beta': 'disappearingCalls',
   'desktop.disappearingCalls.prod': 'disappearingCalls',

@@ -9,12 +9,12 @@ import classNames from 'classnames';
 import type { LocalizerType } from '../types/Util.std.ts';
 import { AxoSwitch } from '../axo/AxoSwitch.dom.tsx';
 import { tokenizeCss } from '../beacon/util/cssHighlight.std.ts';
+import { noop } from 'lodash';
 
 const STORAGE_KEY = 'beacon-custom-css';
 const STYLE_ID = 'beacon-custom-css';
 const INDENT = '  ';
 
-/** Number of rules the browser accepts, or undefined if it cannot parse. */
 export function countCssRules(source: string): number | undefined {
   try {
     const sheet = new CSSStyleSheet();
@@ -33,9 +33,6 @@ export function getCustomCSS(): string {
   }
 }
 
-/**
- * Inject custom CSS into the document. Replaces any previous injected CSS.
- */
 export function injectCustomCSS(css: string): void {
   let styleEl = document.getElementById(STYLE_ID);
   if (!styleEl) {
@@ -46,9 +43,6 @@ export function injectCustomCSS(css: string): void {
   styleEl.textContent = css;
 }
 
-/**
- * Load and inject saved CSS on app startup.
- */
 export function loadAndInjectCustomCSS(): void {
   const css = getCustomCSS();
   if (css) {
@@ -65,7 +59,6 @@ function Highlighted({ source }: { source: string }): JSX.Element {
           token.text
         ) : (
           <span
-            // Tokens are positional; the index is the identity.
             // oxlint-disable-next-line react/no-array-index-key
             key={idx}
             className={`BeaconCode__tok BeaconCode__tok--${token.kind}`}
@@ -85,11 +78,6 @@ export type DialogProps = {
   onClose: () => void;
 };
 
-/**
- * Full-window CSS editor with syntax highlighting, line numbers and live
- * preview. Highlighting is a <pre> layer under a transparent <textarea>, so
- * editing keeps native undo, selection and IME behaviour.
- */
 export function BeaconCSSEditorDialog({
   i18n,
   onClose,
@@ -105,7 +93,6 @@ export function BeaconCSSEditorDialog({
   const ruleCount = useMemo(() => countCssRules(draft), [draft]);
   const isDirty = draft !== saved;
 
-  // Live preview applies the draft; closing without saving restores `saved`.
   useEffect(() => {
     injectCustomCSS(livePreview ? draft : saved);
   }, [draft, livePreview, saved]);
@@ -119,7 +106,7 @@ export function BeaconCSSEditorDialog({
     try {
       localStorage.setItem(STORAGE_KEY, draft);
     } catch {
-      // Quota or storage disabled: keep the preview for this session.
+      noop();
     }
     injectCustomCSS(draft);
     onClose();
@@ -160,7 +147,6 @@ export function BeaconCSSEditorDialog({
     if (ev.key === 'Tab') {
       ev.preventDefault();
       const { selectionStart: start, selectionEnd: end } = ta;
-      // execCommand keeps the edit on the native undo stack.
       document.execCommand('insertText', false, INDENT);
       if (start === end) {
         return;

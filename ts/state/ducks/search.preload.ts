@@ -432,7 +432,6 @@ const doSearch = debounce(
     }
 
     const rawQuery = getQuery(state);
-    // Beacon: from:/before:/after:/has: filters; the rest is searched as text.
     const beaconFilters = parseSearchFilters(rawQuery);
     const query = beaconFilters.text;
     const filterByUnread = getFilterByUnread(state);
@@ -567,9 +566,6 @@ async function queryMessages({
   }
 }
 
-// Beacon: search with from:/before:/after:/has: filters. With words, Signal's
-// full-text search runs first and the filters narrow it; filters alone scan
-// recent messages (this chat, or the 30 most recent chats).
 const FILTER_SCAN_CHATS = 30;
 const FILTER_SCAN_PER_CHAT = 400;
 const FILTER_RESULT_LIMIT = 200;

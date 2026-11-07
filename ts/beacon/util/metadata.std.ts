@@ -1,27 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * File metadata detection and removal, without external libraries.
- *
- * Every stripper takes the original bytes and returns a cleaned copy plus a
- * human-readable list of what it found. Where the container has internal
- * offsets (PDF xref tables, MP4 chunk offsets) metadata is overwritten in
- * place at the same length instead of removed, so the file stays valid.
- *
- *   JPEG   EXIF/XMP (APP1), IPTC (APP13), other APPn except ICC/Adobe, COM
- *   PNG    tEXt, zTXt, iTXt, eXIf, tIME
- *   WebP   EXIF and XMP chunks (and their VP8X flags)
- *   GIF    comment and application extensions (except looping)
- *   PDF    Info dictionary values, XMP packets
- *   OOXML  docProps/core.xml, app.xml, custom.xml (docx, xlsx, pptx, ...)
- *   ODF    meta.xml (odt, ods, odp, ...); entry timestamps in both
- *   MP3    ID3v2 and ID3v1 tags
- *   MP4    udta/meta/XMP boxes, creation/modification times (mp4, m4a, mov)
- */
-
-// Byte-level container parsing: bit operations and in-place writes into the
-// working copy are the point of this file.
 /* oxlint-disable no-bitwise, no-param-reassign */
 
 export type MetadataKind =
@@ -36,11 +15,8 @@ export type MetadataKind =
 
 export type MetadataResult = {
   kind: MetadataKind | undefined;
-  /** What was found, e.g. "camera details and location (EXIF)". */
   found: Array<string>;
-  /** Cleaned bytes; the input itself when nothing was found or unsupported. */
   data: Uint8Array<ArrayBuffer>;
-  /** Something could not be removed (see `notes`). */
   partial: boolean;
   notes: Array<string>;
 };
@@ -105,10 +81,6 @@ function result(
   };
 }
 
-// ---------------------------------------------------------------------------
-// Detection
-// ---------------------------------------------------------------------------
-
 export function detectKind(
   bytes: Uint8Array<ArrayBuffer>,
   fileName = ''
@@ -146,7 +118,6 @@ export function detectKind(
   return undefined;
 }
 
-/** File types Beacon cannot inspect but which commonly carry metadata. */
 export function isUncleanableDocument(fileName: string): boolean {
   return /\.(doc|xls|ppt|rtf|heic|heif|tiff?|raw|cr2|nef|arw|dng|psd|ai|svg|flac|ogg|opus|wav|aiff?|mkv|avi|wmv|webm)$/i.test(
     fileName
@@ -191,10 +162,6 @@ export function stripMetadata(
   }
 }
 
-// ---------------------------------------------------------------------------
-// JPEG
-// ---------------------------------------------------------------------------
-
 function stripJpeg(input: Uint8Array<ArrayBuffer>): MetadataResult {
   const keep: Array<Uint8Array<ArrayBuffer>> = [input.subarray(0, 2)];
   const found: Array<string> = [];
@@ -210,7 +177,6 @@ function stripJpeg(input: Uint8Array<ArrayBuffer>): MetadataResult {
       continue;
     }
     if (marker === 0xda) {
-      // Start of scan: the rest is image data.
       keep.push(input.subarray(offset));
       break;
     }
@@ -246,7 +212,6 @@ function stripJpeg(input: Uint8Array<ArrayBuffer>): MetadataResult {
       drop = true;
       found.push('comment');
     } else if (marker >= 0xe2 && marker <= 0xef) {
-      // ICC profile (APP2) and Adobe (APP14) affect how colours decode.
       const isIcc = marker === 0xe2 && id.startsWith('ICC_PROFILE');
       const isAdobe = marker === 0xee && id.startsWith('Adobe');
       if (!isIcc && !isAdobe) {
@@ -264,10 +229,6 @@ function stripJpeg(input: Uint8Array<ArrayBuffer>): MetadataResult {
     ? result('jpeg', concat(keep), found)
     : result('jpeg', input);
 }
-
-// ---------------------------------------------------------------------------
-// PNG
-// ---------------------------------------------------------------------------
 
 const PNG_DROP: Record<string, string> = {
   tEXt: 'text fields (author, software, ...)',
@@ -301,10 +262,6 @@ function stripPng(input: Uint8Array<ArrayBuffer>): MetadataResult {
     : result('png', input);
 }
 
-// ---------------------------------------------------------------------------
-// WebP
-// ---------------------------------------------------------------------------
-
 function stripWebp(input: Uint8Array<ArrayBuffer>): MetadataResult {
   const chunks: Array<Uint8Array<ArrayBuffer>> = [];
   const found: Array<string> = [];
@@ -327,7 +284,6 @@ function stripWebp(input: Uint8Array<ArrayBuffer>): MetadataResult {
   }
   for (const chunk of chunks) {
     if (latin1(chunk, 0, 4) === 'VP8X' && chunk.length > 8) {
-      // Clear the EXIF (0x08) and XMP (0x04) presence flags.
       chunk[8] = (chunk[8] ?? 0) & ~0x0c;
     }
   }
@@ -341,10 +297,6 @@ function stripWebp(input: Uint8Array<ArrayBuffer>): MetadataResult {
   header[7] = (riffSize >>> 24) & 0xff;
   return result('webp', concat([header, body]), found);
 }
-
-// ---------------------------------------------------------------------------
-// GIF
-// ---------------------------------------------------------------------------
 
 function skipSubBlocks(input: Uint8Array<ArrayBuffer>, offset: number): number {
   let o = offset;
@@ -412,10 +364,6 @@ function stripGif(input: Uint8Array<ArrayBuffer>): MetadataResult {
     : result('gif', input);
 }
 
-// ---------------------------------------------------------------------------
-// PDF — same-length, in-place
-// ---------------------------------------------------------------------------
-
 const PDF_INFO_KEYS = [
   'Author',
   'Creator',
@@ -441,13 +389,11 @@ function blankRange(
   }
 }
 
-/** Blanks a PDF string value starting at `start`; returns true if non-empty. */
 function blankPdfString(
   bytes: Uint8Array<ArrayBuffer>,
   start: number
 ): boolean {
   if (bytes[start] === 0x28) {
-    // (literal) with nesting and backslash escapes
     let depth = 0;
     let i = start;
     for (; i < bytes.length; i += 1) {
@@ -483,7 +429,6 @@ function stripPdf(input: Uint8Array<ArrayBuffer>): MetadataResult {
   const found: Array<string> = [];
   const notes: Array<string> = [];
 
-  // 1. Info dictionaries named by every trailer / xref stream.
   const infoRefs = new Set<string>();
   for (const match of text.matchAll(/\/Info\s+(\d+)\s+(\d+)\s+R/g)) {
     infoRefs.add(`${match[1]} ${match[2]}`);
@@ -524,7 +469,6 @@ function stripPdf(input: Uint8Array<ArrayBuffer>): MetadataResult {
     }
   }
 
-  // 2. XMP packets (normally stored uncompressed so tools can find them).
   const packetRe = /<\?xpacket begin=[\s\S]*?<\?xpacket end=['"][rw]['"]\?>/g;
   for (const match of text.matchAll(packetRe)) {
     const start = match.index ?? 0;
@@ -554,10 +498,6 @@ function stripPdf(input: Uint8Array<ArrayBuffer>): MetadataResult {
     ? result('pdf', found.length ? bytes : input, found, notes)
     : result('pdf', input);
 }
-
-// ---------------------------------------------------------------------------
-// OOXML / ODF zip containers
-// ---------------------------------------------------------------------------
 
 const CRC_TABLE = (() => {
   const table = new Uint32Array(256);
@@ -598,12 +538,10 @@ const MINIMAL_PARTS: Record<string, { label: string; xml: string }> = {
   },
 };
 
-// 1980-01-01 00:00 in DOS format.
 const DOS_TIME = 0;
 const DOS_DATE = (0 << 9) | (1 << 5) | 1;
 
 function stripOfficeZip(input: Uint8Array<ArrayBuffer>): MetadataResult {
-  // End of central directory: last 22..65557 bytes.
   let eocd = -1;
   for (
     let i = input.length - 22;
@@ -742,15 +680,10 @@ function stripOfficeZip(input: Uint8Array<ArrayBuffer>): MetadataResult {
   return result('zip-office', concat([...locals, ...centrals, end]), found);
 }
 
-// ---------------------------------------------------------------------------
-// MP3
-// ---------------------------------------------------------------------------
-
 function stripMp3(input: Uint8Array<ArrayBuffer>): MetadataResult {
   let start = 0;
   let end = input.length;
   const found: Array<string> = [];
-  // Several ID3v2 tags can be stacked.
   while (latin1(input, start, start + 3) === 'ID3') {
     const size =
       ((input[start + 6] ?? 0) << 21) |
@@ -770,10 +703,6 @@ function stripMp3(input: Uint8Array<ArrayBuffer>): MetadataResult {
     : result('mp3', input);
 }
 
-// ---------------------------------------------------------------------------
-// MP4 / MOV / M4A — in place: metadata boxes become zeroed 'free' boxes
-// ---------------------------------------------------------------------------
-
 const MP4_CONTAINERS = new Set(['moov', 'trak', 'mdia', 'minf', 'edts']);
 
 function stripMp4(input: Uint8Array<ArrayBuffer>): MetadataResult {
@@ -789,7 +718,6 @@ function stripMp4(input: Uint8Array<ArrayBuffer>): MetadataResult {
   };
 
   const zeroTimes = (offset: number) => {
-    // Full box: version(1) flags(3), then creation + modification time.
     const version = bytes[offset + 8];
     const width = version === 1 ? 8 : 4;
     const from = offset + 12;
@@ -805,7 +733,6 @@ function stripMp4(input: Uint8Array<ArrayBuffer>): MetadataResult {
       let size = u32be(bytes, offset);
       const type = latin1(bytes, offset + 4, offset + 8);
       if (size === 1) {
-        // 64-bit size; upper half must be 0 for anything we can hold.
         size = u32be(bytes, offset + 12) + u32be(bytes, offset + 8) * 2 ** 32;
       } else if (size === 0) {
         size = end - offset;

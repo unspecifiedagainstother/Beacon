@@ -443,9 +443,7 @@ type GetLeftPaneListsProps = Readonly<{
   pinnedConversationIds: ReadonlyArray<string> | null;
   selectedChatFolder: ChatFolder | null;
   stableSelectedConversationIdInChatFolder: string | null;
-  /** Beacon: hidden (and, in a duress session, locked) chats. */
   beaconExcluded?: ReadonlySet<string>;
-  /** Beacon: locked chats — listed, but without a message preview. */
   beaconRedacted?: ReadonlySet<string>;
 }>;
 
@@ -548,7 +546,6 @@ export const getLeftPaneLists = createSelector(
     selectedChatFolder,
     stableSelectedConversationIdInChatFolder,
     hiddenChats,
-    // Only here so collapsing Pinned produces new lists (re-render).
     _chatListState
   ) => {
     return _getLeftPaneLists({

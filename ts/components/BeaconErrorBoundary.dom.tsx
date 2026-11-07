@@ -10,20 +10,13 @@ import * as Errors from '../types/errors.std.ts';
 const log = createLogger('BeaconErrorBoundary');
 
 type Props = Readonly<{
-  /** Shown in the log, e.g. "contact details". */
   name: string;
   children: ReactNode;
-  /** What to render after a crash; nothing by default. */
   fallback?: ReactNode;
 }>;
 
 type State = { failed: boolean };
 
-/**
- * Wraps every piece of Beacon UI rendered inside Signal's own screens: if a
- * Beacon feature throws while rendering, it disappears (and is logged)
- * instead of taking the message, menu or settings page down with it.
- */
 export class BeaconErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);

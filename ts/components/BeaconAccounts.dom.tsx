@@ -11,12 +11,7 @@ import { getInitials } from '../util/getInitials.std.ts';
 import { askConfirm } from '../beacon/core/prompts.dom.ts';
 import { showNotification } from '../beacon/core/ui.dom.ts';
 import { drop } from '../util/drop.std.ts';
-
-/**
- * Account list for the menu drawer, Telegram style: every account signed
- * in on this computer, with its unread count. Click one to switch to it,
- * right-click to remove it, or add another.
- */
+import { noop } from 'lodash';
 
 export type BeaconAccountRow = {
   id: string;
@@ -47,7 +42,7 @@ export function useAccountsExpanded(): [boolean, () => void] {
       try {
         localStorage.setItem(EXPANDED_KEY, value ? '0' : '1');
       } catch {
-        // Ignore
+        noop();
       }
       return !value;
     });

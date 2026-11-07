@@ -1,14 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * A tiny Redux slice whose only job is to change when Beacon state that
- * selectors read from outside Redux (hidden chats, collapsed Pinned
- * section, ...) changes. Selectors that start from the whole state object
- * (state => state) only recompute when some slice is replaced; bumping
- * this version does that.
- */
-
 import type { ReadonlyDeep } from 'type-fest';
 
 export type BeaconStateType = ReadonlyDeep<{ version: number }>;

@@ -1,11 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Looks at a URL before it is opened and lists anything that deserves a
- * second look. Pure, so it is unit-tested.
- */
-
 export type LinkWarning =
   | 'not-https'
   | 'punycode'
@@ -17,9 +12,7 @@ export type LinkWarning =
 
 export type LinkAnalysis = {
   url: URL;
-  /** Hostname as shown to the user (Unicode where the URL used punycode). */
   host: string;
-  /** Registrable-ish domain: the last two labels (three for co.uk-style). */
   site: string;
   warnings: Array<LinkWarning>;
 };
@@ -72,7 +65,6 @@ export function siteOf(hostname: string): string {
   return labels.slice(-take).join('.');
 }
 
-/** Decodes xn-- labels for display; falls back to the raw label. */
 export function toUnicodeHost(hostname: string): string {
   return hostname
     .split('.')
@@ -89,7 +81,6 @@ export function toUnicodeHost(hostname: string): string {
     .join('.');
 }
 
-// RFC 3492 decoder (bootstring), enough for display.
 function decodePunycode(input: string): string {
   const base = 36;
   const tMin = 1;
