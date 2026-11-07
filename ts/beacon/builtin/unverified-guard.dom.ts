@@ -1,13 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Unverified-contact guard. Signal already stops a send when a safety number
- * has *changed*; this also asks when you have never verified the person —
- * i.e. you haven't compared safety numbers, so you can't be sure the keys
- * belong to them. Optional "Not verified" badge in the chat header.
- */
-
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_UNVERIFIED_GUARD } from '../addons/icons.std.ts';
 import { askChoice } from '../core/prompts.dom.ts';
@@ -73,8 +66,6 @@ export default {
   ],
 
   start(ctx) {
-    // 'once' approvals persist; Signal's own check still fires if the safety
-    // number changes later.
     const approved = new Set<string>();
     const remembered = new Set(
       ctx.storage.get<Array<string>>('approved') ?? []

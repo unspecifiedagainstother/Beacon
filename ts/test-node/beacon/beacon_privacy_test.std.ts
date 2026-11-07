@@ -100,7 +100,6 @@ describe('beacon metadata stripping', () => {
   });
 
   it('replaces docProps in an OOXML zip', () => {
-    // Build a two-entry stored zip by hand.
     const entries = [
       { name: '[Content_Types].xml', data: enc('<Types/>') },
       {

@@ -1,20 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Hidden and locked chats, from the chat's ⋯ menu.
- *
- *  - Hidden: left out of the chat list and search until you show hidden
- *    chats (with the passphrase, if one is set). They hide again when
- *    Beacon locks.
- *  - Locked: listed without a message preview; opening one asks for the
- *    passphrase. Unlocked chats stay open until Beacon locks.
- *
- * After a duress unlock both kinds stay hidden and can't be shown or opened
- * for the rest of the session. The lists live in Signal's encrypted
- * database (items), never in localStorage.
- */
-
 import type { AddonManifest } from '../core/types.dom.ts';
 import { BEACON_STATE_CHANGED } from '../../state/ducks/beacon.std.ts';
 import { defineIcon } from '../core/icons.std.ts';
@@ -32,7 +18,6 @@ import { TARGETED_CONVERSATION_CHANGED } from '../../state/ducks/conversations.p
 import { drop } from '../../util/drop.std.ts';
 
 export const ICON_HIDDEN_CHATS = defineIcon([
-  // Chat bubble with a slash.
   'M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 0 1 15.5 4.8',
   'M3 3l18 18',
 ]);
@@ -40,7 +25,6 @@ export const ICON_HIDDEN_CHATS = defineIcon([
 const HIDDEN_KEY = 'beaconHiddenChats';
 const LOCKED_KEY = 'beaconLockedChats';
 
-/** Asks for the real passphrase; true when it matched (or none is set). */
 async function confirmPassphrase(title: string): Promise<boolean> {
   if (!isLockConfigured()) {
     return true;
@@ -50,7 +34,6 @@ async function confirmPassphrase(title: string): Promise<boolean> {
     return false;
   }
   const result = await verifyPassphrase(passphrase);
-  // A duress passphrase behaves like a wrong one here.
   return result.kind === 'real' && !isDuressSession();
 }
 
@@ -137,7 +120,6 @@ export default {
       }
     };
 
-    // Lock everything again whenever Beacon locks.
     ctx.onDispose(
       onLockChange(event => {
         if (event === 'locked') {
@@ -157,7 +139,6 @@ export default {
       })
     );
 
-    // -- Opening a locked chat
     let prompting = false;
     const askToOpen = async (id: string) => {
       if (prompting || isDuressSession()) {
@@ -206,7 +187,6 @@ export default {
       return id && isGuarded(id) ? null : action;
     });
 
-    // -- Showing hidden chats
     const reveal = async () => {
       if (revealed) {
         revealed = false;
@@ -235,7 +215,6 @@ export default {
       execute: () => reveal(),
     });
 
-    // -- Menu items
     ctx.filters.add('conversation.menuItems', (items, { conversationId }) => {
       if (isDuressSession()) {
         return items;
@@ -315,7 +294,6 @@ export default {
       ];
     });
 
-    // -- Notifications
     const isSecret = (id: string) => hidden().has(id) || locked().has(id);
     ctx.filters.add('notification.show', (show, info) => {
       if (!show || !isSecret(info.conversationId)) {

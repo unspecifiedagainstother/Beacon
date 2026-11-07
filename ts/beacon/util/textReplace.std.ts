@@ -1,14 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Rule parsing for the text-replace addon.
- *
- * One rule per line, `find => replace`. `find` is literal text, or a regex
- * written as `/pattern/flags`. Blank lines and lines starting with `#` are
- * ignored. In regex rules `$1`… refer to capture groups.
- */
-
 export type ReplaceRule = {
   source: string;
   apply: (text: string) => string;
@@ -61,7 +53,6 @@ export function parseReplaceRules(source: string): ParseResult {
 
     rules.push({
       source: line,
-      // Literal rules must not interpret `$` in the replacement.
       apply: regexLiteral
         ? text => text.replace(re, replace)
         : text => text.replace(re, () => replace),

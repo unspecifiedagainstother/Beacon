@@ -1,0 +1,137 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v8.31.0). Leave empty to use the package.json version.'
+        required: false
+        default: ''
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/actions/setup
+        with:
+          cache-electron-builder: true
+
+      - name: Build
+        run: |
+          pnpm run generate
+          pnpm run build:rolldown:prod
+          pnpm run build:release --linux deb AppImage --x64 --publish=never
+        env:
+          CC: sccache gcc
+          CXX: sccache g++
+          SCCACHE_GHA_ENABLED: true
+          DISABLE_INSPECT_FUSE: on
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          if-no-files-found: error
+          path: |
+            release/*.deb
+            release/*.AppImage
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/actions/setup
+        with:
+          cache-electron-builder: true
+
+      - name: Disable code signing
+        shell: bash
+        run: |
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            delete pkg.build.win.signtoolOptions.certificateSubjectName;
+            delete pkg.build.win.signtoolOptions.certificateSha1;
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+
+      - name: Build
+        shell: bash
+        run: |
+          pnpm run generate
+          pnpm run build:rolldown:prod
+          pnpm run build:release --win nsis --x64 --publish=never
+        env:
+          DISABLE_INSPECT_FUSE: on
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          if-no-files-found: error
+          path: release/*.exe
+
+  release:
+    name: Publish release
+    needs: [linux, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Pick tag
+        id: tag
+        shell: bash
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            tag="${{ github.ref_name }}"
+          elif [ -n "${{ inputs.tag }}" ]; then
+            tag="${{ inputs.tag }}"
+          else
+            tag="v$(node -p "require('./package.json').version")"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          ls -la dist
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --clobber
+          else
+            gh release create "$TAG" dist/* \
+              --title "Beacon $TAG" \
+              --target "${{ github.sha }}" \
+              --generate-notes
+          fi

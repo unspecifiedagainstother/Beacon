@@ -782,8 +782,6 @@ export const CompositionArea = memo(function CompositionArea({
     </>
   );
 
-  // Beacon: emoji / sticker / GIF picker on the right, where the microphone
-  // was; voice notes moved into the + menu.
   const funPickerFragment = (
     <div
       aria-hidden={isViewOnceActive || undefined}
@@ -830,8 +828,6 @@ export const CompositionArea = memo(function CompositionArea({
 
   const isRecording = recordingState === RecordingState.Recording;
 
-  // Beacon: voice notes start from the + menu (and Mod+Shift+Y) now that
-  // the microphone button's slot holds the emoji/sticker picker.
   const handleStartVoiceNote = useCallback(() => {
     if (draftAttachments.length) {
       showToast({ toastType: ToastType.VoiceNoteMustBeTheOnlyAttachment });

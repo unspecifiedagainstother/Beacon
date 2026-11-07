@@ -10,6 +10,7 @@ import { FileThumbnail } from '../FileThumbnail.dom.tsx';
 export type Props = {
   attachment: AttachmentForUIType;
   onClose: (attachment: AttachmentForUIType) => void;
+  onClick?: () => void;
   i18n: LocalizerType;
 };
 
@@ -17,11 +18,25 @@ export function StagedGenericAttachment({
   attachment,
   i18n,
   onClose,
+  onClick,
 }: Props): JSX.Element {
   const { fileName } = attachment;
 
   return (
-    <div className="module-staged-attachment module-staged-generic-attachment">
+    // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+    <div
+      className="module-staged-attachment module-staged-generic-attachment"
+      onClick={event => {
+        if (
+          onClick &&
+          !(event.target as HTMLElement).closest(
+            '.module-staged-generic-attachment__close-button'
+          )
+        ) {
+          onClick();
+        }
+      }}
+    >
       <button
         type="button"
         className="module-staged-generic-attachment__close-button"

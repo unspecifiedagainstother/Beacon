@@ -17,6 +17,7 @@ import {
   isImageAttachment,
   isVideoAttachment,
 } from '../../util/Attachment.std.ts';
+import { applyBeaconFilter } from '../../beacon/core/filters.std.ts';
 
 export type Props<T extends AttachmentForUIType | AttachmentDraftType> =
   Readonly<{
@@ -110,6 +111,24 @@ export function AttachmentList<
           const isImage = isImageAttachment(forUI);
           const isVideo = isVideoAttachment(forUI);
           const closeAttachment = () => onCloseAttachment(attachment);
+          const beaconAction = (action: 'click' | 'contextmenu') =>
+            applyBeaconFilter('composer.attachmentAction', false, {
+              attachment,
+              action,
+            });
+          const withBeaconMenu = (tile: JSX.Element) => (
+            <div
+              key={key}
+              className="BeaconStagedAttachment"
+              onContextMenu={event => {
+                if (beaconAction('contextmenu')) {
+                  event.preventDefault();
+                }
+              }}
+            >
+              {tile}
+            </div>
+          );
 
           if (
             (isImage && areDimensionsDisplayable(forUI)) ||
@@ -148,23 +167,23 @@ export function AttachmentList<
             );
 
             if (isImage && canEditImages) {
-              return (
-                <div className="module-attachments--editable" key={key}>
+              return withBeaconMenu(
+                <div className="module-attachments--editable">
                   {imgElement}
                   <div className="module-attachments__edit-icon" />
                 </div>
               );
             }
 
-            return imgElement;
+            return withBeaconMenu(imgElement);
           }
 
-          return (
+          return withBeaconMenu(
             <StagedGenericAttachment
-              key={key}
               attachment={forUI}
               i18n={i18n}
               onClose={closeAttachment}
+              onClick={() => beaconAction('click')}
             />
           );
         })}

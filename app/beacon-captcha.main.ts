@@ -1,23 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * In-app captcha window for registration and rate-limit challenges.
- *
- * Upstream opens signalcaptchas.org in the system browser and waits for the
- * OS to hand the resulting `signalcaptcha://` link back to the app. That
- * needs the protocol handler registered, which often isn't the case on
- * Linux (AppImage, Flatpak, distrobox, dev builds). Here the same official
- * page — the one carrying Signal's hCaptcha site key — loads in a small
- * window, and the `signalcaptcha://…` navigation it ends with is caught
- * directly (as signal-cli users do by copying that link by hand).
- *
- * The hCaptcha widget only works on the domain its site key is registered
- * for, so the page has to come from signalcaptchas.org; it can't be embedded
- * in Beacon's own UI. The window uses a throwaway in-memory session (no
- * cookies kept) and may only navigate to the captcha and hCaptcha hosts.
- */
-
 import { BrowserWindow } from 'electron';
 import type { LoggerType } from '../ts/types/Logging.std.ts';
 import { drop } from '../ts/util/drop.std.ts';
@@ -39,7 +22,6 @@ function isAllowed(rawUrl: string): boolean {
   }
 }
 
-/** `signalcaptcha://signal-hcaptcha.<key>.registration.<token>` → token. */
 export function captchaTokenFromUrl(rawUrl: string): string | undefined {
   if (!rawUrl.toLowerCase().startsWith(`${CAPTCHA_SCHEME}//`)) {
     return undefined;
@@ -76,7 +58,6 @@ export function openCaptchaWindow({
     autoHideMenuBar: true,
     show: false,
     webPreferences: {
-      // No "persist:" prefix: in-memory, discarded with the window.
       partition: 'beacon-captcha',
       sandbox: true,
       contextIsolation: true,
@@ -86,9 +67,6 @@ export function openCaptchaWindow({
   });
   current = win;
 
-  // hCaptcha scores the browser; an "Electron/…" or app token in the user
-  // agent reads as automation and Signal then rejects the solved captcha.
-  // Present as the plain Chromium this is.
   win.webContents.setUserAgent(
     win.webContents
       .getUserAgent()
@@ -102,7 +80,6 @@ export function openCaptchaWindow({
       event.preventDefault();
       if (!done) {
         done = true;
-        // The first parts name the captcha type and site key; not secret.
         log.info(
           `beacon captcha: token received (${token
             .split('.')
@@ -124,7 +101,6 @@ export function openCaptchaWindow({
   win.webContents.on('will-redirect', (event, target) => handle(event, target));
   win.webContents.on('will-frame-navigate', event => {
     if (!event.isMainFrame) {
-      // hCaptcha's own iframes.
       if (!isAllowed(event.url) && !captchaTokenFromUrl(event.url)) {
         event.preventDefault();
       }
@@ -153,7 +129,6 @@ export function openCaptchaWindow({
   drop(win.loadURL(url));
 }
 
-/** Close the in-app captcha window (switching to the system browser). */
 export function closeCaptchaWindow(): void {
   if (current && !current.isDestroyed()) {
     current.close();

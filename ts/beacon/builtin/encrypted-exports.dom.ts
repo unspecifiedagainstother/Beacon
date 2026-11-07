@@ -1,13 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Encrypted exports: message-log and profile-history exports are written
- * password-encrypted (PBKDF2-SHA256 600k + AES-256-GCM). The work happens in
- * ../core/exports.dom.ts; this built-in holds the setting and the decrypt
- * command. The Privacy tab has a Decrypt button too.
- */
-
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_ENCRYPTED_EXPORTS } from '../addons/icons.std.ts';
 import {

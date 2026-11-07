@@ -256,7 +256,6 @@ const getSearchResultsUnfiltered = createSelector(
   }
 );
 
-// Beacon: leave hidden chats out of search, by conversation and by message.
 export const getSearchResults = createSelector(
   [getSearchResultsUnfiltered, getHiddenChatsState],
   (results, hiddenChats): ReturnType<typeof getSearchResultsUnfiltered> => {

@@ -8,8 +8,6 @@ $is-storybook: false !default;
 );
 @use 'variables';
 @use 'mixins';
-// Beacon: emits the :root theme tokens that variables.scss reads via var().
-// Must be emitted into the output CSS; keep before component styles.
 @use 'beacon-theme';
 @use 'global';
 @use 'titlebar';

@@ -150,7 +150,6 @@ export const ConversationListItem: FunctionComponent<Props> = memo(
         </span>
       );
     } else if (isSomeoneTyping) {
-      // Beacon: optional "Alice is typing" next to the dots.
       const typingLabel = beaconTweaks.typingLabel?.(
         Object.keys(typingContactIdTimestamps ?? {}),
         type

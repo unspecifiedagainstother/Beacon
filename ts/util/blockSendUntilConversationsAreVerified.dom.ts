@@ -46,7 +46,6 @@ export async function blockSendUntilConversationsAreVerified(
     return explodedPromise.promise;
   }
 
-  // Beacon: the unverified-contact guard may ask before sending.
   return applyBeaconAsyncFilter('send.verify', true, {
     conversationIds: Object.keys(byConversationId),
     serviceIds: Array.from(allServiceIds),

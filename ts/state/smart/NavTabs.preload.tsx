@@ -69,8 +69,6 @@ export const SmartNavTabs = memo(function SmartNavTabs({
     startComposing,
   } = useConversationsActions();
 
-  // Beacon: tell the account switcher who this account is and how many
-  // unread messages it has (shown in other accounts' menus and the tray).
   const accountUnread = getUnreadCountForBadge(
     unreadConversationsStats,
     unreadCountBadgeType

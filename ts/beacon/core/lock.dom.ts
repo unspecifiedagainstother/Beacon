@@ -1,22 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * App lock: a passphrase screen over the whole window, on start and after
- * inactivity, plus an optional duress passphrase.
- *
- * Storage: two "slots" in localStorage, each an AES-GCM blob under a key
- * derived from a passphrase (PBKDF2-SHA256, 600k). One slot opens with the
- * real passphrase, the other with the duress passphrase — or holds random
- * bytes when no duress passphrase is set. Slots are stored in random order
- * and look the same, so the file doesn't reveal whether a duress passphrase
- * exists or what it does.
- *
- * This is a lock on the interface. It does not re-encrypt Signal's database
- * (that key is protected by the OS keychain), so someone with full access
- * to your user account and files can still get at the data.
- */
-
 import { createLogger } from '../../logging/log.std.ts';
 import { createElement } from './ui.dom.ts';
 import { drop } from '../../util/drop.std.ts';
@@ -37,10 +21,6 @@ export type UnlockResult =
   | { kind: 'real' }
   | { kind: 'duress'; action: DuressAction }
   | { kind: 'wrong' };
-
-// ---------------------------------------------------------------------------
-// Crypto
-// ---------------------------------------------------------------------------
 
 const b64 = (bytes: Uint8Array<ArrayBuffer>) => {
   let s = '';
@@ -79,7 +59,6 @@ async function deriveKey(
   );
 }
 
-// Fixed-size plaintext so real and duress slots have the same length.
 const PAYLOAD_SIZE = 64;
 
 function pad(json: string): Uint8Array<ArrayBuffer> {
@@ -132,10 +111,6 @@ async function openSlot(
   }
 }
 
-// ---------------------------------------------------------------------------
-// Config
-// ---------------------------------------------------------------------------
-
 function readConfig(): LockConfig | undefined {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -185,7 +160,6 @@ export async function verifyPassphrase(
   return { kind: 'wrong' };
 }
 
-/** Finds which slot index the given passphrase opens. */
 async function slotIndexFor(
   config: LockConfig,
   passphrase: string
@@ -198,7 +172,6 @@ async function slotIndexFor(
   return payload ? { index, payload } : undefined;
 }
 
-/** Set (no current passphrase) or change (current must be the real one). */
 export async function setPassphrase(
   next: string,
   current?: string
@@ -238,7 +211,6 @@ export async function removePassphrase(current: string): Promise<boolean> {
   return true;
 }
 
-/** Sets or clears (duress = undefined) the duress passphrase. */
 export async function setDuress(
   real: string,
   duress: { passphrase: string; action: DuressAction } | undefined
@@ -266,10 +238,6 @@ export async function setDuress(
   return 'ok';
 }
 
-// ---------------------------------------------------------------------------
-// Lock state and overlay
-// ---------------------------------------------------------------------------
-
 type LockListener = (event: 'locked' | 'unlocked' | 'config') => void;
 const listeners = new Set<LockListener>();
 let locked = false;
@@ -278,7 +246,6 @@ let inerted: Array<HTMLElement> = [];
 let bodyObserver: MutationObserver | undefined;
 let unlockHandler: ((result: UnlockResult) => void) | undefined;
 let pendingResult: UnlockResult | undefined;
-// Once unlocked with the duress passphrase, stays set until restart.
 let duressSession = false;
 
 function notify(event: 'locked' | 'unlocked' | 'config' = 'config'): void {
@@ -302,17 +269,14 @@ export function isLocked(): boolean {
   return locked;
 }
 
-/** True after unlocking with the duress passphrase (until restart). */
 export function isDuressSession(): boolean {
   return duressSession;
 }
 
-/** Called once by the app-lock built-in to handle duress results. */
 export function setUnlockHandler(
   handler: ((result: UnlockResult) => void) | undefined
 ): void {
   unlockHandler = handler;
-  // The startup lock can be answered before the built-in has started.
   if (handler && pendingResult) {
     const result = pendingResult;
     pendingResult = undefined;
@@ -321,13 +285,8 @@ export function setUnlockHandler(
 }
 
 function inertOthers(): void {
-  // Everything except the overlay and the custom titlebar. The titlebar is
-  // nested in the app root, so walk down its ancestor chain and inert the
-  // siblings at each level instead of the ancestors themselves.
   const titlebar = document.querySelector('.BeaconTitlebar');
   if (titlebar) {
-    // A startup lock runs before the titlebar exists and may have inerted
-    // its ancestor; release that one and inert at a finer level below.
     const keep: Array<HTMLElement> = [];
     for (const element of inerted) {
       if (element.contains(titlebar)) {
@@ -437,7 +396,6 @@ function buildOverlay(): HTMLElement {
       failures += 1;
       input.value = '';
       if (failures >= 5) {
-        // 30 s, 60 s, 120 s, ... capped at 15 min.
         const seconds = Math.min(900, 30 * 2 ** (failures - 5));
         blockedUntil = Date.now() + seconds * 1000;
         error.textContent = `Wrong passphrase. Locked for ${seconds} s.`;
@@ -452,7 +410,6 @@ function buildOverlay(): HTMLElement {
     unlock(result);
   });
 
-  // Keep keystrokes from reaching Signal's global shortcuts underneath.
   const stop = (ev: Event) => ev.stopPropagation();
   form.addEventListener('keydown', stop);
   form.addEventListener('keyup', stop);
@@ -464,7 +421,6 @@ function buildOverlay(): HTMLElement {
     children: [form],
   });
 
-  // The custom titlebar ends up under the lock; keep the window usable.
   const addControls = async () => {
     if (!(await window.IPC.beaconGetCustomTitlebar())) {
       return;
@@ -509,7 +465,6 @@ export function lock(): void {
     overlay = buildOverlay();
     document.body.appendChild(overlay);
     inertOthers();
-    // Subtree: the app renders (and the titlebar appears) after a startup lock.
     bodyObserver = new MutationObserver(scheduleInert);
     bodyObserver.observe(document.body, { childList: true, subtree: true });
     overlay.querySelector('input')?.focus();
@@ -543,7 +498,6 @@ function unlock(result: UnlockResult): void {
   }
 }
 
-/** Lock right away at startup when a passphrase is configured. */
 export function lockOnStartup(): void {
   if (isLockConfigured()) {
     lock();

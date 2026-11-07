@@ -1,24 +1,12 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Addon settings store.
- *
- * Values are declared on the manifest (AddonManifest.settings) and stored in
- * one localStorage object keyed by addon id. Both the running addon (through
- * ctx.settings) and the Settings → Beacon → Modules page read and write here,
- * and listeners fire on either side so a change in the UI reaches the addon
- * live.
- *
- * Settings are configuration, not content: localStorage is not encrypted at
- * rest, so nothing sensitive belongs here.
- */
-
 import type {
   AddonSettingDefinition,
   AddonSettingValue,
   Disposer,
 } from './types.dom.ts';
+import { noop } from 'lodash';
 
 const STORAGE_KEY = 'beacon-addon-settings';
 
@@ -109,13 +97,13 @@ export class AddonSettingsStore {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.#cache));
     } catch {
-      // Quota or disabled storage — keep the in-memory value for the session.
+      noop();
     }
     for (const listener of Array.from(this.#listeners)) {
       try {
         listener(addonId, key, next);
       } catch {
-        // A broken listener must not stop the others.
+        noop();
       }
     }
   }
@@ -127,14 +115,14 @@ export class AddonSettingsStore {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.#cache));
     } catch {
-      // see set()
+      noop();
     }
     for (const def of this.definitions(addonId)) {
       for (const listener of Array.from(this.#listeners)) {
         try {
           listener(addonId, def.key, def.defaultValue);
         } catch {
-          // see set()
+          noop();
         }
       }
     }
