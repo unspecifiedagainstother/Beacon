@@ -25,6 +25,7 @@ export function FileThumbnail(props: PropsType): JSX.Element {
     >
       <span
         className={tw(
+          // Beacon: mx-0.5 + small text from 3 chars so "mp3" isn't cut.
           'mx-0.5 overflow-hidden',
           // oxlint-disable-next-line better-tailwindcss/no-restricted-classes
           'text-[rgba(0,0,0,0.85)]',

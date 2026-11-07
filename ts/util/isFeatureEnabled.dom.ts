@@ -26,6 +26,7 @@ export function isFeaturedEnabledSelector({
   prodKey: SemverKeyType;
   remoteConfig: ReadonlyDeep<ConfigMapType> | undefined;
 }): boolean {
+  // Beacon: hidden-features switches force some rollouts on.
   if (isRolloutForcedOn(betaKey)) {
     return true;
   }

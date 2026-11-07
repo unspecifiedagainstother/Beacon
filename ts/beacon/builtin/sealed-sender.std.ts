@@ -1,6 +1,14 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Sealed-sender indicator. Signal normally hides who sent a message from the
+ * server ("sealed sender"); a message that arrived without it means the
+ * server saw the sender. Message.dom.tsx tags incoming bubbles with
+ * --beacon-sealed / --beacon-unsealed (from unidentifiedDeliveryReceived);
+ * this draws a small mark next to the time.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_SEALED_SENDER } from '../addons/icons.std.ts';
 import { iconToCssUrl, defineIcon } from '../core/icons.std.ts';

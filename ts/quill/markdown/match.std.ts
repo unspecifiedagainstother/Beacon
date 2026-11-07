@@ -1,6 +1,13 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Inline-markdown detection for the composer. Signal's message formats are
+ * bold, italic, strikethrough, monospace and spoiler; each has a markdown
+ * spelling here. Called with the text before the cursor right after a
+ * keystroke: if that keystroke closed a span, returns where it is.
+ */
+
 export type MarkdownStyle =
   | 'bold'
   | 'italic'
@@ -10,13 +17,16 @@ export type MarkdownStyle =
 
 export type MarkdownMatch = {
   style: MarkdownStyle;
+  /** Index of the opening delimiter. */
   openStart: number;
+  /** Index of the closing delimiter (it ends at the cursor). */
   closeStart: number;
   delimiterLength: number;
 };
 
 type Rule = { style: MarkdownStyle; delimiter: string };
 
+// Longer delimiters first so `**x**` is bold, not italic.
 export const MARKDOWN_RULES: ReadonlyArray<Rule> = [
   { style: 'bold', delimiter: '**' },
   { style: 'spoiler', delimiter: '||' },
@@ -45,9 +55,11 @@ function matchRule(text: string, rule: Rule): MarkdownMatch | undefined {
   if (beforeClose === undefined || closeStart <= lineStart) {
     return undefined;
   }
+  // `**bold*` must not close as italic, `~~x~` not as single-tilde strike.
   if (beforeClose === delimChar) {
     return undefined;
   }
+  // No space right inside the closing delimiter (except in code spans).
   if (rule.style !== 'monospace' && isSpace(beforeClose)) {
     return undefined;
   }
@@ -68,6 +80,7 @@ function matchRule(text: string, rule: Rule): MarkdownMatch | undefined {
       beforeOpen !== delimChar &&
       afterOpen !== delimChar &&
       (rule.style === 'monospace' || !isSpace(afterOpen)) &&
+      // Opening delimiter starts a word: not "snake_case" or "2*3*4".
       !isWordChar(beforeOpen) &&
       (d > 1 || !inner.includes(delimiter));
 

@@ -144,6 +144,7 @@ type MessageRowType = {
 type HeaderRowType = {
   type: RowType.Header;
   getHeaderText: (i18n: LocalizerType) => string;
+  /** Beacon: makes the header a toggle (collapsible Pinned section). */
   beaconOnClick?: () => void;
 };
 

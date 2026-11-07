@@ -1,6 +1,21 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Attachment privacy.
+ *
+ * Outgoing (filter 'attachment.outgoing', in processAttachment):
+ *  - random file names, keeping the extension (default on). Signal already
+ *    drops the name of photos and videos; this covers files and documents.
+ *  - metadata: remove (default), ask each time, or leave alone — see
+ *    ../util/metadata.std.ts for the formats. Photos Signal re-encodes are
+ *    clean anyway; this catches GIF/WebP, videos, audio, PDFs and documents.
+ *  - a warning before sending file types Beacon can't clean.
+ *
+ * Incoming (filter 'attachment.autoDownload'): rules applied on top of
+ * Signal's own per-type settings, which Beacon defaults to all off.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_ATTACHMENT_PRIVACY } from '../addons/icons.std.ts';
 import { askChoice, askConfirm } from '../core/prompts.dom.ts';
@@ -114,6 +129,7 @@ export default {
       let next = attachment;
       const displayName = info.originalName || 'file';
 
+      // -- Metadata
       const mode = ctx.settings.get<string>('metadata');
       if (mode !== 'off') {
         const cleaned = stripMetadata(next.data, info.originalName);
@@ -173,6 +189,7 @@ export default {
         }
       }
 
+      // -- Name
       if (ctx.settings.get<boolean>('randomNames') && next.fileName) {
         next = { ...next, fileName: randomName(next.fileName) };
       }

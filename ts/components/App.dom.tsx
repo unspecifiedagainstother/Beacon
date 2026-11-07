@@ -100,10 +100,15 @@ export function App({
     document.body.classList.toggle('maximized', isMaximized);
   }, [isFullScreen, isMaximized]);
 
+  // Beacon: load saved custom CSS on app startup. The addon platform itself
+  // is initialized in initializeRedux(), not here — it needs the real store.
   useEffect(() => {
     loadAndInjectCustomCSS();
   }, []);
 
+  // Beacon: the window is frameless when the custom titlebar is enabled, so we
+  // draw our own. Read once — the value only changes across restarts, since
+  // BrowserWindow's `frame` is fixed at creation.
   const [hasCustomTitlebar, setHasCustomTitlebar] = useState(false);
   useEffect(() => {
     let canceled = false;

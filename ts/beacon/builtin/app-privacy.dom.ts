@@ -1,6 +1,17 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * App privacy — window-level protections.
+ *  - Hide from screenshots/screen sharing (Electron content protection).
+ *  - Neutral window title: never "Beacon (3)".
+ *  - Hide the unread count on the tray icon and taskbar/dock badge.
+ *  - Block spellcheck dictionary downloads (only on-disk dictionaries used).
+ *
+ * The first and last live in the main process (app/beacon.main.ts) and are
+ * persisted there so they apply before the UI loads.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_APP_PRIVACY } from '../addons/icons.std.ts';
 import { drop } from '../../util/drop.std.ts';
@@ -66,6 +77,7 @@ export default {
     };
     drop(syncMain());
 
+    // -- Title: strip " (N)" whenever Signal sets it.
     const titleEl = document.querySelector('title');
     const neutralize = () => {
       if (!ctx.settings.get<boolean>('neutralTitle')) {
@@ -86,12 +98,14 @@ export default {
     }
     neutralize();
 
+    // -- Badge and tray: report zero unread while enabled.
     const zeroIfHidden = (args: Array<unknown>) =>
       ctx.settings.get<boolean>('hideBadge') ? [0] : args;
     ctx.patcher.before(window.IPC, 'setBadgeCount', zeroIfHidden);
     ctx.patcher.before(window.IPC, 'updateTrayIcon', zeroIfHidden);
 
     const refreshUnread = () => {
+      // Recomputes and re-sends the count through the patched methods.
       window.ConversationController.updateUnreadCount();
     };
     refreshUnread();

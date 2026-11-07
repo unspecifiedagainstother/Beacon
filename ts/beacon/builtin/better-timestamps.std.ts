@@ -1,6 +1,12 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Better timestamps on messages: clock time instead of "5m", optional
+ * seconds and 24-hour time, the date on older messages, and the full date
+ * and time on hover.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { defineIcon } from '../core/icons.std.ts';
 import { beaconTweaks } from '../core/tweaks.std.ts';

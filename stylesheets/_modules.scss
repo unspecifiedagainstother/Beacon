@@ -1103,6 +1103,7 @@ $message-padding-horizontal: 12px;
   }
 }
 
+// Beacon: earlier revisions of an edited message, shown above the current body.
 .module-message__past-edits {
   display: flex;
   flex-direction: column;
@@ -1110,7 +1111,10 @@ $message-padding-horizontal: 12px;
   margin-bottom: 4px;
 
   &__item {
+    // Dimmed to read as superseded. Paired with a text label below, since
+    // opacity alone is not an accessible signal.
     opacity: var(--beacon-past-edit-opacity, 0.55);
+    // Keep long edit chains from dominating the timeline.
     overflow-wrap: break-word;
   }
 

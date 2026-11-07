@@ -227,6 +227,8 @@ export class NotificationService extends EventEmitter {
    * which doesn't check permissions, do any filtering, etc.
    */
   public add(notificationData: QueuedNotificationData): void {
+    // Beacon: addons may suppress a message/reaction notification (see
+    // notification-filter). Reminders and calls are never filtered.
     if (
       (notificationData.type === NotificationType.Message ||
         notificationData.type === NotificationType.Reaction) &&
@@ -504,6 +506,7 @@ export class NotificationService extends EventEmitter {
     switch (type) {
       case NotificationType.Message:
       case NotificationType.Reaction: {
+        // Beacon: per-chat notification privacy can redact further.
         const content = applyBeaconFilter(
           'notification.content',
           redactMessageNotificationContent({

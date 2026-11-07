@@ -1,6 +1,11 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Text Faces — the classic chat-client slash commands: /tableflip, /unflip,
+ * /lenny and friends. Each inserts its face after any text you typed.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_TEXT_FACES } from './icons.std.ts';
 

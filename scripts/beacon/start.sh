@@ -1,25 +1,26 @@
 #!/usr/bin/env bash
+# Beacon: build if needed, then launch the app.
+#
+#   scripts/beacon/start.sh [options] [-- extra electron args]
+#
+#   --staging     staging servers (standalone device, not your account)
+#   --prod        production servers — real account, linked-device slot
+#                 (default, matches previous behaviour)
+#   --build       force a full rebuild before starting
+#   --no-build    skip the staleness check and start what's built
+#   --debug       expose DevTools protocol on 127.0.0.1:9229 (BEACON_DEBUG_PORT)
+#                 (window.Beacon lives in the "Electron Isolated Context")
+#   -h, --help    show this help
+#
+# Works from the host or inside the `mollydesk` distrobox; it re-enters the
+# container itself. Installs dependencies and a pnpm shim on first run.
 set -euo pipefail
 
 # shellcheck source=scripts/beacon/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 usage() {
-  cat <<'EOF'
-Build if needed, then launch Beacon.
-
-  scripts/beacon/start.sh [options] [-- extra electron args]
-
-  --staging     staging servers (standalone device, not your account)
-  --prod        production servers: real account (default)
-  --build       force a full rebuild before starting
-  --no-build    skip the staleness check and start what's built
-  --debug       expose DevTools protocol on 127.0.0.1:9229 (BEACON_DEBUG_PORT)
-  -h, --help    show this help
-
-Works from the host or inside the `mollydesk` distrobox; it re-enters the
-container itself. Installs dependencies and a pnpm shim on first run.
-EOF
+  sed -n '2,16p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
 MODE=prod
@@ -51,6 +52,7 @@ while [ $# -gt 0 ]; do
   shift
 done
 
+# Re-exec inside the container with the original arguments.
 if [ ! -f /run/.containerenv ]; then
   args=()
   [ "$MODE" = staging ] && args+=(--staging)
@@ -82,6 +84,9 @@ case "$BUILD" in
   skip) ;;
 esac
 
+# Launch Electron directly, not through `pnpm exec`: with NODE_ENV=production
+# pnpm treats the workspace as a production install and offers to purge
+# devDependencies (a hidden prompt that hangs in a terminal).
 ELECTRON="$BEACON_REPO/node_modules/.bin/electron"
 [ -x "$ELECTRON" ] || beacon_die "electron missing — run scripts/beacon/build.sh"
 
@@ -96,6 +101,8 @@ if [ ${#EXTRA[@]} -gt 0 ]; then
 fi
 
 if [ "$MODE" = staging ]; then
+  # config/default.json points at *.staging.signal.org. Your phone cannot link
+  # to it; register via File -> "Set Up as Standalone Device".
   beacon_log "starting against STAGING (standalone device, not your account)"
   exec "$ELECTRON" "${ELECTRON_ARGS[@]}"
 fi

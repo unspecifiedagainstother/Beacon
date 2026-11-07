@@ -1,8 +1,19 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Which conversations the chat list and search leave out. Read by the
+ * left-pane and search selectors (ts/state/selectors/), written by the
+ * hidden-chats built-in. The state object is replaced on every change, so
+ * reselect sees a new input; the built-in then dispatches
+ * beacon/STATE_CHANGED (ducks/beacon.std.ts) so whole-state selectors
+ * recompute too.
+ */
+
 export type HiddenChatsState = Readonly<{
+  /** Conversation ids currently excluded from lists and search. */
   excluded: ReadonlySet<string>;
+  /** Shown in the chat list, but with the message preview replaced. */
   redacted: ReadonlySet<string>;
 }>;
 

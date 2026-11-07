@@ -1,6 +1,16 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Network monitor: which hosts Beacon connects to. Records every Node
+ * socket opened in the renderer (net/tls — attachments, link previews,
+ * updates, ...); the main process adds Chromium's own requests. Shown in
+ * Settings → Privacy. Host and port only, kept in memory, never saved.
+ *
+ * libsignal opens the encrypted chat connection itself, in native code, so
+ * that one is not listed (it goes to chat.signal.org).
+ */
+
 import net from 'node:net';
 
 import type { AddonManifest } from '../core/types.dom.ts';
@@ -8,6 +18,7 @@ import { ICON_NETWORK_MONITOR } from '../addons/icons.std.ts';
 import { recordConnection } from '../core/network-log.std.ts';
 import { siteOf } from '../util/linkSafety.std.ts';
 
+/** Sites Signal itself talks to; anything else is "new" for alerts. */
 export const SIGNAL_SITES = new Set([
   'signal.org',
   'signal.art',
@@ -24,6 +35,7 @@ function parseTarget(
 ): { host: string; port?: number } | undefined {
   const [first, second] = args;
   if (Array.isArray(first)) {
+    // Internal normalized form: [options, callback]
     return parseTarget(first);
   }
   if (typeof first === 'object' && first != null) {

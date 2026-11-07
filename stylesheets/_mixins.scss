@@ -333,6 +333,10 @@ $rtl-icon-map: (
 
 @mixin popper-shadow() {
   & {
+    // Beacon flat theme: elevation is drawn with a hairline border instead of
+    // a drop shadow. Shared by Modal, GroupDialog, ShortcutGuide,
+    // CompositionInput and the timeline popovers, so this one change flattens
+    // all of them. Set --beacon-elevation-shadow to restore a shadow.
     box-shadow: var(--beacon-elevation-shadow, none);
     border: var(--beacon-elevation-border, 1px solid #2f2f2f);
   }

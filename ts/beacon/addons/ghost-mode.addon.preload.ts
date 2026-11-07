@@ -1,6 +1,24 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Ghost Mode — read and type without telling anyone.
+ *
+ * Signal's own settings for typing indicators and read receipts are
+ * symmetric: turn them off and you stop *seeing* them too. Ghost Mode blocks
+ * only the outgoing side, so you keep seeing other people's.
+ *
+ * Mechanism:
+ *  - Typing: patches ConversationModel.prototype.sendTypingMessage, the one
+ *    method every typing start/refresh/stop goes through.
+ *  - Read receipts: patches conversationJobQueue.add and drops Receipts jobs
+ *    of type Read. Read *syncs* to your own linked devices still go out, so
+ *    your phone still marks the chat read.
+ *
+ * Caveat, stated plainly: this is asymmetric, which Signal deliberately is
+ * not. Contacts with receipts on will still see "delivered".
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_GHOST_MODE } from './icons.std.ts';
 import { ConversationModel } from '../../models/conversations.preload.ts';
@@ -60,6 +78,7 @@ export default {
         data?.type === conversationQueueJobEnum.enum.Receipts &&
         data.receiptsType === ReceiptType.Read
       ) {
+        // Callers await this but never read the job back.
         return Promise.resolve(undefined);
       }
       return original(...args);

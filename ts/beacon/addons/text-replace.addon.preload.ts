@@ -1,6 +1,15 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Text Replace — rewrite outgoing messages with your own find/replace rules
+ * (shortcuts, autocorrect, regex). Rules run just before the message is
+ * saved and sent, so the recipient only ever sees the result.
+ *
+ * Like clear-urls, messages with formatting or mentions are skipped: their
+ * body ranges are character offsets that a replacement would shift.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_TEXT_REPLACE } from './icons.std.ts';
 import { ConversationModel } from '../../models/conversations.preload.ts';

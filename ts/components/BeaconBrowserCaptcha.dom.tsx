@@ -7,6 +7,12 @@ import { useState } from 'react';
 import { AxoButton } from '../axo/AxoButton.dom.tsx';
 import { drop } from '../util/drop.std.ts';
 
+/**
+ * Fallback for the registration captcha: solve it in your own browser and
+ * paste the "Open Signal" link back (the way signal-cli does it). Signal
+ * can reject captchas solved in the in-app window; a real browser profile
+ * passes more reliably.
+ */
 export function BeaconBrowserCaptcha(): JSX.Element {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');

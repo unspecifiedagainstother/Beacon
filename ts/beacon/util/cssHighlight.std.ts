@@ -1,6 +1,16 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Small CSS tokenizer for the custom CSS editor's syntax highlighting.
+ *
+ * Not a parser: it tracks just enough context (inside a block or not, before
+ * or after the property colon) to colour selectors, properties and values
+ * differently. Concatenating every token's text always reproduces the input
+ * exactly — the highlight layer sits under a transparent textarea and must
+ * line up character for character.
+ */
+
 export type CssTokenKind =
   | 'comment'
   | 'string'
@@ -33,6 +43,10 @@ export function tokenizeCss(source: string): Array<CssToken> {
   const tokens: Array<CssToken> = [];
   let depth = 0;
   let inValue = false;
+  // Nested rules (@media { a { ... } }) mean a word inside a block is a
+  // selector when a `{` follows before any `;` or `:`-then-`;`. Approximate:
+  // inside a block, a word before ':' is a property unless the rest of the
+  // statement contains '{'.
   let rest = source;
 
   const push = (kind: CssTokenKind, text: string) => {
@@ -66,6 +80,7 @@ export function tokenizeCss(source: string): Array<CssToken> {
           inValue = false;
         } else if (text === ':' && depth > 0 && !inValue) {
           const statement = rest.slice(0, rest.search(/[;}]|$/));
+          // `a:hover {` inside @media is a selector, not a declaration.
           if (!statement.includes('{')) {
             inValue = true;
           }
@@ -80,6 +95,7 @@ export function tokenizeCss(source: string): Array<CssToken> {
           kind = statement.includes('{') ? 'selector' : 'property';
         }
       } else if ((rawKind === 'number' || rawKind === 'color') && !inValue) {
+        // Outside a value these are part of selectors (e.g. `h1`, `#id`).
         kind =
           depth === 0 || rest.slice(0, rest.search(/[;}]|$/)).includes('{')
             ? 'selector'

@@ -1,6 +1,12 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Chat-list privacy: blur message previews (and optionally names and
+ * avatars) in the conversation list, so a glance at the screen doesn't read
+ * your chats. Hover a row, or focus it with the keyboard, to reveal it.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_CHAT_LIST_PRIVACY } from '../addons/icons.std.ts';
 
