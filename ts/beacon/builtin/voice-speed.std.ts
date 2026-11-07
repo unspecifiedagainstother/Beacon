@@ -1,6 +1,12 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Voice-message speed: which speeds the 1×/1.5×/2× button cycles through,
+ * and the speed for chats where you haven't picked one (Signal remembers a
+ * speed per chat once you change it).
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { defineIcon } from '../core/icons.std.ts';
 import { beaconTweaks, DEFAULT_PLAYBACK_RATES } from '../core/tweaks.std.ts';

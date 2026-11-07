@@ -1,6 +1,12 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Inline markdown in the composer (ts/quill/markdown/). Only the on/off
+ * switch lives here; the conversion is a Quill module so it runs on every
+ * keystroke without going through the addon layer.
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { defineIcon } from '../core/icons.std.ts';
 import { InlineMarkdown } from '../../quill/markdown/index.std.ts';

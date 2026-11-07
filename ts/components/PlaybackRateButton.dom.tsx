@@ -82,6 +82,7 @@ export function PlaybackRateButton({
     0.5: i18n('icu:MessageAudio--playbackRatep5'),
   };
 
+  // Beacon: extra speeds have no translated label; show e.g. "1.25×".
   const label = playbackRate
     ? (playbackRateLabels[playbackRate]?.toString() ?? `${playbackRate}×`)
     : undefined;
@@ -108,5 +109,6 @@ export function PlaybackRateButton({
   );
 }
 
+// Beacon: the speeds are configurable (voice-message speed built-in).
 PlaybackRateButton.nextPlaybackRate = (currentRate: number): number =>
   nextPlaybackRate(currentRate);

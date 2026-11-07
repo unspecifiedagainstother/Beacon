@@ -224,6 +224,8 @@ export function moveToCaptchaStage({
 
     let result;
     try {
+      // Beacon: a short server rate limit ("retry after 5s") isn't a
+      // connection problem; wait it out and try again a few times.
       for (let attempt = 1; ; attempt += 1) {
         try {
           // oxlint-disable-next-line no-await-in-loop

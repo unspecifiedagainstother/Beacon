@@ -33,6 +33,7 @@ export type PropsType = {
   onOpenAppearance: () => void;
 };
 
+// Registry entries are booleans keyed by storage key; give each a glyph.
 const FEATURE_SYMBOLS: Partial<Record<BeaconFeatureKey, AxoSymbol.Name>> = {
   beaconBlurPII: 'blur',
 };
@@ -74,6 +75,7 @@ export function BeaconSettingsPage({
   onOpenAppearance,
 }: PropsType): JSX.Element {
   const [editorOpen, setEditorOpen] = useState(false);
+  // Bumped when the editor closes so the summary re-reads the saved CSS.
   const [cssVersion, setCssVersion] = useState(0);
   // oxlint-disable-next-line react-hooks/exhaustive-deps
   const customCss = useMemo(() => getCustomCSS(), [cssVersion]);

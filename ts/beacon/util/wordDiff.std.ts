@@ -1,6 +1,11 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Word-level diff for message edit history. Tokens are words plus the
+ * whitespace after them, so joining the parts reproduces each text exactly.
+ */
+
 export type DiffPart = Readonly<{
   type: 'same' | 'added' | 'removed';
   text: string;
@@ -29,12 +34,14 @@ export function diffWords(before: string, after: string): Array<DiffPart> {
   const a = tokenize(before);
   const b = tokenize(after);
   if (a.length * b.length > MAX_CELLS) {
+    // Too large for a table; show it as a full replacement.
     return merge([
       { type: 'removed', text: before },
       { type: 'added', text: after },
     ]).filter(p => p.text !== '');
   }
 
+  // Longest common subsequence table, filled from the end.
   const rows = a.length + 1;
   const cols = b.length + 1;
   const lcs = new Uint32Array(rows * cols);

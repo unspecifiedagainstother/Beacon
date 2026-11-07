@@ -1,6 +1,14 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Saving Beacon exports (message log, profile history, ...).
+ *
+ * With the encrypted-exports built-in on (the default) every export asks for
+ * a password and is written as a beacon-encrypted-export file; the Privacy
+ * tab can decrypt it again. Off, exports are plain JSON as before.
+ */
+
 import { addonSettings } from './settings.std.ts';
 import { askPassword } from './prompts.dom.ts';
 import { showNotification } from './ui.dom.ts';
@@ -23,8 +31,11 @@ function download(text: string, filename: string): void {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+/** Returns false when the user cancelled the password prompt. */
 export async function saveBeaconExport(options: {
+  /** Without extension, e.g. "beacon-message-log-2026-10-21". */
   basename: string;
+  /** Authenticated with the file; shown when decrypting. */
   label: string;
   data: unknown;
 }): Promise<boolean> {
@@ -57,6 +68,7 @@ export async function saveBeaconExport(options: {
   return true;
 }
 
+/** Pick an encrypted export, ask its password, save the plaintext JSON. */
 export async function decryptBeaconExportFile(): Promise<void> {
   const input = document.createElement('input');
   input.type = 'file';

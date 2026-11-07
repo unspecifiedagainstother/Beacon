@@ -1,6 +1,16 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Privacy Screen — cover the whole window with a blur on demand
+ * (Ctrl/⌘+Alt+H), when the window loses focus, or after a period of
+ * inactivity. Click, press a key or use the shortcut again to reveal.
+ *
+ * This is a shoulder-surfing guard, not a lock: the app keeps running and
+ * the content is still in memory. Signal Desktop has no passphrase lock yet
+ * (see todo.md).
+ */
+
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_PRIVACY_SCREEN } from './icons.std.ts';
 
@@ -100,6 +110,7 @@ export default {
       }
     });
 
+    // Any key reveals; capture phase so the key doesn't also reach the app.
     ctx.dom.on(
       document,
       'keydown',

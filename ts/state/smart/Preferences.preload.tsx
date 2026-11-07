@@ -427,6 +427,7 @@ export function SmartPreferences(): JSX.Element | null {
     useState<SystemTraySetting>();
   const [hasContentProtection, setContentProtection] = useState<boolean>();
   const [hasSpellCheck, setSpellCheck] = useState<boolean>();
+  // Beacon: main-process setting (window frame), not a registry feature.
   const [hasCustomTitlebar, setCustomTitlebarState] = useState<boolean>();
   const [appliedCustomTitlebar, setAppliedCustomTitlebar] = useState<boolean>();
   const [themeSetting, setThemeSetting] = useState<ThemeType>();
@@ -720,10 +721,14 @@ export function SmartPreferences(): JSX.Element | null {
       account.captureChange('linkPreviews');
     }
   );
+  // Beacon: every registered feature, read/written generically. Local to this
+  // install — not synced to other devices, since these describe the client
+  // rather than the account. Adding a feature needs no change here.
   const beaconSettings = useMemo(() => {
     const result = {} as BeaconSettingsType;
     for (const feature of BEACON_FEATURES) {
-      result[feature.key] = items[feature.key] ?? feature.defaultValue;
+      result[feature.key] =
+        (items[feature.key] as boolean | undefined) ?? feature.defaultValue;
     }
     return result;
   }, [items]);

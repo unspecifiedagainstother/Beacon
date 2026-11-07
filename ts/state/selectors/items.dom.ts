@@ -253,6 +253,8 @@ export const getTextFormattingEnabled = createSelector(
   (state: ItemsStateType): boolean => state.textFormatting ?? true
 );
 
+// Beacon: the ☰ drawer replaces the tab rail, so the rail stays collapsed.
+// state.beacon.version is an input so a change of that setting recomputes.
 export const getNavTabsCollapsed = createSelector(
   getItems,
   (state: StateType) => state.beacon.version,

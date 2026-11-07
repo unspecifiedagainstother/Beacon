@@ -13,6 +13,9 @@ import { createLogger } from '../logging/log.std.ts';
 
 const log = createLogger('Storage');
 
+// Beacon: nothing auto-downloads until you turn it on (Settings → Data
+// usage). Downloading on arrival reveals you are online and fetches content
+// you never chose to open.
 export const DEFAULT_AUTO_DOWNLOAD_ATTACHMENT = {
   photos: false,
   videos: false,

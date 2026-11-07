@@ -112,6 +112,7 @@ Quill.register(
     'modules/emojiCompletion': EmojiCompletion,
     'modules/mentionCompletion': MentionCompletion,
     'modules/commandCompletion': CommandCompletion,
+    // Beacon: live **markdown** → Signal formatting.
     'modules/inlineMarkdown': InlineMarkdown,
     'modules/formattingMenu': FormattingMenu,
     'modules/signalClipboard': SignalClipboard,
@@ -532,6 +533,7 @@ export function CompositionInput(props: Props): ReactElement {
       return false;
     }
 
+    // Beacon: a slash command runs instead of being sent as text.
     if (commandCompletionRef.current?.handleEnter()) {
       return false;
     }
@@ -860,7 +862,9 @@ export function CompositionInput(props: Props): ReactElement {
     }
   }, [sortedGroupMembers, memberIdList, previousMemberIdList]);
 
-  const onSelectCommand = useCallback((_commandId: string) => undefined, []);
+  const onSelectCommand = useCallback((_commandId: string) => {
+    // Command system handles execution and output via CommandCompletion.selectCommand
+  }, []);
 
   // Placing all of these callbacks inside of a ref since Quill is not able
   // to re-render. We want to make sure that all these callbacks are fresh

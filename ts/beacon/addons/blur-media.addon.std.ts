@@ -1,9 +1,17 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Blur Media — blur images, videos, stickers and link previews in chats
+ * until you hover them (or always, for screen sharing). Ctrl/⌘+Alt+B
+ * switches between the two. CSS only: nothing about the messages changes.
+ */
+
 import type { AddonManifest, Disposer } from '../core/types.dom.ts';
 import { ICON_BLUR_MEDIA } from './icons.std.ts';
 
+// .module-image is Signal's shared media tile: photos, video and GIF
+// thumbnails, and link-preview images all render through it.
 const MEDIA = ['.module-message .module-image', '.module-message video'];
 const STICKERS = ['.module-message .module-message__sticker-container'];
 const AVATARS = [
@@ -17,6 +25,8 @@ function buildCss(selectors: Array<string>, radius: number, reveal: string) {
     reveal === 'hover'
       ? selectors.map(s => `${s}:hover`).join(',\n')
       : undefined;
+  // No transition on the blur itself: animating from clear to blurred would
+  // flash the content on every render (see _beacon-theme.scss PII notes).
   return `
 ${list} {
   filter: blur(${radius}px);

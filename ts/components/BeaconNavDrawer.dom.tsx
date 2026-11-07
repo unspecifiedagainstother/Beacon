@@ -18,6 +18,13 @@ import {
   useAccountsExpanded,
 } from './BeaconAccounts.dom.tsx';
 
+/**
+ * Telegram-style navigation: the tab rail is gone and the ☰ button in each
+ * sidebar header opens this drawer instead. It slides in over the left side
+ * of the window with your profile on top, then the tabs and shortcuts.
+ */
+
+/** Set by NavTabs; the header ☰ button opens the drawer through it. */
 export const BeaconNavDrawerContext = createContext<(() => void) | null>(null);
 
 export type BeaconNavDrawerExtras = Readonly<{

@@ -46,6 +46,7 @@ export type FunContextSmartProps = Readonly<{
   showStickerPickerHint: boolean;
   onClearStickerPickerHint: () => unknown;
   onSelectSticker: (stickerSelection: FunStickerSelection) => void;
+  /** Beacon: uninstall a pack from the sticker picker. */
   onRemoveStickerPack?: (packId: string) => void;
 
   // GIFs

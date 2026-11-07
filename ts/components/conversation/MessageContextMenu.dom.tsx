@@ -32,6 +32,7 @@ type MessageContextMenuProps = Readonly<{
   onUnpinMessage: (() => void) | null;
   onMoreInfo: (() => void) | null;
   onSelect: (() => void) | null;
+  /** Beacon: identifies the message for message.menuItems. */
   beaconMessage?: { messageId: string; conversationId: string };
   children: ReactNode;
 }>;

@@ -87,6 +87,7 @@ export class SystemTrayService {
    * `setMainWindow`), the tray icon will not be shown, even if enabled.
    */
   setEnabled(enabled: boolean): void {
+    // Beacon: only the main account shows a tray icon; it covers them all.
     const isEnabled = enabled && isBeaconTrayAllowed();
     if (this.#isEnabled === isEnabled) {
       return;
@@ -128,10 +129,12 @@ export class SystemTrayService {
     return this.#tray !== undefined;
   }
 
+  /** Beacon: whether closing a window keeps the app running in the tray. */
   isEnabled(): boolean {
     return this.#isEnabled;
   }
 
+  /** Beacon: re-render after another account's window or unread changed. */
   refresh(): void {
     this.#render();
   }

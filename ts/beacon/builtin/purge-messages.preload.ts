@@ -1,6 +1,24 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
+/**
+ * Purge Messages — "Purge Messages" in a conversation's ⋯ menu deletes every
+ * message *you* sent there, for everyone, in one go.
+ *
+ * Signal only accepts delete-for-everyone within a time window (24 hours by
+ * default, set by the server; longer for group admins on their own groups),
+ * and recipients reject anything older. So a purge:
+ *  1. scans the conversation for your own messages,
+ *  2. queues deletes for all eligible ones at once, through the same path as
+ *     the normal "Delete for everyone" action, then waits until they have
+ *     all been sent and shows a "Purge completed" toast,
+ *  3. optionally deletes the older ones *for you* (they stay on other
+ *     people's devices — Signal cannot remove them).
+ *
+ * Nothing happens until you confirm a dialog showing both counts. Other
+ * people's messages are never touched.
+ */
+
 import type { AddonContext, AddonManifest } from '../core/types.dom.ts';
 import type { MessageAttributesType } from '../../model-types.d.ts';
 import { ICON_PURGE_MESSAGES } from '../addons/icons.std.ts';
@@ -30,6 +48,8 @@ async function scanOwnMessages(conversationId: string): Promise<ScanResult> {
     | { receivedAt: number; sentAt: number; messageId: string }
     | undefined;
 
+  // Page backwards from the newest message. Each page comes back oldest
+  // first, so the first element is the cursor for the next one.
   for (;;) {
     // oxlint-disable-next-line no-await-in-loop
     const page = await DataReader.getOlderMessagesByConversation({
@@ -180,6 +200,10 @@ function runPurge(ctx: AddonContext, conversationId: string): void {
         progress.append(bar, status);
         body.replaceChildren(progress);
 
+        // Phase 1 — queue. Each delete is its own Signal envelope (the
+        // protocol has no batch delete), sent by the conversation's job
+        // queue, which already retries on rate limits. So queue them all as
+        // fast as the local DB allows instead of pacing them by hand.
         const concurrency = ctx.settings.get<number>('concurrency');
         const queued: Array<string> = [];
         let failedToQueue = 0;
@@ -224,6 +248,9 @@ function runPurge(ctx: AddonContext, conversationId: string): void {
           });
         }
 
+        // Phase 2 — wait until every queued delete has actually gone out
+        // (or failed for good), then report. Runs on even if the dialog is
+        // closed; the toast still appears.
         type SendState = 'sent' | 'failed' | 'pending';
         const stateOf = (
           attrs: Pick<
@@ -239,6 +266,8 @@ function runPurge(ctx: AddonContext, conversationId: string): void {
             ? 'sent'
             : 'pending';
         };
+        // In-memory models are freshest; anything evicted from the cache is
+        // read back from the database.
         const settle = async (): Promise<Array<SendState>> => {
           const states = new Map<string, SendState>();
           const missing: Array<string> = [];
@@ -256,6 +285,7 @@ function runPurge(ctx: AddonContext, conversationId: string): void {
               states.set(attrs.id, stateOf(attrs));
             }
           }
+          // Gone from the DB entirely means it was removed: nothing to send.
           return queued.map(id => states.get(id) ?? 'sent');
         };
 

@@ -72,6 +72,7 @@ export const SmartStoryViewer = memo(function SmartStoryViewer() {
   const getPreferredBadge = useSelector(getPreferredBadgeSelector);
   const preferredReactionEmoji = useSelector(getPreferredReactionEmoji);
   const selectedStoryData = useSelector(getSelectedStoryData);
+  // Beacon: Hidden Signal features → download others' stories.
   const internalUser =
     useSelector(isInternalUser) || isHiddenFeatureOn('storyDownload');
 
