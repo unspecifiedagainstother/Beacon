@@ -88,7 +88,7 @@ ELECTRON="$BEACON_REPO/node_modules/.bin/electron"
 ELECTRON_ARGS=(.)
 if [ "$DEBUG" = 1 ]; then
   PORT="${BEACON_DEBUG_PORT:-9229}"
-  ELECTRON_ARGS=(--remote-debugging-port="$PORT" --remote-debugging-address=127.0.0.1 .)
+  ELECTRON_ARGS=(--remote-debugging-port="$PORT" --remote-debugging-address=127.0.0.1 --remote-allow-origins="http://127.0.0.1:$PORT" .)
   beacon_log "DevTools protocol on http://127.0.0.1:$PORT/json"
 fi
 if [ ${#EXTRA[@]} -gt 0 ]; then
