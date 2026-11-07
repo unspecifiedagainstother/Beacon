@@ -122,7 +122,6 @@ export function PreferencesInternal({
   setSfuUrl: (value: string | undefined) => void;
   forceKeyTransparencyCheck: () => Promise<void>;
   keyTransparencySelfHealth: StorageAccessType['keyTransparencySelfHealth'];
-  /** Beacon: only the calling and key-transparency rows (Beacon → Calling). */
   beaconCallingOnly?: boolean;
 }): JSX.Element {
   const [messageCountBySchemaVersion, setMessageCountBySchemaVersion] =

@@ -1,15 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Read All — mark every conversation read at once (/readall or
- * Ctrl/⌘+Alt+R).
- *
- * Uses each conversation's own markRead, so read syncs go to your linked
- * devices and read receipts follow your Privacy setting (and Ghost Mode, if
- * it is on). Archived chats are included only when the setting says so.
- */
-
 import type { AddonManifest } from '../core/types.dom.ts';
 import { ICON_READ_ALL } from '../addons/icons.std.ts';
 import { itemStorage } from '../../textsecure/Storage.preload.ts';
@@ -77,7 +68,6 @@ export default {
           return;
         }
 
-        // Sequential: markRead does DB work and queues jobs per conversation.
         for (const conversation of targets) {
           // oxlint-disable-next-line no-await-in-loop
           await conversation.markRead(

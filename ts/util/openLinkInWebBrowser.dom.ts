@@ -8,7 +8,6 @@ export function openLinkInWebBrowser(url: string): void {
   if (!isValidLink(url)) {
     return;
   }
-  // Beacon: link safety may take over (confirm, clean) and open it itself.
   const target = applyBeaconFilter('link.open', url, { source: 'app' });
   if (!target) {
     return;

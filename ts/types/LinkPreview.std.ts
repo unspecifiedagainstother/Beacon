@@ -109,12 +109,31 @@ const EXCLUDED_DOMAINS = [
   'test',
 ];
 
+// Matches private/loopback/link-local IPv4 and IPv6 addresses that must not
+// be fetched during link preview generation (SSRF prevention).
+const PRIVATE_IP_PATTERNS = [
+  /^127\./,
+  /^10\./,
+  /^192\.168\./,
+  /^172\.(1[6-9]|2\d|3[01])\./,
+  /^169\.254\./,
+  /^\[?::1\]?$/,
+  /^\[?fc[0-9a-f]{2}:/i,
+  /^\[?fd[0-9a-f]{2}:/i,
+  /^\[?fe80:/i,
+  /^0\.0\.0\.0$/,
+];
+
 function isDomainExcluded(url: URL): boolean {
+  const host = url.hostname.toLowerCase();
+
+  // Block private/loopback/link-local IP addresses
+  if (PRIVATE_IP_PATTERNS.some(p => p.test(host))) {
+    return true;
+  }
+
   for (const excludedDomain of EXCLUDED_DOMAINS) {
-    if (
-      url.hostname.endsWith(`.${excludedDomain}`) ||
-      url.hostname === excludedDomain
-    ) {
+    if (host.endsWith(`.${excludedDomain}`) || host === excludedDomain) {
       return true;
     }
   }

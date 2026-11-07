@@ -1,20 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Beacon Redux middleware — the spine of the addon platform.
- *
- * Installed once in createStore. Gives addons:
- *  - interception: rewrite or cancel any action before reducers run
- *  - onActionDispatched / onStateChanged firehose hooks
- *  - derived high-level hooks (message received/sent/changed/edited/
- *    deleted, conversation selected, theme changed) — real payloads straight
- *    from the actions the app itself dispatches, so there is nothing to poll
- *    and no DOM scraping.
- *
- * Everything is guarded: a broken addon can never stall the dispatch chain.
- */
-
 import type { Middleware, UnknownAction } from 'redux';
 import type { StateType } from '../../state/reducer.preload.ts';
 import type { ReadonlyMessageAttributesType } from '../../model-types.d.ts';
@@ -46,7 +32,6 @@ export function registerActionInterceptor(
   };
 }
 
-/** Called by the runtime once the bus exists. */
 export function attachHookBus(hookBus: HookBus): void {
   bus = hookBus;
 }
@@ -113,10 +98,6 @@ function emitDerivedHooks(
       const previous = lookupMessage(prevState, id);
       hookBus.emit('onMessageChanged', data, { id, conversationId, previous });
 
-      // onMessageEdited / onMessageDeletedForEveryone are emitted by the
-      // upstream handlers themselves (handleEditMessage, deleteForEveryone).
-      // Deriving them from MESSAGE_CHANGED misfired whenever an already
-      // edited message was first loaded into Redux.
       break;
     }
     case MESSAGE_DELETED: {
@@ -145,8 +126,6 @@ function emitDerivedHooks(
 }
 
 export const beaconMiddleware: Middleware = storeApi => next => rawAction => {
-  // Thunks and promises pass through untouched — they come back here as plain
-  // actions once they dispatch.
   if (!isPlainAction(rawAction)) {
     return next(rawAction);
   }
@@ -159,7 +138,6 @@ export const beaconMiddleware: Middleware = storeApi => next => rawAction => {
     }
     try {
       const result = entry.interceptor(action);
-      // null cancels; undefined (forgotten return) passes unchanged.
       // oxlint-disable-next-line eqeqeq -- must not match undefined
       if (result === null) {
         return action; // cancelled — reducers never see it

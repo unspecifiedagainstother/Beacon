@@ -1,14 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * File details: right-click a message with attachments → "File details"
- * shows, for every attachment (yours or someone else's), its name, type,
- * size, dimensions or duration, kind (voice note, GIF, …), upload time,
- * download state, hashes and where it lives on disk, plus who sent it and
- * when. Rows copy on click.
- */
-
 import type { AddonContext, AddonManifest } from '../core/types.dom.ts';
 import type { ReadonlyMessageAttributesType } from '../../model-types.d.ts';
 import type { AttachmentType } from '../../types/Attachment.std.ts';

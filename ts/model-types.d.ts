@@ -189,7 +189,6 @@ type MessageType =
 //   consider adding a database column as well and updating `MESSAGE_COLUMNS`
 //   in `ts/sql/Server.ts`
 export type MessageAttributesType = {
-  // Beacon: content retained by the message logger across a delete-for-everyone.
   beaconDeleted?: BeaconDeletedSnapshot;
   bodyAttachment?: AttachmentType;
   bodyRanges?: ReadonlyArray<RawBodyRange>;

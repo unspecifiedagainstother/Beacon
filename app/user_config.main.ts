@@ -36,7 +36,6 @@ if (userData !== undefined) {
   app.setPath('userData', userData);
 }
 
-// Beacon: extra accounts run as their own process with their own folder.
 const beaconAccountDir = resolveBeaconAccountDir(app.getPath('userData'));
 if (beaconAccountDir !== undefined) {
   mkdirSync(beaconAccountDir, { recursive: true });

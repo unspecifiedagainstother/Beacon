@@ -1,12 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * React hooks over window.Beacon (loader and settings), shared by the Beacon
- * settings pages. Reached through the window global so these stay
- * renderer-only modules; the loader lives in preload land.
- */
-
 import { useEffect, useState } from 'react';
 
 import type { AddonInfo, AddonSettingValue } from '../beacon/core/types.dom.ts';

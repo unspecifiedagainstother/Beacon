@@ -40,28 +40,14 @@ $color-gray-40: #808080;
 $color-gray-45: #848484;
 $color-gray-60: #5e5e5e;
 $color-gray-62: #545454;
-// Beacon: dark-theme surfaces, darkened from upstream for the flat theme.
-// Upstream values in comments. These six are ~90% background usage (verified by
-// counting `background:` vs `color:` call sites), so darkening them does not
-// affect text contrast — it increases it, since text on these is white/gray-05.
-//
-// gray-60 and gray-90 are deliberately NOT darkened: they are predominantly
-// *text* colors (75 and 55 `color:` uses respectively, mostly light theme).
-$color-gray-65: #2e2e2e; // upstream #4a4a4a
-$color-gray-75: #1f1f1f; // upstream #3b3b3b
-$color-gray-78: #1a1a1a; // upstream #343434
-$color-gray-80: #151515; // upstream #2e2e2e
-$color-gray-85: #101010; // upstream #262626
-$color-gray-90: #1b1b1b; // upstream — see note below
-$color-gray-95: #050505; // upstream #121212
+$color-gray-65: #2e2e2e;
+$color-gray-75: #1f1f1f;
+$color-gray-78: #1a1a1a;
+$color-gray-80: #151515;
+$color-gray-85: #101010;
+$color-gray-90: #1b1b1b;
+$color-gray-95: #050505;
 
-// Note on gray-90: left at the upstream value on purpose, which means it is now
-// *lighter* than gray-85 — the ramp is non-monotonic between those two.
-// Accepted because gray-85 has only 4 call sites and none sit adjacent to a
-// gray-90 surface. Fixing the ordering would require gray-90 ~= #0b0b0b, and
-// gray-90 is the light theme's body text color (43 `color:` uses), so that
-// would push light-theme text to near-black. Change it if you want the ramp
-// consistent and don't mind harsher light-theme text.
 $color-black: #000000;
 
 $color-white-alpha-06: rgba($color-white, 0.06);

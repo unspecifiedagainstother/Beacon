@@ -47,6 +47,7 @@ import {
 import type { ExistingAttachmentUploadData } from '../sql/Interface.std.ts';
 import { maybeRefreshRemoteConfig } from '../RemoteConfig.dom.ts';
 import { assertDev } from './assert.std.ts';
+import { applyBeaconFilter } from '../beacon/core/filters.std.ts';
 
 const CDNS_SUPPORTING_TUS = new Set([3]);
 const MAX_DURATION_TO_REUSE_ATTACHMENT_CDN_POINTER = 3 * DAY;
@@ -112,7 +113,13 @@ export async function uploadAttachment(
   } = attachment;
 
   let { fileName } = attachment;
-  if (isImageAttachment(attachment) || isVideoAttachment(attachment)) {
+  if (
+    (isImageAttachment(attachment) || isVideoAttachment(attachment)) &&
+    !applyBeaconFilter('attachment.keepFileName', false, {
+      clientUuid,
+      fileName,
+    })
+  ) {
     assertDev(
       fileName == null || fileName === '',
       'Filename should be stripped from visual attachments'

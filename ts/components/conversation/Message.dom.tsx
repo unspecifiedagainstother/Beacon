@@ -135,8 +135,6 @@ const EXPIRED_DELAY = 600;
 const GROUP_AVATAR_SIZE = AvatarSize.TWENTY_EIGHT;
 const STICKER_SIZE = 200;
 const GIF_SIZE = 300;
-// Beacon: how many earlier revisions of an edited message to show inline before
-// deferring the rest to the edit history modal.
 const MAX_INLINE_PAST_EDITS = 2;
 const SENT_STATUSES = new Set<MessageStatusType>([
   'delivered',
@@ -226,16 +224,12 @@ export type PropsData = {
   textDirection: TextDirection;
   textAttachment?: AttachmentForUIType;
   isEditedMessage?: boolean;
-  // Beacon: older revisions of an edited message, oldest -> newest. Rendered
-  // dimmed above the current body. Excludes the current revision.
   pastEdits?: ReadonlyArray<{
     timestamp: number;
     text?: string;
     bodyRanges?: HydratedBodyRangesType;
   }>;
-  // Beacon: incoming only — true if delivered via sealed sender.
   beaconSealedSender?: boolean;
-  // Beacon: content retained by the message logger after a delete-for-everyone.
   beaconDeleted?: {
     text?: string;
     bodyRanges?: HydratedBodyRangesType;
@@ -2414,14 +2408,6 @@ export class Message extends PureComponent<Props, State> {
     return null;
   }
 
-  /**
-   * Beacon: earlier revisions of an edited message, rendered dimmed above the
-   * current body so the edit is visible without opening the modal.
-   *
-   * Only the most recent few are shown inline — a heavily edited message would
-   * otherwise dominate the timeline. Anything older stays behind the existing
-   * edit history modal.
-   */
   public renderPastEdits(): JSX.Element | null {
     const { direction, i18n, id, pastEdits, showEditHistoryModal } = this.props;
 
@@ -2429,7 +2415,6 @@ export class Message extends PureComponent<Props, State> {
       return null;
     }
 
-    // pastEdits is oldest -> newest, so the most recent revisions are last.
     const inline = pastEdits.slice(-MAX_INLINE_PAST_EDITS);
     const hiddenCount = pastEdits.length - inline.length;
 
@@ -2475,12 +2460,6 @@ export class Message extends PureComponent<Props, State> {
     );
   }
 
-  /**
-   * Beacon: what a deleted message said, kept by the message logger. Shown
-   * under the "deleted" line; `.module-message__beacon-deleted` is hidden by
-   * default and revealed by the addon's body class, so disabling the logger
-   * hides retained content without a re-render.
-   */
   public renderBeaconDeleted(): JSX.Element | null {
     const { beaconDeleted, direction, i18n } = this.props;
     if (!beaconDeleted) {
@@ -2595,7 +2574,6 @@ export class Message extends PureComponent<Props, State> {
       >
         {messageStatusContents != null &&
           (deletedForEveryone && this.props.beaconDeleted ? (
-            // Beacon: hidden while the logger shows the kept content instead.
             <span className="module-message__beacon-deleted-notice">
               {messageStatusContents}
             </span>
@@ -3511,11 +3489,9 @@ export class Message extends PureComponent<Props, State> {
       deletedForEveryone
         ? 'module-message__container--deleted-for-everyone'
         : null,
-      // Beacon: the message logger kept this deleted message's content.
       deletedForEveryone && this.props.beaconDeleted
         ? 'module-message__container--beacon-deleted'
         : null,
-      // Beacon: sealed-sender indicator (styled by the privacy feature).
       this.props.beaconSealedSender === true
         ? 'module-message__container--beacon-sealed'
         : null,

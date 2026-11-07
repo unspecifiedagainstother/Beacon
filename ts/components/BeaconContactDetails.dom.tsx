@@ -10,12 +10,6 @@ import { AxoClickableItem } from '../axo/items/AxoClickableItem.dom.tsx';
 import type { AxoSymbol } from '../axo/AxoSymbol.dom.tsx';
 import { drop } from '../util/drop.std.ts';
 
-/**
- * "Details" section for the About-contact dialog (Hidden Signal features →
- * Profile details): everything Beacon knows locally about a contact.
- * Click a row to copy its value. Phone numbers keep the PII blur.
- */
-
 type Row = {
   symbol: AxoSymbol.Name;
   label: string;

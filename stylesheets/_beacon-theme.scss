@@ -1,73 +1,26 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-// Beacon theme tokens.
-//
-// Central place to define Beacon's own colors. Used by Beacon-authored styles
-// (search `var(--beacon-` to find them). Values here can be changed at runtime
-// via devtools, which makes iterating on the palette fast.
-//
-// -- IMPORTANT: this does NOT retheme upstream Signal styles. --
-//
-// Upstream colors live in _variables.scss as ~145 compile-time SCSS variables.
-// Rewriting those to `var(--beacon-*)` was tried and reverted, because the
-// variables are consumed by SCSS color math that cannot operate on `var()`:
-//
-//   * direct calls    - rgba($color-ultramarine, 8%)          _modules.scss
-//   * mixin arguments - color.adjust($background, ...)        _mixins.scss:1106
-//                       (caller passes $color-accent-green)
-//   * SCSS maps       - color.scale(map.get($value, 'end'))   Quote.scss:148
-//                       (map holds $color-ultramarine)
-//
-// The last two are the blockers: the variable is not named at the failure site,
-// so there is no grep that finds every case. Converting upstream colors means
-// auditing every mixin and map that touches them — a real project, not a
-// find-and-replace.
-//
-// To change an upstream color today, edit its literal in _variables.scss. That
-// file is still a single central location; it just isn't runtime-swappable.
-
 :root {
-  // -- Brand
-  // Beacon's identity color. Currently unused by upstream chrome (see above) —
-  // applies to Beacon-authored UI.
   --beacon-brand: #2c6bed;
 
-  // -- Message timeline
-  // Earlier revisions of an edited message (see .module-message__past-edits).
   --beacon-past-edit-opacity: 0.55;
   --beacon-past-edit-label-opacity: 0.8;
 
-  // Retained content from a deleted message (message-logger addon). Red to
-  // read as "this was withdrawn".
   --beacon-deleted-text: #f44336;
   --beacon-deleted-bubble: #b3261e;
   --beacon-deleted-on-bubble: #fff;
 
-  // -- Flat theme
-  // Elevation is drawn with a hairline border rather than a drop shadow.
-  // Consumed by the popper-shadow mixin (_mixins.scss), which Modal,
-  // GroupDialog, ShortcutGuide, CompositionInput and timeline popovers share.
-  //
-  // To restore upstream elevation, set:
-  //   --beacon-elevation-shadow: 0 8px 20px rgb(0 0 0 / 0.3),
-  //                              0 0 8px rgb(0 0 0 / 0.05);
-  //   --beacon-elevation-border: none;
   --beacon-elevation-shadow: none;
   --beacon-elevation-border: 1px solid #2f2f2f;
 
-  // -- Accent
-  // Overwritten at runtime from the default chat color (core/accent.std.ts).
   --beacon-accent: #2c6bed;
   --beacon-accent-pressed: #2459c6;
   --beacon-accent-tint: rgb(44 107 237 / 0.16);
   --beacon-accent-text: #6191f3;
 
-  // -- Window
-  // The main window chrome color: titlebar, Beacon dialogs.
   --beacon-window-bg: #1f1f1f;
 
-  // -- Code editor syntax colors (dark)
   --beacon-code-bg: #161616;
   --beacon-code-comment: #7d8590;
   --beacon-code-string: #a5d6a7;
@@ -81,22 +34,6 @@
   --beacon-code-punctuation: #8b8b8b;
 }
 
-// Beacon: PII blur in Settings.
-//
-// Applied as a container class on the Preferences root, so every matching
-// descendant is blurred by one rule — no per-element wiring, and new PII fields
-// added upstream are covered as long as they use these class names.
-//
-// Design rules, deliberate:
-//   * NO transition. A `transition: filter` animates clear -> blurred on mount,
-//     which renders the value legible for the duration of the animation. That
-//     is the exact leak this feature exists to prevent.
-//   * NO hover/focus reveal. When enabled, the value never becomes legible.
-//     Use the setting toggle to see it.
-//   * `user-select: none` so the text cannot be dragged out and read, and
-//     cannot be copied by accident during a screen share.
-// Beacon: warning banner at the top of Beacon settings, shown when a changed
-// setting only takes effect after an app restart.
 .Beacon__restart-banner {
   display: flex;
   flex-wrap: wrap;
@@ -107,7 +44,6 @@
   padding-block: 10px;
   padding-inline: 12px;
   border-radius: 8px;
-  // Amber rather than red — this is "action needed", not "something broke".
   background: var(--beacon-warning-bg, rgba(255, 214, 36, 0.12));
   border: 1px solid var(--beacon-warning-border, rgba(255, 214, 36, 0.45));
   color: var(--beacon-warning-text, #ffd624);
@@ -135,23 +71,12 @@
   flex-shrink: 0;
 }
 
-// Applied app-wide: the runtime toggles `Beacon--blur-pii` on <body> from the
-// setting, and PII values opt in with `Beacon-pii` (phone number, username,
-// device name in Settings; phone number in contact details). Mark the value
-// only, never its label.
 .Beacon--blur-pii .Beacon-pii {
   filter: blur(var(--beacon-pii-blur-radius, 6px));
   user-select: none;
-  // Blur is a visual guard only — the text stays in the accessibility tree so
-  // screen reader users can still hear their own number.
   pointer-events: none;
 }
 
-// Light theme keeps a visible edge too, but lighter — a #2f2f2f border on a
-// white modal would read as a heavy outline.
-//
-// Note: the theme class goes on <body>, not <html> (background.preload.ts:328),
-// so `:root:not(.dark-theme)` would always match. Target .light-theme directly.
 .light-theme {
   --beacon-elevation-border: 1px solid #d8d8d8;
   --beacon-window-bg: #f5f5f5;
@@ -168,19 +93,14 @@
   --beacon-code-punctuation: #6e7781;
 }
 
-// Beacon: settings pages centre their content with flex spacers that
-// collapse to nothing whenever an item's text is long (e.g. Account), so the
-// content ran edge to edge on some pages only. Guarantee a gutter.
 .Preferences .Preferences__settings-pane-spacer {
   flex: 1 0 24px;
 }
 
-// Beacon: selected nav entries use the accent instead of plain gray.
 .Preferences button[aria-current='page'] {
   background: var(--beacon-accent-tint);
 }
 
-// Beacon: blur whatever sits behind upstream dialogs too.
 .module-modal-host__overlay {
   backdrop-filter: blur(8px);
 }
@@ -188,20 +108,10 @@
 .dark-theme {
   --beacon-brand: #6191f3;
 
-  // Dimmed text needs more contrast on dark backgrounds to stay legible.
   --beacon-past-edit-opacity: 0.65;
 
   --beacon-deleted-text: #ff6b6b;
 }
-
-// ===========================================================================
-// Beacon UI kit
-//
-// Shared primitives for Beacon-authored UI: the Modules page, addon modals,
-// toasts, the message log. Built on the axo color tokens, which already
-// resolve per theme via light-dark(), so nothing here needs a .dark-theme
-// override.
-// ===========================================================================
 
 .BeaconButton {
   display: inline-flex;
@@ -363,14 +273,10 @@
   color: var(--axo-color-label-secondary);
 }
 
-// -- Modules page ------------------------------------------------------------
-
 .BeaconModules {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  // Layout responds to the settings pane width, not the window: the nav
-  // sidebar takes a varying share of it.
   container-type: inline-size;
   container-name: beacon-modules;
 }
@@ -400,11 +306,8 @@
 
 .BeaconModules__grid {
   display: grid;
-  // Two columns once each card gets 280px; one column below that.
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 12px;
-  // Cards in a row share a height so the grid reads as rows, not a ragged
-  // stack; the footer is pinned to the bottom of each card.
   align-items: stretch;
 }
 
@@ -450,8 +353,6 @@
     background: var(--beacon-accent-tint);
   }
 
-  // SVG icons from the manifest are drawn as a mask so they take the
-  // current color (see ts/beacon/core/icons.std.ts).
   &--svg::before {
     content: '';
     width: 20px;
@@ -613,7 +514,6 @@
     padding: 12px;
   }
 
-  // Label above the control instead of fighting for one row.
   .BeaconModules__setting:not(:has(button[role='switch'])) {
     flex-direction: column;
     align-items: stretch;
@@ -630,8 +530,6 @@
   align-self: flex-start;
   margin-top: 4px;
 }
-
-// -- Modals ------------------------------------------------------------------
 
 .BeaconModal {
   position: fixed;
@@ -777,8 +675,6 @@
   }
 }
 
-// -- Toasts ------------------------------------------------------------------
-
 .BeaconToastStack {
   position: fixed;
   inset-inline: 16px;
@@ -821,8 +717,6 @@
     transform: translateY(8px);
   }
 }
-
-// -- Lists (help, stats) -----------------------------------------------------
 
 .BeaconList {
   display: flex;
@@ -899,8 +793,6 @@
   font-size: 0.75rem;
   color: var(--axo-color-label-secondary);
 }
-
-// -- Message log viewer ------------------------------------------------------
 
 .BeaconLog {
   display: flex;
@@ -1015,10 +907,8 @@
   }
 }
 
-// -- Composer slash-command popup (ts/quill/command/completion.dom.tsx) --
-
 .BeaconCommands {
-  z-index: 101; // above the composer's own popups
+  z-index: 101;
   display: flex;
   flex-direction: column;
   inline-size: min(420px, calc(100vw - 32px));
@@ -1196,18 +1086,11 @@
   }
 }
 
-// -- Message logger: retained content of deleted messages ------------------
-//
-// Hidden unless the message-logger addon is running (it adds the body
-// class), so disabling the addon hides retained text without a re-render.
-
 .module-message__beacon-deleted {
   display: none;
 }
 
 .Beacon--logger-show-deleted {
-  // The kept text reads as the message itself — no "X deleted this message"
-  // line, no separator — and the bubble turns red to say it was withdrawn.
   .module-message__beacon-deleted-notice {
     display: none;
   }
@@ -1230,7 +1113,6 @@
       color: var(--beacon-deleted-on-bubble) !important;
     }
 
-    // Trash glyph in the metadata row, after the time/timer.
     .module-message__metadata::after {
       content: '';
       width: 14px;
@@ -1266,8 +1148,6 @@
   opacity: var(--beacon-past-edit-opacity);
 }
 
-// -- Ghost mode badge --------------------------------------------------------
-
 .Beacon--ghost .CompositionArea {
   position: relative;
 
@@ -1290,8 +1170,6 @@
   }
 }
 
-// -- Narrow modal content ------------------------------------------------------
-
 @container (max-width: 420px) {
   .BeaconList__row {
     flex-wrap: wrap;
@@ -1302,12 +1180,6 @@
     flex-basis: 100%;
   }
 }
-
-// -- Code editor (custom CSS) -------------------------------------------------
-//
-// A <pre> highlight layer under a transparent <textarea>. Both layers must use
-// identical font metrics, padding and wrapping or the caret drifts from the
-// coloured text.
 
 .BeaconCode {
   display: flex;
@@ -1366,7 +1238,6 @@
 .BeaconCode__highlight {
   color: var(--beacon-code-value);
   pointer-events: none;
-  // Scroll position is mirrored from the textarea; its own bars stay hidden.
   scrollbar-width: none;
 }
 
@@ -1455,8 +1326,6 @@
   }
 }
 
-// -- Profile history viewer ---------------------------------------------------
-
 .BeaconProfileLog__thumb {
   display: inline-grid;
   flex-shrink: 0;
@@ -1505,9 +1374,6 @@
   color: var(--axo-color-label-primary);
 }
 
-// -- Addon UI slots (ts/beacon/core/slots.dom.ts) ----------------------------
-
-// Empty slots must not take space — the header row uses `gap`.
 .BeaconSlot:empty,
 .BeaconSlot__item:empty {
   display: none;
@@ -1518,10 +1384,6 @@
   align-items: center;
   gap: 8px;
 }
-
-// ---------------------------------------------------------------------------
-// Prompts (ts/beacon/core/prompts.dom.ts)
-// ---------------------------------------------------------------------------
 
 .BeaconChoice {
   display: flex;
@@ -1585,10 +1447,6 @@
   }
 }
 
-// ---------------------------------------------------------------------------
-// Link safety
-// ---------------------------------------------------------------------------
-
 .BeaconLink {
   display: flex;
   flex-direction: column;
@@ -1634,10 +1492,6 @@
   }
 }
 
-// ---------------------------------------------------------------------------
-// Unverified badge (conversation header)
-// ---------------------------------------------------------------------------
-
 .BeaconUnverifiedBadge {
   margin-inline-end: 8px;
   padding-block: 2px;
@@ -1655,10 +1509,6 @@
     background: rgb(227 160 8 / 0.12);
   }
 }
-
-// ---------------------------------------------------------------------------
-// Privacy tab
-// ---------------------------------------------------------------------------
 
 .BeaconPrivacy {
   &__checks {
@@ -1737,7 +1587,6 @@
   }
 }
 
-// Addon setting fields rendered as Axo items (BeaconSettingItems.dom.tsx)
 .BeaconSettingItems {
   &__text,
   &__textarea {
@@ -1750,20 +1599,14 @@
   }
 }
 
-// ---------------------------------------------------------------------------
-// App lock screen (ts/beacon/core/lock.dom.ts)
-// ---------------------------------------------------------------------------
-
 .BeaconLock {
   position: fixed;
   inset: 0;
-  // One below the custom titlebar, which stays usable while locked.
   z-index: 2147483646;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
-  // Solid, not blurred: a blur can still leak shapes of text and photos.
   background: var(--beacon-window-bg, #1f1f1f);
   -webkit-app-region: drag;
 
@@ -1852,10 +1695,6 @@
   }
 }
 
-// ---------------------------------------------------------------------------
-// Composer character counter
-// ---------------------------------------------------------------------------
-
 .module-composition-input__input {
   position: relative;
 }
@@ -1874,17 +1713,12 @@
   }
 }
 
-// Chat-list "Alice is typing"
 .module-conversation-list__item--contact-or-conversation__content__message__text__beacon-typing {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-style: italic;
 }
-
-// ---------------------------------------------------------------------------
-// Bookmarks
-// ---------------------------------------------------------------------------
 
 .BeaconBookmarks {
   display: flex;
@@ -1947,12 +1781,6 @@
   }
 }
 
-// ---------------------------------------------------------------------------
-// Custom titlebar stays on top: dialogs, overlays and the lock screen start
-// below it, so they never cover or blur it. BeaconTitlebar.dom.tsx sets the
-// body class while it is mounted.
-// ---------------------------------------------------------------------------
-
 body.beacon-has-titlebar {
   --beacon-titlebar-height: 32px;
 
@@ -1974,19 +1802,11 @@ body.beacon-has-titlebar {
     height: calc(100vh - var(--beacon-titlebar-height));
   }
 
-  // The real titlebar stays usable, so the lock's own buttons aren't needed.
   .BeaconLock__controls {
     display: none;
   }
 }
 
-// ---------------------------------------------------------------------------
-// Setup screens (install + standalone registration). Both use Signal's own
-// registration frame and Axo components; only the backdrop and the brand
-// mark are Beacon's.
-// ---------------------------------------------------------------------------
-
-// Signal's light illustrated backdrop → the window colour.
 .BeaconSetup.BeaconSetup {
   background: var(--beacon-window-bg, #1f1f1f);
 }
@@ -1994,11 +1814,10 @@ body.beacon-has-titlebar {
 .BeaconSetup__account-back {
   position: absolute;
   z-index: 1;
-  inset-block-start: 27px; // centred on the Link / New account tabs
+  inset-block-start: 27px;
   inset-inline-start: 20px;
 }
 
-// QR codes need a white quiet zone to scan.
 .BeaconSetup .module-InstallScreenQrCodeNotScannedStep__qr-code {
   margin: 0;
   padding: 12px;
@@ -2006,8 +1825,6 @@ body.beacon-has-titlebar {
   background: #fff;
 }
 
-// Squarer corners than Signal's pill/blob shapes: buttons, the segmented
-// control, inputs and callouts at 6px, the card at 10px.
 .BeaconSetup {
   :is(
     button,
@@ -2026,38 +1843,25 @@ body.beacon-has-titlebar {
   }
 }
 
-// The registration card's inner scroller shows bare arrows in its corners.
 .BeaconSetup__card ::-webkit-scrollbar-button {
   display: none;
 }
 
-// Composer: same corner radius as the chat-list search box (8px) instead of
-// Signal's pill shape.
 body .module-composition-input__input {
   border-radius: 8px;
 }
 
-// ---------------------------------------------------------------------------
-// Messages and replies: squarer bubbles, quotes without the side stripe.
-// Media corners follow CurveType in conversation/Image.dom.tsx.
-// ---------------------------------------------------------------------------
-
-// Base radius only — Signal's 4px corners between grouped messages
-// (more specific selectors) still apply.
 body .module-message__container {
   border-radius: 10px;
 }
 
 body .module-quote {
   border-radius: 6px;
-  // A tint of the bubble's own text colour works on every bubble colour;
-  // beats Signal's per-chat-colour quote backgrounds.
   background-color: color-mix(
     in srgb,
     currentcolor 12%,
     transparent
   ) !important;
-  // Signal paints quotes with a per-colour gradient on top.
   background-image: none !important;
 
   &__container {
@@ -2073,7 +1877,6 @@ body .module-quote {
     border-width: 0;
   }
 
-  // Room for the thumbnail / icon only when there is one.
   &:has(.module-quote__icon-container) .module-quote__primary {
     min-height: 54px;
   }
@@ -2093,24 +1896,15 @@ body .module-quote__reference-warning {
   border-end-end-radius: 6px;
 }
 
-// Quieter time / status line.
 body .module-message__metadata__date {
   font-size: 0.6875rem;
   opacity: 0.8;
 }
 
-// Contact details (BeaconContactDetails.dom.tsx): IDs wrap instead of
-// stretching the dialog.
 .BeaconContactDetails__value {
   overflow-wrap: anywhere;
   user-select: text;
 }
-
-// ---------------------------------------------------------------------------
-// Sticker picker, Discord-style: search on top, pack icons in a vertical
-// sidebar on the left, stickers on the right; remove button on pack headers.
-// (FunPanelStickers.dom.tsx adds FunPanel--stickers.)
-// ---------------------------------------------------------------------------
 
 .FunPanel.FunPanel--stickers {
   width: 400px;
@@ -2184,7 +1978,6 @@ body .module-message__metadata__date {
   mask: url('../images/icons/v3/trash/trash.svg') center / 16px no-repeat;
 }
 
-// Inline "Remove pack?" confirmation in sticker pack headers.
 .FunGrid__BeaconRemoveConfirm {
   display: inline-flex;
   align-items: center;
@@ -2214,13 +2007,6 @@ body .module-message__metadata__date {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Consistent look (built-in "Look"): squarer corners across the app.
-// Signal's Axo radii all derive from these variables; pill buttons and
-// segmented controls get a small fixed radius. Avatars/icon buttons stay
-// round.
-// ---------------------------------------------------------------------------
-
 body.beacon-square {
   --radius-lg: 6px;
   --radius-xl: 8px;
@@ -2243,9 +2029,6 @@ body.beacon-square {
   }
 }
 
-// Staged attachments with several files (Beacon allows any mix): Signal's
-// rail always showed a scrollbar and file tiles were block-level, so a
-// second file wrapped onto a hidden line. One scrollable row instead.
 body .module-attachments__rail {
   display: flex;
   align-items: flex-start;
@@ -2267,11 +2050,8 @@ body .module-staged-generic-attachment {
   border-radius: 8px;
 }
 
-// Name + size above audio files that aren't voice notes (MessageAudio).
 .module-message__audio-attachment__beacon-filename {
   display: flex;
-  // The player's own box can measure 0px wide (its parts overflow it),
-  // so size this line by its content, capped.
   align-self: flex-start;
   width: max-content;
   max-width: 240px;
@@ -2280,7 +2060,6 @@ body .module-staged-generic-attachment {
   min-width: 0;
   margin-block-end: 6px;
   font-size: 0.8125rem;
-  // The player zeroes line-height; the clipped name would be 0px tall.
   line-height: 1.35;
 
   &__name {
@@ -2299,7 +2078,6 @@ body .module-staged-generic-attachment {
   }
 }
 
-// File details dialog (builtin/file-details.preload.ts).
 .BeaconFileDetails {
   display: flex;
   flex-direction: column;
@@ -2337,7 +2115,6 @@ body .module-staged-generic-attachment {
   }
 }
 
-// Edit history: word-level changes (EditHistoryMessagesModal.dom.tsx).
 .EditHistoryMessagesModal__beacon-title-row {
   display: flex;
   align-items: center;
@@ -2387,7 +2164,6 @@ body .module-staged-generic-attachment {
   }
 }
 
-// Collapsible "Pinned" header in the chat list.
 .module-conversation-list__item--header--beacon-toggle {
   width: 100%;
   border: 0;
@@ -2402,7 +2178,6 @@ body .module-staged-generic-attachment {
   }
 }
 
-// Proxy controls on the Privacy tab.
 .BeaconPrivacy__proxy {
   display: flex;
   flex-direction: column;
@@ -2429,13 +2204,9 @@ body .module-staged-generic-attachment {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Navigation drawer (Telegram style): ☰ in the sidebar header opens it.
-// ---------------------------------------------------------------------------
-
 .BeaconNavDrawer {
   position: absolute;
-  z-index: 210; // over the toast/megaphone layer (200), under modals
+  z-index: 210;
   inset: 0;
   pointer-events: none;
 
@@ -2591,17 +2362,14 @@ body .module-staged-generic-attachment {
   }
 }
 
-// Breathing room between the custom titlebar and the sidebar header.
 body.beacon-has-titlebar .NavSidebar__Header {
   padding-block-start: 8px;
 }
 
-// The sidebar shares the titlebar's color so they read as one surface.
 .NavSidebar.NavSidebar {
   background-color: var(--beacon-window-bg);
 }
 
-// Account switcher in the menu drawer.
 .BeaconNavDrawer__profile-row {
   display: flex;
   align-items: stretch;
@@ -2707,7 +2475,6 @@ body.beacon-has-titlebar .NavSidebar__Header {
   }
 }
 
-// Registration captcha: solve in the system browser and paste the link.
 .BeaconBrowserCaptcha {
   display: flex;
   flex-direction: column;
@@ -2743,4 +2510,12 @@ body.beacon-has-titlebar .NavSidebar__Header {
     font-size: 0.8125rem;
     color: var(--axo-color-label-destructive);
   }
+}
+
+.BeaconStagedAttachment {
+  display: contents;
+}
+
+body.beacon-rename-files .module-staged-generic-attachment {
+  cursor: pointer;
 }

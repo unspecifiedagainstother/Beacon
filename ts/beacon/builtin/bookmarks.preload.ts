@@ -1,16 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Bookmarks and saved messages, from a message's right-click menu.
- *
- *  - Bookmark: remembers the message (with an optional note and a snapshot
- *    of its text) in Signal's encrypted database. Mod+Alt+K or /bookmarks
- *    lists them, searchable, with Jump.
- *  - Save to Note to Self: sends a copy (text and downloaded attachments)
- *    to your Note to Self chat in one click.
- */
-
 import type { AddonContext, AddonManifest } from '../core/types.dom.ts';
 import { defineIcon } from '../core/icons.std.ts';
 import { askText } from '../core/prompts.dom.ts';

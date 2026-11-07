@@ -84,9 +84,6 @@ function openStandalone(
   OpenStandaloneActionType
 > {
   return async (dispatch, getState) => {
-    // Beacon: registering this computer as a primary device is allowed in
-    // every build (Signal limits it to development builds).
-
     cancelInstall()(dispatch, getState, undefined);
 
     window.IPC.addSetupMenuItems();

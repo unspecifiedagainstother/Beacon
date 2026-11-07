@@ -1,20 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Passphrase encryption of the database key.
- *
- * Signal encrypts its SQLite database with a random key and keeps that key
- * in config.json, protected by the OS keychain (safeStorage). Anyone who
- * can use your user account can therefore open the database. With this
- * turned on, Beacon instead stores the key wrapped with your passphrase
- * (scrypt → AES-256-GCM) and removes the keychain copy; at startup a small
- * window asks for the passphrase before the database is opened.
- *
- * There is no recovery: forgetting the passphrase means the local data is
- * gone (re-link the device to start over).
- */
-
 import { BrowserWindow, app, safeStorage } from 'electron';
 import {
   createCipheriv,
@@ -36,7 +22,6 @@ const scrypt = promisify(scryptCallback) as (
 ) => Promise<Buffer<ArrayBuffer>>;
 
 const CONFIG_KEY = 'beaconWrappedKey';
-// ~64 MiB, ~0.3 s on a laptop: slow enough to make guessing expensive.
 const SCRYPT = { N: 2 ** 16, r: 8, p: 1, maxmem: 160 * 1024 * 1024 };
 
 type WrappedKey = {
@@ -63,8 +48,6 @@ function readWrapped(): WrappedKey | undefined {
   }
 }
 
-// The key the database was opened with this session, so it can be wrapped
-// (or re-stored) later without asking the keychain again.
 let unlockedKey: string | undefined;
 let unlockedWithPassphrase = false;
 
@@ -120,7 +103,6 @@ async function wrap(sqlKey: string, passphrase: string): Promise<WrappedKey> {
   };
 }
 
-/** Throws on a wrong passphrase. */
 async function unwrap(
   wrapped: WrappedKey,
   passphrase: string
@@ -142,11 +124,6 @@ async function unwrap(
   ]).toString('utf8');
 }
 
-/**
- * Turn passphrase protection on. `currentKey` is the key Signal is using
- * right now. The keychain/plaintext copies are removed
- * only after the wrapped copy has been verified.
- */
 export async function enableDatabasePassphrase(
   passphrase: string
 ): Promise<void> {
@@ -166,7 +143,6 @@ export async function enableDatabasePassphrase(
   userConfig.set('key', undefined);
 }
 
-/** Change the passphrase. Returns false when `current` is wrong. */
 export async function changeDatabasePassphrase(
   current: string,
   next: string
@@ -188,11 +164,6 @@ export async function changeDatabasePassphrase(
   return true;
 }
 
-/**
- * Turn protection off: the key goes back into the OS keychain (or plain
- * config where no keychain exists, as Signal does). False on a wrong
- * passphrase.
- */
 export async function disableDatabasePassphrase(
   passphrase: string
 ): Promise<boolean> {
@@ -218,10 +189,6 @@ export async function disableDatabasePassphrase(
   return true;
 }
 
-// ---------------------------------------------------------------------------
-// Startup prompt
-// ---------------------------------------------------------------------------
-
 const PROMPT_HTML = `<!doctype html><html><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
 <title>Unlock Beacon</title><style>
@@ -246,11 +213,6 @@ f.addEventListener('submit',e=>{e.preventDefault();if(!pw.value)return;go.disabl
 const b=btoa(unescape(encodeURIComponent(pw.value)));pw.value='';document.title='BEACON_SUBMIT:'+b;});
 </script></body></html>`;
 
-/**
- * If protection is on, ask for the passphrase and return the database key.
- * Returns undefined when protection is off (use Signal's normal key).
- * Quits the app if the window is closed.
- */
 export async function promptForDatabaseKey(
   log: LoggerType
 ): Promise<string | undefined> {
@@ -302,7 +264,6 @@ export async function promptForDatabaseKey(
           } catch {
             failures += 1;
             log.warn('beacon dbcrypt: wrong passphrase');
-            // Back-off after repeated failures.
             const delay = failures >= 5 ? Math.min(30, 2 ** (failures - 4)) : 0;
             await new Promise(r => setTimeout(r, delay * 1000));
             if (!win.isDestroyed()) {
@@ -326,7 +287,6 @@ export async function promptForDatabaseKey(
         app.exit(0);
       }
     });
-    // A data: URL arrives empty here, so write the page into about:blank.
     drop(
       (async () => {
         await win.loadURL('about:blank');

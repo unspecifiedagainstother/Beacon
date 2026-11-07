@@ -16,7 +16,12 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'none';
             child-src 'self';
-            connect-src 'self' https: wss: attachment: bundles:;
+            connect-src 'self'
+              https://*.signal.org wss://*.signal.org
+              https://*.staging.signal.org wss://*.staging.signal.org
+              https://signalcaptchas.org
+              https://updates2.signal.org
+              attachment: bundles:;
             font-src 'self' asset:;
             form-action 'self';
             frame-src 'none';

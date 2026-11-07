@@ -1,18 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * Vencord-style runtime function patcher.
- *
- * Lets an addon wrap any method on any live object: run code before it (and
- * rewrite the arguments), after it (and rewrite the return value), or replace
- * it entirely while keeping a handle to the original.
- *
- * Multiple patches on the same method stack; disposing one splices it out
- * without disturbing the others. Each addon gets its own Patcher instance so
- * disabling the addon can unpatch everything it touched.
- */
-
 /* oxlint-disable no-param-reassign -- patching mutates the target by design */
 
 import { createLogger } from '../../logging/log.std.ts';
@@ -36,8 +24,6 @@ type PatchEntry = {
   proxy: AnyFn;
 };
 
-// Shared across all Patcher instances so two addons patching the same method
-// stack on one proxy instead of wrapping each other's wrappers.
 const patchedMethods = new WeakMap<object, Map<string, PatchEntry>>();
 
 function getOrCreateEntry(obj: object, method: string): PatchEntry {
@@ -68,8 +54,6 @@ function getOrCreateEntry(obj: object, method: string): PatchEntry {
   entry.proxy = function patchedProxy(this: unknown, ...args: Array<unknown>) {
     let callArgs = args;
 
-    // before/after callbacks are guarded: a broken addon must not break the
-    // patched upstream method. `instead` is not — it owns the call.
     for (const before of Array.from(entry.befores)) {
       try {
         const replaced = before(callArgs);
@@ -84,7 +68,6 @@ function getOrCreateEntry(obj: object, method: string): PatchEntry {
     const boundOriginal = entry.original.bind(this);
     let result: unknown;
     if (entry.insteads.length > 0) {
-      // Chain insteads: each receives "call the rest" as its original.
       const chain = entry.insteads.reduceRight<AnyFn>(
         (nextFn, instead) =>
           (...a: Array<unknown>) =>
@@ -121,7 +104,6 @@ function maybeRestore(obj: object, method: string, entry: PatchEntry): void {
     entry.insteads.length === 0 &&
     entry.afters.length === 0
   ) {
-    // Only restore if nobody re-patched over our proxy in the meantime.
     if ((obj as Record<string, unknown>)[method] === entry.proxy) {
       (obj as Record<string, unknown>)[method] = entry.original;
     }

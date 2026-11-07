@@ -276,7 +276,6 @@ export function NavTabs({
             i18n={i18n}
             navTabsCollapsed={navTabsCollapsed}
             onToggleNavTabsCollapse={onToggleNavTabsCollapse}
-            // These are all shown elsewhere when nav tabs are shown
             hasFailedStorySends={false}
             hasPendingUpdate={false}
             otherTabsUnreadCount={0}

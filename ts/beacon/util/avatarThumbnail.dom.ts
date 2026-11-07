@@ -1,12 +1,6 @@
 // Copyright 2026 Beacon
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/**
- * A small square JPEG (data: URL) of a profile photo, for showing an
- * account's picture in other accounts' menus. Other processes can't read
- * this account's attachment files, so the picture travels as data.
- */
-
 const SIZE = 64;
 const cache = new Map<string, Promise<string | undefined>>();
 

@@ -182,7 +182,6 @@ const IPC: IPCType = {
     ipc.send('title-bar-double-click');
   },
 
-  // Beacon: generic bridge to app/beacon.main.ts.
   beaconInvoke: (name: string, payload?: unknown): Promise<unknown> => {
     return ipc.invoke('beacon:invoke', name, payload);
   },
@@ -194,7 +193,6 @@ const IPC: IPCType = {
     };
   },
 
-  // Beacon: custom titlebar window controls.
   beaconWindowMinimize: () => {
     ipc.send('beacon:window:minimize');
   },
