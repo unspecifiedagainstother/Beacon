@@ -90,7 +90,8 @@ beacon_run() {
 beacon_ensure_deps() {
   local stamp=node_modules/.modules.yaml
   local reason=""
-  if [ ! -x node_modules/.bin/electron ] || [ ! -x node_modules/.bin/rolldown ]; then
+  if [ ! -x node_modules/.bin/electron ] || [ ! -x node_modules/.bin/rolldown ] ||
+    [ ! -s "$stamp" ]; then
     reason="dependencies missing"
   elif [ pnpm-lock.yaml -nt "$stamp" ] || [ package.json -nt "$stamp" ] ||
     [ pnpm-workspace.yaml -nt "$stamp" ]; then
@@ -99,8 +100,20 @@ beacon_ensure_deps() {
   if [ -n "$reason" ]; then
     beacon_log "$reason, installing from the lockfile..."
     # --frozen-lockfile: never re-resolve or rewrite pnpm-lock.yaml.
-    pnpm install --frozen-lockfile --config.confirm-modules-purge=false
-    touch "$stamp"
+    #
+    # A tree left by a host pnpm (pnpm 10, old .modules.yaml) makes pnpm 11
+    # "recreate" node_modules and then fail with LOCKFILE_CONFIG_MISMATCH,
+    # stranding a half-wiped tree that later looks up to date. node_modules is
+    # derived, so wipe it and install once more from scratch.
+    if ! pnpm install --frozen-lockfile --config.confirm-modules-purge=false; then
+      beacon_log "install failed, wiping node_modules and retrying once..."
+      rm -rf node_modules
+      pnpm install --frozen-lockfile --config.confirm-modules-purge=false ||
+        beacon_die "pnpm install failed — see output above"
+    fi
+    # Only refresh the stamp; touching a missing one would create an empty
+    # .modules.yaml that pnpm then treats as an up-to-date install.
+    [ -s "$stamp" ] && touch "$stamp"
   fi
   # An install from a different environment (e.g. a host pnpm) can leave the
   # native bindings for the wrong platform/libc. Load them to be sure.
